@@ -1,6 +1,7 @@
 import React, {FunctionComponent} from 'react'
 import HandlerInput from 'src/kapacitor/components/HandlerInput'
 import HandlerEmpty from 'src/kapacitor/components/HandlerEmpty'
+import HandlerActions from './HandlerActions'
 
 interface Props {
   selectedHandler: {
@@ -8,6 +9,7 @@ interface Props {
   }
   handleModifyHandler: () => void
   onGoToConfig: () => void
+  onTest: (handler: Record<string, unknown>) => void
   validationError: string
 }
 
@@ -15,24 +17,20 @@ const Pagerduty2Handler: FunctionComponent<Props> = ({
   selectedHandler,
   handleModifyHandler,
   onGoToConfig,
+  onTest,
   validationError,
 }) => {
   if (selectedHandler.enabled) {
-    let goToConfigText
-    if (validationError) {
-      goToConfigText = 'Exit this Rule and Edit Configuration'
-    } else {
-      goToConfigText = 'Save this Rule and Edit Configuration'
-    }
     return (
       <div className="endpoint-tab-contents">
         <div className="endpoint-tab--parameters">
           <h4 className="u-flex u-jc-space-between">
             Parameters from Kapacitor Configuration
-            <div className="btn btn-default btn-sm" onClick={onGoToConfig}>
-              <span className="icon cog-thick" />
-              {goToConfigText}
-            </div>
+            <HandlerActions
+              onGoToConfig={onGoToConfig}
+              onTest={() => onTest(selectedHandler)}
+              validationError={validationError}
+            />
           </h4>
           <HandlerInput
             selectedHandler={selectedHandler}

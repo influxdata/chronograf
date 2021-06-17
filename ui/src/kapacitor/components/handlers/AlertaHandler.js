@@ -2,11 +2,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import HandlerInput from 'src/kapacitor/components/HandlerInput'
 import HandlerEmpty from 'src/kapacitor/components/HandlerEmpty'
+import HandlerActions from './HandlerActions'
 
 const AlertaHandler = ({
   selectedHandler,
   handleModifyHandler,
   onGoToConfig,
+  onTest,
   validationError,
 }) =>
   selectedHandler.enabled ? (
@@ -14,12 +16,11 @@ const AlertaHandler = ({
       <div className="endpoint-tab--parameters">
         <h4 className="u-flex u-jc-space-between">
           Parameters from Kapacitor Configuration
-          <div className="btn btn-default btn-sm" onClick={onGoToConfig}>
-            <span className="icon cog-thick" />
-            {validationError
-              ? 'Exit this Rule and Edit Configuration'
-              : 'Save this Rule and Edit Configuration'}
-          </div>
+          <HandlerActions
+            onGoToConfig={onGoToConfig}
+            onTest={() => onTest(selectedHandler)}
+            validationError={validationError}
+          />
         </h4>
         <div className="faux-form">
           <HandlerInput

@@ -2,10 +2,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import HandlerInput from 'src/kapacitor/components/HandlerInput'
 import HandlerEmpty from 'src/kapacitor/components/HandlerEmpty'
+import HandlerActions from './HandlerActions'
+
 const ZenossHandler = ({
   selectedHandler,
   handleModifyHandler,
   onGoToConfig,
+  onTest,
   validationError,
 }) =>
   selectedHandler.enabled ? (
@@ -13,12 +16,16 @@ const ZenossHandler = ({
       <div className="endpoint-tab--parameters">
         <h4 className="u-flex u-jc-space-between">
           Parameters from Kapacitor Configuration
-          <div className="btn btn-default btn-sm" onClick={onGoToConfig}>
-            <span className="icon cog-thick" />
-            {validationError
-              ? 'Exit this Rule and Edit Configuration'
-              : 'Save this Rule and Edit Configuration'}
-          </div>
+          <HandlerActions
+            onGoToConfig={onGoToConfig}
+            onTest={() =>
+              onTest(selectedHandler, {
+                evclass: 'eventclass',
+                evclasskey: 'eventclasskey',
+              })
+            }
+            validationError={validationError}
+          />
         </h4>
         <div className="faux-form">
           <HandlerInput

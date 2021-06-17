@@ -27,6 +27,9 @@ interface Props {
   ruleActions: RuleActions
   handlersFromConfig: Handler[]
   onGoToConfig: (configName: string) => void
+  onTestHandler: (
+    configName: string
+  ) => (handler: Record<string, unknown>) => void
   validationError: string
 }
 
@@ -85,6 +88,7 @@ class RuleHandlers extends PureComponent<Props, State> {
       rule,
       ruleActions,
       onGoToConfig,
+      onTestHandler,
       validationError,
       handlersFromConfig,
     } = this.props
@@ -152,6 +156,7 @@ class RuleHandlers extends PureComponent<Props, State> {
                 updateDetails={ruleActions.updateDetails}
                 rule={rule}
                 onGoToConfig={onGoToConfig}
+                onTestHandler={onTestHandler}
                 validationError={validationError}
               />
             </div>

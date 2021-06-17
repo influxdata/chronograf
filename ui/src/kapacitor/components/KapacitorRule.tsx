@@ -25,6 +25,8 @@ import {
   notifyAlertRuleRequiresQuery,
   notifyAlertRuleRequiresConditionValue,
   notifyAlertRuleDeadmanInvalid,
+  notifyTestAlertSent,
+  notifyTestAlertFailed,
 } from 'src/shared/copy/notifications'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -41,6 +43,7 @@ import {
   KapacitorQueryConfigActions,
   KapacitorRuleActions,
 } from 'src/types/actions'
+import {testAlertOutput} from 'src/shared/apis'
 
 interface Props {
   source: Source
@@ -130,6 +133,7 @@ class KapacitorRule extends Component<Props, State> {
               ruleActions={ruleActions}
               handlersFromConfig={handlersFromConfig}
               onGoToConfig={this.handleSaveToConfig}
+              onTestHandler={this.handleTestHandler}
               validationError={this.validationError}
             />
             <RuleMessage rule={rule} ruleActions={ruleActions} />
@@ -144,6 +148,19 @@ class KapacitorRule extends Component<Props, State> {
     this.setState({timeRange})
   }
 
+  private applyRuleWorkarounds(updatedRule: any): void {
+    // defect #5768 - naming issue
+    if (updatedRule.alertNodes?.teams?.length) {
+      const teams = (updatedRule.alertNodes.teams[0] as unknown) as Record<
+        string,
+        unknown
+      >
+      if (teams['channel-url']) {
+        teams.channel_url = teams['channel-url']
+      }
+    }
+  }
+
   private handleCreate = (pathname?: string) => {
     const {notify, queryConfigs, rule, source, router, kapacitor} = this.props
 
@@ -151,6 +168,7 @@ class KapacitorRule extends Component<Props, State> {
       query: queryConfigs[rule.queryID],
     })
     delete newRule.queryID
+    this.applyRuleWorkarounds(newRule)
 
     createRule(kapacitor, newRule)
       .then(() => {
@@ -167,14 +185,16 @@ class KapacitorRule extends Component<Props, State> {
     const updatedRule = Object.assign({}, rule, {
       query: queryConfigs[rule.queryID],
     })
-
+    this.applyRuleWorkarounds(updatedRule)
     editRule(updatedRule)
       .then(() => {
         router.push(pathname || `/sources/${source.id}/alert-rules`)
         notify(notifyAlertRuleUpdated(rule.name))
       })
       .catch(e => {
-        notify(notifyAlertRuleUpdateFailed(rule.name, e.data.message))
+        notify(
+          notifyAlertRuleUpdateFailed(rule.name, e?.data?.message || String(e))
+        )
       })
   }
 
@@ -202,6 +222,49 @@ class KapacitorRule extends Component<Props, State> {
       this.handleCreate(pathname)
     } else {
       this.handleEdit(pathname)
+    }
+  }
+  private handleTestHandler = (configName: string) => async (
+    handler: Record<string, unknown>,
+    toTestProperty: Record<string, string> = {}
+  ) => {
+    const testData = Object.keys(handler).reduce<Record<string, unknown>>(
+      (acc, key) => {
+        // ignore: 'type' is created by UI, 'enabled' is not used by testing
+        if (key === 'enabled' || key === 'type') {
+          return acc
+        }
+        if (key === '_type') {
+          acc.type = handler._type
+          return acc
+        }
+        if (toTestProperty[key]) {
+          acc[toTestProperty[key]] = handler[key]
+          return acc
+        }
+        // common property
+        acc[key] = handler[key]
+        // there are naming problems in kapacitor, - and _ are used inconsistently in tickscript and testing options
+        acc[key.replace('-', '_')] = acc[key]
+        acc[key.replace('_', '-')] = acc[key]
+        return acc
+      },
+      {}
+    )
+    try {
+      const {data} = await testAlertOutput(
+        this.props.kapacitor,
+        configName,
+        testData,
+        testData
+      )
+      if (data.success) {
+        this.props.notify(notifyTestAlertSent(configName))
+      } else {
+        this.props.notify(notifyTestAlertFailed(configName, data.message))
+      }
+    } catch (error) {
+      this.props.notify(notifyTestAlertFailed(configName))
     }
   }
 
