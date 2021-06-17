@@ -109,10 +109,14 @@ class MultiSelectDropdown extends Component {
   }
 
   renderMenu() {
-    const {items, isApplyShown} = this.props
+    const {items, isApplyShown, rightAligned} = this.props
 
     return (
-      <ul className="dropdown-menu">
+      <ul
+        className={classnames('dropdown-menu', {
+          'dropdown--right': rightAligned,
+        })}
+      >
         {isApplyShown && (
           <li className="multi-select--apply">
             <button className="btn btn-xs btn-info" onClick={this.handleApply}>

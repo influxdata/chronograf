@@ -189,6 +189,9 @@ $dropdown-purple-header: $c-potassium;
   display: none;
   position: absolute;
   top: 100%;
+  &.dropdown--right {
+    right: 0px
+  }
 }
 .dropdown.open {
   z-index: 9999;
