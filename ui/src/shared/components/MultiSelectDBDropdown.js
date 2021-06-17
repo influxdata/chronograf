@@ -21,7 +21,7 @@ class MultiSelectDBDropdown extends Component {
 
   render() {
     const {dbrps} = this.state
-    const {onApply, selectedItems} = this.props
+    const {onApply, selectedItems, rightAligned} = this.props
     const label = 'Select databases'
 
     return (
@@ -31,6 +31,7 @@ class MultiSelectDBDropdown extends Component {
         onApply={onApply}
         isApplyShown={false}
         selectedItems={selectedItems}
+        rightAligned={rightAligned}
       />
     )
   }
