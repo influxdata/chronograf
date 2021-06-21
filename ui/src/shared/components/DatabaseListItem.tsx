@@ -24,7 +24,6 @@ const DatabaseListItem: FunctionComponent<DatabaseListItemProps> = ({
     data-test="database-query-builder"
   >
     {database}.{retentionPolicy}
-    data-test={`database-query-builder-${namespace}`}
   </div>
 )
 

@@ -83,7 +83,29 @@ export const setupConnection = () => {
   })
 }
 
+export const writeManualData = (fieldKey: string,
+                                dataValue: string,
+) => {
+  cy.get('[data-test=write-data-button]').click()
+  cy.get('[data-test=dropdown-toggle]')
+  .first()
+  .click()
+
+  cy.get('[data-test="dropdown-item"]')
+  .filter(':contains("_tasks")')
+  .click()
+
+  cy.getByTitle('Write data manually using Line Protocol')
+    .click()
+  cy.get('[data-test=manual-entry-field]')
+    .clear()
+    .type(fieldKey+" "+dataValue)
+  cy.get('[data-test="write-data-submit-button"]').click()
+  cy.wait(200)
+}
+
 
 Cypress.Commands.add('getByTestID', getByTestID)
 Cypress.Commands.add('getByTitle', getByTitle)
 Cypress.Commands.add('setupConnection', setupConnection )
+Cypress.Commands.add('writeManualData', writeManualData)

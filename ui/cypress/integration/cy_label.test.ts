@@ -1,4 +1,4 @@
-describe.only('Navigate', () => {
+describe('Navigate', () => {
   beforeEach(cy.setupConnection)
 
   it('_start and _stop display', () => {
@@ -11,7 +11,7 @@ describe.only('Navigate', () => {
         if($el.text() == 'InfluxTest2'){
           $el.click()}
       })
-    //cy.get(':nth-child(1) > .dropdown-item--children').should('include.text', 'InfluxTest2').click()
+    
     cy.get('[data-test=source-button-selector] > .radio-buttons').contains('Flux').click({force: true})
     cy.get('[data-test=flux-schema-flux-schema-tree]').click({multiple: true})
     cy.get('[data-test="schema-category-field"]')

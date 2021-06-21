@@ -80,6 +80,7 @@ class DEHeader extends Component<Props> {
             <button
               onClick={toggleSendToDashboard}
               className="button button-sm button-success"
+              data-test="send-to-dashboard-btn"
             >
               Send to Dashboard
             </button>
