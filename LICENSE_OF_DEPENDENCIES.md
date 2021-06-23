@@ -459,7 +459,6 @@
 * chokidar 3.5.1 [MIT](git+https://github.com/paulmillr/chokidar.git)
 * chokidar 2.1.8 [MIT](https://github.com/paulmillr/chokidar.git)
 * chroma-js 1.4.1 [SEE LICENSE IN LICENSE](git://github.com/gka/chroma.js.git)
-* chronograf-ui 1.8.10 [AGPL-3.0](https://github.com/influxdata/chronograf.git)
 * ci-info 2.0.0 [MIT](https://github.com/watson/ci-info.git)
 * cipher-base 1.0.4 [MIT](git+https://github.com/crypto-browserify/cipher-base.git)
 * cjs-module-lexer 0.6.0 [MIT](git+https://github.com/guybedford/cjs-module-lexer.git)
