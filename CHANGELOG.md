@@ -47,6 +47,7 @@
 1. [#5769](https://github.com/influxdata/chronograf/pull/5769): Don't modify query passed to a Dashboard page using a `query` URL parameter.
 1. [#5774](https://github.com/influxdata/chronograf/pull/5774): Show full DB names in TICKScript editor dropdown.
 1. [#5778](https://github.com/influxdata/chronograf/pull/5778): Use docker environment variables to specify default chronograf arguments.
+1. [#5777](https://github.com/influxdata/chronograf/pull/5777): Refresh flux bucket list on source change.
 
 ### Other
 
