@@ -148,7 +148,7 @@ export const proxy = async (source: Source, script: string) => {
   try {
     const response = await AJAX({
       method: 'POST',
-      url: `${base}?path=/api/v2/query${mark}organization=defaultorgname`,
+      url: `${base}?version=${source.version}&path=/api/v2/query${mark}organization=defaultorgname`,
       data,
       headers: {'Content-Type': 'application/json'},
     })
