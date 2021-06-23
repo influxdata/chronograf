@@ -32,6 +32,7 @@ class TickscriptEditorControls extends Component<Props> {
           <MultiSelectDBDropdown
             selectedItems={this.addName(task.dbrps)}
             onApply={onSelectDbrps}
+            rightAligned={true}
           />
         </div>
       </div>
