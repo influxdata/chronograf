@@ -46,7 +46,7 @@
 1. [#5757](https://github.com/influxdata/chronograf/pull/5757): Enforce unique dashboard variable names.
 1. [#5769](https://github.com/influxdata/chronograf/pull/5769): Don't modify query passed to a Dashboard page using a `query` URL parameter.
 1. [#5774](https://github.com/influxdata/chronograf/pull/5774): Show full DB names in TICKScript editor dropdown.
-
+1. [#5778](https://github.com/influxdata/chronograf/pull/5778): Use docker environment variables to specify default chronograf arguments.
 
 ### Other
 
