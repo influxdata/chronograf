@@ -6,6 +6,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Source, NotificationAction} from 'src/types'
 import {executeQuery} from 'src/shared/apis/flux/query'
 import {parseResponse} from 'src/shared/parsing/flux/response'
+import {isEqual} from 'lodash'
 
 interface Props {
   source: Source
@@ -44,6 +45,18 @@ class DatabaseList extends PureComponent<Props, State> {
 
   public componentDidMount() {
     this.getDatabases()
+  }
+
+  public componentDidUpdate({source: prevSource}: Props) {
+    const {source: nextSource} = this.props
+    const differentSource = !isEqual(prevSource, nextSource)
+
+    if (differentSource) {
+      this.setState({
+        databases: [],
+      })
+      this.getDatabases()
+    }
   }
 
   public async getDatabases() {
