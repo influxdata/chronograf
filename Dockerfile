@@ -2,6 +2,7 @@ FROM alpine:3.12
 
 ENV PROTOBOARDS_PATH /usr/share/chronograf/protoboards
 ENV CANNED_PATH /usr/share/chronograf/canned
+ENV RESOURCES_PATH /usr/share/chronograf/resources
 ENV BOLT_PATH /var/lib/chronograf/chronograf-v1.db
 
 RUN apk add --update ca-certificates && \
