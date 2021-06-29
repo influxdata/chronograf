@@ -4,6 +4,7 @@ module.exports = {
       displayName: 'test',
       testPathIgnorePatterns: [
         'build',
+        '<rootDir>/cypress/',
         '<rootDir>/node_modules/(?!(jest-test))',
       ],
       modulePaths: ['<rootDir>', '<rootDir>/..'],

@@ -32,7 +32,7 @@ class WriteDataHeader extends PureComponent<Props> {
 
     return (
       <div className="write-data-form--header">
-        <div className="page-header--left">
+        <div className="page-header--left" data-test="write-data-left-head">
           <h1 className="page-header--title">Write Data To</h1>
           <DatabaseDropdown
             source={source}

@@ -41,6 +41,7 @@ class DropdownButton extends Component<Props> {
         onClick={onClick}
         disabled={this.isDisabled}
         title={title}
+        data-test="wizard-bucket-selected"
       >
         {this.icon}
         <span className="dropdown--selected">{children}</span>

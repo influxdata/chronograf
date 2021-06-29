@@ -33,6 +33,7 @@ class DropdownItem extends Component<Props> {
           'multi-select--item': checkbox,
         })}
         onClick={this.handleClick}
+        data-test="dropdown--item"
       >
         {this.checkBox}
         {this.dot}

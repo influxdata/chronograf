@@ -183,6 +183,7 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
               type="button"
               onClick={this.handleSave}
               disabled={!this.canSave}
+              data-test="btn-accept"
             >
               {this.saveButtonText}
             </button>
@@ -214,6 +215,7 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
                 onKeyPress={this.handleNameKeyPress}
                 onBlur={this.formatName}
                 spellCheck={false}
+                data-test="variable-name-type"
               />
             </div>
             <div className="form-group col-sm-4">

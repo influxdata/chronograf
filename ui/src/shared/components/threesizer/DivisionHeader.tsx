@@ -17,7 +17,10 @@ class DivisionHeader extends PureComponent<Props> {
     return (
       <div className="threesizer--header">
         {this.renderName}
-        <div className="threesizer--header-controls">
+        <div
+          className="threesizer--header-controls"
+          data-test="threesizer-header-controls"
+        >
           {this.props.buttons.map(b => b)}
           <DivisionMenu menuItems={this.menuItems} />
         </div>

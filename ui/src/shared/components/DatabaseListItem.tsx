@@ -21,6 +21,7 @@ const DatabaseListItem: FunctionComponent<DatabaseListItemProps> = ({
       active: isActive,
     })}
     onClick={onChooseNamespace(namespace)}
+    data-test="database-query-builder"
   >
     {database}.{retentionPolicy}
   </div>

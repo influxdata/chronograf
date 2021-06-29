@@ -598,6 +598,7 @@ class TableGraph extends PureComponent<Props, State> {
         data-row-index={rowIndex}
         onMouseOver={this.handleHover}
         title={cellContents}
+        data-test="table-graph"
       >
         {cellContents}
       </div>

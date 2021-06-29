@@ -21,7 +21,11 @@ class PageHeaderCenter extends Component<Props> {
     this.validateChildCount()
 
     return (
-      <div className="page-header--center" style={this.styles}>
+      <div
+        className="page-header--center"
+        style={this.styles}
+        data-test="page-header--center"
+      >
         {children}
       </div>
     )
