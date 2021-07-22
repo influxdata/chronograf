@@ -240,7 +240,12 @@ class SingleStat extends PureComponent<Props, State> {
 
     return (
       <div className="single-stat--resizer">
-        <svg width="100%" height="100%" viewBox={viewBox}>
+        <svg
+          width="100%"
+          height="100%"
+          viewBox={viewBox}
+          style={{display: 'block'}}
+        >
           <text
             className="single-stat--text"
             fontSize="87"

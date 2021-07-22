@@ -2,6 +2,8 @@
 
 ### Bug Fixes
 
+1. [#5784](https://github.com/influxdata/chronograf/pull/5784): Fix Safari display issues of the Single Stat
+
 ### Features
 
 ### Other
