@@ -175,6 +175,7 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
               className="btn btn-default btn-sm"
               type="button"
               onClick={onCancel}
+              data-test="btn-cancel"
             >
               Cancel
             </button>

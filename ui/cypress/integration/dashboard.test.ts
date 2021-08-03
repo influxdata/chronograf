@@ -2,8 +2,9 @@ import { delay } from "cypress/types/bluebird"
 
 describe('variables', () => {
   beforeEach(cy.setupConnection)
-
+  
   it('create dashboard', () => {
+    cy.visit('http://localhost:8888/')
     cy.clickNav(4, 'Dashboards')
     cy.getByTitle('Create Dashboard')
       .click()
@@ -58,12 +59,9 @@ describe('variables', () => {
         .eq(0)
       .type('testing_simple_data')
     cy.getByTitle('Must choose at least 1 dashboard and set a name').click()
-
-
-
   })
 
-  it('variables', () => {
+  it('cfreate and delete variables', () => {
     cy.clickNav(4, 'Dashboards')
     cy.get(':nth-child(1) > :nth-child(1) > a').click()
     cy.getByTitle('Show Template Variables Controls').click()
@@ -80,8 +78,9 @@ describe('variables', () => {
       .filter(':visible')
       .click({force: true})
 
-    cy.get('[data-test=dropdown-item]')
-    .contains('InfluxQL Meta Query').should('exist').click()
+    cy.get('[data-test=dropdown-ul] > .fancy-scroll--container > .fancy-scroll--view > :nth-child(8) > a').click()
+    //.contains('InfluxQL Meta Query').should('exist').click()
+    
     
     cy.wait(2000)
     cy.get('[data-test=variable-name-type]').type('iHopeThisNameDoesNotExist')
@@ -113,5 +112,24 @@ describe('variables', () => {
       .clear()
       .type('iHopeThisNameDoesNotExist',{delay:200})
     cy.get('[data-test=btn-accept]').should('be.disabled')
+    cy.get('[data-test=btn-cancel]').click()
+
+
+    //deletes existing variable
+    cy.getByTestID('edit')
+      .first()
+      .click()
+    cy.getByTitle('Confirm').click()
+    cy.getByTestID('confirm-btn').click()
+
+    cy.getByTestID('edit')
+      .first()
+      .click()
+    cy.getByTitle('Confirm').click()
+    cy.getByTestID('confirm-btn').click()
+
+    cy.get('.template-control--dropdown').should('not.exist')
+    cy.get('[data-test="empty-state"]').should('exist')
+
   })
 })

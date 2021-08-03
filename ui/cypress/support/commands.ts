@@ -51,6 +51,8 @@ const createConnectionV2 = (url: string,
 
 export const setupConnection = () => {
     cy.visit('http://localhost:8888/')
+    //cy.waitFor('#tooltip', {timeout: 20000});
+    cy.get('h1', {timeout: 10000}).should('be.visible')
     cy.get('h1').then(($a) => {
       if ($a.text().includes('Welcome to Chronograf')) {
       //initialize connections v1
@@ -100,7 +102,7 @@ export const writeManualData = (fieldKey: string,
   cy.get('[data-test=manual-entry-field]')
     .clear()
     .type(fieldKey+" "+dataValue)
-  cy.get('[data-test="write-data-submit-button"]').click()
+  cy.get('[data-test="write-data-submit-button"]', {timeout: 10000}).click()
   cy.wait(200)
 }
 
