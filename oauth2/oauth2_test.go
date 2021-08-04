@@ -10,7 +10,7 @@ import (
 
 	goauth "golang.org/x/oauth2"
 
-	gojwt "github.com/dgrijalva/jwt-go"
+	gojwt "github.com/golang-jwt/jwt/v4"
 	"github.com/influxdata/chronograf"
 )
 

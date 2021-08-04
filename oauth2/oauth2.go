@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	gojwt "github.com/dgrijalva/jwt-go"
+	gojwt "github.com/golang-jwt/jwt/v4"
 	"golang.org/x/oauth2"
 )
 
