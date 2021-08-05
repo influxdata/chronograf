@@ -1,1 +1,5 @@
-{}
+{
+  "$schema": "https://on.cypress.io/cypress.schema.json",
+  "baseUrl": "http://localhost:8888/sources/2/dashboards",
+  "video": false
+}

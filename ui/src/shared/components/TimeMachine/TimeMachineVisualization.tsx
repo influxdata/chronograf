@@ -73,7 +73,7 @@ const TimeMachineVisualization: FunctionComponent<Props> = props => {
   return (
     <div className="deceo--top">
       <div className="deceo--visualization">
-        <div className="graph-container">
+        <div className="graph-container" data-test="graph-container">
           <RefreshingGraph
             source={props.source}
             colors={colors}

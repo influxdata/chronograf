@@ -22,5 +22,8 @@
   "author": {
     "name": "InfluxData"
   },
-  "license": "AGPL-3.0"
+  "license": "AGPL-3.0",
+  "devDependencies": {
+    "cypress-image-snapshot": "^4.0.1"
+  }
 }

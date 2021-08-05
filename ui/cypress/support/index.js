@@ -19,5 +19,9 @@ import './commands'
 import 'cypress-pipe'
 import 'cypress-plugin-tab'
 
+import { addMatchImageSnapshotCommand } from 'cypress-image-snapshot/command';
+
+addMatchImageSnapshotCommand();
+
 // Alternatively you can use CommonJS syntax:
 // require('./commands')

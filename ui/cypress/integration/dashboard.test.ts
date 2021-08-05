@@ -61,7 +61,7 @@ describe('variables', () => {
     cy.getByTitle('Must choose at least 1 dashboard and set a name').click()
   })
 
-  it('cfreate and delete variables', () => {
+  it('create and delete variables', () => {
     cy.clickNav(4, 'Dashboards')
     cy.get(':nth-child(1) > :nth-child(1) > a').click()
     cy.getByTitle('Show Template Variables Controls').click()
