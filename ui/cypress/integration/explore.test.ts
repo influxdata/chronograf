@@ -71,50 +71,57 @@ it('create data queries in data explore',() =>{
   cy.getByTitle('Flux').click()
 
   cy.get('[data-test=threesizer-header-controls] > .button-default').click('left')
-    cy.get('.form--wrapper > :nth-child(1) > .dropdown > [data-test=wizard-bucket-selected]')
+  cy.get('.form--wrapper > :nth-child(1) > .dropdown > [data-test=wizard-bucket-selected]')
     .click()
   
-    cy.getByTestID('dropdown--item')
+  cy.getByTestID('dropdown--item')
     .filter(':contains("_tasks")')
     .click()
-    cy.get(':nth-child(2) > .dropdown > [data-test=wizard-bucket-selected]')
+  cy.get(':nth-child(2) > .dropdown > [data-test=wizard-bucket-selected]')
     .click()
     .filter(':contains("new_data")').click()
-    cy.get('.form--submit > .button').click()
+  cy.get('.form--submit > .button').click()
 
-    cy.getByTestID('rename-graph')
-          .click()
-          .clear()
-          .type('Stacked line', {delay:100})
-
-    cy. getByTitle('Visualization').click()
-    cy.get('#StepPlot').click()
-    cy.getByTestID('line-colours').click()
-    cy.get('.color-dropdown--menu > .fancy-scroll--container > .fancy-scroll--view > :nth-child(5)')
+  cy.getByTestID('rename-graph')
     .click()
-    /*cy.getByTestID('graph-container').matchImageSnapshot('stackLine')
+    .clear()
+    .type('Stacked line', {delay:100})
+
+  cy. getByTitle('Visualization').click()
+  cy.get('#StepPlot').click()
+  cy.getByTestID('line-colours').click()
+  cy.get('.color-dropdown--menu > .fancy-scroll--container > .fancy-scroll--view > :nth-child(5)')
+    .click()
     
-    cy.get('#Line').click()
-    cy.getByTestID('graph-container').matchImageSnapshot('line')
-    */
-    cy.get('#SingleStat').click()
-    cy.getByTestID('graph-container')
+  cy.get('#SingleStat').click()
+  cy.getByTestID('graph-container')
     .wait(500)
+
+  cy.getByTestID('graph-container')
     .matchImageSnapshot('singleStat')
 
+  cy.get('.color-dropdown > .btn').click()
 
-    let date = new Date()
-    date.setDate(date.getDate())
-    
-    let date = new Date()
-    date.setDate(date.getDate() +5)
-    cy.log(date.getDate())
-    
-    //edit graph
-    cy.getByTitle('Save').click()
+  cy.getByTestID('base-colour')
+    .each(($el: { text: () => string; click: () => void }, index: any, $list: any) => {
+      if($el.text() == 'Thunder'){
+        $el.click()}})
+
+  cy.get(':nth-child(1) > .form-control').type('Amos ')
+  cy.get('.graph-options-group > :nth-child(2) > .form-control').type('%')
+  cy.getByTitle('Apply coloration to cell background').click()
+
+
+  //edit graph
+  cy.getByTitle('Save').click()
+
+  cy.get('.dash-graph--container')
+    .wait(500)
+  cy.get('.dash-graph--container')
+    .matchImageSnapshot('dashboardSingleStat')
 
     
-    
+
 
 })
 
