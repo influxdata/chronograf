@@ -98,7 +98,7 @@ it('create data queries in data explore',() =>{
     .wait(500)
 
   cy.getByTestID('graph-container')
-    .matchImageSnapshot('singleStat')
+    .matchImageSnapshot('singleNumber')
 
   cy.get('.color-dropdown > .btn').click()
 
@@ -118,7 +118,7 @@ it('create data queries in data explore',() =>{
   cy.get('.dash-graph--container')
     .wait(500)
   cy.get('.dash-graph--container')
-    .matchImageSnapshot('dashboardSingleStat')
+    .matchImageSnapshot('dashboardSingleNumber')
 
     
 
