@@ -298,7 +298,9 @@ export class DataExplorer extends PureComponent<Props, State> {
     const pathname = stripPrefix(location.pathname)
     const search = queryParams ? `?${qs.stringify(queryParams)}` : ''
 
-    router.push(pathname + search)
+    if (location.search !== search) {
+      router.push(pathname + search)
+    }
   }
 
   private get writeDataForm(): JSX.Element {
