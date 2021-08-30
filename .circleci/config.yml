@@ -1,7 +1,6 @@
-version: "2.1"
+version: 2.1
 orbs:
   browser-tools: circleci/browser-tools@1.1.3
-  cypress: cypress-io/cypress@1.29.0
 
 commands:
   influxdb-onboarding:
@@ -46,11 +45,6 @@ workflows:
               ignore: /.*/
             tags:
               only: /^[0-9]+(\.[0-9]+)*$/
-      - cypress/run:
-          store_artifacts: true
-          post-steps:
-            -store_test_results:
-                path: cypress/results
 
 jobs:
   build:
@@ -113,6 +107,9 @@ jobs:
       - store_artifacts:
           path: ui/cypress/screenshots
           destination: screenshots
+      - store_artifacts:
+          path: ui/cypress/snapshots
+          destination: snapshots
 
   deploy-nightly:
     environment:
