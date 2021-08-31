@@ -13,9 +13,9 @@ declare namespace Cypress {
 // We set up the settings
 addMatchImageSnapshotCommand({
   customSnapshotsDir: 'src/snapshots',
-  failureThreshold: 0.25, // threshold for entire image
+  failureThreshold: 0.75, // threshold for entire image
   failureThresholdType: 'percent', // percent of image or number of pixels
-  customDiffConfig: { threshold: 0.25 }, // threshold for each pixel
+  customDiffConfig: { threshold: 0.75 }, // threshold for each pixel
   capture: 'viewport' // capture viewport in screenshot
 });
 
