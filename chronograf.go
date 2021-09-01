@@ -295,6 +295,7 @@ type AlertRule struct {
 	Modified      time.Time             `json:"modified"`               // Date the task was last modified
 	LastEnabled   time.Time             `json:"last-enabled,omitempty"` // Date the task was last set to status enabled
 	Vars          map[string]client.Var `json:"vars,omitempty"`         // task variables when defined
+	TemplateID    string                `json:"template-id,omitempty"`  // task template id when created from template
 }
 
 // TICKScript task to be used by kapacitor

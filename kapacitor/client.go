@@ -80,16 +80,26 @@ func NewTask(task *client.Task) *Task {
 	}
 
 	script := chronograf.TICKScript(task.TICKscript)
-	rule, err := Reverse(script)
-	if err != nil {
-		// try to parse Name from a line such as: `var name = 'Rule Name'
-		name := task.ID
-		if matches := reTaskName.FindStringSubmatch(task.TICKscript); matches != nil {
-			name = matches[1]
+	var rule chronograf.AlertRule = chronograf.AlertRule{Query: nil}
+	if task.TemplateID == "" {
+		// try to parse chronograf rule, tasks created from template cannot be chronograf rules
+		if parsedRule, err := Reverse(script); err == nil {
+			rule = parsedRule
 		}
-		rule = chronograf.AlertRule{
-			Name:  name,
-			Query: nil,
+	}
+	if rule.Name == "" {
+		// try to parse Name from a line such as: `var name = 'Rule Name'
+		if matches := reTaskName.FindStringSubmatch(task.TICKscript); matches != nil {
+			rule.Name = matches[1]
+		} else {
+			rule.Name = task.ID
+		}
+	}
+
+	// #5403 override name when defined in a variable
+	if nameVar, exists := task.Vars["name"]; exists {
+		if val, isString := nameVar.Value.(string); isString && val != "" {
+			rule.Name = val
 		}
 	}
 	// #5403 override name when defined in a variable
@@ -100,6 +110,7 @@ func NewTask(task *client.Task) *Task {
 	}
 
 	rule.Vars = task.Vars
+	rule.TemplateID = task.TemplateID
 	rule.ID = task.ID
 	rule.TICKScript = script
 	rule.Type = task.Type.String()
@@ -321,6 +332,7 @@ func (c *Client) Get(ctx context.Context, id string) (*Task, error) {
 	if err != nil {
 		return nil, chronograf.ErrAlertNotFound
 	}
+	fmt.Println("!!!", task.ID, task.TemplateID)
 
 	return NewTask(&task), nil
 }
