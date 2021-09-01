@@ -99,6 +99,7 @@ func NewTask(task *client.Task) *Task {
 		}
 	}
 
+	rule.Vars = task.Vars
 	rule.ID = task.ID
 	rule.TICKScript = script
 	rule.Type = task.Type.String()
