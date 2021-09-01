@@ -102,12 +102,6 @@ func NewTask(task *client.Task) *Task {
 			rule.Name = val
 		}
 	}
-	// #5403 override name when defined in a variable
-	if nameVar, exists := task.Vars["name"]; exists {
-		if val, isString := nameVar.Value.(string); isString && val != "" {
-			rule.Name = val
-		}
-	}
 
 	rule.Vars = task.Vars
 	rule.TemplateID = task.TemplateID
