@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import _ from 'lodash'
-import {InjectedRouter} from 'react-router'
+import {InjectedRouter, Link} from 'react-router'
 import {connect} from 'react-redux'
 
 import PageSpinner from 'src/shared/components/PageSpinner'
@@ -36,6 +36,7 @@ import {
   KapacitorQueryConfigActions,
   KapacitorRuleActions,
 } from 'src/types/actions'
+import {Page} from 'src/reusable_ui'
 
 interface Params {
   ruleID: string
@@ -111,6 +112,24 @@ class KapacitorRulePage extends Component<Props, State> {
     const rule = this.rule
     const query = rule && queryConfigs[rule.queryID]
 
+    if (rule && rule['template-id'] && kapacitor) {
+      return (
+        <Page>
+          <Page.Contents>
+            <div>
+              This rule was created from a template. It cannot be edited in
+              chronograf, see its{' '}
+              <Link
+                to={`sources/${source.id}/kapacitors/${kapacitor.id}/tickscripts/${rule.id}`}
+              >
+                TICKScript
+              </Link>
+              .
+            </div>
+          </Page.Contents>
+        </Page>
+      )
+    }
     if (!query) {
       return <PageSpinner />
     }
