@@ -140,11 +140,29 @@ export class TickscriptPage extends PureComponent<Props, State> {
 
     if (this.isEditing) {
       await kapacitorActions.getRule(kapacitor, ruleID)
-      const {id, name, tickscript, status, dbrps, type} = this.props.rules.find(
-        r => r.id === ruleID
-      )
+      const {
+        id,
+        name,
+        tickscript,
+        status,
+        dbrps,
+        type,
+        'template-id': templateID,
+        vars,
+      } = this.props.rules.find(r => r.id === ruleID)
 
-      this.setState({task: {tickscript, dbrps, type, status, name, id}})
+      this.setState({
+        task: {
+          tickscript,
+          dbrps,
+          type,
+          status,
+          name,
+          id,
+          templateID,
+          vars,
+        },
+      })
     }
 
     this.fetchChunkedLogs(kapacitor, ruleID)

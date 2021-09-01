@@ -39,12 +39,14 @@ class TickscriptHeader extends Component<Props> {
             areLogsVisible={areLogsVisible}
             onToggleLogsVisibility={onToggleLogsVisibility}
           />
-          <TickscriptSave
-            task={task}
-            onSave={onSave}
-            unsavedChanges={unsavedChanges}
-            isNewTickscript={isNewTickscript}
-          />
+          {task.templateID ? undefined : (
+            <TickscriptSave
+              task={task}
+              onSave={onSave}
+              unsavedChanges={unsavedChanges}
+              isNewTickscript={isNewTickscript}
+            />
+          )}
           {this.saveButton}
         </Page.Header.Right>
       </Page.Header>

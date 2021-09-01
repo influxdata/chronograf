@@ -27,14 +27,16 @@ class TickscriptEditorControls extends Component<Props> {
     return (
       <div className="tickscript-controls">
         {this.tickscriptID}
-        <div className="tickscript-controls--right">
-          <TickscriptType type={task.type} onChangeType={onChangeType} />
-          <MultiSelectDBDropdown
-            selectedItems={this.addName(task.dbrps)}
-            onApply={onSelectDbrps}
-            rightAligned={true}
-          />
-        </div>
+        {task.templateID ? undefined : (
+          <div className="tickscript-controls--right">
+            <TickscriptType type={task.type} onChangeType={onChangeType} />
+            <MultiSelectDBDropdown
+              selectedItems={this.addName(task.dbrps)}
+              onApply={onSelectDbrps}
+              rightAligned={true}
+            />
+          </div>
+        )}
       </div>
     )
   }
