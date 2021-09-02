@@ -27,7 +27,7 @@ class TickscriptEditorControls extends Component<Props> {
     return (
       <div className="tickscript-controls">
         {this.tickscriptID}
-        {task.templateID ? undefined : (
+        {!task.name || task.templateID ? undefined : (
           <div className="tickscript-controls--right">
             <TickscriptType type={task.type} onChangeType={onChangeType} />
             <MultiSelectDBDropdown
