@@ -3,6 +3,7 @@
 ### Bug Fixes
 
 1. [#5784](https://github.com/influxdata/chronograf/pull/5784): Fix Safari display issues of a Single Stat.
+1. [#5787](https://github.com/influxdata/chronograf/pull/5787): Upgrade bluemonday to resolve CVE-2021-29272.
 1. [#5792](https://github.com/influxdata/chronograf/pull/5792): Rename arm rpms with yum-compatible names.
 1. [#5804](https://github.com/influxdata/chronograf/pull/5804): Name tickscript after a `name` task variable, when defined.
 
