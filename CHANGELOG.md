@@ -9,6 +9,7 @@
 1. [#5796](https://github.com/influxdata/chronograf/pull/5796): Avoid useless browser history change.
 1. [#5803](https://github.com/influxdata/chronograf/pull/5803): Repair time rendering in horizontal table.
 1. [#5804](https://github.com/influxdata/chronograf/pull/5804): Name tickscript after a `name` task variable, when defined.
+1. [#5806](https://github.com/influxdata/chronograf/pull/5806): Repair paginated retrival of flux tasks.
 
 ### Features
 

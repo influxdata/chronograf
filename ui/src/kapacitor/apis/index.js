@@ -76,7 +76,10 @@ export const getFluxTasks = async kapacitor => {
       method: 'GET',
       url:
         kapacitor.links.proxy +
-        `?path=/kapacitor/v1/api/v2/tasks?limit=500&after=${lastID}`,
+        '?path=' +
+        encodeURIComponent(
+          `/kapacitor/v1/api/v2/tasks?limit=500&after=${lastID}`
+        ),
     })
     if (!tasks || !tasks.length) {
       break
