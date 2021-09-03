@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	gojwt "github.com/dgrijalva/jwt-go"
+	gojwt "github.com/golang-jwt/jwt/v4"
 	"github.com/lestrrat-go/jwx/jwk"
 )
 

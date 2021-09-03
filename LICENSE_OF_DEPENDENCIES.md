@@ -10,7 +10,7 @@
 * github.com/coreos/go-systemd [Apache-2.0](https://github.com/coreos/go-systemd/blob/master/LICENSE)
 * github.com/coreos/pkg/capnslog [Apache-2.0](https://github.com/coreos/pkg/blob/master/LICENSE)
 * github.com/davecgh/go-spew/spew [ISC](https://github.com/davecgh/go-spew/blob/master/LICENSE)
-* github.com/dgrijalva/jwt-go [MIT](https://github.com/dgrijalva/jwt-go/blob/master/LICENSE)
+* github.com/golang-jwt/jwt/v4 [MIT](github.com/golang-jwt/jwt/blob/main/LICENSE)
 * github.com/dustin/go-humanize [MIT](https://github.com/dustin/go-humanize/blob/master/LICENSE)
 * github.com/eclipse/paho.mqtt.golang [EPL-1.0](https://github.com/eclipse/paho.mqtt.golang/blob/master/LICENSE)
 * github.com/elazarl/go-bindata-assetfs [BSD-2-Clause](https://github.com/elazarl/go-bindata-assetfs/blob/master/LICENSE)
