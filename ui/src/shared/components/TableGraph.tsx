@@ -528,7 +528,7 @@ class TableGraph extends PureComponent<Props, State> {
       isTimeVisible &&
       (this.isVerticalTimeAxis
         ? !isFirstRow && columnIndex === this.timeFieldIndex
-        : rowIndex === this.timeFieldIndex && isFirstCol)
+        : rowIndex === this.timeFieldIndex && !isFirstCol)
     const isFieldName = this.isVerticalTimeAxis ? isFirstRow : isFirstCol
     const isFixedCorner = isFirstRow && isFirstCol
 
