@@ -38,13 +38,18 @@ export function fetchRule(source, ruleID) {
   return dispatch => {
     getActiveKapacitor(source).then(kapacitor => {
       getRuleAJAX(kapacitor, ruleID).then(({data: rule}) => {
+        if (rule.query) {
+          rule = Object.assign(rule, {queryID: rule.query.id})
+        }
         dispatch({
           type: 'LOAD_RULE',
           payload: {
-            rule: Object.assign(rule, {queryID: rule.query.id}),
+            rule,
           },
         })
-        dispatch(loadQuery(rule.query))
+        if (rule.query) {
+          dispatch(loadQuery(rule.query))
+        }
       })
     })
   }

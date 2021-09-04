@@ -8,6 +8,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 interface Props {
   onChangeScript: (tickscript: string) => void
   script: string
+  readOnly?: boolean
 }
 
 const NOOP = () => {}
@@ -19,13 +20,13 @@ class TickscriptEditor extends Component<Props> {
   }
 
   public render() {
-    const {script} = this.props
+    const {script, readOnly} = this.props
 
     const options = {
       lineNumbers: true,
       theme: 'tickscript',
       tabIndex: 1,
-      readonly: false,
+      readOnly: !!readOnly,
       mode: 'tickscript',
     }
 

@@ -70,11 +70,13 @@ class Tickscript extends PureComponent<Props> {
             />
             <TickscriptEditor
               script={task.tickscript}
+              readOnly={!!task.templateID}
               onChangeScript={onChangeScript}
             />
             <TickscriptEditorConsole
               consoleMessage={consoleMessage}
               unsavedChanges={unsavedChanges}
+              task={task}
             />
           </div>
           {this.logsTable}

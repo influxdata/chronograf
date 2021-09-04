@@ -4631,6 +4631,30 @@
           "description": "Date the task was last set to status enabled",
           "readOnly": true
         },
+        "template-id": {
+          "type": "string",
+          "description": "Template ID when created from template",
+          "readOnly": true
+        },
+        "vars": {
+          "type": "object",
+          "description": "task external variables",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string",
+                "description": "Must be either a string, bool, numeric or a list of Var objects."
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        },
         "links": {
           "type": "object",
           "required": ["self", "kapacitor"],

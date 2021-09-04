@@ -55,6 +55,8 @@ export interface AlertRule {
   modified: string
   queryID?: string
   'last-enabled'?: string
+  'template-id'?: string
+  vars?: Record<string, {type: string; value: unknown}>
 }
 
 export interface Task {
@@ -64,6 +66,8 @@ export interface Task {
   tickscript: string
   dbrps: DBRP[]
   type: string
+  templateID?: string
+  vars?: Record<string, {type: string; value: unknown}>
 }
 
 export type TaskStatusType = 'active' | 'inactive'

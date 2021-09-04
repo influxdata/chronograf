@@ -5,6 +5,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 export interface Task {
   dbrps: DBRP[]
   id: string
+  templateID?: string
 }
 
 interface SaveProps {
