@@ -12,6 +12,7 @@
 1. [#5805](https://github.com/influxdata/chronograf/pull/5805): Make template tasks read-only.
 1. [#5806](https://github.com/influxdata/chronograf/pull/5806): Repair paginated retrival of flux tasks.
 1. [#5815](https://github.com/influxdata/chronograf/pull/5815): Update time range of flux queries on dashboard zoom.
+1. [#5808](https://github.com/influxdata/chronograf/pull/5808): Enforce one organization between browser tabs.
 
 ### Features
 
