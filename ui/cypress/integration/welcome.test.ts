@@ -36,5 +36,4 @@ describe('welcome test', () => {
     cy.clickNav(8, 'Configuration')
     cy.clickNav(1, 'Status')
   })
-
 })
