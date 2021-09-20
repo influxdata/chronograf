@@ -42,7 +42,7 @@ export default class ColorScaleDropdown extends Component<Props, State> {
 
     return (
       <ClickOutside onClickOutside={this.handleClickOutside}>
-        <div className={this.dropdownClassName}>
+        <div className={this.dropdownClassName} data-test="line-colours">
           <div className={this.buttonClassName} onClick={this.handleToggleMenu}>
             <div
               className="color-dropdown--swatches"

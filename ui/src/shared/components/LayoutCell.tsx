@@ -148,6 +148,7 @@ export default class LayoutCell extends Component<Props> {
           <button
             className="no-query--button btn btn-md btn-primary"
             onClick={this.handleSummonOverlay}
+            data-test="add-data-btn"
           >
             <span className="icon plus" /> Add Data
           </button>

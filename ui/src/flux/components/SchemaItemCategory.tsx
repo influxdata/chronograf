@@ -68,9 +68,16 @@ class SchemaItemCategory extends PureComponent<
           isOpen ? 'expanded' : ''
         }`}
       >
-        <div className="flux-schema--item" onClick={this.handleClick}>
+        <div
+          className="flux-schema--item"
+          onClick={this.handleClick}
+          data-test="schema-category-field"
+          >
           <div className="flex-schema-item-group flux-schema-item--expandable">
-            <div className="flux-schema--expander" />
+            <div 
+              className="flux-schema--expander"
+              data-test="schema-category-item"
+            />
             {this.categoryName}
             <span className="flux-schema--type">
               (<TimeRangeLabel timeRange={this.props.timeRange} />)
