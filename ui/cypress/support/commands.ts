@@ -1,0 +1,133 @@
+import {addMatchImageSnapshotCommand} from 'cypress-image-snapshot/command'
+
+/* declare namespace Cypress {
+  interface Chainable {
+    click()
+    first()
+    /**
+     * Custom command to match image snapshots.
+     * @example cy.matchImageSnapshot('greeting')
+     */
+/*    matchImageSnapshot(snapshotName?: string): void
+  }
+}
+*/
+// We set up the settings
+/* addMatchImageSnapshotCommand({
+  customSnapshotsDir: 'src/snapshots',
+  failureThreshold: 0.75, // threshold for entire image
+  failureThresholdType: 'percent', // percent of image or number of pixels
+  customDiffConfig: {threshold: 0.75}, // threshold for each pixel
+  capture: 'viewport', // capture viewport in screenshot
+})
+
+// We also overwrite the command, so it does not take a sceenshot if we run the tests inside the test runner
+Cypress.Commands.overwrite(
+  'matchImageSnapshot',
+  (originalFn, snapshotName, options) => {
+    if (Cypress.env('ALLOW_SCREENSHOT')) {
+      originalFn(snapshotName, options)
+    } else {
+      cy.log(`Screenshot comparison is disabled`)
+    }
+  }
+)
+ */
+export const clickNav = (index: number, label: string): Cypress.Chainable => {
+  cy.get(`:nth-child(${index}) > .sidebar--square`).click()
+  return cy.get('h1.page-header--title').should('have.text', `${label}`)
+}
+
+export const setupConnection = () => {
+  cy.visit('http://localhost:8888/')
+  // cy.waitFor('#tooltip', {timeout: 20000});
+  cy.get('h1', {timeout: 10000}).should('be.visible')
+  cy.get('h1').then($a => {
+    if ($a.text().includes('Welcome to Chronograf')) {
+      // initialize connections v1
+      cy.get('.wizard-button-bar').contains('Get Started').click()
+      createConnectionV1(
+        'http://localhost:8086',
+        'InfluxTest1',
+        'admin',
+        'admin',
+        'telegraf'
+      )
+      cy.get('.wizard-button-bar').contains('Add Connection').click()
+      cy.get('.notification-message').should(
+        'have.text',
+        'Connected to InfluxDB InfluxTest1 successfully.'
+      )
+      cy.get('.notification-close').click()
+      cy.get('button').contains('Next').click()
+      //kapacitor skip
+      cy.get('button').contains('Skip').click()
+      //setup complete
+      cy.get('button').contains('View All Connections').click()
+      cy.get('h1.page-header--title').should('have.text', 'Configuration')
+
+      //add connection v2
+      cy.clickNav(8, 'Configuration')
+      cy.get('div.btn').contains(' Add Connection').click()
+      createConnectionV2(
+        'http://localhost:9999',
+        'InfluxTest2',
+        'my-org',
+        'my-token',
+        'telegraf'
+      )
+      cy.get('.wizard-button-bar').contains('Add Connection').click()
+      cy.get('.notification-message').should(
+        'have.text',
+        'Connected to InfluxDB InfluxTest2 successfully.'
+      )
+      cy.get('.notification-close').click()
+      cy.get('button').contains('Next').click()
+      //kapacitor skip
+      cy.get('button').contains('Skip').click()
+      cy.get('button').contains('Finish').click()
+    }
+  })
+}
+
+export const getByTestID = (
+  dataTest: string,
+  options?: Partial<
+    Cypress.Loggable & Cypress.Timeoutable & Cypress.Withinable & Cypress.Shadow
+  >
+): Cypress.Chainable => {
+  return cy.get(`[data-test="${dataTest}"]`, options)
+}
+
+export const getByTitle = (name: string): Cypress.Chainable => {
+  return cy.get(`[title="${name}"]`)
+}
+
+export const writeManualData = (fieldKey: string, dataValue: string) => {
+  cy.get('[data-test=write-data-button]').click()
+  cy.get('[data-test=dropdown-toggle]').first().click()
+
+  cy.get('[data-test="dropdown-item"]').filter(':contains("_tasks")').click()
+
+  cy.getByTitle('Write data manually using Line Protocol').click()
+  cy.get('[data-test=manual-entry-field]')
+    .clear()
+    .type(fieldKey + ' ' + dataValue)
+  cy.get('[data-test="write-data-submit-button"]', {timeout: 10000}).click()
+  cy.wait(2000)
+}
+
+Cypress.Commands.add('clickNav', clickNav)
+Cypress.Commands.add('setupConnection', setupConnection)
+Cypress.Commands.add('getByTestID', getByTestID)
+Cypress.Commands.add('getByTitle', getByTitle)
+Cypress.Commands.add('writeManualData', writeManualData)
+function createConnectionV1(
+  arg0: string,
+  arg1: string,
+  arg2: string,
+  arg3: string,
+  arg4: string
+) {
+  throw new Error('Function not implemented.')
+}

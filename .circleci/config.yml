@@ -1,8 +1,25 @@
+version: 2.1
+orbs:
+  browser-tools: circleci/browser-tools@1.1.3
+
+commands:
+  influxdb-onboarding:
+    steps:
+      - run:
+          name: "Post onBoarding request to InfluxDB 2"
+          command: sh ./etc/scripts/influxdb-onboarding.sh
+
 workflows:
   version: 2
   main:
     jobs:
       - build:
+          filters:
+            tags:
+              only: /.*/
+      - e2e:
+          requires:
+            - build
           filters:
             tags:
               only: /.*/
@@ -29,7 +46,6 @@ workflows:
             tags:
               only: /^[0-9]+(\.[0-9]+)*$/
 
-version: 2
 jobs:
   build:
     environment:
@@ -54,6 +70,47 @@ jobs:
           root: /home/circleci
           paths:
             - project
+
+  #### cypress e2e tests
+  e2e:
+    docker:
+      - image: cimg/go:1.15.6-browsers
+      - image: influxdb:2.0
+        environment:
+          INFLUXD_HTTP_BIND_ADDRESS: :9999
+      - image: influxdb:1.8
+        environment:
+          INFLUXD_HTTP_BIND_ADDRESS: :8086
+
+    environment:
+      GOCACHE: /tmp/go-cache
+    steps:
+      - browser-tools/install-chrome
+      - checkout
+      - influxdb-onboarding
+      - restore_cache:
+          name: Restore Yarn Cache
+          keys:
+            - yarn-deps-lock-{{ checksum "yarn.lock" }}
+      - run: sudo apt-get update && sudo apt-get install netcat-openbsd
+      - run:
+          command: make
+      - run:
+          command: ./chronograf
+          background: true
+      - run:
+          command: make e2e
+      - store_test_results:
+          path: ui/cypress-jsunit-results.xml
+      - store_artifacts:
+          path: ui/cypress/videos
+          destination: videos
+      - store_artifacts:
+          path: ui/cypress/screenshots
+          destination: screenshots
+      - store_artifacts:
+          path: ui/cypress/snapshots
+          destination: snapshots
 
   deploy-nightly:
     environment:

@@ -83,6 +83,7 @@ class Input extends Component<Props> {
           onKeyUp={onKeyUp}
           onKeyDown={onKeyDown}
           className="input-field"
+          data-test="input-field"
           disabled={status === ComponentStatus.Disabled}
         />
         {this.icon}

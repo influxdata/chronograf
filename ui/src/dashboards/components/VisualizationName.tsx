@@ -48,7 +48,7 @@ class VisualizationName extends Component<Props, State> {
     }
 
     return (
-      <div className="rename-dashboard">
+      <div className="rename-dashboard" data-test="rename-graph">
         <div className="rename-dashboard--title" onClick={this.handleClick}>
           {workingName}
           <span className="icon pencil" />

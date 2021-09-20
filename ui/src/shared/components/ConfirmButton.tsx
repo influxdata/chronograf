@@ -62,6 +62,7 @@ class ConfirmButton extends PureComponent<Props, State> {
               className="confirm-button--confirmation"
               onClick={this.handleConfirmClick}
               ref={r => (this.tooltipDiv = r)}
+              data-test="confirm-btn"
             >
               {confirmText}
             </div>
