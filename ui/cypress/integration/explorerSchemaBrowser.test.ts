@@ -242,4 +242,74 @@ it('default connetion to influxdb v2', ()=> {
     cy.get('.dash-graph--container')
       .matchImageSnapshot('dashboardSingleNumber')
   })
+  it('snapshot',() =>{
+    cy.clickNav(3, 'Explore')
+
+    cy.get('[data-test=source-button-selector] > .dropdown > [data-test=wizard-bucket-selected]')
+      .click()
+    // selecting dynamic dropdown item
+    cy.get('[data-test="dropdown--item"]')
+      .each(($el, index, $list) => {
+        if($el.text() == 'InfluxTest2'){
+          $el.click()}
+    })
+
+    cy.getByTitle('Flux').click()
+    cy.writeManualData('testing_value', 'value=0')
+
+    
+    cy.get('[data-test=source-button-selector] > .dropdown > [data-test=wizard-bucket-selected]')
+      .click()
+
+  // selecting dynamic dropdown item
+  cy.clickNav(4, 'Dashboards')
+  cy.getByTitle('Create Dashboard').click()
+  cy.getByTestID('rename-dashboard')
+    .click()
+    .type('explorer_test{enter}')
+  cy.getByTestID('add-data-btn').click()
+
+  cy.get('[data-test=source-button-selector] > .dropdown > [data-test=wizard-bucket-selected]')
+    .click()
+  
+  // selecting dynamic dropdown item
+  cy.get('[data-test="dropdown--item"]')
+    .each(($el, index, $list) => {
+      if($el.text() == 'InfluxTest2'){
+        $el.click()}})
+  
+  cy.getByTitle('Flux').click()
+
+  cy.getByTitle('Script Wizard').click()
+  cy.get('.form--wrapper > :nth-child(1) > .dropdown > [data-test=wizard-bucket-selected]')
+    .click()
+
+  cy.getByTestID('dropdown--item')
+    .filter(':contains("_tasks")')
+    .click()
+  cy.get(':nth-child(2) > .dropdown > [data-test=wizard-bucket-selected]')
+        .click()
+    /*.filter(':contains("testing_value")').click()*/
+  cy.get('[data-test="dropdown--item"]')
+    .each(($el, index, $list) => {
+      if($el.text() == 'testing_value'){
+        $el.click()}})
+  cy.get('.form--submit > .button').click()
+
+  cy. getByTitle('Visualization').click()
+  cy.get('#SingleStat').click()
+  cy.getByTestID('graph-container')
+    .wait(500)
+
+  cy.getByTestID('graph-container')
+    .matchImageSnapshot('singleNumber')
+
+  //edit graph
+  cy.getByTitle('Save').click()
+
+    cy.get('.dash-graph--container')
+    .wait(1500)
+  cy.get('.dash-graph--container')
+    .matchImageSnapshot('dashboardSingleNumber')
+  })
 })

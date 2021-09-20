@@ -2084,13 +2084,6 @@ ansi-escapes@^4.2.1:
   dependencies:
     type-fest "^0.11.0"
 
-ansi-escapes@^4.3.0:
-  version "4.3.2"
-  resolved "https://registry.yarnpkg.com/ansi-escapes/-/ansi-escapes-4.3.2.tgz#6b2291d1db7d98b6521d5f1efa42d0f3a9feb65e"
-  integrity sha512-gKXj5ALrKWQLsYG9jlTRmR/xKluxHV+Z9QEwNIgCfM1/uwPMCuzVVnh5mwTd+OuBZcwSIMbqssNWRm1lE51QaQ==
-  dependencies:
-    type-fest "^0.21.3"
-
 ansi-regex@^2.0.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-2.1.1.tgz#c3b33ab5ee360d86e0e628f0468ae7ef27d654df"
@@ -11336,6 +11329,14 @@ tar@^6.0.2, tar@^6.1.2:
     minizlib "^2.1.1"
     mkdirp "^1.0.3"
     yallist "^4.0.0"
+
+term-img@^4.0.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/term-img/-/term-img-4.1.0.tgz#5b170961f7aa20b2f3b22deb8ad504beb963a8a5"
+  integrity sha512-DFpBhaF5j+2f7kheKFc1ajsAUUDGOaNPpKPtiIMxlbfud6mvfFZuWGnTRpaujUa5J7yl6cIw/h6nyr4mSsENPg==
+  dependencies:
+    ansi-escapes "^4.1.0"
+    iterm2-version "^4.1.0"
 
 term-img@^4.0.0:
   version "4.1.0"
