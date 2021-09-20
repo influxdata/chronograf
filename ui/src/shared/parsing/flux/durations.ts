@@ -1,4 +1,4 @@
-import {get, isObject, isArray} from 'lodash'
+import {get, isObject, isArray, find} from 'lodash'
 import {getAST} from 'src/shared/apis/flux/ast'
 
 export async function getMinDuration(
@@ -66,6 +66,7 @@ type RangeCallPropertyValue =
   | DateTimeLiteral
   | Identifier
   | DurationBinaryExpression
+  | MemberExpression
 
 interface MinusUnaryExpression<T> {
   type: 'UnaryExpression'
@@ -109,6 +110,12 @@ interface DurationBinaryExpression {
   left: DateTimeLiteral
   right: DurationLiteral
   operator: '+' | '-'
+}
+
+interface MemberExpression {
+  type: 'MemberExpression'
+  object: Identifier
+  property: Identifier
 }
 
 export function allRangeTimes(ast: any): Array<[number, number]> {
@@ -157,6 +164,12 @@ function propertyTime(
       return Date.parse(value.value)
     case 'Identifier':
       return propertyTime(ast, resolveDeclaration(ast, value.name), now)
+    case 'MemberExpression':
+      return propertyTime(
+        ast,
+        resolveDeclaration(ast, value.object.name, value.property.name),
+        now
+      )
     case 'BinaryExpression': {
       const leftTime = Date.parse(value.left.value)
       const rightDuration = durationDuration(value.right)
@@ -198,7 +211,11 @@ function durationDuration(durationLiteral: DurationLiteral): number {
   Find the node in the `ast` that defines the value of the variable with the
   given `name`.
 */
-function resolveDeclaration(ast: any, name: string): RangeCallPropertyValue {
+function resolveDeclaration(
+  ast: any,
+  name: string,
+  property?: string
+): RangeCallPropertyValue {
   const isDeclarator = node => {
     return (
       get(node, 'type') === 'VariableAssignment' &&
@@ -217,6 +234,15 @@ function resolveDeclaration(ast: any, name: string): RangeCallPropertyValue {
   }
 
   const init = declarator[0].init
+
+  // init can be an ObjectExpression, extract the property when known
+  if (property && Array.isArray(init.properties)) {
+    const propVal = find(init.properties, x => x.key.name === property)
+    if (!propVal) {
+      throw new Error(`cannot resolve object expression ${name}.${propVal}`)
+    }
+    return propVal.value
+  }
 
   return init
 }
