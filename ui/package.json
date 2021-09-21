@@ -16,6 +16,7 @@
     "test:watch": "jest --watch",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand --watch",
     "lint": "yarn run eslint; yarn run tsc",
+    "test:e2e": "CYPRESS_baseUrl=http://localhost:8888 cypress run --browser chrome --headless --reporter junit --reporter-options 'mochaFile=cypress-jsunit-results.xml'",
     "eslint": "eslint src",
     "eslint:watch": "esw src --watch --cache",
     "eslint:fix": "eslint src --fix",
