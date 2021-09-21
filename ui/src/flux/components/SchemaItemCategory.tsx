@@ -72,9 +72,9 @@ class SchemaItemCategory extends PureComponent<
           className="flux-schema--item"
           onClick={this.handleClick}
           data-test="schema-category-field"
-          >
+        >
           <div className="flex-schema-item-group flux-schema-item--expandable">
-            <div 
+            <div
               className="flux-schema--expander"
               data-test="schema-category-item"
             />
