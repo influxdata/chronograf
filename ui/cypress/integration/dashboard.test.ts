@@ -18,7 +18,7 @@ describe('variables', () => {
       .click()
       cy.get('[data-test="dropdown--item"]')
       .each(($el, index, $list) => {
-        if($el.text() == 'InfluxTest2'){
+        if($el.text() == 'Influx 2'){
           $el.click()}
     })
     cy.getByTitle('Flux').click()
@@ -70,7 +70,7 @@ describe('variables', () => {
 
     cy.get('[data-test="dropdown--item"]')
       .each(($el, index, $list) => {
-        if($el.text() == 'InfluxTest2'){
+        if($el.text() == 'Influx 2'){
           $el.click()}
         })
 
@@ -92,7 +92,7 @@ describe('variables', () => {
     cy.get(':nth-child(1) > .dropdown > .dropdown--button').click()
     cy.get('[data-test="dropdown--item"]')
       .each(($el, index, $list) => {
-        if($el.text() == 'InfluxTest2'){
+        if($el.text() == 'Influx 2'){
           $el.click()}
         })
 
@@ -110,7 +110,7 @@ describe('variables', () => {
     cy.get('[data-test=add-template-variable]').click()
     cy.get('[data-test=variable-name-type]')
       .clear()
-      .type('iHopeThisNameDoesNotExist',{delay:200})
+      .type('iHopeThisNameDoesNotExist',{delay:400})
     cy.get('[data-test=btn-accept]').should('be.disabled')
     cy.get('[data-test=btn-cancel]').click()
 
@@ -123,7 +123,7 @@ describe('variables', () => {
     cy.getByTestID('confirm-btn').click()
 
     cy.getByTestID('edit')
-      .first()
+      // .first()
       .click()
     cy.getByTitle('Confirm').click()
     cy.getByTestID('confirm-btn').click()
