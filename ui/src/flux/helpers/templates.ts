@@ -1,6 +1,10 @@
-import {Template, TimeRange} from 'src/types'
+import {Template, TemplateValueType, TimeRange} from 'src/types'
 import {computeInterval} from 'src/tempVars/utils/replace'
-import {DEFAULT_DURATION_MS} from 'src/shared/constants'
+import {
+  DEFAULT_DURATION_MS,
+  TEMP_VAR_DASHBOARD_TIME,
+  TEMP_VAR_UPPER_DASHBOARD_TIME,
+} from 'src/shared/constants'
 import {extractImports} from 'src/shared/parsing/flux/extractImports'
 import {getMinDuration} from 'src/shared/parsing/flux/durations'
 import fluxString from './fluxString'
@@ -59,6 +63,30 @@ function fluxVariables(
     return `dashboardTime = ${lower}\nupperDashboardTime = ${upper}\nautoInterval = ${interval}ms\nv = {${extraVars} timeRangeStart: dashboardTime , timeRangeStop: upperDashboardTime , windowPeriod: autoInterval }`
   }
   return `dashboardTime = ${lower}\nupperDashboardTime = ${upper}\nv = {${extraVars} timeRangeStart: dashboardTime , timeRangeStop: upperDashboardTime }`
+}
+
+/**
+ * Extracts exact time range from `dashboardTime` and `upperDashboardTime` variables or returns undefined.
+ */
+export function extractExactTimeRange(
+  templates: Template[]
+): TimeRange | undefined {
+  const lower = templates.find(x => x.tempVar === TEMP_VAR_DASHBOARD_TIME)
+  const upper = templates.find(x => x.tempVar === TEMP_VAR_UPPER_DASHBOARD_TIME)
+  if (!lower || !upper) {
+    return undefined
+  }
+
+  if (
+    lower.values?.[0]?.type === TemplateValueType.TimeStamp &&
+    upper.values?.[0]?.type === TemplateValueType.TimeStamp
+  ) {
+    return {
+      lower: lower.values?.[0]?.value,
+      upper: upper.values?.[0]?.value,
+    }
+  }
+  return undefined
 }
 
 export const renderTemplatesInScript = async (
