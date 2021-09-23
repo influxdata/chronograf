@@ -11,6 +11,7 @@
 1. [#5804](https://github.com/influxdata/chronograf/pull/5804): Name tickscript after a `name` task variable, when defined.
 1. [#5805](https://github.com/influxdata/chronograf/pull/5805): Make templated tasks read-only.
 1. [#5806](https://github.com/influxdata/chronograf/pull/5806): Repair paginated retrival of flux tasks.
+1. [#5815](https://github.com/influxdata/chronograf/pull/5815): Update time range of flux queries on dashboard zoom.
 
 ### Features
 
