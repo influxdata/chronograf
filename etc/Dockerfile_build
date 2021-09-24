@@ -36,7 +36,7 @@ ENV GOPATH /root/go
 ENV GO_VERSION 1.16.4
 ENV GO_ARCH amd64
 ENV GO111MODULES ON
-RUN wget https://storage.googleapis.com/golang/go${GO_VERSION}.linux-${GO_ARCH}.tar.gz; \
+RUN wget https://golang.org/dl/go${GO_VERSION}.linux-${GO_ARCH}.tar.gz; \
    tar -C /usr/local/ -xf /go${GO_VERSION}.linux-${GO_ARCH}.tar.gz ; \
    rm /go${GO_VERSION}.linux-${GO_ARCH}.tar.gz
 ENV PATH /usr/local/go/bin:$PATH
