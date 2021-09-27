@@ -18,7 +18,7 @@ describe('variables', () => {
       .click()
       cy.get('[data-test="dropdown--item"]')
       .each(($el, index, $list) => {
-        if($el.text() == 'Influx 2'){
+        if($el.text() == 'InfluxTest2'){
           $el.click()}
     })
     cy.getByTitle('Flux').click()
@@ -70,20 +70,19 @@ describe('variables', () => {
 
     cy.get('[data-test="dropdown--item"]')
       .each(($el, index, $list) => {
-        if($el.text() == 'Influx 2'){
+        if($el.text() == 'InfluxTest2'){
           $el.click()}
         })
-
-    cy.get('[data-test="dropdown-toggle"]')
+    
+    cy.get(':nth-child(3) > [data-test=dropdown-toggle] > .btn > .dropdown-selected')
       .filter(':visible')
-      .click({force: true})
+      .click()
 
     cy.get('[data-test=dropdown-ul] > .fancy-scroll--container > .fancy-scroll--view > :nth-child(8) > a').click()
-    //.contains('InfluxQL Meta Query').should('exist').click()
     
     
     cy.wait(2000)
-    cy.get('[data-test=variable-name-type]').type('iHopeThisNameDoesNotExist')
+    cy.get('[data-test=variable-name-type]').type('iHopeThisNameDoesNotExist', {delay:600})
     cy.wait(2500)
     cy.get('[data-test="btn-accept"]').click()
     cy.wait(2500)
@@ -92,7 +91,7 @@ describe('variables', () => {
     cy.get(':nth-child(1) > .dropdown > .dropdown--button').click()
     cy.get('[data-test="dropdown--item"]')
       .each(($el, index, $list) => {
-        if($el.text() == 'Influx 2'){
+        if($el.text() == 'InfluxTest2'){
           $el.click()}
         })
 
@@ -103,7 +102,7 @@ describe('variables', () => {
           $el.click()}
         })
 
-    cy.get('[data-test=variable-name-type]').type('{selectAll}{backspace}iHopeThisNameDoesNotExist22')
+    cy.get('[data-test=variable-name-type]').type('{selectAll}{backspace}iHopeThisNameDoesNotExist22' , {delay:600})
     cy.get('[data-test="btn-accept"]').click()   
     cy.get('.template-control--container').contains('iHopeThisNameDoesNotExist')
     

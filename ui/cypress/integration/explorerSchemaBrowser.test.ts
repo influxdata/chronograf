@@ -35,12 +35,12 @@ describe('Navigate', () => {
     cy.get('[data-test=source-button-selector] > .dropdown > .dropdown--button')
       .click()
     cy.get('[data-test=dropdown--item]')
-      .filter(':contains("Influx 2")')
+      .filter(':contains("InfluxTest2")')
       .click()
     cy.getByTitle('Flux').click()
 
     cy.writeManualData('new_data', 'value=2')
-    cy.writeManualData('new_data', 'value=2.5')
+    cy.writeManualData('new_data', 'value=2.50')
     cy.writeManualData('new_data', 'value=5.8')
     cy.writeManualData('new_data', 'value=3.7')
     cy.writeManualData('new_data', 'value=4.5')
@@ -68,7 +68,7 @@ describe('Navigate', () => {
 it('default connetion to influxdb v2', ()=> {
   cy.clickNav(8, 'Configuration')
   cy.get('h1')
-  cy.getByTestID('set-conection-panel-body').contains('Influx 2 (Default)')
+  cy.getByTestID('set-conection-panel-body').contains('InfluxTest2 (Default)')
   })
 
   it('add data to explore', () => { 
