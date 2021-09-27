@@ -32,6 +32,51 @@ export const clickNav = (index: number, label: string): Cypress.Chainable => {
   return cy.get('h1.page-header--title').should('have.text', `${label}`)
 }
 
+export const getByTestID = (
+  dataTest: string,
+  options?: Partial<
+    Cypress.Loggable & Cypress.Timeoutable & Cypress.Withinable & Cypress.Shadow
+  >
+): Cypress.Chainable => {
+  return cy.get(`[data-test="${dataTest}"]`, options)
+}
+
+export const getByTitle = (name: string): Cypress.Chainable => {
+  return cy.get(`[title="${name}"]`)
+}
+
+// create connection with influxDB v1
+function createConnectionV1(url: string,
+  connectionName: string,
+  username: string,
+  password: string,
+  dbname: string,
+) {
+cy.get('input[id="Connection URL"]').clear().type(url)
+cy.get('input[id="Connection Name"]').clear()
+cy.get('input[id="Connection Name"]').clear().type(connectionName)
+cy.get('input[id="Username"]').clear().type(username)
+cy.get('input[id="Password"]').clear().type(password)
+cy.get('input[id="Telegraf Database Name"]').clear().type(dbname)
+cy.get('input[id="Default Retention Policy"]').clear()
+}
+
+function createConnectionV2(url: string,
+  connectionName: string,
+  organization: string,
+  token: string,
+  dbname: string,
+) {
+cy.get('div[title="Default connection"]').click()
+cy.get('div[title="InfluxDB v2 Auth"]').click()
+cy.get('input[id="Connection URL"]').clear().type(url)
+cy.get('input[id="Connection Name"]').clear().type(connectionName)
+cy.get('input[id="Organization"]').clear().type(organization)
+cy.get('input[id="Token"]').clear().type(token)
+cy.get('input[id="Telegraf Database Name"]').clear().type(dbname)
+cy.get('input[id="Default Retention Policy"]').clear()
+}
+
 export const setupConnection = () => {
   cy.visit('http://localhost:8888/')
   // cy.waitFor('#tooltip', {timeout: 20000});
@@ -84,18 +129,6 @@ export const setupConnection = () => {
   })
 }
 
-export const getByTestID = (
-  dataTest: string,
-  options?: Partial<
-    Cypress.Loggable & Cypress.Timeoutable & Cypress.Withinable & Cypress.Shadow
-  >
-): Cypress.Chainable => {
-  return cy.get(`[data-test="${dataTest}"]`, options)
-}
-
-export const getByTitle = (name: string): Cypress.Chainable => {
-  return cy.get(`[title="${name}"]`)
-}
 
 export const writeManualData = (fieldKey: string, dataValue: string) => {
   cy.get('[data-test=write-data-button]').click()
@@ -116,12 +149,3 @@ Cypress.Commands.add('setupConnection', setupConnection)
 Cypress.Commands.add('getByTestID', getByTestID)
 Cypress.Commands.add('getByTitle', getByTitle)
 Cypress.Commands.add('writeManualData', writeManualData)
-function createConnectionV1(
-  arg0: string,
-  arg1: string,
-  arg2: string,
-  arg3: string,
-  arg4: string
-) {
-  throw new Error('Function not implemented.')
-}
