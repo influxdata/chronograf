@@ -15,6 +15,11 @@
 1. [#5810](https://github.com/influxdata/chronograf/pull/5810): Repair calculation of flux query range duration.
 1. [#5815](https://github.com/influxdata/chronograf/pull/5815): Update time range of flux queries on dashboard zoom.
 
+
+### Other
+
+1. [#5816](https://github.com/influxdata/chronograf/pull/5816): Upgrade golang to 1.17.1.
+
 ### Features
 
 1. [#5807](https://github.com/influxdata/chronograf/pull/#5807): Distinguish template tasks in task list.

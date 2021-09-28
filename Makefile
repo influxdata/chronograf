@@ -82,7 +82,7 @@ dep: .jsdep .godep
 .godep:
 ifndef GOBINDATA
 	@echo "Installing go-bindata"
-	go get -u github.com/kevinburke/go-bindata/go-bindata
+	go install github.com/kevinburke/go-bindata/...@v3.22.0+incompatible
 	GO111MODULE=on go get
 endif
 	@touch .godep
