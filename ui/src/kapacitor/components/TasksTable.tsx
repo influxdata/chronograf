@@ -62,7 +62,11 @@ export class TaskRow extends PureComponent<TaskRowProps> {
     return (
       <tr key={task.id}>
         <td style={{minWidth: colName}}>
-          <Link className="link-success" to={editLink}>
+          <Link
+            style={{color: task['template-id'] ? 'gray' : undefined}}
+            className="link-success"
+            to={editLink}
+          >
             {task.name}
           </Link>
         </td>
