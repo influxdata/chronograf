@@ -1753,6 +1753,534 @@ const AST_8 = {
   ],
 }
 
+const AST_9 = {
+  type: 'Package',
+  package: 'main',
+  files: [
+    {
+      type: 'File',
+      location: {
+        start: {line: 1, column: 1},
+        end: {line: 7, column: 71},
+        source:
+          'dashboardTime = 2020-09-20T14:50:00.000Z\nupperDashboardTime = 2021-09-20T14:50:00.000Z\nv = { timeRangeStart: dashboardTime , timeRangeStop: upperDashboardTime }\n\nfrom(bucket: "my-bucket/autogen")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == "test" and r._field == "val")',
+      },
+      metadata: 'parser-type=go',
+      package: null,
+      imports: null,
+      body: [
+        {
+          type: 'VariableAssignment',
+          location: {
+            start: {line: 1, column: 1},
+            end: {line: 1, column: 41},
+            source: 'dashboardTime = 2020-09-20T14:50:00.000Z',
+          },
+          id: {
+            type: 'Identifier',
+            location: {
+              start: {line: 1, column: 1},
+              end: {line: 1, column: 14},
+              source: 'dashboardTime',
+            },
+            name: 'dashboardTime',
+          },
+          init: {
+            type: 'DateTimeLiteral',
+            location: {
+              start: {line: 1, column: 17},
+              end: {line: 1, column: 41},
+              source: '2020-09-20T14:50:00.000Z',
+            },
+            value: '2020-09-20T14:50:00Z',
+          },
+        },
+        {
+          type: 'VariableAssignment',
+          location: {
+            start: {line: 2, column: 1},
+            end: {line: 2, column: 46},
+            source: 'upperDashboardTime = 2021-09-20T14:50:00.000Z',
+          },
+          id: {
+            type: 'Identifier',
+            location: {
+              start: {line: 2, column: 1},
+              end: {line: 2, column: 19},
+              source: 'upperDashboardTime',
+            },
+            name: 'upperDashboardTime',
+          },
+          init: {
+            type: 'DateTimeLiteral',
+            location: {
+              start: {line: 2, column: 22},
+              end: {line: 2, column: 46},
+              source: '2021-09-20T14:50:00.000Z',
+            },
+            value: '2021-09-20T14:50:00Z',
+          },
+        },
+        {
+          type: 'VariableAssignment',
+          location: {
+            start: {line: 3, column: 1},
+            end: {line: 3, column: 74},
+            source:
+              'v = { timeRangeStart: dashboardTime , timeRangeStop: upperDashboardTime }',
+          },
+          id: {
+            type: 'Identifier',
+            location: {
+              start: {line: 3, column: 1},
+              end: {line: 3, column: 2},
+              source: 'v',
+            },
+            name: 'v',
+          },
+          init: {
+            type: 'ObjectExpression',
+            location: {
+              start: {line: 3, column: 5},
+              end: {line: 3, column: 74},
+              source:
+                '{ timeRangeStart: dashboardTime , timeRangeStop: upperDashboardTime }',
+            },
+            properties: [
+              {
+                type: 'Property',
+                location: {
+                  start: {line: 3, column: 7},
+                  end: {line: 3, column: 36},
+                  source: 'timeRangeStart: dashboardTime',
+                },
+                key: {
+                  type: 'Identifier',
+                  location: {
+                    start: {line: 3, column: 7},
+                    end: {line: 3, column: 21},
+                    source: 'timeRangeStart',
+                  },
+                  name: 'timeRangeStart',
+                },
+                value: {
+                  type: 'Identifier',
+                  location: {
+                    start: {line: 3, column: 23},
+                    end: {line: 3, column: 36},
+                    source: 'dashboardTime',
+                  },
+                  name: 'dashboardTime',
+                },
+              },
+              {
+                type: 'Property',
+                location: {
+                  start: {line: 3, column: 39},
+                  end: {line: 3, column: 72},
+                  source: 'timeRangeStop: upperDashboardTime',
+                },
+                key: {
+                  type: 'Identifier',
+                  location: {
+                    start: {line: 3, column: 39},
+                    end: {line: 3, column: 52},
+                    source: 'timeRangeStop',
+                  },
+                  name: 'timeRangeStop',
+                },
+                value: {
+                  type: 'Identifier',
+                  location: {
+                    start: {line: 3, column: 54},
+                    end: {line: 3, column: 72},
+                    source: 'upperDashboardTime',
+                  },
+                  name: 'upperDashboardTime',
+                },
+              },
+            ],
+          },
+        },
+        {
+          type: 'ExpressionStatement',
+          location: {
+            start: {line: 5, column: 1},
+            end: {line: 7, column: 71},
+            source:
+              'from(bucket: "my-bucket/autogen")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == "test" and r._field == "val")',
+          },
+          expression: {
+            type: 'PipeExpression',
+            location: {
+              start: {line: 5, column: 1},
+              end: {line: 7, column: 71},
+              source:
+                'from(bucket: "my-bucket/autogen")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == "test" and r._field == "val")',
+            },
+            argument: {
+              type: 'PipeExpression',
+              location: {
+                start: {line: 5, column: 1},
+                end: {line: 6, column: 59},
+                source:
+                  'from(bucket: "my-bucket/autogen")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)',
+              },
+              argument: {
+                type: 'CallExpression',
+                location: {
+                  start: {line: 5, column: 1},
+                  end: {line: 5, column: 34},
+                  source: 'from(bucket: "my-bucket/autogen")',
+                },
+                callee: {
+                  type: 'Identifier',
+                  location: {
+                    start: {line: 5, column: 1},
+                    end: {line: 5, column: 5},
+                    source: 'from',
+                  },
+                  name: 'from',
+                },
+                arguments: [
+                  {
+                    type: 'ObjectExpression',
+                    location: {
+                      start: {line: 5, column: 6},
+                      end: {line: 5, column: 33},
+                      source: 'bucket: "my-bucket/autogen"',
+                    },
+                    properties: [
+                      {
+                        type: 'Property',
+                        location: {
+                          start: {line: 5, column: 6},
+                          end: {line: 5, column: 33},
+                          source: 'bucket: "my-bucket/autogen"',
+                        },
+                        key: {
+                          type: 'Identifier',
+                          location: {
+                            start: {line: 5, column: 6},
+                            end: {line: 5, column: 12},
+                            source: 'bucket',
+                          },
+                          name: 'bucket',
+                        },
+                        value: {
+                          type: 'StringLiteral',
+                          location: {
+                            start: {line: 5, column: 14},
+                            end: {line: 5, column: 33},
+                            source: '"my-bucket/autogen"',
+                          },
+                          value: 'my-bucket/autogen',
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+              call: {
+                type: 'CallExpression',
+                location: {
+                  start: {line: 6, column: 6},
+                  end: {line: 6, column: 59},
+                  source:
+                    'range(start: v.timeRangeStart, stop: v.timeRangeStop)',
+                },
+                callee: {
+                  type: 'Identifier',
+                  location: {
+                    start: {line: 6, column: 6},
+                    end: {line: 6, column: 11},
+                    source: 'range',
+                  },
+                  name: 'range',
+                },
+                arguments: [
+                  {
+                    type: 'ObjectExpression',
+                    location: {
+                      start: {line: 6, column: 12},
+                      end: {line: 6, column: 58},
+                      source: 'start: v.timeRangeStart, stop: v.timeRangeStop',
+                    },
+                    properties: [
+                      {
+                        type: 'Property',
+                        location: {
+                          start: {line: 6, column: 12},
+                          end: {line: 6, column: 35},
+                          source: 'start: v.timeRangeStart',
+                        },
+                        key: {
+                          type: 'Identifier',
+                          location: {
+                            start: {line: 6, column: 12},
+                            end: {line: 6, column: 17},
+                            source: 'start',
+                          },
+                          name: 'start',
+                        },
+                        value: {
+                          type: 'MemberExpression',
+                          location: {
+                            start: {line: 6, column: 19},
+                            end: {line: 6, column: 35},
+                            source: 'v.timeRangeStart',
+                          },
+                          object: {
+                            type: 'Identifier',
+                            location: {
+                              start: {line: 6, column: 19},
+                              end: {line: 6, column: 20},
+                              source: 'v',
+                            },
+                            name: 'v',
+                          },
+                          property: {
+                            type: 'Identifier',
+                            location: {
+                              start: {line: 6, column: 21},
+                              end: {line: 6, column: 35},
+                              source: 'timeRangeStart',
+                            },
+                            name: 'timeRangeStart',
+                          },
+                        },
+                      },
+                      {
+                        type: 'Property',
+                        location: {
+                          start: {line: 6, column: 37},
+                          end: {line: 6, column: 58},
+                          source: 'stop: v.timeRangeStop',
+                        },
+                        key: {
+                          type: 'Identifier',
+                          location: {
+                            start: {line: 6, column: 37},
+                            end: {line: 6, column: 41},
+                            source: 'stop',
+                          },
+                          name: 'stop',
+                        },
+                        value: {
+                          type: 'MemberExpression',
+                          location: {
+                            start: {line: 6, column: 43},
+                            end: {line: 6, column: 58},
+                            source: 'v.timeRangeStop',
+                          },
+                          object: {
+                            type: 'Identifier',
+                            location: {
+                              start: {line: 6, column: 43},
+                              end: {line: 6, column: 44},
+                              source: 'v',
+                            },
+                            name: 'v',
+                          },
+                          property: {
+                            type: 'Identifier',
+                            location: {
+                              start: {line: 6, column: 45},
+                              end: {line: 6, column: 58},
+                              source: 'timeRangeStop',
+                            },
+                            name: 'timeRangeStop',
+                          },
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+            call: {
+              type: 'CallExpression',
+              location: {
+                start: {line: 7, column: 6},
+                end: {line: 7, column: 71},
+                source:
+                  'filter(fn: (r) =\u003e r._measurement == "test" and r._field == "val")',
+              },
+              callee: {
+                type: 'Identifier',
+                location: {
+                  start: {line: 7, column: 6},
+                  end: {line: 7, column: 12},
+                  source: 'filter',
+                },
+                name: 'filter',
+              },
+              arguments: [
+                {
+                  type: 'ObjectExpression',
+                  location: {
+                    start: {line: 7, column: 13},
+                    end: {line: 7, column: 70},
+                    source:
+                      'fn: (r) =\u003e r._measurement == "test" and r._field == "val"',
+                  },
+                  properties: [
+                    {
+                      type: 'Property',
+                      location: {
+                        start: {line: 7, column: 13},
+                        end: {line: 7, column: 70},
+                        source:
+                          'fn: (r) =\u003e r._measurement == "test" and r._field == "val"',
+                      },
+                      key: {
+                        type: 'Identifier',
+                        location: {
+                          start: {line: 7, column: 13},
+                          end: {line: 7, column: 15},
+                          source: 'fn',
+                        },
+                        name: 'fn',
+                      },
+                      value: {
+                        type: 'FunctionExpression',
+                        location: {
+                          start: {line: 7, column: 17},
+                          end: {line: 7, column: 70},
+                          source:
+                            '(r) =\u003e r._measurement == "test" and r._field == "val"',
+                        },
+                        params: [
+                          {
+                            type: 'Property',
+                            location: {
+                              start: {line: 7, column: 18},
+                              end: {line: 7, column: 19},
+                              source: 'r',
+                            },
+                            key: {
+                              type: 'Identifier',
+                              location: {
+                                start: {line: 7, column: 18},
+                                end: {line: 7, column: 19},
+                                source: 'r',
+                              },
+                              name: 'r',
+                            },
+                            value: null,
+                          },
+                        ],
+                        body: {
+                          type: 'LogicalExpression',
+                          location: {
+                            start: {line: 7, column: 24},
+                            end: {line: 7, column: 70},
+                            source:
+                              'r._measurement == "test" and r._field == "val"',
+                          },
+                          operator: 'and',
+                          left: {
+                            type: 'BinaryExpression',
+                            location: {
+                              start: {line: 7, column: 24},
+                              end: {line: 7, column: 48},
+                              source: 'r._measurement == "test"',
+                            },
+                            operator: '==',
+                            left: {
+                              type: 'MemberExpression',
+                              location: {
+                                start: {line: 7, column: 24},
+                                end: {line: 7, column: 38},
+                                source: 'r._measurement',
+                              },
+                              object: {
+                                type: 'Identifier',
+                                location: {
+                                  start: {line: 7, column: 24},
+                                  end: {line: 7, column: 25},
+                                  source: 'r',
+                                },
+                                name: 'r',
+                              },
+                              property: {
+                                type: 'Identifier',
+                                location: {
+                                  start: {line: 7, column: 26},
+                                  end: {line: 7, column: 38},
+                                  source: '_measurement',
+                                },
+                                name: '_measurement',
+                              },
+                            },
+                            right: {
+                              type: 'StringLiteral',
+                              location: {
+                                start: {line: 7, column: 42},
+                                end: {line: 7, column: 48},
+                                source: '"test"',
+                              },
+                              value: 'test',
+                            },
+                          },
+                          right: {
+                            type: 'BinaryExpression',
+                            location: {
+                              start: {line: 7, column: 53},
+                              end: {line: 7, column: 70},
+                              source: 'r._field == "val"',
+                            },
+                            operator: '==',
+                            left: {
+                              type: 'MemberExpression',
+                              location: {
+                                start: {line: 7, column: 53},
+                                end: {line: 7, column: 61},
+                                source: 'r._field',
+                              },
+                              object: {
+                                type: 'Identifier',
+                                location: {
+                                  start: {line: 7, column: 53},
+                                  end: {line: 7, column: 54},
+                                  source: 'r',
+                                },
+                                name: 'r',
+                              },
+                              property: {
+                                type: 'Identifier',
+                                location: {
+                                  start: {line: 7, column: 55},
+                                  end: {line: 7, column: 61},
+                                  source: '_field',
+                                },
+                                name: '_field',
+                              },
+                            },
+                            right: {
+                              type: 'StringLiteral',
+                              location: {
+                                start: {line: 7, column: 65},
+                                end: {line: 7, column: 70},
+                                source: '"val"',
+                              },
+                              value: 'val',
+                            },
+                          },
+                        },
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  ],
+}
+
 export const AST_TESTS: Array<[string, string, number, any]> = [
   [
     'basic relative query',
@@ -1801,5 +2329,12 @@ export const AST_TESTS: Array<[string, string, number, any]> = [
     'range(start: -3s, stop: -2s)\nrange(start: -2s, stop: -1s)\nrange(start: -1s)',
     1000,
     AST_8,
+  ],
+  [
+    'query with range defined using v.timeRangeStart and v.timeRangeStop',
+    'dashboardTime = 2020-09-20T14:50:00.000Z\nupperDashboardTime = 2021-09-20T14:50:00.000Z\nv = { timeRangeStart: dashboardTime , timeRangeStop: upperDashboardTime }\n\nfrom(bucket: "my-bucket/autogen")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == "test" and r._field == "val")',
+    new Date('2021-09-20T14:50:00.000Z').getTime() -
+      new Date('2020-09-20T14:50:00.000Z').getTime(),
+    AST_9,
   ],
 ]
