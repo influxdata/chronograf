@@ -16,7 +16,10 @@ import {notify} from 'src/shared/actions/notifications'
 import {fluxResponseTruncatedError} from 'src/shared/copy/notifications'
 import {getDeep} from 'src/utils/wrappers'
 import {restartable} from 'src/shared/utils/restartable'
-import {renderTemplatesInScript} from 'src/flux/helpers/templates'
+import {
+  extractExactTimeRange,
+  renderTemplatesInScript,
+} from 'src/flux/helpers/templates'
 import {parseResponse} from 'src/shared/parsing/flux/response'
 import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 import {DEFAULT_X_PIXELS} from 'src/shared/constants'
@@ -281,7 +284,7 @@ class TimeSeries extends PureComponent<Props, State> {
 
     const renderedScript = await renderTemplatesInScript(
       script,
-      timeRange,
+      extractExactTimeRange(templates) || timeRange, // zoom functionality updates templates, prefer zoomed time range in flux
       templates,
       fluxASTLink
     )

@@ -1,4 +1,7 @@
-import {renderTemplatesInScript} from 'src/flux/helpers/templates'
+import {
+  extractExactTimeRange,
+  renderTemplatesInScript,
+} from 'src/flux/helpers/templates'
 import {Template, TemplateType, TemplateValueType} from 'src/types'
 
 const allTemplateTypes: Template[] = [
@@ -283,5 +286,114 @@ describe('Flux.helpers.renderTemplatesInScript', () => {
     expected +=
       '\n\nfrom(bucket: "a") |> range(start: 0) |> aggregateWindow(every: v.windowPeriod, fn: mean)'
     expect(actual).toEqual(expected)
+  })
+})
+
+describe('extractExactTimeRange', () => {
+  it('extracts no value for unknown exact range', async () => {
+    const tests: Template[][] = [
+      [],
+      [
+        {
+          id: 'dashtime',
+          tempVar: ':dashboardTime:',
+          type: TemplateType.TimeStamp,
+          label: '',
+          values: [
+            {
+              value: '2021-01-01T00:45:07.929Z',
+              type: TemplateValueType.TimeStamp,
+              selected: true,
+              localSelected: true,
+            },
+          ],
+        },
+      ],
+      [
+        {
+          id: 'upperdashtime',
+          tempVar: ':upperDashboardTime:',
+          type: TemplateType.TimeStamp,
+          label: '',
+          values: [
+            {
+              value: '2021-01-01T00:46:18.532Z',
+              type: TemplateValueType.TimeStamp,
+              selected: true,
+              localSelected: true,
+            },
+          ],
+        },
+      ],
+      [
+        {
+          id: 'dashtime',
+          tempVar: ':dashboardTime:',
+          type: TemplateType.Constant,
+          label: '',
+          values: [
+            {
+              value: 'now() - 5m',
+              type: TemplateValueType.Constant,
+              selected: true,
+              localSelected: true,
+            },
+          ],
+        },
+        {
+          id: 'upperdashtime',
+          tempVar: ':upperDashboardTime:',
+          type: TemplateType.Constant,
+          label: '',
+          values: [
+            {
+              value: 'now()',
+              type: TemplateValueType.Constant,
+              selected: true,
+              localSelected: true,
+            },
+          ],
+        },
+      ],
+    ]
+    tests.forEach(t => {
+      expect(extractExactTimeRange(t)).toEqual(undefined)
+    })
+  })
+  it('extracts valid time range for an exact range', async () => {
+    const templates = [
+      {
+        id: 'dashtime',
+        tempVar: ':dashboardTime:',
+        type: TemplateType.TimeStamp,
+        label: '',
+        values: [
+          {
+            value: '2021-01-01T00:45:07.929Z',
+            type: TemplateValueType.TimeStamp,
+            selected: true,
+            localSelected: true,
+          },
+        ],
+      },
+      {
+        id: 'upperdashtime',
+        tempVar: ':upperDashboardTime:',
+        type: TemplateType.TimeStamp,
+        label: '',
+        values: [
+          {
+            value: '2021-01-01T00:46:18.532Z',
+            type: TemplateValueType.TimeStamp,
+            selected: true,
+            localSelected: true,
+          },
+        ],
+      },
+    ]
+    expect(extractExactTimeRange(templates)).toEqual({
+      lower: '2021-01-01T00:45:07.929Z',
+      upper: '2021-01-01T00:46:18.532Z',
+    })
   })
 })
