@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import idGenerator from 'uuid'
 import Deferred from 'src/worker/Deferred'
-import DB from './Database'
+import {readPayload, writePayload} from './Database'
 import {
   TimeSeriesServerResponse,
   TimeSeriesToTableGraphReturnType,
@@ -98,7 +98,7 @@ class JobManager {
     const deferred = this.jobs[data.origin]
     if (deferred) {
       if (data.result === 'success') {
-        this.fetchPayload(deferred, data.id)
+        this.fetchPayload(deferred, data)
       } else {
         deferred.reject(data.error)
       }
@@ -106,10 +106,9 @@ class JobManager {
     }
   }
 
-  private fetchPayload = async (deferred, id) => {
+  private fetchPayload = async (deferred, msg) => {
     try {
-      const payload = await DB.get(id)
-      await DB.del(id)
+      const payload = readPayload(msg)
       deferred.resolve(payload)
     } catch (e) {
       console.error(e)
@@ -152,9 +151,10 @@ class JobManager {
 
     this.jobs[id] = deferred
 
-    await DB.put(id, payload)
+    const msg = {id, type}
+    await writePayload(msg, payload)
 
-    this.postMessage({id, type})
+    this.postMessage(msg)
 
     return deferred.promise
   }

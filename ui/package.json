@@ -40,7 +40,7 @@
     "@types/dygraphs": "^1.1.6",
     "@types/enzyme": "^3.1.13",
     "@types/jest": "^26.0.20",
-    "@types/levelup": "^0.0.30",
+    "@types/levelup": "^4.3.3",
     "@types/lodash": "^4.14.104",
     "@types/node": "^9.4.6",
     "@types/papaparse": "^4.1.34",
