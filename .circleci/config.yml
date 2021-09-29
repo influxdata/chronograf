@@ -68,7 +68,7 @@ jobs:
   #### cypress e2e tests
   e2e:
     docker:
-      - image: cimg/go:1.15.6-browsers
+      - image: cimg/go:1.17.1-browsers
       - image: influxdb:2.0
         environment:
           INFLUXD_HTTP_BIND_ADDRESS: :9999
