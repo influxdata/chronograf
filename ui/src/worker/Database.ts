@@ -6,7 +6,7 @@ let DB
 levelup(encoding(level('worker'), {valueEncoding: 'json'}), (err, db) => {
   DB = db
   if (err) {
-    // index DB not available, can happen in private modes
+    // can happen in Firefox private mode
     // eslint-disable-next-line no-console
     console.debug('IndexedDB is not available')
   }
@@ -18,12 +18,13 @@ interface DBMessage {
 }
 
 export const writePayload = async (msg: DBMessage, payload: any) => {
-  try {
-    if (DB) {
-      return DB.put(msg.id, payload)
+  if (DB) {
+    try {
+      await DB.put(msg.id, payload)
+      return
+    } catch (e) {
+      console.error('Unable to write to IndexedDB', e)
     }
-  } catch (e) {
-    // unable to write to DB
   }
   msg.payload = payload
 }
