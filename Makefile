@@ -129,7 +129,6 @@ e2e-prepare:
 	docker rm -f 	influx_test2
 	docker run -d --name influx_test1 --env INFLUXD_HTTP_BIND_ADDRESS=:8086 -p 8086:8086 influxdb:1.8
 	docker run -d --name influx_test2 --env INFLUXD_HTTP_BIND_ADDRESS=:9999 -p 9999:9999 influxdb:2.0
-	./etc/scripts/influxdb-onboarding.sh
 
 e2e:
 	cd ui && yarn test:e2e
