@@ -2,12 +2,6 @@ version: 2.1
 orbs:
   browser-tools: circleci/browser-tools@1.1.3
 
-commands:
-  influxdb-onboarding:
-    steps:
-      - run:
-          name: "Post onBoarding request to InfluxDB 2"
-          command: sh ./etc/scripts/influxdb-onboarding.sh
 
 workflows:
   version: 2
