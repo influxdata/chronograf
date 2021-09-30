@@ -50,7 +50,7 @@ describe('Navigate', () => {
       .click()
   
     cy.get('[data-test="dropdown--item"]')
-      .filter(':contains("_tasks")')
+      .filter(':contains("my-bucket")')
       .click()
     cy.get(':nth-child(2) > .dropdown > [data-test=wizard-bucket-selected]')
       .click()
