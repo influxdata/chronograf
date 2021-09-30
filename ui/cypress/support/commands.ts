@@ -134,7 +134,7 @@ export const writeManualData = (fieldKey: string, dataValue: string) => {
   cy.get('[data-test=write-data-button]').click()
   cy.get('[data-test=dropdown-toggle]').first().click()
 
-  cy.get('[data-test="dropdown-item"]').filter(':contains("_tasks")').click()
+  cy.get('[data-test="dropdown-item"]').filter(':contains("my-bucket")').click()
 
   cy.getByTitle('Write data manually using Line Protocol').click()
   cy.get('[data-test=manual-entry-field]')
