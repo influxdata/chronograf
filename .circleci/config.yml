@@ -81,7 +81,6 @@ jobs:
     steps:
       - browser-tools/install-chrome
       - checkout
-      - influxdb-onboarding
       - restore_cache:
           name: Restore Yarn Cache
           keys:
