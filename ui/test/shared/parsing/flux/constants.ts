@@ -192,3 +192,14 @@ export const ERROR_RESPONSE = `#datatype,string,string
 #default,,
 ,error,reference
 ,${ERROR}`
+
+export const WINDOWED_WITH_EMPTY = `
+#group,false,false,true,true,false,false,true,true
+#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,double,string,string
+#default,_result,,,,,,,
+,result,table,_start,_stop,_time,_value,_field,_measurement
+,,0,2020-12-31T23:00:00Z,2021-01-01T04:00:00Z,2021-01-01T02:44:10Z,,value,temperature2
+,,0,2020-12-31T23:00:00Z,2021-01-01T04:00:00Z,2021-01-01T02:45:00Z,22,value,temperature2
+,,0,2020-12-31T23:00:00Z,2021-01-01T04:00:00Z,2021-01-01T02:45:50Z,,value,temperature2
+,,0,2020-12-31T23:00:00Z,2021-01-01T04:00:00Z,2021-01-01T02:46:40Z,23,value,temperature2
+,,0,2020-12-31T23:00:00Z,2021-01-01T04:00:00Z,2021-01-01T02:47:30Z,,value,temperature2`
