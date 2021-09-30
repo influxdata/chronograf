@@ -5,6 +5,7 @@ import {
   MISMATCHED,
   MULTI_VALUE_ROW,
   MIXED_DATATYPES,
+  WINDOWED_WITH_EMPTY,
 } from 'test/shared/parsing/flux/constants'
 
 describe('fluxTablesToDygraph', () => {
@@ -69,5 +70,18 @@ describe('fluxTablesToDygraph', () => {
       nonNumericColumns: ['my_fun_col'],
     }
     expect(actual).toEqual(expected)
+  })
+  it('returns null if value is not available', () => {
+    const fluxTables = parseResponse(WINDOWED_WITH_EMPTY)
+    const actual = fluxTablesToDygraph(fluxTables)
+    const expected = [
+      [new Date('2021-01-01T02:44:10Z'), null],
+      [new Date('2021-01-01T02:45:00Z'), 22],
+      [new Date('2021-01-01T02:45:50Z'), null],
+      [new Date('2021-01-01T02:46:40Z'), 23],
+      [new Date('2021-01-01T02:47:30Z'), null],
+    ]
+
+    expect(actual.dygraphsData).toEqual(expected)
   })
 })

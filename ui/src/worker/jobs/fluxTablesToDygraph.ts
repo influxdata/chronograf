@@ -36,7 +36,7 @@ export const fluxTablesToDygraphWork = (
 
       for (const [seriesName, value] of Object.entries(values)) {
         const i = allColumnNames.indexOf(seriesName) + DATE_INDEX_OFFSET
-        dygraphValuesByTime[date][i] = Number(value)
+        dygraphValuesByTime[date][i] = value === '' ? null : Number(value)
       }
     }
   }
