@@ -15,7 +15,7 @@
 1. [#5810](https://github.com/influxdata/chronograf/pull/5810): Repair calculation of flux query range duration.
 1. [#5815](https://github.com/influxdata/chronograf/pull/5815): Update time range of flux queries on dashboard zoom.
 1. [#5818](https://github.com/influxdata/chronograf/pull/5818): Support Firefox private mode.
-
+1. [#5821](https://github.com/influxdata/chronograf/pull/5821): Skip missing values in line chart instead of returning zeros.
 
 ### Other
 
