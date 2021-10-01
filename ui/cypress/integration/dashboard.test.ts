@@ -32,7 +32,7 @@ describe('variables', () => {
     .click()
   
     cy.get('[data-test="dropdown--item"]')
-    .filter(':contains("_tasks")')
+    .filter(':contains("my-bucket")')
     .click()
     cy.get(':nth-child(2) > .dropdown > [data-test=wizard-bucket-selected]')
     .click()
@@ -109,7 +109,7 @@ describe('variables', () => {
     cy.get('[data-test=add-template-variable]').click()
     cy.get('[data-test=variable-name-type]')
       .clear()
-      .type('iHopeThisNameDoesNotExist',{delay:400})
+      .type('iHopeThisNameDoesNotExist',{delay:600})
     cy.get('[data-test=btn-accept]').should('be.disabled')
     cy.get('[data-test=btn-cancel]').click()
 
