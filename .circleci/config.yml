@@ -72,6 +72,12 @@ jobs:
       - image: influxdb:2.0
         environment:
           INFLUXD_HTTP_BIND_ADDRESS: :9999
+          DOCKER_INFLUXDB_INIT_MODE: setup
+          DOCKER_INFLUXDB_INIT_USERNAME: my-user
+          DOCKER_INFLUXDB_INIT_PASSWORD: my-password
+          DOCKER_INFLUXDB_INIT_ORG: my-org
+          DOCKER_INFLUXDB_INIT_BUCKET: my-bucket
+          DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: my-token
       - image: influxdb:1.8
         environment:
           INFLUXD_HTTP_BIND_ADDRESS: :8086
