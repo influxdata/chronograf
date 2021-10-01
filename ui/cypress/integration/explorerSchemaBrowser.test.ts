@@ -140,7 +140,7 @@ it('default connetion to influxdb v2', ()=> {
       .click()
     
     cy.getByTestID('dropdown--item')
-      .filter(':contains("_tasks")')
+      .filter(':contains("my-bucket")')
       .click()
     cy.get(':nth-child(2) > .dropdown > [data-test=wizard-bucket-selected]')
       .click()
@@ -212,7 +212,7 @@ it('default connetion to influxdb v2', ()=> {
     cy.get('.form--wrapper > :nth-child(1) > .dropdown > [data-test=wizard-bucket-selected]').click()
 
     cy.getByTestID('dropdown--item')
-      .filter(':contains("_tasks")')
+      .filter(':contains("my-bucket")')
       .click()
     cy.get(':nth-child(2) > .dropdown > [data-test=wizard-bucket-selected]')
         .click()
