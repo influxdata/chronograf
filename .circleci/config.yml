@@ -81,17 +81,15 @@ jobs:
     environment:
       GOCACHE: /tmp/go-cache
     steps:
-      - attach_workspace:
-          at: /home/circleci
       - browser-tools/install-chrome
-#      - checkout
-#      - restore_cache:
-#          name: Restore Yarn Cache
-#          keys:
-#            - yarn-deps-lock-{{ checksum "yarn.lock" }}
-#      - run: sudo apt-get update && sudo apt-get install netcat-openbsd
-#      - run:
-#          command: make
+      - checkout
+      - restore_cache:
+          name: Restore Yarn Cache
+          keys:
+            - yarn-deps-lock-{{ checksum "yarn.lock" }}
+      - run: sudo apt-get update && sudo apt-get install netcat-openbsd
+      - run:
+          command: make
       - run:
           command: ./chronograf
           background: true
