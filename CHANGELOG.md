@@ -18,7 +18,7 @@
 1. [#5803](https://github.com/influxdata/chronograf/pull/5803): Repair time rendering in horizontal table.
 1. [#5804](https://github.com/influxdata/chronograf/pull/5804): Name tickscript after a `name` task variable, when defined.
 1. [#5805](https://github.com/influxdata/chronograf/pull/5805): Make template tasks read-only.
-1. [#5806](https://github.com/influxdata/chronograf/pull/5806): Repair paginated retrival of flux tasks.
+1. [#5806](https://github.com/influxdata/chronograf/pull/5806): Repair paginated retrieval of flux tasks.
 1. [#5808](https://github.com/influxdata/chronograf/pull/5808): Enforce one organization between browser tabs.
 1. [#5810](https://github.com/influxdata/chronograf/pull/5810): Repair calculation of flux query range duration.
 1. [#5815](https://github.com/influxdata/chronograf/pull/5815): Update time range of flux queries on dashboard zoom.
