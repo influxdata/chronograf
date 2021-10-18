@@ -1,14 +1,11 @@
 Download the protobuf binary by either:
 - `brew install protobuf`
-- Download from protobuf [github release](https://github.com/google/protobuf/releases/tag/v3.1.0) and place in your $PATH
+- Download from protobuf [github release](https://github.com/protocolbuffers/protobuf/releases/tag/v3.17.3) and place in your $PATH
 
 
-run the following 4 commands listed here https://github.com/gogo/protobuf
+run the following command
 ```sh
-go get github.com/gogo/protobuf/proto
-go get github.com/gogo/protobuf/jsonpb
-go get github.com/gogo/protobuf/protoc-gen-gogo
-go get github.com/gogo/protobuf/gogoproto
+go install google.golang.org/protobuf/cmd/protoc-gen-go
 ```
 
-now, you can regenerate the `.proto` file: `protoc --gogo_out=. internal.proto`
+now, you can regenerate the `.proto` file: `protoc --go_out=. internal.proto`
