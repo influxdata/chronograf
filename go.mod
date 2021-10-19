@@ -8,7 +8,6 @@ require (
 	github.com/abbot/go-http-auth v0.4.0
 	github.com/bouk/httprouter v0.0.0-20160817010721-ee8b3818a7f5
 	github.com/elazarl/go-bindata-assetfs v1.0.0
-	github.com/gogo/protobuf v1.3.2
 	github.com/golang-jwt/jwt/v4 v4.0.0
 	github.com/google/go-cmp v0.5.5
 	github.com/google/go-github v17.0.0+incompatible
@@ -18,7 +17,6 @@ require (
 	github.com/influxdata/kapacitor v1.5.10-0.20210518140415-452f2b236610
 	github.com/influxdata/usage-client v0.0.0-20160829180054-6d3895376368
 	github.com/jessevdk/go-flags v1.4.0
-	github.com/kevinburke/go-bindata v3.22.0+incompatible // indirect
 	github.com/lestrrat-go/jwx v0.9.0
 	github.com/microcosm-cc/bluemonday v1.0.15
 	github.com/sergi/go-diff v1.1.0
@@ -30,6 +28,7 @@ require (
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e
 	golang.org/x/oauth2 v0.0.0-20210427180440-81ed05c6b58c
 	google.golang.org/api v0.46.0
+	google.golang.org/protobuf v1.27.1
 )
 
 require (
@@ -47,6 +46,7 @@ require (
 	github.com/form3tech-oss/jwt-go v3.2.2+incompatible // indirect
 	github.com/go-sql-driver/mysql v1.4.1 // indirect
 	github.com/gofrs/uuid v3.3.0+incompatible // indirect
+	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/geo v0.0.0-20190916061304-5b978397cfec // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -99,7 +99,6 @@ require (
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20210503173045-b96a97608f20 // indirect
 	google.golang.org/grpc v1.37.0 // indirect
-	google.golang.org/protobuf v1.26.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect

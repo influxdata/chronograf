@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/gogo/protobuf/proto"
 	"github.com/influxdata/chronograf"
+	"google.golang.org/protobuf/proto"
 )
 
-//go:generate protoc --gogo_out=. internal.proto
+//go:generate protoc --go_out=. internal.proto
 
 // MarshalBuild encodes a build to binary protobuf format.
 func MarshalBuild(b chronograf.BuildInfo) ([]byte, error) {
