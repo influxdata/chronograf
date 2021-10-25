@@ -6,7 +6,8 @@
 
 ### Other
 
-1. [#5824](https://github.com/influxdata/chronograf/pull/5824): Move from `gogo/protobuf` to `google.golang.org/protobuf` for wire format messages
+1. [#5824](https://github.com/influxdata/chronograf/pull/5824): Move from `gogo/protobuf` to `google.golang.org/protobuf` for wire format messages.
+1. [#5825](https://github.com/influxdata/chronograf/pull/5825): Upgrade bluemonday to resolve CVE-2021-42576.
 
 ## v1.9.1 [2021-10-08]
 
