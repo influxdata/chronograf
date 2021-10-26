@@ -125,9 +125,7 @@ run-dev: chronogiraffe
 	./chronograf -d --log-level=debug
 
 e2e-prepare:
-	docker rm -f 	influx_test1
 	docker rm -f 	influx_test2
-	docker run -d --name influx_test1 --env INFLUXD_HTTP_BIND_ADDRESS=:8086 -p 8086:8086 influxdb:1.8
 	docker run -d --name influx_test2 --env INFLUXD_HTTP_BIND_ADDRESS=:9999 -p 9999:9999 -e DOCKER_INFLUXDB_INIT_MODE=setup -e DOCKER_INFLUXDB_INIT_USERNAME=my-user -e DOCKER_INFLUXDB_INIT_PASSWORD=my-password -e DOCKER_INFLUXDB_INIT_ORG=my-org -e DOCKER_INFLUXDB_INIT_BUCKET=my-bucket -e DOCKER_INFLUXDB_INIT_RETENTION=1w -e DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-token influxdb:2.0
 
 e2e:
