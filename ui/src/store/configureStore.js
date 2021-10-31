@@ -38,7 +38,7 @@ const rootReducer = combineReducers({
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 const KEY_ORG = 'orgchrono' // local storage key holding active organization
-let currentOrg // active organization, possibly empty or undefined
+let currentOrg = '' // active organization, possibly empty or undefined
 
 export default function configureStore(initialState, browserHistory) {
   const routingMiddleware = routerMiddleware(browserHistory)
@@ -56,9 +56,9 @@ export default function configureStore(initialState, browserHistory) {
 
   // reload whenever current organization is changed from another tab/window
   try {
-    currentOrg = window.localStorage.getItem(KEY_ORG)
+    currentOrg = window.localStorage.getItem(KEY_ORG) || ''
     window.addEventListener('storage', function (e) {
-      if (e.storageArea !== window.localStorage && e.key !== KEY_ORG) {
+      if (e.storageArea !== window.localStorage || e.key !== KEY_ORG) {
         return
       }
       if (e.newValue !== currentOrg) {
