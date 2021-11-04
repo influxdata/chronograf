@@ -168,9 +168,13 @@ it('default connetion to influxdb v2', ()=> {
         if($el.text() == 'Thunder'){
           $el.click()}})
   
-      cy.get(':nth-child(1) > .form-control').type('Amos ')
+    cy.get(':nth-child(1) > .form-control').type('Amos ')
     // edit graph
-      cy.getByTitle('Save').click()
+    cy.getByTitle('Save').click()
+          
+    cy.clickNav(4, 'Dashboards')
+    cy.getByTitle('Confirm').click({multiple :true, force: true})
+    cy.getByTestID('confirm-btn').click({multiple: true, force:true})
   })
   it('snapshot',() =>{
     cy.clickNav(3, 'Explore')

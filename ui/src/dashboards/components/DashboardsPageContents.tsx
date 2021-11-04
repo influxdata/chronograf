@@ -57,7 +57,7 @@ class DashboardsPageContents extends Component<Props, State> {
     return (
       <div className="panel dashboards-page-panel">
         {this.renderPanelHeading}
-        <div className="panel-body">
+        <div className="panel-body" data-test="dashboard-panel">
           <DashboardsTable
             dashboards={this.filteredDashboards}
             dashboardsStatus={dashboardsStatus}

@@ -1,5 +1,3 @@
-import { delay } from "cypress/types/bluebird"
-
 describe('variables', () => {
   beforeEach(cy.setupConnection)
   
@@ -8,9 +6,7 @@ describe('variables', () => {
     cy.clickNav(4, 'Dashboards')
     cy.getByTitle('Create Dashboard')
       .click()
-    cy.get('[data-test=rename-dashboard]')
-      .click()
-      .clear()
+    cy.getByTestID('rename-dashboard')
       .type('testing_dashboard{enter}')
     
     cy.clickNav(3, 'Explore')
@@ -44,18 +40,20 @@ describe('variables', () => {
       .click()
     
     //selecting dynamic dropdown
-    cy.get('[data-test="dropdown--item"]')
-      .each(($el, index, $list) => {
-        if($el.text() == 'testing_dashboard'){
-          $el.click()}
-        })
+    cy.get('[data-test="dropdown--item"]').contains('testing_dashboard').then(()=>
+        cy.get('[data-test="dropdown--item"]')
+          .each(($el, index, $list) => {
+            if($el.text() == 'testing_dashboard'){
+              $el.click()}
+            } 
+          ))
     
     cy.get('.form--wrapper > :nth-child(1) > .dropdown > [data-test=wizard-bucket-selected]')
     .click()
     cy.get('.form--wrapper > :nth-child(1) > .dropdown > [data-test=wizard-bucket-selected]')
     .should('include.text', 'testing_dashboard')
 
-    cy.get('[data-test="input-field"]')
+    cy.getByTestID('input-field')
         .eq(0)
       .type('testing_simple_data')
     cy.getByTitle('Must choose at least 1 dashboard and set a name').click()
@@ -63,12 +61,32 @@ describe('variables', () => {
 
   it('create and delete variables', () => {
     cy.clickNav(4, 'Dashboards')
-    cy.get(':nth-child(1) > :nth-child(1) > a').click()
+    cy.get('h2', {timeout: 10000}).should('be.visible')
+    cy.get('h2',).then($a => {
+      cy.wrap($a)
+      if ($a.text().includes('0 Dashboards')) {
+        cy.get('h4').then($b => {
+          cy.wrap($b)
+          cy.getByTitle('Create Dashboard').click()
+        })
+        
+      }
+      else{
+        cy.getByTitle('Confirm')
+          .click({multiple: true, force:true})
+          .then(()=>
+            cy.getByTestID('confirm-btn')
+              .click({multiple: true, force:true}))
+              .then(()=>
+                cy.getByTitle('Create Dashboard').click({force: true})
+        )}
+    })
+
     cy.getByTitle('Show Template Variables Controls').click()
-    cy.get('[data-test=add-template-variable]').click()
+    cy.get('[data-test=add-template-variable]').click({force: true})
     cy.get(':nth-child(1) > .dropdown > [data-test=wizard-bucket-selected]').click()
 
-    cy.get('[data-test="dropdown--item"]')
+    cy.getByTestID('dropdown--item')
       .each(($el, index, $list) => {
         if($el.text() == 'InfluxTest2'){
           $el.click()}
@@ -80,55 +98,62 @@ describe('variables', () => {
 
     cy.get('[data-test=dropdown-ul] > .fancy-scroll--container > .fancy-scroll--view > :nth-child(8) > a').click()
     
-    
     cy.wait(2000)
-    cy.get('[data-test=variable-name-type]').type('iHopeThisNameDoesNotExist', {delay:600})
-    cy.wait(2500)
-    cy.get('[data-test="btn-accept"]').click()
+    cy.getByTestID('variable-name-type', {timeout: 2000})
+      .clear()
+      .type('iHopeThisNameDoesNotExist', {delay:200})
+
+    cy.getByTestID('btn-accept').click()
     cy.wait(2500)
 
-    cy.get('[data-test=add-template-variable]').click()
+    cy.getByTestID('add-template-variable').click()
     cy.get(':nth-child(1) > .dropdown > .dropdown--button').click()
-    cy.get('[data-test="dropdown--item"]')
+    cy.getByTestID('dropdown--item')
       .each(($el, index, $list) => {
         if($el.text() == 'InfluxTest2'){
           $el.click()}
         })
 
     cy.get(':nth-child(3) > [data-test=dropdown-toggle] > .btn > .dropdown-selected').click()
-    cy.get('[data-test="dropdown-ul"]')
+    cy.getByTestID('dropdown-ul')
       .each(($el, index, $list) => {
         if($el.text() == 'Flux Query'){
           $el.click()}
-        })
+        })   
+    cy.getByTestID('variable-name-type', {timeout: 2000})
+      .type('{selectAll}{backspace}iHopeThisNameDoesNotExist22' , {delay:600})
 
-    cy.get('[data-test=variable-name-type]').type('{selectAll}{backspace}iHopeThisNameDoesNotExist22' , {delay:600})
-    cy.get('[data-test="btn-accept"]').click()   
+    cy.getByTestID('btn-accept').click()   
     cy.get('.template-control--container').contains('iHopeThisNameDoesNotExist')
     
-    cy.get('[data-test=add-template-variable]').click()
-    cy.get('[data-test=variable-name-type]')
-      .clear()
-      .type('iHopeThisNameDoesNotExist',{delay:600})
-    cy.get('[data-test=btn-accept]').should('be.disabled')
-    cy.get('[data-test=btn-cancel]').click()
+    cy.getByTestID('add-template-variable').click()
+    cy.getByTestID('variable-name-type', {timeout: 2000})
+      .type('{selectAll}{backspace}iHopeThisNameDoesNotExist',{delay:400})
+
+
+    cy.getByTestID('btn-accept').should('be.disabled')
+    cy.getByTestID('btn-cancel').click()
 
 
     //deletes existing variable
     cy.getByTestID('edit')
-      .first()
+      .last()
       .click()
     cy.getByTitle('Confirm').click()
     cy.getByTestID('confirm-btn').click()
-
-    cy.getByTestID('edit')
-      // .first()
-      .click()
+    cy.wait(500)
+    cy.getByTestID('edit').then($a => {
+      cy.wrap($a)
+      .first()
+      .click({ force: true })})
     cy.getByTitle('Confirm').click()
     cy.getByTestID('confirm-btn').click()
 
     cy.get('.template-control--dropdown').should('not.exist')
     cy.get('[data-test="empty-state"]').should('exist')
 
+    cy.clickNav(4, 'Dashboards')
+    cy.getByTitle('Confirm').click({multiple: true, force:true}).then(()=>
+    cy.getByTestID('confirm-btn').click({multiple: true, force:true}))
   })
 })
