@@ -23,6 +23,8 @@ import {
 } from 'src/admin/actions/influxdb'
 
 import {notify as notifyAction} from 'shared/actions/notifications'
+import {Button, IconFont, ComponentStatus} from 'src/reusable_ui'
+import moment from 'moment'
 
 class QueriesPage extends Component {
   constructor(props) {
@@ -55,7 +57,16 @@ class QueriesPage extends Component {
       <div className="panel panel-solid">
         <div className="panel-heading">
           <h2 className="panel-title">{title}</h2>
-          <div style={{float: 'right'}}>
+          <div style={{float: 'right', display: 'flex'}}>
+            <div style={{marginRight: '5px'}}>
+              <Button
+                customClass="csv-export"
+                text="CSV"
+                icon={IconFont.Download}
+                status={ComponentStatus.Default}
+                onClick={this.downloadCSV}
+              />
+            </div>
             <AutoRefreshDropdown
               selected={updateInterval}
               onChoose={this.changeRefreshInterval}
@@ -135,6 +146,27 @@ class QueriesPage extends Component {
   handleKillQuery = query => {
     const {source, killQuery} = this.props
     killQuery(source.links.proxy, query)
+  }
+
+  downloadCSV = () => {
+    const queries = this.props.queries || {}
+    const csv = queries.reduce((acc, val) => {
+      const db = val.database.replace(/"/g, '""')
+      const query = val.query.replace(/"/g, '""')
+      return `${acc}"${db}","${query}",${val.duration}${'\n'}`
+    }, 'database,query,duration\n')
+    const blob = new Blob([csv], {type: 'text/csv'})
+    const a = document.createElement('a')
+
+    a.href = window.URL.createObjectURL(blob)
+    a.target = '_blank'
+    a.download = `${moment().format(
+      'YYYY-MM-DD-HH-mm-ss'
+    )} Chronograf Queries.csv`
+
+    document.body.appendChild(a)
+    a.click()
+    a.parentNode.removeChild(a)
   }
 }
 

@@ -1,9 +1,13 @@
 ## v1.9.2
 
+### Features
+
+1. [#5831](https://github.com/influxdata/chronograf/pull/5831): Add download button on query management page.
+
 ### Bug Fixes
 
 1. [#5830](https://github.com/influxdata/chronograf/pull/5830): Repair enforcement of one organization between multiple tabs.
- 
+
 ### Other
 
 1. [#5824](https://github.com/influxdata/chronograf/pull/5824): Move from `gogo/protobuf` to `google.golang.org/protobuf` for wire format messages.
