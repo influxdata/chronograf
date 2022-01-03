@@ -25,6 +25,7 @@ interface Props {
   consoleMessage: string
   onChangeType: (type: string) => void
   onChangeID: (e: ChangeEvent<HTMLInputElement>) => void
+  onChangeName: (name: string) => void
   isNewTickscript: boolean
   unsavedChanges: boolean
 }
@@ -41,6 +42,7 @@ class Tickscript extends PureComponent<Props> {
       onChangeScript,
       onChangeType,
       onChangeID,
+      onChangeName,
       unsavedChanges,
       isNewTickscript,
       areLogsVisible,
@@ -66,6 +68,7 @@ class Tickscript extends PureComponent<Props> {
               onSelectDbrps={onSelectDbrps}
               onChangeType={onChangeType}
               onChangeID={onChangeID}
+              onChangeName={onChangeName}
               task={task}
             />
             <TickscriptEditor

@@ -2,12 +2,11 @@ import React, {Component, ChangeEvent} from 'react'
 
 import TickscriptType from 'src/kapacitor/components/TickscriptType'
 import MultiSelectDBDropdown from 'src/shared/components/MultiSelectDBDropdown'
-import TickscriptID, {
-  TickscriptStaticID,
-} from 'src/kapacitor/components/TickscriptID'
+import TickscriptID from 'src/kapacitor/components/TickscriptID'
 
 import {Task} from 'src/types'
 import {DBRP} from 'src/types/kapacitor'
+import TickscriptNameEditor from './TickscriptNameEditor'
 
 interface DBRPDropdownItem extends DBRP {
   name: string
@@ -18,6 +17,7 @@ interface Props {
   onSelectDbrps: (dbrps: DBRP[]) => void
   onChangeType: (type: string) => void
   onChangeID: (e: ChangeEvent<HTMLInputElement>) => void
+  onChangeName: (name: string) => void
   task: Task
 }
 
@@ -42,13 +42,13 @@ class TickscriptEditorControls extends Component<Props> {
   }
 
   private get tickscriptID() {
-    const {isNewTickscript, onChangeID, task} = this.props
+    const {isNewTickscript, onChangeID, onChangeName, task} = this.props
 
     if (isNewTickscript) {
       return <TickscriptID onChangeID={onChangeID} id={task.id} />
     }
 
-    return <TickscriptStaticID id={this.taskID} />
+    return <TickscriptNameEditor name={this.taskID} onRename={onChangeName} />
   }
 
   private get taskID() {
