@@ -4,6 +4,7 @@
 
 1. [#5831](https://github.com/influxdata/chronograf/pull/5831): Add download button on query management page.
 1. [#5836](https://github.com/influxdata/chronograf/pull/5836): Allow to rename TICKscript.
+
 ### Bug Fixes
 
 1. [#5830](https://github.com/influxdata/chronograf/pull/5830): Repair enforcement of one organization between multiple tabs.
