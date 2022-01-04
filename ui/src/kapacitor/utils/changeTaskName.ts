@@ -1,6 +1,6 @@
 const reNameDeclaration = new RegExp(
   // eslint-disable-next-line no-control-regex
-  "(?:^|\n)var[ \t]+name[ \t]*=[ \t]*'[^\n]+'\\s*?[\n]"
+  "(?:^|\n)var[ \t]+name[ \t]*=[ \t]*'[^\n]*'[ \r\t]*\n"
 )
 
 function escapeName(s: string) {
