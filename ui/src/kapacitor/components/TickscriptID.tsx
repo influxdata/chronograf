@@ -1,4 +1,4 @@
-import React, {Component, FunctionComponent, ChangeEvent} from 'react'
+import React, {Component, ChangeEvent} from 'react'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface TickscriptIDProps {
@@ -28,12 +28,5 @@ class TickscriptID extends Component<TickscriptIDProps> {
     )
   }
 }
-
-interface TickscriptStaticIDProps {
-  id: string
-}
-export const TickscriptStaticID: FunctionComponent<TickscriptStaticIDProps> = ({
-  id,
-}) => <h1 className="tickscript-controls--name">{id}</h1>
 
 export default TickscriptID
