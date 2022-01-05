@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react'
+import React, {CSSProperties, PureComponent} from 'react'
 import classnames from 'classnames'
 import {ClickOutside} from 'src/shared/components/ClickOutside'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -16,6 +16,7 @@ interface Props {
   disabled?: boolean
   customClass?: string
   position?: Position
+  style?: CSSProperties
 }
 
 interface State {
@@ -43,12 +44,13 @@ class ConfirmButton extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {text, confirmText, icon} = this.props
+    const {text, confirmText, icon, style} = this.props
 
     return (
       <ClickOutside onClickOutside={this.handleClickOutside}>
         <div
           className={this.className}
+          style={style}
           onClick={this.handleButtonClick}
           ref={r => (this.buttonDiv = r)}
           title={confirmText}
