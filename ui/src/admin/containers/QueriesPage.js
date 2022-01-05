@@ -153,8 +153,8 @@ class QueriesPage extends Component {
     const csv = queries.reduce((acc, val) => {
       const db = val.database.replace(/"/g, '""')
       const query = val.query.replace(/"/g, '""')
-      return `${acc}"${db}","${query}",${val.duration}${'\n'}`
-    }, 'database,query,duration\n')
+      return `${acc}"${db}","${query}",${val.duration},${val.status}${'\n'}`
+    }, 'database,query,duration,status\n')
     const blob = new Blob([csv], {type: 'text/csv'})
     const a = document.createElement('a')
 
