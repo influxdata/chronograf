@@ -21,7 +21,10 @@ const QueryRow = ({query, onKill}) => {
       <td>
         <code>{query.query}</code>
       </td>
-      <td style={{width: `${QUERIES_TABLE.colRunning}px`}} className="monotype">
+      <td
+        style={{width: `${QUERIES_TABLE.colDuration}px`}}
+        className="monotype"
+      >
         {duration}
       </td>
       <td

@@ -40,11 +40,11 @@ const QueriesTable = ({queries, queriesSort, changeSort, onKillQuery}) => {
           </th>
           <th>Query</th>
           <th
-            style={{width: `${QUERIES_TABLE.colRunning}px`}}
+            style={{width: `${QUERIES_TABLE.colDuration}px`}}
             className={`col--sortable ${timeSortClass}`}
             onClick={() => changeSort(newTimeSort)}
           >
-            Running
+            Duration
           </th>
           <th style={{width: `${QUERIES_TABLE.colKillQuery}px`}} />
         </tr>
