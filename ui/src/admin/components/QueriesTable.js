@@ -46,7 +46,7 @@ const QueriesTable = ({queries, queriesSort, changeSort, onKillQuery}) => {
           >
             Duration
           </th>
-          <th style={{width: `${QUERIES_TABLE.colKillQuery}px`}} />
+          <th style={{width: `${QUERIES_TABLE.colKillQuery}px`}}>Status</th>
         </tr>
       </thead>
       <tbody>
