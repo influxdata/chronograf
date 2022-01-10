@@ -13,7 +13,7 @@ export const ROLES_TABLE = {
 }
 export const QUERIES_TABLE = {
   colDatabase: 160,
-  colRunning: 80,
+  colDuration: 80,
   colKillQuery: 70,
 }
 export const ADMIN_TABLE = {

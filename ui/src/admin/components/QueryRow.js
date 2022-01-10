@@ -5,7 +5,7 @@ import ConfirmButton from 'shared/components/ConfirmButton'
 import {QUERIES_TABLE} from 'src/admin/constants/tableSizing'
 
 const QueryRow = ({query, onKill}) => {
-  const {database, duration} = query
+  const {database, duration, status} = query
   const wrappedKill = () => {
     onKill(query)
   }
@@ -21,20 +21,37 @@ const QueryRow = ({query, onKill}) => {
       <td>
         <code>{query.query}</code>
       </td>
-      <td style={{width: `${QUERIES_TABLE.colRunning}px`}} className="monotype">
+      <td
+        style={{width: `${QUERIES_TABLE.colDuration}px`}}
+        className="monotype"
+      >
         {duration}
       </td>
       <td
         style={{width: `${QUERIES_TABLE.colKillQuery}px`}}
-        className="text-right"
+        className="text-left"
       >
-        <ConfirmButton
-          text="Kill"
-          confirmAction={wrappedKill}
-          size="btn-xs"
-          type="btn-danger"
-          customClass="table--show-on-row-hover"
-        />
+        <div style={{width: '100%', position: 'relative'}}>
+          {status === 'running' ? (
+            <div
+              style={{
+                width: '100%',
+                position: 'absolute',
+                top: '-4px', // go over top td padding
+              }}
+            >
+              <ConfirmButton
+                text="Kill"
+                confirmAction={wrappedKill}
+                size="btn-xs"
+                type="btn-danger"
+                customClass="table--show-on-row-hover"
+                style={{width: '100%'}}
+              />
+            </div>
+          ) : undefined}
+          {status}
+        </div>
       </td>
     </tr>
   )

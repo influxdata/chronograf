@@ -14,7 +14,7 @@ export default function parseshowQueries(response) {
       id: value[series.columns.indexOf('qid')],
       database: value[series.columns.indexOf('database')],
       query: value[series.columns.indexOf('query')],
-      tcpHost: value[series.columns.indexOf('tcp_host')],
+      status: value[series.columns.indexOf('status')],
       duration: value[series.columns.indexOf('duration')],
     }
   })
