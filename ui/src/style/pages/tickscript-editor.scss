@@ -35,6 +35,24 @@ $tickscript-controls-height: 60px;
   font-size: 17px;
   font-weight: 400;
   color: $g13-mist;
+  
+  .icon {
+    padding-left: 6px;
+    position: absolute;
+    font-size: 15px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  &:hover {
+    cursor: text;
+    color: $g20-white;
+    background-color: $g2-kevlar;
+    border-color: $g2-kevlar;
+  }
+
+  &:hover .icon {
+    opacity: 1;
+  }  
 }
 .tickscript-controls--right {
   display: flex;

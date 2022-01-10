@@ -25,6 +25,7 @@ import {
   notifyKapacitorNotFound,
 } from 'src/shared/copy/notifications'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import changeTaskName from '../utils/changeTaskName'
 
 interface TaskResponse {
   id: number
@@ -200,6 +201,7 @@ export class TickscriptPage extends PureComponent<Props, State> {
         areLogsEnabled={areLogsEnabled}
         consoleMessage={consoleMessage}
         onChangeID={this.handleChangeID}
+        onChangeName={this.handleChangeName}
         onChangeType={this.handleChangeType}
         isNewTickscript={!this.isEditing}
         onSelectDbrps={this.handleSelectDbrps}
@@ -300,6 +302,17 @@ export class TickscriptPage extends PureComponent<Props, State> {
       task: {...this.state.task, id: e.target.value},
       unsavedChanges: true,
     })
+  }
+
+  private handleChangeName = (name: string): void => {
+    this.setState(state => ({
+      task: {
+        ...state.task,
+        tickscript: changeTaskName(state.task.tickscript, name),
+        name,
+      },
+      unsavedChanges: true,
+    }))
   }
 
   private handleToggleLogsVisibility = (areLogsVisible: boolean): void => {
