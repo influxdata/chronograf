@@ -89,81 +89,85 @@ class FluxQueryMaker extends PureComponent<Props, State> {
       fluxProportions,
       onSetFluxProportions,
     } = this.props
-    const {suggestions, isWizardActive, draftScriptStatus} = this.state
-
-    const [leftSize, middleSize, rightSize] = fluxProportions
-
-    const divisions = [
-      {
-        name: 'Schema',
-        size: leftSize,
-        headerButtons: [],
-        menuOptions: [],
-        render: () => <SchemaExplorer source={source} notify={notify} />,
-        headerOrientation: HANDLE_VERTICAL,
-      },
-      {
-        name: 'Script',
-        size: middleSize,
-        customClass: 'flux-query-maker--script',
-        headerOrientation: HANDLE_VERTICAL,
-        headerButtons: [
-          <Button
-            key={0}
-            text={'Script Wizard'}
-            onClick={this.handleShowWizard}
-            size={ComponentSize.ExtraSmall}
-          />,
-          <Button
-            key={1}
-            text={'Run Script'}
-            onClick={this.handleSubmitScript}
-            size={ComponentSize.ExtraSmall}
-            color={ComponentColor.Primary}
-          />,
-        ],
-        menuOptions: [],
-        render: visibility => (
-          <FluxEditor
-            status={draftScriptStatus}
-            script={draftScript}
-            visibility={visibility}
-            suggestions={suggestions}
-            onChangeScript={this.handleChangeDraftScript}
-            onSubmitScript={this.handleSubmitScript}
-            onShowWizard={this.handleShowWizard}
-            onCursorChange={this.handleCursorPosition}
-          />
-        ),
-      },
-      {
-        name: 'Flux Functions',
-        size: rightSize,
-        headerButtons: [],
-        menuOptions: [],
-        render: () => (
-          <FluxFunctionsToolbar
-            onInsertFluxFunction={this.handleInsertFluxFunction}
-          />
-        ),
-        headerOrientation: HANDLE_VERTICAL,
-      },
-    ]
+    if (!this.state.isWizardActive) {
+      const {suggestions, draftScriptStatus} = this.state
+      const [leftSize, middleSize, rightSize] = fluxProportions
+      const divisions = [
+        {
+          name: 'Schema',
+          size: leftSize,
+          headerButtons: [],
+          menuOptions: [],
+          render: () => <SchemaExplorer source={source} notify={notify} />,
+          headerOrientation: HANDLE_VERTICAL,
+        },
+        {
+          name: 'Script',
+          size: middleSize,
+          customClass: 'flux-query-maker--script',
+          headerOrientation: HANDLE_VERTICAL,
+          headerButtons: [
+            <Button
+              key={0}
+              text={'Script Wizard'}
+              onClick={this.handleShowWizard}
+              size={ComponentSize.ExtraSmall}
+            />,
+            <Button
+              key={1}
+              text={'Run Script'}
+              onClick={this.handleSubmitScript}
+              size={ComponentSize.ExtraSmall}
+              color={ComponentColor.Primary}
+            />,
+          ],
+          menuOptions: [],
+          render: visibility => (
+            <FluxEditor
+              status={draftScriptStatus}
+              script={draftScript}
+              visibility={visibility}
+              suggestions={suggestions}
+              onChangeScript={this.handleChangeDraftScript}
+              onSubmitScript={this.handleSubmitScript}
+              onShowWizard={this.handleShowWizard}
+              onCursorChange={this.handleCursorPosition}
+            />
+          ),
+        },
+        {
+          name: 'Flux Functions',
+          size: rightSize,
+          headerButtons: [],
+          menuOptions: [],
+          render: () => (
+            <FluxFunctionsToolbar
+              onInsertFluxFunction={this.handleInsertFluxFunction}
+            />
+          ),
+          headerOrientation: HANDLE_VERTICAL,
+        },
+      ]
+      return (
+        <div className="flux-script-wizard">
+          <div className="flux-script-wizard--children">
+            <Threesizer
+              orientation={HANDLE_VERTICAL}
+              divisions={divisions}
+              containerClass="page-contents"
+              onResize={onSetFluxProportions}
+            />
+          </div>
+        </div>
+      )
+    }
 
     return (
       <FluxScriptWizardDialog
         source={source}
-        isWizardActive={isWizardActive}
         onSetIsWizardActive={this.handleSetIsWizardActive}
         onAddToScript={this.handleAddToScript}
-      >
-        <Threesizer
-          orientation={HANDLE_VERTICAL}
-          divisions={divisions}
-          containerClass="page-contents"
-          onResize={onSetFluxProportions}
-        />
-      </FluxScriptWizardDialog>
+      ></FluxScriptWizardDialog>
     )
   }
 

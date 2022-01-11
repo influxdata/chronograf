@@ -41,8 +41,6 @@ const LAST_DROPDOWN_MENU_HEIGHT = 70
 
 interface Props {
   source: Source
-  children: JSX.Element
-  isWizardActive: boolean
   onSetIsWizardActive: (isWizardActive: boolean) => void
   onAddToScript: (script: string) => void
 }
@@ -77,15 +75,6 @@ class FluxScriptWizard extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {children, isWizardActive} = this.props
-
-    if (!isWizardActive) {
-      return (
-        <div className="flux-script-wizard">
-          <div className="flux-script-wizard--children">{children}</div>
-        </div>
-      )
-    }
     const {
       dbsToRPsStatus,
       measurements,
@@ -101,7 +90,6 @@ class FluxScriptWizard extends PureComponent<Props, State> {
 
     return (
       <div className="flux-script-wizard">
-        <div className="flux-script-wizard--children">{children}</div>
         <div className="flux-script-wizard--backdrop" />
         <div className="flux-script-wizard--wizard">
           <div className="flux-script-wizard--wizard-header">
