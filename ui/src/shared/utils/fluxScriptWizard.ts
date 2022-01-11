@@ -12,28 +12,6 @@ export interface DBsToRPs {
   [databaseName: string]: string[]
 }
 
-export async function fetchDBsToRPs(proxyLink: string): Promise<DBsToRPs> {
-  const dbsQuery = 'SHOW DATABASES'
-  const dbsResp = await proxy({source: proxyLink, query: dbsQuery})
-  const dbs = parseMetaQuery(dbsQuery, dbsResp.data).sort()
-
-  const rpsQuery = dbs
-    .map(db => `SHOW RETENTION POLICIES ON "${db}"`)
-    .join('; ')
-
-  const rpsResp = await proxy({source: proxyLink, query: rpsQuery})
-
-  const dbsToRPs: DBsToRPs = dbs.reduce((acc, db, i) => {
-    const series = rpsResp.data.results[i].series[0]
-    const namesIndex = series.columns.indexOf('name')
-    const rpNames = series.values.map(row => row[namesIndex])
-
-    return {...acc, [db]: rpNames}
-  }, {})
-
-  return dbsToRPs
-}
-
 export async function fetchMeasurements(
   proxyLink: string,
   database: string
