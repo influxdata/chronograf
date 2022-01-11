@@ -2,28 +2,11 @@ import {isEmpty} from 'lodash'
 
 import {TIMERANGE_START, WINDOW_PERIOD} from 'src/flux/helpers/templates'
 
-import {proxy} from 'src/utils/queryUrlGenerator'
-import {parseMetaQuery} from 'src/tempVars/parsing'
-
 import {RemoteDataState} from 'src/types'
 import {ComponentStatus} from 'src/reusable_ui'
 
 export interface DBsToRPs {
   [databaseName: string]: string[]
-}
-
-export async function fetchFields(
-  proxyLink: string,
-  database: string,
-  measurement: string
-): Promise<string[]> {
-  const query = `SHOW FIELD KEYS ON "${database}" FROM "${measurement}"`
-  const resp = await proxy({source: proxyLink, query})
-  const fields = parseMetaQuery(query, resp.data)
-
-  fields.sort()
-
-  return fields
 }
 
 export function formatDBwithRP(db: string, rp: string): string {
