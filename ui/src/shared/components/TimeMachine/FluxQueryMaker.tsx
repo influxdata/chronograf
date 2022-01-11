@@ -5,7 +5,7 @@ import {Position} from 'codemirror'
 // Components
 import SchemaExplorer from 'src/flux/components/SchemaExplorer'
 import FluxEditor from 'src/flux/components/FluxEditor'
-import FluxScriptWizard from 'src/shared/components/TimeMachine/FluxScriptWizard'
+import FluxScriptWizardDialog from 'src/shared/components/TimeMachine/FluxScriptWizardDialog'
 import Threesizer from 'src/shared/components/threesizer/Threesizer'
 import {Button, ComponentSize, ComponentColor} from 'src/reusable_ui'
 import FluxFunctionsToolbar from 'src/flux/components/flux_functions_toolbar/FluxFunctionsToolbar'
@@ -151,7 +151,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
     ]
 
     return (
-      <FluxScriptWizard
+      <FluxScriptWizardDialog
         source={source}
         isWizardActive={isWizardActive}
         onSetIsWizardActive={this.handleSetIsWizardActive}
@@ -163,7 +163,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
           containerClass="page-contents"
           onResize={onSetFluxProportions}
         />
-      </FluxScriptWizard>
+      </FluxScriptWizardDialog>
     )
   }
 
