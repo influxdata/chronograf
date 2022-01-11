@@ -12,19 +12,6 @@ export interface DBsToRPs {
   [databaseName: string]: string[]
 }
 
-export async function fetchMeasurements(
-  proxyLink: string,
-  database: string
-): Promise<string[]> {
-  const query = `SHOW MEASUREMENTS ON "${database}"`
-  const resp = await proxy({source: proxyLink, query})
-  const measurements = parseMetaQuery(query, resp.data)
-
-  measurements.sort()
-
-  return measurements
-}
-
 export async function fetchFields(
   proxyLink: string,
   database: string,
