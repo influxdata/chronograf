@@ -7,6 +7,7 @@ import FancyScrollbar from '../../FancyScrollbar'
 import {RemoteDataState, Source} from 'src/types'
 import {getBuckets} from 'src/flux/components/DatabaseList'
 import {Button, ComponentColor, ComponentSize} from 'src/reusable_ui'
+import AggregationSelector from './AggregationSelector'
 
 interface State {
   selectedBucket?: string
@@ -61,7 +62,7 @@ const FluxQueryBuilder = ({source, onSubmit, onShowEditor}: Props) => {
             </BuilderCard>
           </div>
         </FancyScrollbar>
-        <div className="flux-query-builder--right">
+        <AggregationSelector>
           <div className="flux-query-builder--actions">
             <Button
               size={ComponentSize.ExtraSmall}
@@ -76,7 +77,7 @@ const FluxQueryBuilder = ({source, onSubmit, onShowEditor}: Props) => {
               text="Submit"
             />
           </div>
-        </div>
+        </AggregationSelector>
       </div>
     </div>
   )
