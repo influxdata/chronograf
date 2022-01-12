@@ -210,13 +210,6 @@ class FluxQueryMaker extends PureComponent<Props, State> {
     this.setState({isWizardActive})
   }
 
-  private handleAddToScript = async (draftScript): Promise<void> => {
-    const {onChangeDraftScript} = this.props
-
-    await onChangeDraftScript(draftScript)
-    this.handleSubmitScript()
-  }
-
   private handleChangeDraftScript = async (
     draftScript: string
   ): Promise<void> => {
