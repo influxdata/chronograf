@@ -1,7 +1,12 @@
-import React, {useState} from 'react'
+import React, {useState, PureComponent} from 'react'
+import onClickOutside from 'react-onclickoutside'
 import Dropdown from 'src/shared/components/Dropdown'
 import {DURATIONS} from 'src/shared/constants/queryBuilder'
 
+function isDurationParseable(duration: string): boolean {
+  const durationRegExp = /^(([0-9]+)(y|mo|w|d|h|ms|s|m|us|µs|ns))+$/g
+  return !!duration.match(durationRegExp)
+}
 interface Props {
   selected: string | 'auto'
   autoPeriod: string
@@ -39,26 +44,10 @@ const WindowPeriod = ({selected, autoPeriod, onChoose}: Props) => {
       }}
     >
       {customDuration !== undefined ? (
-        <input
-          className="form-control input-sm"
-          placeholder="Search for a bucket"
-          type="text"
-          value={customDuration}
-          onChange={e => setCustomDuration(e.target.value)}
-          onKeyUp={e => {
-            if (e.key === 'Escape') {
-              e.stopPropagation()
-              setCustomDuration(undefined)
-            }
-            if (e.key === 'Enter') {
-              e.stopPropagation()
-              setCustomDuration(undefined)
-              onChoose(customDuration)
-            }
-          }}
-          spellCheck={false}
-          autoComplete="false"
-          autoFocus={true}
+        <CustomDurationInput
+          customDuration={customDuration}
+          setCustomDuration={setCustomDuration}
+          onChoose={onChoose}
         />
       ) : (
         <Dropdown
@@ -78,5 +67,51 @@ const WindowPeriod = ({selected, autoPeriod, onChoose}: Props) => {
     </div>
   )
 }
+
+interface CustomDurationProps {
+  customDuration: string
+  setCustomDuration: (value: string | undefined) => void
+  onChoose: (value: string) => void
+}
+class DurationInput extends PureComponent<CustomDurationProps> {
+  public render() {
+    const {customDuration, setCustomDuration, onChoose} = this.props
+    const valid = isDurationParseable(customDuration)
+    return (
+      <input
+        className="form-control input-sm"
+        placeholder="Enter custom duration"
+        type="text"
+        style={valid ? undefined : {border: '2px solid #F95F53'}}
+        value={customDuration}
+        onChange={e => setCustomDuration(e.target.value)}
+        onKeyUp={e => {
+          if (e.key === 'Escape') {
+            e.stopPropagation()
+            setCustomDuration(undefined)
+          }
+          if (e.key === 'Enter') {
+            e.stopPropagation()
+            if (valid) {
+              setCustomDuration(undefined)
+              onChoose(customDuration)
+            } else {
+              console.error('Invalid custom duration:', customDuration)
+            }
+          }
+        }}
+        onFocus={e => e.target.select()}
+        spellCheck={false}
+        autoComplete="false"
+        autoFocus={true}
+      />
+    )
+  }
+  public handleClickOutside = () => {
+    this.props.setCustomDuration(undefined)
+  }
+}
+
+const CustomDurationInput = onClickOutside(DurationInput)
 
 export default WindowPeriod
