@@ -58,17 +58,19 @@ const BucketsSelector = ({
         </BuilderCard.Menu>
         {list.length ? (
           <BuilderCard.Body>
-            {list.map(bucket => (
-              <div
-                className={classnames('flux-query-builder--list-item', {
-                  active: bucket === selectedBucket,
-                })}
-                onClick={() => onSelectBucket(bucket)}
-                key={bucket}
-              >
-                {bucket}
-              </div>
-            ))}
+            <div className="flux-query-builder--list">
+              {list.map(bucket => (
+                <div
+                  className={classnames('flux-query-builder--list-item', {
+                    active: bucket === selectedBucket,
+                  })}
+                  onClick={() => onSelectBucket(bucket)}
+                  key={bucket}
+                >
+                  {bucket}
+                </div>
+              ))}
+            </div>
           </BuilderCard.Body>
         ) : (
           <BuilderCard.Empty>No buckets matched your search</BuilderCard.Empty>
