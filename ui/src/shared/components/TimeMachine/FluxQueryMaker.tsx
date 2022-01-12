@@ -5,7 +5,6 @@ import {Position} from 'codemirror'
 // Components
 import SchemaExplorer from 'src/flux/components/SchemaExplorer'
 import FluxEditor from 'src/flux/components/FluxEditor'
-import FluxScriptWizardDialog from 'src/shared/components/TimeMachine/FluxScriptWizardDialog'
 import Threesizer from 'src/shared/components/threesizer/Threesizer'
 import {Button, ComponentSize, ComponentColor} from 'src/reusable_ui'
 import FluxFunctionsToolbar from 'src/flux/components/flux_functions_toolbar/FluxFunctionsToolbar'
@@ -33,6 +32,7 @@ import {
   ScriptStatus,
   FluxToolbarFunction,
 } from 'src/types/flux'
+import FluxQueryBuilder from './fluxQueryBuilder/FluxQueryBuilder'
 
 const CHECK_SCRIPT_DELAY = 600
 const VALID_SCRIPT_STATUS = {type: 'success', text: ''}
@@ -162,13 +162,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
       )
     }
 
-    return (
-      <FluxScriptWizardDialog
-        source={source}
-        onSetIsWizardActive={this.handleSetIsWizardActive}
-        onAddToScript={this.handleAddToScript}
-      ></FluxScriptWizardDialog>
-    )
+    return <FluxQueryBuilder source={source} />
   }
 
   private handleCursorPosition = (position: Position): void => {
@@ -209,7 +203,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
   }
 
   private handleShowWizard = (): void => {
-    this.setState({isWizardActive: true})
+    this.handleSetIsWizardActive(true)
   }
 
   private handleSetIsWizardActive = (isWizardActive: boolean): void => {

@@ -1,0 +1,85 @@
+.flux-query-builder {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  padding-top: $ix-marg-b;
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+  @include no-user-select();
+}
+
+.flux-query-builder--cards {
+  flex: 1 1 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+$flux-query-builder--list-item-bg: transparent;
+$flux-query-builder--list-item-text: $g11-sidewalk;
+$flux-query-builder--list-item-height: 28px;
+$flux-query-builder--list-gutter: 11px;
+$flux-query-builder--list-item-bg-hover: $g4-onyx;
+$flux-query-builder--list-item-text-hover: $g15-platinum;
+$flux-query-builder--list-item-bg-active: $g4-onyx;
+$flux-query-builder--list-item-text-active: $g18-cloud;
+$flux-query-builder--list-item-text-disabled: $g9-mountain;
+
+.flux-query-builder--list-item {
+  @include no-user-select();
+  background-color: $flux-query-builder--list-item-bg;
+  color: $flux-query-builder--list-item-text;
+  height: $flux-query-builder--list-item-height;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  list-style-type: none;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0 $flux-query-builder--list-gutter;
+  transition: color 0.25s ease, background-color 0.25s ease;
+
+  &:hover {
+    background-color: $flux-query-builder--list-item-bg-hover;
+    color: $flux-query-builder--list-item-text-hover;
+    cursor: pointer;
+  }
+  /* Active State */
+  &.active {
+    background-color: $flux-query-builder--list-item-bg-active;
+    background: linear-gradient(90deg, rgb(142, 31, 195) 0%, rgb(6, 111, 197) 100%);
+    color: $flux-query-builder--list-item-text-active;
+  }
+  /* Hide dropdowns unless item is active */
+  & > .dropdown {
+    visibility: hidden;
+  }
+  &.active > .dropdown {
+    visibility: visible;
+  }
+  /* Sub-item group for layout purposes */
+  & > span {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    margin-right: 8px;
+  }
+  /* Disabled State */
+  &.disabled {
+    font-style: italic;
+    color: $flux-query-builder--list-item-text-disabled;
+
+    &:hover {
+      cursor: default;
+      background-color: $flux-query-builder--list-item-bg;
+    }
+    
+    &.active {
+      background-color: $flux-query-builder--list-item-bg-active;
+    }
+  }
+}
