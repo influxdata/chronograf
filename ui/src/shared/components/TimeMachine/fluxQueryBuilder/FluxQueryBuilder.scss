@@ -7,8 +7,7 @@
   padding-top: $ix-marg-b;
   display: flex;
   flex-direction: column;
-  margin-left: 20px;
-  margin-bottom: 10px;
+  margin: 0 20px 10px 20px;
   @include no-user-select();
 }
 
@@ -51,7 +50,11 @@ $flux-query-builder--list-item-text-disabled: $g9-mountain;
   /* Active State */
   &.active {
     background-color: $flux-query-builder--list-item-bg-active;
-    background: linear-gradient(90deg, rgb(142, 31, 195) 0%, rgb(6, 111, 197) 100%);
+    background: linear-gradient(
+      90deg,
+      rgb(142, 31, 195) 0%,
+      rgb(6, 111, 197) 100%
+    );
     color: $flux-query-builder--list-item-text-active;
   }
   /* Hide dropdowns unless item is active */
@@ -78,9 +81,26 @@ $flux-query-builder--list-item-text-disabled: $g9-mountain;
       cursor: default;
       background-color: $flux-query-builder--list-item-bg;
     }
-    
+
     &.active {
       background-color: $flux-query-builder--list-item-bg-active;
+    }
+  }
+}
+
+.flux-query-builder--right {
+  flex: 0 0 228px;
+}
+.flux-query-builder--actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+
+  > * {
+    margin-right: 4px;
+    &:last-child {
+      flex-grow: 1;
     }
   }
 }

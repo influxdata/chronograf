@@ -6,6 +6,7 @@ import BucketsSelector from './BucketsSelector'
 import FancyScrollbar from '../../FancyScrollbar'
 import {RemoteDataState, Source} from 'src/types'
 import {getBuckets} from 'src/flux/components/DatabaseList'
+import {Button, ComponentColor, ComponentSize} from 'src/reusable_ui'
 
 interface State {
   selectedBucket?: string
@@ -14,8 +15,10 @@ interface State {
 }
 interface Props {
   source: Source
+  onSubmit: () => void
+  onShowEditor: () => void
 }
-const FluxQueryBuilder = ({source}: Props) => {
+const FluxQueryBuilder = ({source, onSubmit, onShowEditor}: Props) => {
   const [state, setState] = useState({
     selectedBucket: '',
     sortedBucketNames: [],
@@ -58,6 +61,22 @@ const FluxQueryBuilder = ({source}: Props) => {
             </BuilderCard>
           </div>
         </FancyScrollbar>
+        <div className="flux-query-builder--right">
+          <div className="flux-query-builder--actions">
+            <Button
+              size={ComponentSize.ExtraSmall}
+              onClick={onShowEditor}
+              text="Query Editor"
+              titleText="Switch to Flux Query Editor"
+            />
+            <Button
+              size={ComponentSize.ExtraSmall}
+              color={ComponentColor.Primary}
+              onClick={onSubmit}
+              text="Submit"
+            />
+          </div>
+        </div>
       </div>
     </div>
   )

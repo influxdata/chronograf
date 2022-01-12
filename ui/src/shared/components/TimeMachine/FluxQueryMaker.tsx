@@ -162,7 +162,13 @@ class FluxQueryMaker extends PureComponent<Props, State> {
       )
     }
 
-    return <FluxQueryBuilder source={source} />
+    return (
+      <FluxQueryBuilder
+        source={source}
+        onSubmit={this.handleSubmitScript}
+        onShowEditor={this.handleShowEditor}
+      />
+    )
   }
 
   private handleCursorPosition = (position: Position): void => {
@@ -203,11 +209,11 @@ class FluxQueryMaker extends PureComponent<Props, State> {
   }
 
   private handleShowWizard = (): void => {
-    this.handleSetIsWizardActive(true)
+    this.setState({isWizardActive: true})
   }
 
-  private handleSetIsWizardActive = (isWizardActive: boolean): void => {
-    this.setState({isWizardActive})
+  private handleShowEditor = (): void => {
+    this.setState({isWizardActive: false})
   }
 
   private handleChangeDraftScript = async (
