@@ -59,7 +59,7 @@ interface State {
   selectedAggFunction: string | null
 }
 
-class FluxScriptWizard extends PureComponent<Props, State> {
+class FluxScriptWizardDialog extends PureComponent<Props, State> {
   public state: State = {
     dbsToRPs: {},
     dbsToRPsStatus: RemoteDataState.NotStarted,
@@ -404,4 +404,4 @@ class FluxScriptWizard extends PureComponent<Props, State> {
   }
 }
 
-export default FluxScriptWizard
+export default FluxScriptWizardDialog
