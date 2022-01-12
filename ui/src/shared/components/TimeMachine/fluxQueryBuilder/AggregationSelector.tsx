@@ -10,7 +10,7 @@ interface Props {
   children?: JSX.Element
 }
 const AggregationSelector: FunctionComponent = ({children}: Props) => {
-  const [period, setPeriod] = useState('auto')
+  const [period, setPeriod] = useState('11s')
   const [fillMissing, setFillMissing] = useState(false)
 
   const functions = FUNCTIONS.map(f => f.name)
@@ -111,7 +111,7 @@ const AggregationSelector: FunctionComponent = ({children}: Props) => {
                 }
                 key={fn}
               >
-                <input type="checkbox" id={fn} checked={active} />
+                <input type="checkbox" id={fn} defaultChecked={active} />
                 <label htmlFor="{fn}">{fn}</label>
               </div>
             )
