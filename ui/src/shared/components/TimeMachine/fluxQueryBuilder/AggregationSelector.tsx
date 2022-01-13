@@ -1,15 +1,20 @@
 import React, {FunctionComponent, useState} from 'react'
+
+import {connect} from 'react-redux'
+import {notify} from 'src/shared/actions/notifications'
+import {fluxWizardError} from 'src/shared/copy/notifications'
+
 import {ComponentSize, SlideToggle} from 'src/reusable_ui'
 import ReactTooltip from 'react-tooltip'
-
 import BuilderCard from './BuilderCard'
 import WindowPeriod from './WindowPeriod'
 import {FUNCTIONS} from 'src/shared/constants/queryBuilder'
 
 interface Props {
+  notify: (notification: any) => void
   children?: JSX.Element
 }
-const AggregationSelector: FunctionComponent = ({children}: Props) => {
+const AggregationSelector: FunctionComponent = (props: Props) => {
   const [period, setPeriod] = useState('11s')
   const [fillMissing, setFillMissing] = useState(false)
 
@@ -17,7 +22,7 @@ const AggregationSelector: FunctionComponent = ({children}: Props) => {
   const [selectedFunctions, setSelectedFunctions] = useState(['mean'])
   return (
     <BuilderCard className="aggregation-selector" testID="aggregation-selector">
-      {children}
+      {props.children}
       <BuilderCard.Header
         title="Window Period"
         className="aggregation-selector-header"
@@ -106,6 +111,12 @@ const AggregationSelector: FunctionComponent = ({children}: Props) => {
               // at least one function must be selected
               if (newSelected.length) {
                 setSelectedFunctions(newSelected)
+              } else {
+                props.notify(
+                  fluxWizardError(
+                    'You must have at least one aggregation function selected'
+                  )
+                )
               }
             }
 
@@ -131,4 +142,4 @@ const AggregationSelector: FunctionComponent = ({children}: Props) => {
   )
 }
 
-export default AggregationSelector
+export default connect(null, {notify})(AggregationSelector)
