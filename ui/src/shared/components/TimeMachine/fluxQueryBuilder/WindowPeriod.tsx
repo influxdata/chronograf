@@ -1,7 +1,13 @@
 import React, {useState, PureComponent} from 'react'
+import {connect} from 'react-redux'
+import {bindActionCreators} from 'redux'
 import onClickOutside from 'react-onclickoutside'
+
+import {notify as notifyAction} from 'src/shared/actions/notifications'
 import Dropdown from 'src/shared/components/Dropdown'
 import {DURATIONS} from 'src/shared/constants/queryBuilder'
+import {Notification} from 'src/types/notifications'
+import {fluxWizardError} from 'src/shared/copy/notifications'
 
 function isDurationParseable(duration: string): boolean {
   const durationRegExp = /^(?:[1-9][0-9]*(?:y|mo|w|d|h|ms|s|m|us|µs|ns))+$/g
@@ -69,6 +75,7 @@ const WindowPeriod = ({selected, autoPeriod, onChoose}: Props) => {
 }
 
 interface CustomDurationProps {
+  notify: (notification: Notification) => void
   customDuration: string
   setCustomDuration: (value: string | undefined) => void
   onChoose: (value: string) => void
@@ -96,7 +103,9 @@ class DurationInput extends PureComponent<CustomDurationProps> {
               setCustomDuration(undefined)
               onChoose(customDuration)
             } else {
-              console.error('Invalid custom duration:', customDuration)
+              this.props.notify(
+                fluxWizardError(`Invalid duration literal: ${customDuration}`)
+              )
             }
           }
         }}
@@ -112,6 +121,12 @@ class DurationInput extends PureComponent<CustomDurationProps> {
   }
 }
 
-const CustomDurationInput = onClickOutside(DurationInput)
+const mapDispatchToProps = dispatch => ({
+  notify: bindActionCreators(notifyAction, dispatch),
+})
+const CustomDurationInput = connect(
+  null,
+  mapDispatchToProps
+)(onClickOutside(DurationInput))
 
 export default WindowPeriod

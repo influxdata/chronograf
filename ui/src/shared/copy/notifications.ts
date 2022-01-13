@@ -909,3 +909,9 @@ export const annotationsError = (message: string): Notification => ({
   ...defaultErrorNotification,
   message,
 })
+
+export const fluxWizardError = (message: string): Notification => ({
+  ...defaultErrorNotification,
+  duration: FIVE_SECONDS,
+  message,
+})
