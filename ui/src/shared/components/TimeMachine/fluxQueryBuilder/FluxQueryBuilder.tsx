@@ -6,7 +6,13 @@ import BucketsSelector from './BucketsSelector'
 import FancyScrollbar from '../../FancyScrollbar'
 import {RemoteDataState, Source} from 'src/types'
 import {getBuckets} from 'src/flux/components/DatabaseList'
-import {Button, ComponentColor, ComponentSize} from 'src/reusable_ui'
+import {
+  Button,
+  ButtonShape,
+  ComponentColor,
+  ComponentSize,
+  IconFont,
+} from 'src/reusable_ui'
 import AggregationSelector from './AggregationSelector'
 
 interface State {
@@ -60,6 +66,13 @@ const FluxQueryBuilder = ({source, onSubmit, onShowEditor}: Props) => {
                 }
               />
             </BuilderCard>
+            <Button
+              size={ComponentSize.Large}
+              customClass="flux-query-builder--add-card-button"
+              icon={IconFont.PlusSkinny}
+              onClick={() => console.error('Not Implemented')}
+              shape={ButtonShape.Square}
+            />
           </div>
         </FancyScrollbar>
         <AggregationSelector>

@@ -188,3 +188,9 @@ $flux-form-control-checkbox-gap: 20px;
     }
   }
 }
+button.flux-query-builder--add-card-button {
+  height: 100%;
+  background-color: $g4-onyx;
+  border-color: $g4-onyx;
+  flex: 0 0  32px;
+}
