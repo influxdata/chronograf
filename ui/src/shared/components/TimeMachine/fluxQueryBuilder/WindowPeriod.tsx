@@ -4,7 +4,7 @@ import Dropdown from 'src/shared/components/Dropdown'
 import {DURATIONS} from 'src/shared/constants/queryBuilder'
 
 function isDurationParseable(duration: string): boolean {
-  const durationRegExp = /^(([0-9]+)(y|mo|w|d|h|ms|s|m|us|µs|ns))+$/g
+  const durationRegExp = /^(?:[1-9][0-9]*(?:y|mo|w|d|h|ms|s|m|us|µs|ns))+$/g
   return !!duration.match(durationRegExp)
 }
 interface Props {
