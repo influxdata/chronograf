@@ -99,19 +99,28 @@ const AggregationSelector: FunctionComponent = ({children}: Props) => {
         <div className="flux-query-builder--list">
           {functions.map(fn => {
             const active = selectedFunctions.includes(fn)
+            const onChange = () => {
+              const newSelected = active
+                ? selectedFunctions.filter(x => x !== fn)
+                : [fn, ...selectedFunctions]
+              // at least one function must be selected
+              if (newSelected.length) {
+                setSelectedFunctions(newSelected)
+              }
+            }
+
             return (
               <div
                 className="flux-query-builder--list-item compact"
-                onClick={() =>
-                  setSelectedFunctions(
-                    active
-                      ? selectedFunctions.filter(x => x !== fn)
-                      : [fn, ...selectedFunctions]
-                  )
-                }
+                onClick={onChange}
                 key={fn}
               >
-                <input type="checkbox" id={fn} defaultChecked={active} />
+                <input
+                  type="checkbox"
+                  id={fn}
+                  checked={active}
+                  onChange={onChange}
+                />
                 <label htmlFor="{fn}">{fn}</label>
               </div>
             )
