@@ -120,19 +120,16 @@ const AggregationSelector: FunctionComponent = (props: Props) => {
               }
             }
 
+            const id = `flx-agrselect${fn}`
             return (
               <div
                 className="flux-query-builder--list-item compact"
                 onClick={onChange}
-                key={fn}
+                key={id}
+                id={id}
               >
-                <input
-                  type="checkbox"
-                  id={fn}
-                  checked={active}
-                  onChange={onChange}
-                />
-                <label htmlFor="{fn}">{fn}</label>
+                <input type="checkbox" checked={active} onChange={onChange} />
+                <label htmlFor={id}>{fn}</label>
               </div>
             )
           })}
