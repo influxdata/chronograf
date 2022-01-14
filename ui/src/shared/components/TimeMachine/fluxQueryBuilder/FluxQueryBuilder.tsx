@@ -51,8 +51,8 @@ const FluxQueryBuilder = ({source, onSubmit, onShowEditor}: Props) => {
   }, [])
 
   // TODO demo selectors are to be replaced by a real implementation
-  const [tagSelectors, setTagSelectors] = useState(0)
-  const [activeTagSelectors, setActiveTagSelectors] = useState([] as number[])
+  const [tagSelectors, setTagSelectors] = useState(1)
+  const [activeTagSelectors, setActiveTagSelectors] = useState([0])
 
   const {selectedBucket, sortedBucketNames, bucketsStatus} = state
   return (
