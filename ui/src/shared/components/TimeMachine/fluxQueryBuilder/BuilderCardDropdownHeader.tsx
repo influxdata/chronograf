@@ -1,15 +1,14 @@
 // Libraries
 import React, {PureComponent} from 'react'
 
-import {Dropdown} from 'src/reusable_ui'
-import {BuilderAggregateFunctionType} from 'src/types'
+import {Dropdown} from '../../Dropdown'
 
 interface Props {
   options: string[]
   selectedOption: string
   testID?: string
-  onSelect?: (option: BuilderAggregateFunctionType) => void
-  onDelete?: () => void
+  onSelect?: (option: string) => void
+  onDelete?: () => void | boolean
   isInCheckOverlay?: boolean
   children?: JSX.Element
 }
@@ -22,29 +21,17 @@ export default class BuilderCardDropdownHeader extends PureComponent<Props> {
   }
 
   public render() {
-    const {
-      children,
-      isInCheckOverlay,
-      options,
-      onSelect,
-      selectedOption,
-      testID,
-    } = this.props
+    const {children, options, onSelect, selectedOption, testID} = this.props
     return (
       <div className="builder-card--header" data-testid={testID}>
-        {isInCheckOverlay ? (
-          <span>{selectedOption}</span>
-        ) : (
-          <Dropdown
-            selectedID={selectedOption}
-            data-testid="select-option-dropdown"
-            onChange={onSelect ? onSelect : emptyFunction}
-          >
-            {options.map((option: string) => (
-              <Dropdown.Item id={option} key={option} value={option} />
-            ))}
-          </Dropdown>
-        )}
+        <Dropdown
+          items={options}
+          onChoose={({text}) => onSelect(text)}
+          selected={selectedOption}
+          buttonSize="btn-sm"
+          className="dropdown-stretch"
+          data-testid="select-option-dropdown"
+        />
         {children}
         {this.deleteButton}
       </div>

@@ -14,6 +14,7 @@ import {
   IconFont,
 } from 'src/reusable_ui'
 import AggregationSelector from './AggregationSelector'
+import TagSelector from './TagSelector'
 
 interface State {
   selectedBucket?: string
@@ -49,6 +50,10 @@ const FluxQueryBuilder = ({source, onSubmit, onShowEditor}: Props) => {
       })
   }, [])
 
+  // TODO demo selectors are to be replaced by a real implementation
+  const [tagSelectors, setTagSelectors] = useState(0)
+  const [activeTagSelectors, setActiveTagSelectors] = useState([] as number[])
+
   const {selectedBucket, sortedBucketNames, bucketsStatus} = state
   return (
     <div className="flux-query-builder" data-testid="flux-query-builder">
@@ -66,11 +71,25 @@ const FluxQueryBuilder = ({source, onSubmit, onShowEditor}: Props) => {
                 }
               />
             </BuilderCard>
+            {activeTagSelectors.map(i => (
+              <TagSelector
+                key={i}
+                index={i}
+                onRemoveTagSelector={ix =>
+                  setActiveTagSelectors(
+                    activeTagSelectors.filter(x => x !== ix)
+                  )
+                }
+              />
+            ))}
             <Button
               size={ComponentSize.Large}
               customClass="flux-query-builder--add-card-button"
               icon={IconFont.PlusSkinny}
-              onClick={() => console.error('Not Implemented')}
+              onClick={() => {
+                setActiveTagSelectors([...activeTagSelectors, tagSelectors])
+                setTagSelectors(tagSelectors + 1)
+              }}
               shape={ButtonShape.Square}
             />
           </div>
