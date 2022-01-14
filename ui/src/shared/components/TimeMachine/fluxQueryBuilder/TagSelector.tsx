@@ -267,10 +267,15 @@ const DemoTagSelector = ({
       )
       setTimeout(() => {
         setValuesStatus(RemoteDataState.Done)
-        const newVals = 'a a1 a2 a3 a4 a5 a6 a7 a8 ba b2 b3 b4 c1 c3 ca2 ca3 ca4 ca5 ca6 ca7'
+        const demoValues =
+          aggregateFunctionType === 'filter'
+            ? 'a a1 a2 a3 a4 a5 a6 a7 a8 ba b2 b3 b4 c1 c3 ca2 ca3 ca4 ca5 ca6 ca7'
+            : '_measurement _field tag1 tag2 tag3'
+        const newVals = demoValues
           .split(' ')
           .filter(v => v.includes(valuesSearchTerm))
         setValues(newVals)
+        setSelectedValues(selectedValues.filter(x => newVals.includes(x)))
       }, DEMO_LOAD_DELAY * 2)
     }
   }, [valuesStatus])
@@ -282,6 +287,7 @@ const DemoTagSelector = ({
       onChangeFunctionType={(type, i) => {
         console.error('DemoTagSelector.onChangeFunctionType', type, i)
         setAggregateFunctionType(type)
+        setValuesStatus(RemoteDataState.NotStarted)
       }}
       keysStatus={keysStatus}
       keys={keys}
