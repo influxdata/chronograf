@@ -5,7 +5,7 @@ import classnames from 'classnames'
 interface Props {
   testID?: string
   className?: string
-  children?: JSX.Element
+  children?: React.ReactNode | React.ReactNodeArray
 }
 
 const BuilderCardMenu = (props: Props) => {

@@ -2,12 +2,13 @@
 import React, {PureComponent} from 'react'
 
 import {Dropdown} from 'src/reusable_ui'
+import {BuilderAggregateFunctionType} from 'src/types'
 
 interface Props {
   options: string[]
   selectedOption: string
   testID?: string
-  onSelect?: (option: 'filter' | 'group') => void
+  onSelect?: (option: BuilderAggregateFunctionType) => void
   onDelete?: () => void
   isInCheckOverlay?: boolean
   children?: JSX.Element
