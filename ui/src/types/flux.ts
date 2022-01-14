@@ -201,3 +201,5 @@ export interface FluxToolbarFunction {
   category: string
   link: string
 }
+
+export type BuilderAggregateFunctionType = 'filter' | 'group'

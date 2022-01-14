@@ -55,7 +55,13 @@ import {
   NotificationFunc,
   NotificationAction,
 } from './notifications'
-import {FluxTable, ScriptStatus, SchemaFilter, RemoteDataState} from './flux'
+import {
+  FluxTable,
+  ScriptStatus,
+  SchemaFilter,
+  RemoteDataState,
+  BuilderAggregateFunctionType,
+} from './flux'
 import {
   DygraphSeries,
   DygraphValue,
@@ -140,4 +146,5 @@ export {
   Layout,
   QueryType,
   QueryUpdateState,
+  BuilderAggregateFunctionType,
 }
