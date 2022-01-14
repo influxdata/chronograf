@@ -1,4 +1,4 @@
-@keyframes loading-dots {
+@keyframes wt-loading-dots {
   0% {
     content: ' ';
   }
@@ -21,6 +21,6 @@
 }
 
 .waiting-text::after {
-  animation: 2s linear loading-dots infinite;
+  animation: 2s linear wt-loading-dots infinite;
   content: '...';
 }
