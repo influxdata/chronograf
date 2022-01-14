@@ -13,8 +13,6 @@ interface Props {
   children?: JSX.Element
 }
 
-const emptyFunction = () => {}
-
 export default class BuilderCardDropdownHeader extends PureComponent<Props> {
   public static defaultProps = {
     testID: 'builder-card--header',
