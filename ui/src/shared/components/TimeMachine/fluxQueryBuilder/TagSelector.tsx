@@ -253,8 +253,8 @@ const DemoTagSelector = ({
     setTimeout(() => setKeysStatus(RemoteDataState.Loading), DEMO_LOAD_DELAY)
     setTimeout(() => {
       setKeysStatus(RemoteDataState.Done)
-      setKeys(['these', 'are', 'just', 'demo', 'keys'])
-      setSelectedKey('these')
+      setKeys(['_measurement', '_field', 'tag1', 'tag2', 'tag3'])
+      setSelectedKey('_measurement')
       setValuesStatus(RemoteDataState.NotStarted)
     }, DEMO_LOAD_DELAY * 2)
   }, [])
