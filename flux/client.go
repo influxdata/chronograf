@@ -10,13 +10,13 @@ import (
 	"time"
 
 	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/influx"
+	"github.com/influxdata/chronograf/util"
 )
 
 // Shared transports for all clients to prevent leaking connections.
 var (
-	skipVerifyTransport = influx.CreateTransport(true)
-	defaultTransport    = influx.CreateTransport(false)
+	skipVerifyTransport = util.CreateTransport(true)
+	defaultTransport    = util.CreateTransport(false)
 )
 
 // Client is how we interact with Flux.

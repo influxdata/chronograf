@@ -9,7 +9,7 @@ import (
 
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/id"
-	"github.com/influxdata/chronograf/influx"
+	"github.com/influxdata/chronograf/util"
 	client "github.com/influxdata/kapacitor/client/v1"
 )
 
@@ -22,8 +22,8 @@ const (
 )
 
 var (
-	skipVerifyTransport = influx.CreateTransport(true)
-	defaultTransport    = influx.CreateTransport(false)
+	skipVerifyTransport = util.CreateTransport(true)
+	defaultTransport    = util.CreateTransport(false)
 )
 
 // Client communicates to kapacitor

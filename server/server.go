@@ -33,6 +33,7 @@ import (
 	clog "github.com/influxdata/chronograf/log"
 	"github.com/influxdata/chronograf/oauth2"
 	"github.com/influxdata/chronograf/server/config"
+	"github.com/influxdata/chronograf/util"
 	client "github.com/influxdata/usage-client/v1"
 	flags "github.com/jessevdk/go-flags"
 )
@@ -692,7 +693,7 @@ func (s *Server) Serve(ctx context.Context) {
 		return
 	}
 
-	transport := influx.CreateTransport(true)
+	transport := util.CreateTransport(true)
 	transport.TLSClientConfig.InsecureSkipVerify = s.GenericInsecure
 	transport.TLSClientConfig.RootCAs = certs
 	s.oauthClient = http.Client{Transport: transport}
