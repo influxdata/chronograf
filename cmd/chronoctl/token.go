@@ -77,6 +77,7 @@ func getNonceMsg(url string, insecureSkipVerify bool) ([]byte, error) {
 
 	hc := &http.Client{
 		Transport: &http.Transport{
+			Proxy:           http.ProxyFromEnvironment,
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: insecureSkipVerify},
 		},
 	}
