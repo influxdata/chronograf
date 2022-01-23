@@ -692,14 +692,10 @@ func (s *Server) Serve(ctx context.Context) {
 		return
 	}
 
-	s.oauthClient = http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: s.GenericInsecure,
-				RootCAs:            certs,
-			},
-		},
-	}
+	transport := influx.CreateTransport(true)
+	transport.TLSClientConfig.InsecureSkipVerify = s.GenericInsecure
+	transport.TLSClientConfig.RootCAs = certs
+	s.oauthClient = http.Client{Transport: transport}
 
 	auth := oauth2.NewCookieJWT(s.TokenSecret, s.AuthDuration, s.InactivityDuration)
 	providerFuncs := []func(func(oauth2.Provider, oauth2.Mux)){
