@@ -10,6 +10,7 @@
 
 1. [#5830](https://github.com/influxdata/chronograf/pull/5830): Repair enforcement of one organization between multiple tabs.
 1. [#5836](https://github.com/influxdata/chronograf/pull/5836): Allow to save a new TICKscript.
+1. [#5842](https://github.com/influxdata/chronograf/pull/5842): Configure HTTP proxy from environment variables in HTTP clients.
 
 ### Other
 

@@ -2,7 +2,6 @@ package kapacitor
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/id"
+	"github.com/influxdata/chronograf/util"
 	client "github.com/influxdata/kapacitor/client/v1"
 )
 
@@ -22,10 +22,8 @@ const (
 )
 
 var (
-	skipVerifyTransport = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	defaultTransport = &http.Transport{}
+	skipVerifyTransport = util.CreateTransport(true)
+	defaultTransport    = util.CreateTransport(false)
 )
 
 // Client communicates to kapacitor

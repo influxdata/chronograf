@@ -2,7 +2,6 @@ package flux
 
 import (
 	"context"
-	"crypto/tls"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -11,14 +10,13 @@ import (
 	"time"
 
 	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/util"
 )
 
 // Shared transports for all clients to prevent leaking connections.
 var (
-	skipVerifyTransport = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	defaultTransport = &http.Transport{}
+	skipVerifyTransport = util.CreateTransport(true)
+	defaultTransport    = util.CreateTransport(false)
 )
 
 // Client is how we interact with Flux.

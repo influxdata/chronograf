@@ -32,7 +32,7 @@ type tokenCommand struct {
 func (t *tokenCommand) Execute(args []string) error {
 	key, err := parsePrivKey(string(t.PrivKeyFile))
 	if err != nil {
-		errExit(fmt.Errorf("Failed to parse RSA key: %s", err.Error()))
+		errExit(fmt.Errorf("failed to parse RSA key: %s", err.Error()))
 	}
 
 	msg, err := getNonceMsg(t.ChronoURL, t.SkipVerify)
@@ -42,7 +42,7 @@ func (t *tokenCommand) Execute(args []string) error {
 
 	dgst, err := signMsg(msg, key)
 	if err != nil {
-		errExit(fmt.Errorf("Failed to sign: %s", err.Error()))
+		errExit(fmt.Errorf("failed to sign: %s", err.Error()))
 	}
 
 	fmt.Println(base64.StdEncoding.EncodeToString(dgst))
@@ -51,19 +51,19 @@ func (t *tokenCommand) Execute(args []string) error {
 
 func parsePrivKey(privKeyFile string) (*rsa.PrivateKey, error) {
 	if privKeyFile == "" {
-		return nil, errors.New("No private key file specified")
+		return nil, errors.New("no private key file specified")
 	}
 
 	pemBytes, err := ioutil.ReadFile(string(privKeyFile))
 	if err != nil {
-		return nil, fmt.Errorf("Failed to read file: %s", err.Error())
+		return nil, fmt.Errorf("failed to read file: %s", err.Error())
 	}
 
 	block, _ := pem.Decode(pemBytes)
 	if block == nil {
-		return nil, errors.New("No PEM formatted key found")
+		return nil, errors.New("no PEM formatted key found")
 	} else if block.Type != "RSA PRIVATE KEY" {
-		return nil, fmt.Errorf("Unsupported key type %q", block.Type)
+		return nil, fmt.Errorf("unsupported key type %q", block.Type)
 	}
 
 	return x509.ParsePKCS1PrivateKey(block.Bytes)
@@ -72,18 +72,19 @@ func parsePrivKey(privKeyFile string) (*rsa.PrivateKey, error) {
 func getNonceMsg(url string, insecureSkipVerify bool) ([]byte, error) {
 	req, err := http.NewRequest("GET", url+"/nonce", nil)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to create request: %s", err.Error())
+		return nil, fmt.Errorf("failed to create request: %s", err.Error())
 	}
 
 	hc := &http.Client{
 		Transport: &http.Transport{
+			Proxy:           http.ProxyFromEnvironment,
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: insecureSkipVerify},
 		},
 	}
 
 	resp, err := hc.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to get nonce: %s", err.Error())
+		return nil, fmt.Errorf("failed to get nonce: %s", err.Error())
 	}
 	defer resp.Body.Close()
 
