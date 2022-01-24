@@ -2,7 +2,7 @@ import React, {ChangeEvent, useEffect, useMemo, useState} from 'react'
 import BuilderCard from './BuilderCard'
 import DefaultDebouncer from 'src/shared/utils/debouncer'
 import {RemoteDataState, BuilderAggregateFunctionType} from 'src/types'
-import Dropdown from '../../Dropdown'
+import SearchableDropdown from '../../SearchableDropdown'
 import WaitingText from '../../WaitingText'
 
 const SEARCH_DEBOUNCE_MS = 400
@@ -27,6 +27,10 @@ interface Props {
   keys: string[]
   selectedKey: string
   onKeyChange: (key: string, index: number) => void
+
+  keysSearchTerm: string
+  onChangeKeysSearchTerm: (searchTerm: string, index: number) => void
+  onSearchKeys: (index: number) => void
 
   valuesSearchTerm: string
   onChangeValuesSearchTerm: (searchTerm: string, index: number) => void
@@ -72,30 +76,17 @@ const TagSelectorBody = (props: Props) => {
     valuesSearchTerm,
     onChangeValuesSearchTerm,
     onSearchValues,
+    keysSearchTerm,
+    onChangeKeysSearchTerm,
+    onSearchKeys,
     selectedValues,
   } = props
-
-  if (keysStatus === RemoteDataState.NotStarted) {
-    return (
-      <BuilderCard.Empty>
-        <WaitingText text="Waiting for tag keys" />
-      </BuilderCard.Empty>
-    )
-  }
-
-  if (keysStatus === RemoteDataState.Loading) {
-    return (
-      <BuilderCard.Empty>
-        <WaitingText text="Loading tag keys" />
-      </BuilderCard.Empty>
-    )
-  }
 
   if (keysStatus === RemoteDataState.Error) {
     return <BuilderCard.Empty>Failed to load tag keys</BuilderCard.Empty>
   }
 
-  if (keysStatus === RemoteDataState.Done && !keys.length) {
+  if (keysStatus === RemoteDataState.Done && !keys.length && !keysSearchTerm) {
     return (
       <BuilderCard.Empty testID="empty-tag-keys">
         No tag keys found <small>in the current time range</small>
@@ -108,6 +99,10 @@ const TagSelectorBody = (props: Props) => {
   function onValueTermChange(e: ChangeEvent<HTMLInputElement>) {
     onChangeValuesSearchTerm(e.target.value, index)
     debouncer.call(() => onSearchValues(index), SEARCH_DEBOUNCE_MS)
+  }
+  function onKeyTermChange(term: string) {
+    onChangeKeysSearchTerm(term, index)
+    debouncer.call(() => onSearchKeys(index), SEARCH_DEBOUNCE_MS)
   }
 
   const placeholderText =
@@ -126,12 +121,15 @@ const TagSelectorBody = (props: Props) => {
               marginBottom: '4px',
             }}
           >
-            <Dropdown
+            <SearchableDropdown
               items={keys}
-              onChoose={({text}) => onKeyChange(text, index)}
+              onChoose={(key: string) => onKeyChange(key, index)}
+              searchTerm={keysSearchTerm}
+              onChangeSearchTerm={onKeyTermChange}
               selected={selectedKey}
               buttonSize="btn-sm"
               className="dropdown-stretch"
+              status={keysStatus}
             />
             {selectedValues.length ? (
               <div
@@ -145,15 +143,17 @@ const TagSelectorBody = (props: Props) => {
             ) : undefined}
           </div>
         )}
-        <input
-          className="form-control input-sm"
-          placeholder={placeholderText}
-          type="text"
-          value={valuesSearchTerm}
-          onChange={onValueTermChange}
-          spellCheck={false}
-          autoComplete="false"
-        />
+        {keysStatus === RemoteDataState.Done ? (
+          <input
+            className="form-control input-sm"
+            placeholder={placeholderText}
+            type="text"
+            value={valuesSearchTerm}
+            onChange={onValueTermChange}
+            spellCheck={false}
+            autoComplete="false"
+          />
+        ) : undefined}
       </BuilderCard.Menu>
       <TagSelectorValues {...props} />
     </>
@@ -162,6 +162,7 @@ const TagSelectorBody = (props: Props) => {
 
 const TagSelectorValues = (props: Props) => {
   const {
+    keysStatus,
     selectedKey,
     index,
     values,
@@ -169,6 +170,21 @@ const TagSelectorValues = (props: Props) => {
     selectedValues,
     onChangeSelectedValues,
   } = props
+  if (keysStatus === RemoteDataState.NotStarted) {
+    return (
+      <BuilderCard.Empty>
+        <WaitingText text="Waiting for tag keys" />
+      </BuilderCard.Empty>
+    )
+  }
+
+  if (keysStatus === RemoteDataState.Loading) {
+    return (
+      <BuilderCard.Empty>
+        <WaitingText text="Loading tag keys" />
+      </BuilderCard.Empty>
+    )
+  }
   if (valuesStatus === RemoteDataState.Error) {
     return (
       <BuilderCard.Empty>
@@ -241,44 +257,60 @@ const DemoTagSelector = ({
   const [aggregateFunctionType, setAggregateFunctionType] = useState(
     'filter' as BuilderAggregateFunctionType
   )
+  const [keysChanged, setKeysChanged] = useState(0)
   const [keysStatus, setKeysStatus] = useState(RemoteDataState.NotStarted)
   const [keys, setKeys] = useState([] as string[])
   const [selectedKey, setSelectedKey] = useState('')
   const [valuesSearchTerm, setValuesSearchTerm] = useState('')
   const [values, setValues] = useState([] as string[])
   const [selectedValues, setSelectedValues] = useState([] as string[])
+  const [valuesChanged, setValuesChanged] = useState(0)
   const [valuesStatus, setValuesStatus] = useState(undefined)
+  const [keysSearchTerm, setKeysSearchTerm] = useState('')
 
   useEffect(() => {
+    setKeysStatus(RemoteDataState.NotStarted)
     setTimeout(() => setKeysStatus(RemoteDataState.Loading), DEMO_LOAD_DELAY)
     setTimeout(() => {
       setKeysStatus(RemoteDataState.Done)
-      setKeys(['_measurement', '_field', 'tag1', 'tag2', 'tag3'])
-      setSelectedKey('_measurement')
+      const newKeys = [
+        '_measurement',
+        '_field',
+        'tag1',
+        'tag2',
+        'tag3',
+      ].filter(x => x.includes(keysSearchTerm))
+      setKeys(newKeys)
+      if (!newKeys.includes(selectedKey)) {
+        setSelectedKey(newKeys.length ? newKeys[0] : '')
+      }
       setValuesStatus(RemoteDataState.NotStarted)
+      setValuesChanged(valuesChanged + 1)
     }, DEMO_LOAD_DELAY * 2)
-  }, [])
+  }, [keysChanged])
 
   useEffect(() => {
-    if (valuesStatus === RemoteDataState.NotStarted) {
-      setTimeout(
-        () => setValuesStatus(RemoteDataState.Loading),
-        DEMO_LOAD_DELAY
-      )
-      setTimeout(() => {
-        setValuesStatus(RemoteDataState.Done)
-        const demoValues =
-          aggregateFunctionType === 'filter'
-            ? 'a a1 a2 a3 a4 a5 a6 a7 a8 ba b2 b3 b4 c1 c3 ca2 ca3 ca4 ca5 ca6 ca7'
-            : '_measurement _field tag1 tag2 tag3'
-        const newVals = demoValues
-          .split(' ')
-          .filter(v => v.includes(valuesSearchTerm))
-        setValues(newVals)
-        setSelectedValues(selectedValues.filter(x => newVals.includes(x)))
-      }, DEMO_LOAD_DELAY * 2)
-    }
-  }, [valuesStatus])
+    setValuesStatus(RemoteDataState.NotStarted)
+    setTimeout(() => setValuesStatus(RemoteDataState.Loading), DEMO_LOAD_DELAY)
+    setTimeout(() => {
+      setValuesStatus(RemoteDataState.Done)
+      let demoValues: string[]
+      if (aggregateFunctionType === 'filter') {
+        if (selectedKey) {
+          demoValues = 'a a1 a2 a3 a4 a5 a6 a7 a8 ba b2 b3 b4 c1 c3 ca2 ca3 ca4 ca5 ca6 ca7'.split(
+            ' '
+          )
+        } else {
+          demoValues = []
+        }
+      } else {
+        demoValues = '_measurement _field tag1 tag2 tag3'.split(' ')
+      }
+      const newVals = demoValues.filter(v => v.includes(valuesSearchTerm))
+      setValues(newVals)
+      setSelectedValues(selectedValues.filter(x => newVals.includes(x)))
+    }, DEMO_LOAD_DELAY * 2)
+  }, [valuesChanged])
   return (
     <TagSelector
       index={index}
@@ -287,7 +319,6 @@ const DemoTagSelector = ({
       onChangeFunctionType={(type, i) => {
         console.error('DemoTagSelector.onChangeFunctionType', type, i)
         setAggregateFunctionType(type)
-        setValuesStatus(RemoteDataState.NotStarted)
       }}
       keysStatus={keysStatus}
       keys={keys}
@@ -296,7 +327,16 @@ const DemoTagSelector = ({
         console.error('DemoTagSelector.onKeyChange', key, i)
         setSelectedKey(key)
         setSelectedValues([])
-        setValuesStatus(RemoteDataState.NotStarted)
+        setValuesChanged(valuesChanged + 1)
+      }}
+      keysSearchTerm={keysSearchTerm}
+      onChangeKeysSearchTerm={(term, i) => {
+        console.error('DemoTagSelector.onChangeKeysSearchTerm', term, i)
+        setKeysSearchTerm(term)
+      }}
+      onSearchKeys={(i: number) => {
+        setKeysChanged(valuesChanged + 1)
+        console.error('DemoTagSelector.onSearchKeys', i)
       }}
       valuesSearchTerm={valuesSearchTerm}
       onChangeValuesSearchTerm={(term, i) => {
@@ -304,7 +344,7 @@ const DemoTagSelector = ({
         setValuesSearchTerm(term)
       }}
       onSearchValues={(i: number) => {
-        setValuesStatus(RemoteDataState.NotStarted)
+        setValuesChanged(valuesChanged + 1)
         console.error('DemoTagSelector.onSearchValues', i)
       }}
       valuesStatus={valuesStatus}
