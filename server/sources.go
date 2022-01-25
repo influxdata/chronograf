@@ -198,7 +198,7 @@ func (s *Service) sourceVersion(ctx context.Context, src *chronograf.Source) str
 	if err == nil {
 		return retVal
 	}
-	s.Logger.WithField("error", err.Error()).Info("Failed to retrieve database version")
+	s.Logger.WithField("error", err.Error()).WithField("url", src.URL).Info("Failed to retrieve database version")
 	if strings.HasPrefix(src.Version, "1.") || strings.HasPrefix(src.Version, "2.") {
 		// keep the client version unchanged
 		return src.Version
