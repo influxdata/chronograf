@@ -1,4 +1,12 @@
-## v1.9.2
+## v1.9.3
+
+### Features
+
+### Bug Fixes
+
+### Other
+
+## v1.9.2 [2022-01-25]
 
 ### Features
 
