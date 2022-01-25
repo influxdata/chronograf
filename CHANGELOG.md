@@ -1,10 +1,8 @@
 ## v1.9.3
 
-### Features
-
 ### Bug Fixes
 
-### Other
+1. [#5845](https://github.com/influxdata/chronograf/pull/5845): Repair retrieval of background job results.
 
 ## v1.9.2 [2022-01-25]
 
