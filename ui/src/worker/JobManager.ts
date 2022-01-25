@@ -108,7 +108,7 @@ class JobManager {
 
   private fetchPayload = async (deferred, msg) => {
     try {
-      const payload = readPayload(msg)
+      const payload = await readPayload(msg)
       deferred.resolve(payload)
     } catch (e) {
       console.error(e)
