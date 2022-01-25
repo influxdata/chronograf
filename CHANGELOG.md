@@ -1,7 +1,16 @@
-## v1.9.3
+## v1.9.4
+
+### Features
 
 ### Bug Fixes
 
+### Other
+
+## v1.9.3 [2022-01-25]
+
+### Bug Fixes
+
+1. [#5843](https://github.com/influxdata/chronograf/pull/5843): Log remote URL when ping fails.
 1. [#5845](https://github.com/influxdata/chronograf/pull/5845): Repair retrieval of background job results.
 
 ## v1.9.2 [2022-01-25]
