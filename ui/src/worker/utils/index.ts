@@ -24,7 +24,7 @@ export const success = async (originMsg: Message, payload: any) => {
     origin: originMsg.id,
     result: 'success',
   }
-  writePayload(msg, payload)
+  await writePayload(msg, payload)
 
   postMessage(msg)
 }
