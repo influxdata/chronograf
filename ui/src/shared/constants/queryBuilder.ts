@@ -146,3 +146,5 @@ export const FUNCTIONS: QueryFn[] = [
     flux: (period, fillValues) => genFlux('sort', period, fillValues),
   },
 ]
+
+export const FUNCTION_NAMES = FUNCTIONS.map(f => f.name)
