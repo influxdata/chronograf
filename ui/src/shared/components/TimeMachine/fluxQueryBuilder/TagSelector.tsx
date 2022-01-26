@@ -17,28 +17,27 @@ function renderType(type: BuilderAggregateFunctionType) {
 interface Props {
   index: number
   aggregateFunctionType: BuilderAggregateFunctionType
+
+  keysStatus: RemoteDataState
+  keys: string[]
+  selectedKey: string
+  keysSearchTerm: string
+
+  valuesSearchTerm: string
+  valuesStatus: RemoteDataState
+  values: string[]
+  selectedValues: string[]
+
   onRemoveTagSelector: (index: number) => void
   onChangeFunctionType: (
     type: BuilderAggregateFunctionType,
     index: number
   ) => void
-
-  keysStatus: RemoteDataState
-  keys: string[]
-  selectedKey: string
   onKeyChange: (key: string, index: number) => void
-
-  keysSearchTerm: string
   onChangeKeysSearchTerm: (searchTerm: string, index: number) => void
   onSearchKeys: (index: number) => void
-
-  valuesSearchTerm: string
   onChangeValuesSearchTerm: (searchTerm: string, index: number) => void
   onSearchValues: (index: number) => void
-
-  valuesStatus: RemoteDataState
-  values: string[]
-  selectedValues: string[]
   onChangeSelectedValues: (values: string[], index: number) => void
 }
 
