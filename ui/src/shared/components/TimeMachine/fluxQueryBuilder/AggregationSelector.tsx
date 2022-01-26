@@ -154,6 +154,7 @@ const AggregationSelector = (props: Props) => {
   )
 }
 
+// TODO replace demo UI by a real implementation
 const DemoAggregationSelector = ({
   notify,
   defaultPeriod,
