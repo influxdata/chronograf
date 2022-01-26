@@ -1,25 +1,41 @@
-import React, {FunctionComponent, useState} from 'react'
+import React, {useState} from 'react'
 
 import {connect} from 'react-redux'
-import {notify} from 'src/shared/actions/notifications'
+import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {fluxWizardError} from 'src/shared/copy/notifications'
 
 import {ComponentSize, SlideToggle} from 'src/reusable_ui'
 import ReactTooltip from 'react-tooltip'
 import BuilderCard from './BuilderCard'
 import WindowPeriod from './WindowPeriod'
-import {FUNCTIONS} from 'src/shared/constants/queryBuilder'
+import {FUNCTION_NAMES} from 'src/shared/constants/queryBuilder'
+import {TimeRange} from 'src/types'
 
-interface Props {
+interface AggregationViewProps {
+  timeRange: TimeRange
+  period: string
+  fillMissing: boolean
+  selectedFunctions: string[]
+}
+interface Props extends AggregationViewProps {
   notify: (notification: any) => void
   children?: JSX.Element
-}
-const AggregationSelector: FunctionComponent = (props: Props) => {
-  const [period, setPeriod] = useState('11s')
-  const [fillMissing, setFillMissing] = useState(false)
 
-  const functions = FUNCTIONS.map(f => f.name)
-  const [selectedFunctions, setSelectedFunctions] = useState(['mean'])
+  setPeriod: (period: string) => void
+  setFillMissing: (fillMissing: boolean) => void
+  setSelectedFunctions: (fns: string[]) => void
+}
+const AggregationSelector = (props: Props) => {
+  const {
+    period,
+    setPeriod,
+    fillMissing,
+    setFillMissing,
+    selectedFunctions,
+    setSelectedFunctions,
+  } = props
+  const autoPeriod = '10s' // TODO compute from timeRange
+
   return (
     <BuilderCard className="aggregation-selector" testID="aggregation-selector">
       {props.children}
@@ -41,7 +57,7 @@ const AggregationSelector: FunctionComponent = (props: Props) => {
           }}
         >
           <WindowPeriod
-            autoPeriod="10s"
+            autoPeriod={autoPeriod}
             selected={period}
             onChoose={setPeriod}
           />
@@ -102,7 +118,7 @@ const AggregationSelector: FunctionComponent = (props: Props) => {
       />
       <BuilderCard.Body>
         <div className="flux-query-builder--list">
-          {functions.map(fn => {
+          {FUNCTION_NAMES.map(fn => {
             const active = selectedFunctions.includes(fn)
             const onChange = () => {
               const newSelected = active
@@ -139,4 +155,33 @@ const AggregationSelector: FunctionComponent = (props: Props) => {
   )
 }
 
-export default connect(null, {notify})(AggregationSelector)
+const DemoAggregationSelector = ({
+  notify,
+  timeRange,
+  children,
+}: {
+  notify: (notification: any) => void
+  timeRange: TimeRange
+  children?: JSX.Element
+}) => {
+  const [period, setPeriod] = useState('auto')
+  const [fillMissing, setFillMissing] = useState(false)
+  const [selectedFunctions, setSelectedFunctions] = useState(['mean'])
+
+  return (
+    <AggregationSelector
+      notify={notify}
+      timeRange={timeRange}
+      period={period}
+      setPeriod={setPeriod}
+      fillMissing={fillMissing}
+      setFillMissing={setFillMissing}
+      selectedFunctions={selectedFunctions}
+      setSelectedFunctions={setSelectedFunctions}
+    >
+      {children}
+    </AggregationSelector>
+  )
+}
+
+export default connect(null, {notify: notifyAction})(DemoAggregationSelector)

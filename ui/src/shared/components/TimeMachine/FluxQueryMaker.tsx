@@ -25,7 +25,7 @@ import {getSuggestions} from 'src/flux/helpers/suggestions'
 import {insertFluxFunction} from 'src/flux/helpers/scriptInsertion'
 
 // Types
-import {NotificationAction, Source} from 'src/types'
+import {NotificationAction, Source, TimeRange} from 'src/types'
 import {
   Suggestion,
   Links,
@@ -52,6 +52,7 @@ interface PassedProps {
   onUpdateStatus?: (status: ScriptStatus) => void
   links: Links
   notify: NotificationAction
+  timeRange: TimeRange
 }
 
 type Props = ConnectedProps & PassedProps
@@ -88,6 +89,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
       draftScript,
       fluxProportions,
       onSetFluxProportions,
+      timeRange,
     } = this.props
     if (!this.state.isWizardActive) {
       const {suggestions, draftScriptStatus} = this.state
@@ -165,6 +167,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
     return (
       <FluxQueryBuilder
         source={source}
+        timeRange={timeRange}
         onSubmit={this.handleSubmitScript}
         onShowEditor={this.handleShowEditor}
       />
@@ -254,6 +257,7 @@ const ConnectedFluxQueryMaker = (props: PassedProps) => (
     {(container: TimeMachineContainer) => (
       <FluxQueryMaker
         {...props}
+        timeRange={container.state.timeRange}
         fluxProportions={container.state.fluxProportions}
         onSetFluxProportions={container.handleSetFluxProportions}
       />

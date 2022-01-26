@@ -4,7 +4,7 @@ import React, {useEffect, useState} from 'react'
 import BuilderCard from './BuilderCard'
 import BucketsSelector from './BucketsSelector'
 import FancyScrollbar from '../../FancyScrollbar'
-import {RemoteDataState, Source} from 'src/types'
+import {RemoteDataState, Source, TimeRange} from 'src/types'
 import {getBuckets} from 'src/flux/components/DatabaseList'
 import {
   Button,
@@ -23,10 +23,16 @@ interface State {
 }
 interface Props {
   source: Source
+  timeRange: TimeRange
   onSubmit: () => void
   onShowEditor: () => void
 }
-const FluxQueryBuilder = ({source, onSubmit, onShowEditor}: Props) => {
+const FluxQueryBuilder = ({
+  source,
+  onSubmit,
+  onShowEditor,
+  timeRange,
+}: Props) => {
   const [state, setState] = useState({
     selectedBucket: '',
     sortedBucketNames: [],
@@ -94,7 +100,7 @@ const FluxQueryBuilder = ({source, onSubmit, onShowEditor}: Props) => {
             />
           </div>
         </FancyScrollbar>
-        <AggregationSelector>
+        <AggregationSelector timeRange={timeRange}>
           <div className="flux-query-builder--actions">
             <Button
               size={ComponentSize.ExtraSmall}
