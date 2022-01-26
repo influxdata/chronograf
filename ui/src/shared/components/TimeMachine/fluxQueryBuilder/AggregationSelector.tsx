@@ -9,10 +9,9 @@ import ReactTooltip from 'react-tooltip'
 import BuilderCard from './BuilderCard'
 import WindowPeriod from './WindowPeriod'
 import {FUNCTION_NAMES} from 'src/shared/constants/queryBuilder'
-import {TimeRange} from 'src/types'
 
 interface AggregationViewProps {
-  timeRange: TimeRange
+  defaultPeriod: string
   period: string
   fillMissing: boolean
   selectedFunctions: string[]
@@ -27,6 +26,7 @@ interface Props extends AggregationViewProps {
 }
 const AggregationSelector = (props: Props) => {
   const {
+    defaultPeriod,
     period,
     setPeriod,
     fillMissing,
@@ -34,7 +34,6 @@ const AggregationSelector = (props: Props) => {
     selectedFunctions,
     setSelectedFunctions,
   } = props
-  const autoPeriod = '10s' // TODO compute from timeRange
 
   return (
     <BuilderCard className="aggregation-selector" testID="aggregation-selector">
@@ -57,7 +56,7 @@ const AggregationSelector = (props: Props) => {
           }}
         >
           <WindowPeriod
-            autoPeriod={autoPeriod}
+            autoPeriod={defaultPeriod}
             selected={period}
             onChoose={setPeriod}
           />
@@ -157,11 +156,11 @@ const AggregationSelector = (props: Props) => {
 
 const DemoAggregationSelector = ({
   notify,
-  timeRange,
+  defaultPeriod,
   children,
 }: {
   notify: (notification: any) => void
-  timeRange: TimeRange
+  defaultPeriod: string
   children?: JSX.Element
 }) => {
   const [period, setPeriod] = useState('auto')
@@ -171,7 +170,7 @@ const DemoAggregationSelector = ({
   return (
     <AggregationSelector
       notify={notify}
-      timeRange={timeRange}
+      defaultPeriod={defaultPeriod}
       period={period}
       setPeriod={setPeriod}
       fillMissing={fillMissing}

@@ -1,5 +1,5 @@
 // Libraries
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 
 import BuilderCard from './BuilderCard'
 import BucketsSelector from './BucketsSelector'
@@ -15,6 +15,8 @@ import {
 } from 'src/reusable_ui'
 import AggregationSelector from './AggregationSelector'
 import TagSelector from './TagSelector'
+import {fluxPeriodFromRangeSeconds} from 'src/tempVars/utils/replace'
+import moment from 'moment'
 
 interface State {
   selectedBucket?: string
@@ -38,6 +40,19 @@ const FluxQueryBuilder = ({
     sortedBucketNames: [],
     bucketsStatus: RemoteDataState.Loading,
   } as State)
+  const defaultPeriod = useMemo(() => {
+    if (timeRange) {
+      if (timeRange.seconds) {
+        return fluxPeriodFromRangeSeconds(timeRange.seconds)
+      }
+      // calculate from upper / lower
+      const seconds = Math.round(
+        moment(timeRange.upper).diff(moment(timeRange.lower)) / 1000
+      )
+      return fluxPeriodFromRangeSeconds(seconds)
+    }
+  }, [timeRange])
+
   useEffect(() => {
     getBuckets(source)
       .then(buckets => {
@@ -100,7 +115,7 @@ const FluxQueryBuilder = ({
             />
           </div>
         </FancyScrollbar>
-        <AggregationSelector timeRange={timeRange}>
+        <AggregationSelector defaultPeriod={defaultPeriod}>
           <div className="flux-query-builder--actions">
             <Button
               size={ComponentSize.ExtraSmall}
