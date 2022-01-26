@@ -40,6 +40,7 @@ const VALID_SCRIPT_STATUS = {type: 'success', text: ''}
 interface ConnectedProps {
   fluxProportions: number[]
   onSetFluxProportions: (fluxProportions: number[]) => void
+  timeRange: TimeRange
 }
 
 interface PassedProps {
@@ -52,7 +53,6 @@ interface PassedProps {
   onUpdateStatus?: (status: ScriptStatus) => void
   links: Links
   notify: NotificationAction
-  timeRange: TimeRange
 }
 
 type Props = ConnectedProps & PassedProps
