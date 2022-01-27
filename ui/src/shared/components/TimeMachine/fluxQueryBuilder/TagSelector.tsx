@@ -18,15 +18,15 @@ function renderType(type: BuilderAggregateFunctionType) {
 interface Callbacks {
   onRemoveTagSelector: (index: number) => void
   onChangeFunctionType: (
-    type: BuilderAggregateFunctionType,
-    index: number
+    index: number,
+    type: BuilderAggregateFunctionType
   ) => void
-  onKeyChange: (key: string, index: number) => void
-  onChangeKeysSearchTerm: (searchTerm: string, index: number) => void
+  onSelectKey: (index: number, key: string) => void
+  onChangeKeysSearchTerm: (index: number, searchTerm: string) => void
   onSearchKeys: (index: number) => void
-  onChangeValuesSearchTerm: (searchTerm: string, index: number) => void
+  onChangeValuesSearchTerm: (index: number, searchTerm: string) => void
   onSearchValues: (index: number) => void
-  onChangeSelectedValues: (values: string[], index: number) => void
+  onChangeSelectedValues: (index: number, values: string[]) => void
 }
 type Props = TagSelectorState & Callbacks
 
@@ -45,7 +45,7 @@ const TagSelector = (props: Props) => {
         selectedOption={renderType(aggregateFunctionType)}
         onDelete={index ? () => onRemoveTagSelector(index) : undefined}
         onSelect={val =>
-          onChangeFunctionType(val === 'Filter' ? 'filter' : 'group', index)
+          onChangeFunctionType(index, val === 'Filter' ? 'filter' : 'group')
         }
       />
       <TagSelectorBody {...props} />
@@ -60,7 +60,7 @@ const TagSelectorBody = (props: Props) => {
     keys,
     keysStatus,
     selectedKey,
-    onKeyChange,
+    onSelectKey,
     valuesSearchTerm,
     onChangeValuesSearchTerm,
     onSearchValues,
@@ -85,11 +85,11 @@ const TagSelectorBody = (props: Props) => {
   const debouncer = useMemo(() => new DefaultDebouncer(), [])
   useEffect(() => () => debouncer.cancelAll(), [])
   function onValueTermChange(e: ChangeEvent<HTMLInputElement>) {
-    onChangeValuesSearchTerm(e.target.value, index)
+    onChangeValuesSearchTerm(index, e.target.value)
     debouncer.call(() => onSearchValues(index), SEARCH_DEBOUNCE_MS)
   }
   function onKeyTermChange(term: string) {
-    onChangeKeysSearchTerm(term, index)
+    onChangeKeysSearchTerm(index, term)
     debouncer.call(() => onSearchKeys(index), SEARCH_DEBOUNCE_MS)
   }
 
@@ -111,7 +111,7 @@ const TagSelectorBody = (props: Props) => {
           >
             <SearchableDropdown
               items={keys}
-              onChoose={(key: string) => onKeyChange(key, index)}
+              onChoose={(key: string) => onSelectKey(index, key)}
               searchTerm={keysSearchTerm}
               onChangeSearchTerm={onKeyTermChange}
               selected={selectedKey}
@@ -208,10 +208,10 @@ const TagSelectorValues = (props: Props) => {
           const active = selectedValues.includes(value)
           const onChange = () =>
             onChangeSelectedValues(
+              index,
               active
                 ? selectedValues.filter((x: string) => x !== value)
-                : [value, ...selectedValues],
-              index
+                : [value, ...selectedValues]
             )
 
           const id = `flxts${index}_${value}`
@@ -304,21 +304,21 @@ const DemoTagSelector = ({
       index={index}
       aggregateFunctionType={aggregateFunctionType}
       onRemoveTagSelector={onRemoveTagSelector}
-      onChangeFunctionType={(type, i) => {
+      onChangeFunctionType={(i, type) => {
         console.error('DemoTagSelector.onChangeFunctionType', type, i)
         setAggregateFunctionType(type)
       }}
       keysStatus={keysStatus}
       keys={keys}
       selectedKey={selectedKey}
-      onKeyChange={(key, i) => {
+      onSelectKey={(i, key) => {
         console.error('DemoTagSelector.onKeyChange', key, i)
         setSelectedKey(key)
         setSelectedValues([])
         setValuesChanged(valuesChanged + 1)
       }}
       keysSearchTerm={keysSearchTerm}
-      onChangeKeysSearchTerm={(term, i) => {
+      onChangeKeysSearchTerm={(i, term) => {
         console.error('DemoTagSelector.onChangeKeysSearchTerm', term, i)
         setKeysSearchTerm(term)
       }}
@@ -327,7 +327,7 @@ const DemoTagSelector = ({
         console.error('DemoTagSelector.onSearchKeys', i)
       }}
       valuesSearchTerm={valuesSearchTerm}
-      onChangeValuesSearchTerm={(term, i) => {
+      onChangeValuesSearchTerm={(i, term) => {
         console.error('DemoTagSelector.onChangeValuesSearchTerm', term, i)
         setValuesSearchTerm(term)
       }}
@@ -338,7 +338,7 @@ const DemoTagSelector = ({
       valuesStatus={valuesStatus}
       values={values}
       selectedValues={selectedValues}
-      onChangeSelectedValues={(newValues, i) => {
+      onChangeSelectedValues={(i, newValues) => {
         console.error('DemoTagSelector.onChangeSelectedValues', newValues, i)
         setSelectedValues(newValues)
       }}
