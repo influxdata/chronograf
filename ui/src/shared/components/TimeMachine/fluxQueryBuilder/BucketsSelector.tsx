@@ -116,7 +116,7 @@ const InitializeBucketsSelector = (props: {source: Source} & Props) => {
 const mstp = (state: any): BucketSelectorState => {
   return state?.fluxQueryBuilder?.buckets as BucketSelectorState
 }
-const mdtp = {
+const mdtp: Callbacks = {
   onFilterBuckets: filterBuckets,
   onSelectBucket: selectBucket,
   onChangeBucketsState: changeBucketsState,
