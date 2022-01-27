@@ -1,5 +1,5 @@
 // Libraries
-import React, {useEffect} from 'react'
+import React, {useEffect, useMemo} from 'react'
 import {connect} from 'react-redux'
 import classnames from 'classnames'
 
@@ -96,8 +96,8 @@ const BucketsSelector = ({
 }
 
 const InitializeBucketsSelector = (props: {source: Source} & Props) => {
+  useMemo(() => props.onChangeBucketsState(RemoteDataState.Loading, []), [])
   useEffect(() => {
-    props.onChangeBucketsState(RemoteDataState.Loading, [])
     getBuckets(props.source)
       .then(buckets => {
         props.onChangeBucketsState(RemoteDataState.Done, buckets)
