@@ -27,7 +27,10 @@ const BucketsSelector = ({
   onSelectBucket,
 }: Props) => {
   const [searchTerm, setSearchTerm] = useState('')
-  const list = sortedBucketNames.filter(filterBuckets(searchTerm))
+  let list = sortedBucketNames.filter(filterBuckets(searchTerm))
+  if (list.length > 200) {
+    list = list.slice(0, 200)
+  }
 
   if (bucketsStatus === RemoteDataState.Done) {
     if (!sortedBucketNames.length) {
