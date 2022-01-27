@@ -14,7 +14,7 @@ export interface AggregationSelectorState {
 }
 
 export interface TagSelectorState {
-  index: number
+  id: string
   aggregateFunctionType: BuilderAggregateFunctionType
 
   keysStatus: RemoteDataState

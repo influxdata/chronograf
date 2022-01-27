@@ -16,23 +16,20 @@ function renderType(type: BuilderAggregateFunctionType) {
 }
 
 interface Callbacks {
-  onRemoveTagSelector: (index: number) => void
-  onChangeFunctionType: (
-    index: number,
-    type: BuilderAggregateFunctionType
-  ) => void
-  onSelectKey: (index: number, key: string) => void
-  onChangeKeysSearchTerm: (index: number, searchTerm: string) => void
-  onSearchKeys: (index: number) => void
-  onChangeValuesSearchTerm: (index: number, searchTerm: string) => void
-  onSearchValues: (index: number) => void
-  onSelectValues: (index: number, values: string[]) => void
+  onRemoveTagSelector: (id: string) => void
+  onChangeFunctionType: (id: string, type: BuilderAggregateFunctionType) => void
+  onSelectKey: (id: string, key: string) => void
+  onChangeKeysSearchTerm: (id: string, searchTerm: string) => void
+  onSearchKeys: (id: string) => void
+  onChangeValuesSearchTerm: (id: string, searchTerm: string) => void
+  onSearchValues: (id: string) => void
+  onSelectValues: (id: string, values: string[]) => void
 }
 type Props = TagSelectorState & Callbacks
 
 const TagSelector = (props: Props) => {
   const {
-    index,
+    id,
     aggregateFunctionType,
     onRemoveTagSelector,
     onChangeFunctionType,
@@ -43,9 +40,9 @@ const TagSelector = (props: Props) => {
       <BuilderCard.DropdownHeader
         options={['Filter', 'Group']}
         selectedOption={renderType(aggregateFunctionType)}
-        onDelete={index ? () => onRemoveTagSelector(index) : undefined}
+        onDelete={id ? () => onRemoveTagSelector(id) : undefined}
         onSelect={val =>
-          onChangeFunctionType(index, val === 'Filter' ? 'filter' : 'group')
+          onChangeFunctionType(id, val === 'Filter' ? 'filter' : 'group')
         }
       />
       <TagSelectorBody {...props} />
@@ -56,7 +53,7 @@ const TagSelector = (props: Props) => {
 const TagSelectorBody = (props: Props) => {
   const {
     aggregateFunctionType,
-    index,
+    id,
     keys,
     keysStatus,
     selectedKey,
@@ -85,12 +82,12 @@ const TagSelectorBody = (props: Props) => {
   const debouncer = useMemo(() => new DefaultDebouncer(), [])
   useEffect(() => () => debouncer.cancelAll(), [])
   function onValueTermChange(e: ChangeEvent<HTMLInputElement>) {
-    onChangeValuesSearchTerm(index, e.target.value)
-    debouncer.call(() => onSearchValues(index), SEARCH_DEBOUNCE_MS)
+    onChangeValuesSearchTerm(id, e.target.value)
+    debouncer.call(() => onSearchValues(id), SEARCH_DEBOUNCE_MS)
   }
   function onKeyTermChange(term: string) {
-    onChangeKeysSearchTerm(index, term)
-    debouncer.call(() => onSearchKeys(index), SEARCH_DEBOUNCE_MS)
+    onChangeKeysSearchTerm(id, term)
+    debouncer.call(() => onSearchKeys(id), SEARCH_DEBOUNCE_MS)
   }
 
   const placeholderText =
@@ -99,7 +96,7 @@ const TagSelectorBody = (props: Props) => {
       : `Search ${selectedKey} tag values`
   return (
     <>
-      <BuilderCard.Menu testID={`tag-selector--container ${index}`}>
+      <BuilderCard.Menu testID={`tag-selector--container`}>
         {aggregateFunctionType !== 'group' && (
           <div
             style={{
@@ -111,7 +108,7 @@ const TagSelectorBody = (props: Props) => {
           >
             <SearchableDropdown
               items={keys}
-              onChoose={(key: string) => onSelectKey(index, key)}
+              onChoose={(key: string) => onSelectKey(id, key)}
               searchTerm={keysSearchTerm}
               onChangeSearchTerm={onKeyTermChange}
               selected={selectedKey}
@@ -152,7 +149,7 @@ const TagSelectorValues = (props: Props) => {
   const {
     keysStatus,
     selectedKey,
-    index,
+    id,
     values,
     valuesStatus,
     selectedValues,
@@ -208,22 +205,22 @@ const TagSelectorValues = (props: Props) => {
           const active = selectedValues.includes(value)
           const onChange = () =>
             onSelectValues(
-              index,
+              id,
               active
                 ? selectedValues.filter((x: string) => x !== value)
                 : [value, ...selectedValues]
             )
 
-          const id = `flxts${index}_${value}`
+          const tagId = `flxts${id}_${value}`
           return (
             <div
               className="flux-query-builder--list-item"
               onClick={onChange}
-              key={id}
-              id={id}
+              key={tagId}
+              id={tagId}
             >
               <input type="checkbox" checked={active} onChange={onChange} />
-              <label htmlFor={id}>{value}</label>
+              <label htmlFor={tagId}>{value}</label>
             </div>
           )
         })}
@@ -235,13 +232,10 @@ const TagSelectorValues = (props: Props) => {
 // TODO replace demo UI by a real implementation
 const DEMO_LOAD_DELAY = 1000
 interface DemoTagSelectorProps {
-  index: number
-  onRemoveTagSelector: (index: number) => void
+  id: string
+  onRemoveTagSelector: (id: string) => void
 }
-const DemoTagSelector = ({
-  index,
-  onRemoveTagSelector,
-}: DemoTagSelectorProps) => {
+const DemoTagSelector = ({id, onRemoveTagSelector}: DemoTagSelectorProps) => {
   const [aggregateFunctionType, setAggregateFunctionType] = useState(
     'filter' as BuilderAggregateFunctionType
   )
@@ -301,7 +295,7 @@ const DemoTagSelector = ({
   }, [valuesChanged])
   return (
     <TagSelector
-      index={index}
+      id={id}
       aggregateFunctionType={aggregateFunctionType}
       onRemoveTagSelector={onRemoveTagSelector}
       onChangeFunctionType={(i, type) => {
@@ -322,7 +316,7 @@ const DemoTagSelector = ({
         console.error('DemoTagSelector.onChangeKeysSearchTerm', term, i)
         setKeysSearchTerm(term)
       }}
-      onSearchKeys={(i: number) => {
+      onSearchKeys={i => {
         setKeysChanged(valuesChanged + 1)
         console.error('DemoTagSelector.onSearchKeys', i)
       }}
@@ -331,7 +325,7 @@ const DemoTagSelector = ({
         console.error('DemoTagSelector.onChangeValuesSearchTerm', term, i)
         setValuesSearchTerm(term)
       }}
-      onSearchValues={(i: number) => {
+      onSearchValues={i => {
         setValuesChanged(valuesChanged + 1)
         console.error('DemoTagSelector.onSearchValues', i)
       }}

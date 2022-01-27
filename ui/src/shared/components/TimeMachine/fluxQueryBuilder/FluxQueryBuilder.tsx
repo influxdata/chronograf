@@ -44,7 +44,7 @@ const FluxQueryBuilder = ({
 
   // TODO demo selectors are to be replaced by a real implementation
   const [tagSelectors, setTagSelectors] = useState(1)
-  const [activeTagSelectors, setActiveTagSelectors] = useState([0])
+  const [activeTagSelectors, setActiveTagSelectors] = useState(['0'])
 
   return (
     <div className="flux-query-builder" data-testid="flux-query-builder">
@@ -58,7 +58,7 @@ const FluxQueryBuilder = ({
             {activeTagSelectors.map(i => (
               <TagSelector
                 key={i}
-                index={i}
+                id={i}
                 onRemoveTagSelector={ix =>
                   setActiveTagSelectors(
                     activeTagSelectors.filter(x => x !== ix)
@@ -71,7 +71,10 @@ const FluxQueryBuilder = ({
               customClass="flux-query-builder--add-card-button"
               icon={IconFont.PlusSkinny}
               onClick={() => {
-                setActiveTagSelectors([...activeTagSelectors, tagSelectors])
+                setActiveTagSelectors([
+                  ...activeTagSelectors,
+                  String(tagSelectors),
+                ])
                 setTagSelectors(tagSelectors + 1)
               }}
               shape={ButtonShape.Square}
