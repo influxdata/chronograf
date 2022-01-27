@@ -4,6 +4,7 @@ import DefaultDebouncer from 'src/shared/utils/debouncer'
 import {RemoteDataState, BuilderAggregateFunctionType} from 'src/types'
 import SearchableDropdown from '../../SearchableDropdown'
 import WaitingText from '../../WaitingText'
+import {TagSelectorState} from './types'
 
 const SEARCH_DEBOUNCE_MS = 400
 
@@ -14,20 +15,7 @@ function renderType(type: BuilderAggregateFunctionType) {
   return 'Filter'
 }
 
-interface Props {
-  index: number
-  aggregateFunctionType: BuilderAggregateFunctionType
-
-  keysStatus: RemoteDataState
-  keys: string[]
-  selectedKey: string
-  keysSearchTerm: string
-
-  valuesSearchTerm: string
-  valuesStatus: RemoteDataState
-  values: string[]
-  selectedValues: string[]
-
+interface Callbacks {
   onRemoveTagSelector: (index: number) => void
   onChangeFunctionType: (
     type: BuilderAggregateFunctionType,
@@ -40,6 +28,7 @@ interface Props {
   onSearchValues: (index: number) => void
   onChangeSelectedValues: (values: string[], index: number) => void
 }
+type Props = TagSelectorState & Callbacks
 
 const TagSelector = (props: Props) => {
   const {
