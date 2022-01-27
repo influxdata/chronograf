@@ -26,7 +26,7 @@ interface Callbacks {
   onSearchKeys: (index: number) => void
   onChangeValuesSearchTerm: (index: number, searchTerm: string) => void
   onSearchValues: (index: number) => void
-  onChangeSelectedValues: (index: number, values: string[]) => void
+  onSelectValues: (index: number, values: string[]) => void
 }
 type Props = TagSelectorState & Callbacks
 
@@ -156,7 +156,7 @@ const TagSelectorValues = (props: Props) => {
     values,
     valuesStatus,
     selectedValues,
-    onChangeSelectedValues,
+    onSelectValues,
   } = props
   if (keysStatus === RemoteDataState.NotStarted) {
     return (
@@ -207,7 +207,7 @@ const TagSelectorValues = (props: Props) => {
         {values.map((value: string) => {
           const active = selectedValues.includes(value)
           const onChange = () =>
-            onChangeSelectedValues(
+            onSelectValues(
               index,
               active
                 ? selectedValues.filter((x: string) => x !== value)
@@ -338,8 +338,8 @@ const DemoTagSelector = ({
       valuesStatus={valuesStatus}
       values={values}
       selectedValues={selectedValues}
-      onChangeSelectedValues={(i, newValues) => {
-        console.error('DemoTagSelector.onChangeSelectedValues', newValues, i)
+      onSelectValues={(i, newValues) => {
+        console.error('DemoTagSelector.onSelectValues', newValues, i)
         setSelectedValues(newValues)
       }}
     />
