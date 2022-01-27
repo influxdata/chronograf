@@ -15,7 +15,6 @@ import {
   changeBucketsState,
 } from './actions/buckets'
 import {getBuckets} from 'src/flux/components/DatabaseList'
-import {bindActionCreators, Dispatch} from 'redux'
 
 interface Callbacks {
   onFilterBuckets: typeof filterBuckets
@@ -101,6 +100,10 @@ const InitializeBucketsSelector = (props: {source: Source} & Props) => {
     getBuckets(props.source)
       .then(buckets => {
         props.onChangeBucketsState(RemoteDataState.Done, buckets)
+        const selectedBucket = buckets.includes(props.selectedBucket)
+          ? props.selectedBucket
+          : ''
+        props.onSelectBucket(selectedBucket)
       })
       .catch(e => {
         console.error(e)
@@ -113,14 +116,9 @@ const InitializeBucketsSelector = (props: {source: Source} & Props) => {
 const mstp = (state: any): BucketSelectorState => {
   return state?.fluxQueryBuilder?.buckets as BucketSelectorState
 }
-const mdtp = (dispatch: Dispatch<any>): Callbacks => {
-  return bindActionCreators(
-    {
-      onFilterBuckets: filterBuckets,
-      onSelectBucket: selectBucket,
-      onChangeBucketsState: changeBucketsState,
-    },
-    dispatch
-  )
+const mdtp = {
+  onFilterBuckets: filterBuckets,
+  onSelectBucket: selectBucket,
+  onChangeBucketsState: changeBucketsState,
 }
 export default connect(mstp, mdtp)(InitializeBucketsSelector)

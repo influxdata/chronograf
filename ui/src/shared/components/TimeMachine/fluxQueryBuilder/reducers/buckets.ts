@@ -30,15 +30,9 @@ const bucketsReducer = (
       const buckets = action.payload.buckets
         ? filterBuckets(action.payload.buckets, state.searchTerm)
         : state.buckets
-      const selectedBucket =
-        action.payload.state !== RemoteDataState.Done ||
-        buckets.includes(state.selectedBucket)
-          ? state.selectedBucket
-          : ''
       return {
         ...state,
         status: action.payload.state,
-        selectedBucket,
         buckets,
       }
     }
