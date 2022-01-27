@@ -1,4 +1,4 @@
-import {AggregationSelectorAction} from '../actions/aggregations'
+import {AggregationSelectorAction} from '../actions/aggregation'
 import {AggregationSelectorState} from '../types'
 
 export const initialState: AggregationSelectorState = {

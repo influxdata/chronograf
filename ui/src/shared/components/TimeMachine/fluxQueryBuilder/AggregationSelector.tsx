@@ -10,7 +10,7 @@ import BuilderCard from './BuilderCard'
 import WindowPeriod from './WindowPeriod'
 import {FUNCTION_NAMES} from 'src/shared/constants/queryBuilder'
 import {AggregationSelectorState} from './types'
-import {actionCreators} from './actions/aggregations'
+import {actionCreators} from './actions/aggregation'
 
 interface Callbacks {
   notify: (notification: any) => void
