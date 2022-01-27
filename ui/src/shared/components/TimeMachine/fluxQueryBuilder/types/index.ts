@@ -6,3 +6,9 @@ export interface BucketSelectorState {
   status: RemoteDataState
   searchTerm: string
 }
+
+export interface AggregationSelectorState {
+  period: string
+  fillMissing: boolean
+  selectedFunctions: string[]
+}

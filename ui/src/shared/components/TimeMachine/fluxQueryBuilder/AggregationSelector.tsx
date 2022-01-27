@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React from 'react'
 
 import {connect} from 'react-redux'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
@@ -9,29 +9,28 @@ import ReactTooltip from 'react-tooltip'
 import BuilderCard from './BuilderCard'
 import WindowPeriod from './WindowPeriod'
 import {FUNCTION_NAMES} from 'src/shared/constants/queryBuilder'
+import {AggregationSelectorState} from './types'
+import {actionCreators} from './actions/aggregations'
 
-interface AggregationViewProps {
-  defaultPeriod: string
-  period: string
-  fillMissing: boolean
-  selectedFunctions: string[]
-}
-interface Props extends AggregationViewProps {
+interface Callbacks {
   notify: (notification: any) => void
-  children?: JSX.Element
-
   setPeriod: (period: string) => void
   setFillMissing: (fillMissing: boolean) => void
   setSelectedFunctions: (fns: string[]) => void
 }
-const AggregationSelector = (props: Props) => {
+interface OwnProps {
+  defaultPeriod: string
+}
+type Props = AggregationSelectorState & OwnProps & Callbacks
+
+const AggregationSelector = (props: Props & {children?: JSX.Element}) => {
   const {
     defaultPeriod,
     period,
-    setPeriod,
     fillMissing,
-    setFillMissing,
     selectedFunctions,
+    setPeriod,
+    setFillMissing,
     setSelectedFunctions,
   } = props
 
@@ -154,34 +153,13 @@ const AggregationSelector = (props: Props) => {
   )
 }
 
-// TODO replace demo UI by a real implementation
-const DemoAggregationSelector = ({
-  notify,
-  defaultPeriod,
-  children,
-}: {
-  notify: (notification: any) => void
-  defaultPeriod: string
-  children?: JSX.Element
-}) => {
-  const [period, setPeriod] = useState('auto')
-  const [fillMissing, setFillMissing] = useState(false)
-  const [selectedFunctions, setSelectedFunctions] = useState(['mean'])
-
-  return (
-    <AggregationSelector
-      notify={notify}
-      defaultPeriod={defaultPeriod}
-      period={period}
-      setPeriod={setPeriod}
-      fillMissing={fillMissing}
-      setFillMissing={setFillMissing}
-      selectedFunctions={selectedFunctions}
-      setSelectedFunctions={setSelectedFunctions}
-    >
-      {children}
-    </AggregationSelector>
-  )
+const mstp = (state: any): AggregationSelectorState => {
+  return state?.fluxQueryBuilder?.aggregation as AggregationSelectorState
 }
-
-export default connect(null, {notify: notifyAction})(DemoAggregationSelector)
+const mdtp = {
+  notify: notifyAction,
+  setFillMissing: actionCreators.setFillMissing,
+  setPeriod: actionCreators.setPeriod,
+  setSelectedFunctions: actionCreators.setSelectedFunctions,
+}
+export default connect(mstp, mdtp)(AggregationSelector)
