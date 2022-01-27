@@ -23,14 +23,14 @@ export function addTagSelector(): ActionAddTagSelector {
 export interface ActionRemoveTagSelector {
   type: 'FQB_TAG_REMOVE'
   payload: {
-    index: number
+    tagId: string
   }
 }
-export function removeTagSelector(index: number): ActionRemoveTagSelector {
+export function removeTagSelector(tagId: string): ActionRemoveTagSelector {
   return {
     type: 'FQB_TAG_REMOVE',
     payload: {
-      index,
+      tagId,
     },
   }
 }
@@ -38,18 +38,18 @@ export function removeTagSelector(index: number): ActionRemoveTagSelector {
 export interface ActionChangeFunctionType {
   type: 'FQB_TAG_CHANGE_TYPE'
   payload: {
-    index: number
+    tagId: string
     type: BuilderAggregateFunctionType
   }
 }
 export function changeFunctionType(
-  index: number,
+  tagId: string,
   type: BuilderAggregateFunctionType
 ): ActionChangeFunctionType {
   return {
     type: 'FQB_TAG_CHANGE_TYPE',
     payload: {
-      index,
+      tagId,
       type,
     },
   }
@@ -58,15 +58,15 @@ export function changeFunctionType(
 export interface ActionSelectKey {
   type: 'FQB_TAG_SELECT_KEY'
   payload: {
-    index: number
+    tagId: string
     key: string
   }
 }
-export function selectKey(index: number, key: string): ActionSelectKey {
+export function selectKey(tagId: string, key: string): ActionSelectKey {
   return {
     type: 'FQB_TAG_SELECT_KEY',
     payload: {
-      index,
+      tagId,
       key,
     },
   }
@@ -75,18 +75,18 @@ export function selectKey(index: number, key: string): ActionSelectKey {
 export interface ActionChangeKeysSearchTerm {
   type: 'FQB_TAG_CHANGE_KEY_SEARCHTERM'
   payload: {
-    index: number
+    tagId: string
     term: string
   }
 }
 export function changeKeysSearchTerm(
-  index: number,
+  tagId: string,
   term: string
 ): ActionChangeKeysSearchTerm {
   return {
     type: 'FQB_TAG_CHANGE_KEY_SEARCHTERM',
     payload: {
-      index,
+      tagId,
       term,
     },
   }
@@ -95,14 +95,14 @@ export function changeKeysSearchTerm(
 export interface ActionSearchKeys {
   type: 'FQB_TAG_SEARCH_KEY'
   payload: {
-    index: number
+    tagId: string
   }
 }
-export function searchKeys(index: number): ActionSearchKeys {
+export function searchKeys(tagId: string): ActionSearchKeys {
   return {
     type: 'FQB_TAG_SEARCH_KEY',
     payload: {
-      index,
+      tagId,
     },
   }
 }
@@ -110,18 +110,18 @@ export function searchKeys(index: number): ActionSearchKeys {
 export interface ActionSelectValues {
   type: 'FQB_TAG_SELECT_VALUES'
   payload: {
-    index: number
+    tagId: string
     values: string[]
   }
 }
 export function selectValues(
-  index: number,
+  tagId: string,
   values: string[]
 ): ActionSelectValues {
   return {
     type: 'FQB_TAG_SELECT_VALUES',
     payload: {
-      index,
+      tagId,
       values,
     },
   }
@@ -130,18 +130,18 @@ export function selectValues(
 export interface ActionChangeValuesSearchTerm {
   type: 'FQB_TAG_CHANGE_VALUES_SEARCHTERM'
   payload: {
-    index: number
+    tagId: string
     term: string
   }
 }
 export function changeValuesSearchTerm(
-  index: number,
+  tagId: string,
   term: string
 ): ActionChangeValuesSearchTerm {
   return {
     type: 'FQB_TAG_CHANGE_VALUES_SEARCHTERM',
     payload: {
-      index,
+      tagId,
       term,
     },
   }
@@ -150,14 +150,14 @@ export function changeValuesSearchTerm(
 export interface ActionSearchValues {
   type: 'FQB_TAG_SEARCH_VALUES'
   payload: {
-    index: number
+    tagId: string
   }
 }
-export function searchValues(index: number): ActionSearchValues {
+export function searchValues(tagId: string): ActionSearchValues {
   return {
     type: 'FQB_TAG_SEARCH_VALUES',
     payload: {
-      index,
+      tagId,
     },
   }
 }

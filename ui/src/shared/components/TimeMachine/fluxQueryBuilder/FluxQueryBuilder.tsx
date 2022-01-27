@@ -58,7 +58,7 @@ const FluxQueryBuilder = ({
             {activeTagSelectors.map(i => (
               <TagSelector
                 key={i}
-                id={i}
+                tagId={i}
                 onRemoveTagSelector={ix =>
                   setActiveTagSelectors(
                     activeTagSelectors.filter(x => x !== ix)
