@@ -1,42 +1,46 @@
 // Libraries
-import React, {useState} from 'react'
+import React, {useEffect} from 'react'
+import {connect} from 'react-redux'
 import classnames from 'classnames'
 
 // Components
 import BuilderCard from './BuilderCard'
 
 // Types
-import {RemoteDataState} from 'src/types'
+import {RemoteDataState, Source} from 'src/types'
+import {BucketSelectorState} from './types'
+import {
+  filterBuckets,
+  selectBucket,
+  changeBucketsState,
+} from './actions/buckets'
+import {getBuckets} from 'src/flux/components/DatabaseList'
+import {bindActionCreators, Dispatch} from 'redux'
 
-const filterBuckets = (term: string) => {
-  const searchTerm = term.toLocaleLowerCase()
-  return (bucket: string) => bucket.toLocaleLowerCase().includes(searchTerm)
+interface Callbacks {
+  onFilterBuckets: typeof filterBuckets
+  onSelectBucket: typeof selectBucket
+  onChangeBucketsState: typeof changeBucketsState
 }
-
-interface Props {
-  selectedBucket?: string
-  sortedBucketNames: string[]
-  bucketsStatus: RemoteDataState
-  onSelectBucket: (bucket: string) => void
-}
+type Props = BucketSelectorState & Callbacks
 
 const BucketsSelector = ({
   selectedBucket,
-  sortedBucketNames,
-  bucketsStatus,
+  buckets,
+  status,
+  searchTerm,
   onSelectBucket,
+  onFilterBuckets,
 }: Props) => {
-  const [searchTerm, setSearchTerm] = useState('')
-  let list = sortedBucketNames.filter(filterBuckets(searchTerm))
-  if (list.length > 200) {
-    list = list.slice(0, 200)
-  }
-
-  if (bucketsStatus === RemoteDataState.Done) {
-    if (!sortedBucketNames.length) {
+  if (status === RemoteDataState.Done) {
+    if (!buckets.length) {
       return (
         <BuilderCard.Empty>
-          <i>No buckets found</i>
+          {searchTerm ? (
+            <i>No buckets matched your search</i>
+          ) : (
+            <i>No buckets found</i>
+          )}
         </BuilderCard.Empty>
       )
     }
@@ -48,40 +52,36 @@ const BucketsSelector = ({
             placeholder="Search for a bucket"
             type="text"
             value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
+            onChange={e => onFilterBuckets(e.target.value)}
             onKeyUp={e => {
               if (e.key === 'Escape') {
                 e.stopPropagation()
-                setSearchTerm('')
+                onSelectBucket('')
               }
             }}
             spellCheck={false}
             autoComplete="false"
           />
         </BuilderCard.Menu>
-        {list.length ? (
-          <BuilderCard.Body>
-            <div className="flux-query-builder--list">
-              {list.map(bucket => (
-                <div
-                  className={classnames('flux-query-builder--list-item', {
-                    active: bucket === selectedBucket,
-                  })}
-                  onClick={() => onSelectBucket(bucket)}
-                  key={bucket}
-                >
-                  {bucket}
-                </div>
-              ))}
-            </div>
-          </BuilderCard.Body>
-        ) : (
-          <BuilderCard.Empty>No buckets matched your search</BuilderCard.Empty>
-        )}
+        <BuilderCard.Body>
+          <div className="flux-query-builder--list">
+            {buckets.map(bucket => (
+              <div
+                className={classnames('flux-query-builder--list-item', {
+                  active: bucket === selectedBucket,
+                })}
+                onClick={() => onSelectBucket(bucket)}
+                key={bucket}
+              >
+                {bucket}
+              </div>
+            ))}
+          </div>
+        </BuilderCard.Body>
       </>
     )
   }
-  if (bucketsStatus === RemoteDataState.Error) {
+  if (status === RemoteDataState.Error) {
     return (
       <BuilderCard.Empty>
         <i>Failed to load buckets</i>
@@ -95,4 +95,32 @@ const BucketsSelector = ({
   )
 }
 
-export default BucketsSelector
+const InitializeBucketsSelector = (props: {source: Source} & Props) => {
+  useEffect(() => {
+    props.onChangeBucketsState(RemoteDataState.Loading, [])
+    getBuckets(props.source)
+      .then(buckets => {
+        props.onChangeBucketsState(RemoteDataState.Done, buckets)
+      })
+      .catch(e => {
+        console.error(e)
+        props.onChangeBucketsState(RemoteDataState.Error)
+      })
+  }, [])
+
+  return <BucketsSelector {...props}></BucketsSelector>
+}
+const mstp = (state: any): BucketSelectorState => {
+  return state?.fluxQueryBuilder?.buckets as BucketSelectorState
+}
+const mdtp = (dispatch: Dispatch<any>): Callbacks => {
+  return bindActionCreators(
+    {
+      onFilterBuckets: filterBuckets,
+      onSelectBucket: selectBucket,
+      onChangeBucketsState: changeBucketsState,
+    },
+    dispatch
+  )
+}
+export default connect(mstp, mdtp)(InitializeBucketsSelector)
