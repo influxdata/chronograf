@@ -71,16 +71,22 @@ const TagSelectorBody = (props: Props) => {
     onSearchKeys,
     selectedValues,
   } = props
-  if (keysStatus === RemoteDataState.Error) {
-    return <BuilderCard.Empty>Failed to load tag keys</BuilderCard.Empty>
-  }
+  if (aggregateFunctionType === 'filter') {
+    if (keysStatus === RemoteDataState.Error) {
+      return <BuilderCard.Empty>Failed to load tag keys</BuilderCard.Empty>
+    }
 
-  if (keysStatus === RemoteDataState.Done && !keys.length && !keysSearchTerm) {
-    return (
-      <BuilderCard.Empty testID="empty-tag-keys">
-        No tag keys found <small>in the current time range</small>
-      </BuilderCard.Empty>
-    )
+    if (
+      keysStatus === RemoteDataState.Done &&
+      !keys.length &&
+      !keysSearchTerm
+    ) {
+      return (
+        <BuilderCard.Empty testID="empty-tag-keys">
+          No tag keys found <small>in the current time range</small>
+        </BuilderCard.Empty>
+      )
+    }
   }
 
   const debouncer = useMemo(() => new DefaultDebouncer(), [])
