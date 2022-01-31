@@ -7,7 +7,7 @@ export type BucketSelectorAction =
 
 export function changeBucketsState(state: RemoteDataState, buckets?: string[]) {
   return {
-    type: 'FQB_BUCKETS_CHANGE',
+    type: 'FQB_BUCKETS_CHANGE' as const,
     payload: {
       state,
       buckets,
@@ -17,7 +17,7 @@ export function changeBucketsState(state: RemoteDataState, buckets?: string[]) {
 
 export function selectBucket(bucket: string) {
   return {
-    type: 'FQB_BUCKETS_SELECT',
+    type: 'FQB_BUCKETS_SELECT' as const,
     payload: {
       bucket,
     },
@@ -26,7 +26,7 @@ export function selectBucket(bucket: string) {
 
 export function filterBuckets(term: string) {
   return {
-    type: 'FQB_BUCKETS_FILTER',
+    type: 'FQB_BUCKETS_FILTER' as const,
     payload: {
       term,
     },

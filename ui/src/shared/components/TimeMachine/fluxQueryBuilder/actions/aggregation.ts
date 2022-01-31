@@ -5,7 +5,7 @@ export type AggregationSelectorAction =
 
 export function setPeriod(period: string) {
   return {
-    type: 'FQB_AGG_PERIOD',
+    type: 'FQB_AGG_PERIOD' as const,
     payload: {
       period,
     },
@@ -14,7 +14,7 @@ export function setPeriod(period: string) {
 
 export function setFillMissing(fillMissing: boolean) {
   return {
-    type: 'FQB_AGG_FILL_MISSING',
+    type: 'FQB_AGG_FILL_MISSING' as const,
     payload: {
       fillMissing,
     },
@@ -23,7 +23,7 @@ export function setFillMissing(fillMissing: boolean) {
 
 export function setSelectedFunctions(functions: string[]) {
   return {
-    type: 'FQB_AGG_SELECTED_FNS',
+    type: 'FQB_AGG_SELECTED_FNS' as const,
     payload: {
       functions,
     },

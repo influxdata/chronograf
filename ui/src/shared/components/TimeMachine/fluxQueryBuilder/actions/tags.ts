@@ -13,13 +13,13 @@ export type TagSelectorAction =
 
 export function addTagSelector() {
   return {
-    type: 'FQB_TAG_ADD',
+    type: 'FQB_TAG_ADD' as const,
   }
 }
 
 export function removeTagSelector(tagId: string) {
   return {
-    type: 'FQB_TAG_REMOVE',
+    type: 'FQB_TAG_REMOVE' as const,
     payload: {
       tagId,
     },
@@ -31,7 +31,7 @@ export function changeFunctionType(
   type: BuilderAggregateFunctionType
 ) {
   return {
-    type: 'FQB_TAG_CHANGE_TYPE',
+    type: 'FQB_TAG_CHANGE_TYPE' as const,
     payload: {
       tagId,
       type,
@@ -41,7 +41,7 @@ export function changeFunctionType(
 
 export function selectKey(tagId: string, key: string) {
   return {
-    type: 'FQB_TAG_SELECT_KEY',
+    type: 'FQB_TAG_SELECT_KEY' as const,
     payload: {
       tagId,
       key,
@@ -51,7 +51,7 @@ export function selectKey(tagId: string, key: string) {
 
 export function changeKeysSearchTerm(tagId: string, term: string) {
   return {
-    type: 'FQB_TAG_CHANGE_KEY_SEARCHTERM',
+    type: 'FQB_TAG_CHANGE_KEY_SEARCHTERM' as const,
     payload: {
       tagId,
       term,
@@ -61,7 +61,7 @@ export function changeKeysSearchTerm(tagId: string, term: string) {
 
 export function searchKeys(tagId: string) {
   return {
-    type: 'FQB_TAG_SEARCH_KEY',
+    type: 'FQB_TAG_SEARCH_KEY' as const,
     payload: {
       tagId,
     },
@@ -70,7 +70,7 @@ export function searchKeys(tagId: string) {
 
 export function selectValues(tagId: string, values: string[]) {
   return {
-    type: 'FQB_TAG_SELECT_VALUES',
+    type: 'FQB_TAG_SELECT_VALUES' as const,
     payload: {
       tagId,
       values,
@@ -80,7 +80,7 @@ export function selectValues(tagId: string, values: string[]) {
 
 export function changeValuesSearchTerm(tagId: string, term: string) {
   return {
-    type: 'FQB_TAG_CHANGE_VALUES_SEARCHTERM',
+    type: 'FQB_TAG_CHANGE_VALUES_SEARCHTERM' as const,
     payload: {
       tagId,
       term,
@@ -90,7 +90,7 @@ export function changeValuesSearchTerm(tagId: string, term: string) {
 
 export function searchValues(tagId: string) {
   return {
-    type: 'FQB_TAG_SEARCH_VALUES',
+    type: 'FQB_TAG_SEARCH_VALUES' as const,
     payload: {
       tagId,
     },
