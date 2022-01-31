@@ -10,7 +10,7 @@ export type TagSelectorAction =
   | ReturnType<typeof selectValues>
   | ReturnType<typeof changeValuesSearchTerm>
   | ReturnType<typeof searchValues>
-  | ReturnType<typeof setBuilderTagKeysStatus>
+  | ReturnType<typeof setTagKeysStatus>
 
 export function addTagSelector() {
   return {
@@ -98,10 +98,7 @@ export function searchValues(tagId: string) {
   }
 }
 
-export function setBuilderTagKeysStatus(
-  tagId: string,
-  status: RemoteDataState
-) {
+export function setTagKeysStatus(tagId: string, status: RemoteDataState) {
   return {
     type: 'FQB_TAG_KEY_STATUS' as const,
     payload: {
