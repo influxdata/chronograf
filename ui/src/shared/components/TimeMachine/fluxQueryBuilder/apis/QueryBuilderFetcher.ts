@@ -39,6 +39,7 @@ class QueryBuilderFetcher {
     }
 
     const pendingResult = findBuckets(source)
+    this.findBucketsQuery = pendingResult
 
     pendingResult.promise
       .then(result => {
