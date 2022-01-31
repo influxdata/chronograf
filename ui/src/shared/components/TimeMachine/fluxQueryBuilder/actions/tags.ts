@@ -18,7 +18,7 @@ export function addTagSelector() {
   }
 }
 
-export function removeTagSelector(tagId: string) {
+export function removeTagSelector(tagId: number) {
   return {
     type: 'FQB_TAG_REMOVE' as const,
     payload: {
@@ -28,7 +28,7 @@ export function removeTagSelector(tagId: string) {
 }
 
 export function changeFunctionType(
-  tagId: string,
+  tagId: number,
   type: BuilderAggregateFunctionType
 ) {
   return {
@@ -40,7 +40,7 @@ export function changeFunctionType(
   }
 }
 
-export function selectKey(tagId: string, key: string) {
+export function selectKey(tagId: number, key: string) {
   return {
     type: 'FQB_TAG_SELECT_KEY' as const,
     payload: {
@@ -50,7 +50,7 @@ export function selectKey(tagId: string, key: string) {
   }
 }
 
-export function changeKeysSearchTerm(tagId: string, term: string) {
+export function changeKeysSearchTerm(tagId: number, term: string) {
   return {
     type: 'FQB_TAG_CHANGE_KEY_SEARCHTERM' as const,
     payload: {
@@ -60,7 +60,7 @@ export function changeKeysSearchTerm(tagId: string, term: string) {
   }
 }
 
-export function searchKeys(tagId: string) {
+export function searchKeys(tagId: number) {
   return {
     type: 'FQB_TAG_SEARCH_KEY' as const,
     payload: {
@@ -69,7 +69,7 @@ export function searchKeys(tagId: string) {
   }
 }
 
-export function selectValues(tagId: string, values: string[]) {
+export function selectValues(tagId: number, values: string[]) {
   return {
     type: 'FQB_TAG_SELECT_VALUES' as const,
     payload: {
@@ -79,7 +79,7 @@ export function selectValues(tagId: string, values: string[]) {
   }
 }
 
-export function changeValuesSearchTerm(tagId: string, term: string) {
+export function changeValuesSearchTerm(tagId: number, term: string) {
   return {
     type: 'FQB_TAG_CHANGE_VALUES_SEARCHTERM' as const,
     payload: {
@@ -89,7 +89,7 @@ export function changeValuesSearchTerm(tagId: string, term: string) {
   }
 }
 
-export function searchValues(tagId: string) {
+export function searchValues(tagId: number) {
   return {
     type: 'FQB_TAG_SEARCH_VALUES' as const,
     payload: {
@@ -98,7 +98,7 @@ export function searchValues(tagId: string) {
   }
 }
 
-export function setTagKeysStatus(tagId: string, status: RemoteDataState) {
+export function setTagKeysStatus(tagId: number, status: RemoteDataState) {
   return {
     type: 'FQB_TAG_KEY_STATUS' as const,
     payload: {

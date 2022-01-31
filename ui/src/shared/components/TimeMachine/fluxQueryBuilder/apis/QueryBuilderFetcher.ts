@@ -23,8 +23,8 @@ function tagSelectionKey(tags: BuilderTagsType[]): any[] {
 }
 class QueryBuilderFetcher {
   private findBucketsQuery?: CancelableQuery
-  private findKeysQueries: {[tagId: string]: CancelableQuery | undefined} = {}
-  private findValuesQueries: {[tagId: string]: CancelableQuery | undefined} = {}
+  private findKeysQueries: Array<CancelableQuery | undefined>
+  private findValuesQueries: Array<CancelableQuery | undefined>
   private findKeysCache: {[key: string]: string[]} = {}
   private findValuesCache: {[key: string]: string[]} = {}
   private findBucketsCache: {[key: string]: string[]} = {}
@@ -57,7 +57,7 @@ class QueryBuilderFetcher {
   }
 
   public async findKeys(
-    tagId: string,
+    tagId: number,
     options: FindKeysOptions
   ): Promise<string[]> {
     this.cancelFindKeys(tagId)
@@ -87,7 +87,7 @@ class QueryBuilderFetcher {
     return pendingResult.promise
   }
 
-  public cancelFindKeys(tagId: string): void {
+  public cancelFindKeys(tagId: number): void {
     if (this.findKeysQueries[tagId]) {
       this.findKeysQueries[tagId].cancel()
       this.findKeysQueries[tagId] = undefined
@@ -95,7 +95,7 @@ class QueryBuilderFetcher {
   }
 
   public async findValues(
-    tagId: string,
+    tagId: number,
     options: FindValuesOptions
   ): Promise<string[]> {
     this.cancelFindValues(tagId)
@@ -125,7 +125,7 @@ class QueryBuilderFetcher {
     return pendingResult.promise
   }
 
-  public cancelFindValues(tagId: string): void {
+  public cancelFindValues(tagId: number): void {
     if (this.findValuesQueries[tagId]) {
       this.findValuesQueries[tagId].cancel()
       this.findValuesQueries[tagId] = undefined
@@ -134,8 +134,8 @@ class QueryBuilderFetcher {
 
   public clearCache(): void {
     this.cancelFindBuckets()
-    Object.keys(this.findKeysQueries).forEach(x => this.cancelFindKeys(x))
-    Object.keys(this.findValuesQueries).forEach(x => this.cancelFindValues(x))
+    this.findKeysQueries.forEach((_, i) => this.cancelFindKeys(i))
+    this.findValuesQueries.forEach((_, i) => this.cancelFindValues(i))
     this.findBucketsCache = {}
     this.findKeysCache = {}
     this.findValuesCache = {}

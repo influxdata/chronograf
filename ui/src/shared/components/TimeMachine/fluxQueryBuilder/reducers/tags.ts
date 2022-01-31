@@ -1,13 +1,12 @@
 import {TagSelectorAction} from '../actions/tags'
 import {TagSelectorState} from '../types'
-import uuid from 'uuid'
 import {RemoteDataState} from 'src/types'
 
 export const initialState: TagSelectorState[] = []
 
 function changeTagSelector(
   state: TagSelectorState[],
-  tagId: string,
+  tagId: number,
   fn: (tagState: TagSelectorState, index: number) => Partial<TagSelectorState>
 ): TagSelectorState[] {
   const index = state.findIndex(({tagId: id}) => id === tagId)
@@ -29,7 +28,7 @@ const aggregationReducer = (
       return [
         ...state,
         {
-          tagId: uuid.v4(),
+          tagId: state.length,
           aggregateFunctionType: 'filter',
           keys: [],
           keysSearchTerm: '',

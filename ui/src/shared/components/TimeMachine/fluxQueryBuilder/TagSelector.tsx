@@ -16,17 +16,17 @@ function renderType(type: BuilderAggregateFunctionType) {
 }
 
 interface Callbacks {
-  onRemoveTagSelector: (tagId: string) => void
+  onRemoveTagSelector: (tagId: number) => void
   onChangeFunctionType: (
-    tagId: string,
+    tagId: number,
     type: BuilderAggregateFunctionType
   ) => void
-  onSelectKey: (tagId: string, key: string) => void
-  onChangeKeysSearchTerm: (tagId: string, searchTerm: string) => void
-  onSearchKeys: (tagId: string) => void
-  onChangeValuesSearchTerm: (tagId: string, searchTerm: string) => void
-  onSearchValues: (tagId: string) => void
-  onSelectValues: (tagId: string, values: string[]) => void
+  onSelectKey: (tagId: number, key: string) => void
+  onChangeKeysSearchTerm: (tagId: number, searchTerm: string) => void
+  onSearchKeys: (tagId: number) => void
+  onChangeValuesSearchTerm: (tagId: number, searchTerm: string) => void
+  onSearchValues: (tagId: number) => void
+  onSelectValues: (tagId: number, values: string[]) => void
 }
 type Props = TagSelectorState & Callbacks
 
@@ -43,7 +43,7 @@ const TagSelector = (props: Props) => {
       <BuilderCard.DropdownHeader
         options={['Filter', 'Group']}
         selectedOption={renderType(aggregateFunctionType)}
-        onDelete={tagId !== '0' ? () => onRemoveTagSelector(tagId) : undefined}
+        onDelete={tagId !== 0 ? () => onRemoveTagSelector(tagId) : undefined}
         onSelect={val =>
           onChangeFunctionType(tagId, val === 'Filter' ? 'filter' : 'group')
         }
@@ -235,8 +235,8 @@ const TagSelectorValues = (props: Props) => {
 // TODO replace demo UI by a real implementation
 const DEMO_LOAD_DELAY = 1000
 interface DemoTagSelectorProps {
-  tagId: string
-  onRemoveTagSelector: (tagId: string) => void
+  tagId: number
+  onRemoveTagSelector: (tagId: number) => void
 }
 const DemoTagSelector = ({
   tagId,
