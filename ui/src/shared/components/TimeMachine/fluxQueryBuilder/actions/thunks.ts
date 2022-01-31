@@ -72,7 +72,7 @@ export const loadTagSelectorThunk = (
           .filter(x => x.aggregateFunctionType === 'filter'),
       })
 
-      const {key} = tagState
+      const {tagKey: key} = tagState
 
       if (!key) {
         let defaultKey: string
@@ -127,7 +127,6 @@ const loadTagSelectorValuesThunk = (
     return
   }
 
-  dispatch(tagActions.setValuesStatus(tagIndex, RemoteDataState.Loading))
   const tagState = tags[tagIndex]
 
   try {
@@ -135,13 +134,14 @@ const loadTagSelectorValuesThunk = (
     const originalSelected = tagState.selectedValues || []
     let selectedValues = originalSelected
     if (tagState.aggregateFunctionType === 'filter') {
+      dispatch(tagActions.setValuesStatus(tagIndex, RemoteDataState.Loading))
       values = await queryBuilderFetcher.findValues(tagIndex, {
         source,
         bucket: selectedBucket,
         tagsSelections: tags
           .slice(0, tagIndex)
           .filter(x => x.aggregateFunctionType === 'filter'),
-        key: tagState.key,
+        key: tagState.tagKey,
         searchTerm: tagState.valuesSearchTerm,
         timeRange,
       })
@@ -154,8 +154,8 @@ const loadTagSelectorValuesThunk = (
       }
     } else {
       values = tags.slice(0, tagIndex).reduce((acc, tag) => {
-        if (tag.aggregateFunctionType === 'filter' && tag.key) {
-          acc.push(tag.key)
+        if (tag.aggregateFunctionType === 'filter' && tag.tagKey) {
+          acc.push(tag.tagKey)
         }
         return acc
       }, [])

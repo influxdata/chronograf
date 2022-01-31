@@ -16,7 +16,7 @@ type CancelableQuery = CancelBox<string[]>
 
 function tagSelectionKey(tags: BuilderTagsType[]): any[] {
   return tags.map(x => ({
-    k: x.key || '',
+    k: x.tagKey || '',
     v: x.values || [],
     t: x.aggregateFunctionType,
   }))

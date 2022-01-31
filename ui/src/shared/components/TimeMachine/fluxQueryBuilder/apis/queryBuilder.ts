@@ -134,7 +134,7 @@ export function extractCol(csv: string, colName: string): string[] {
 
 export function formatTagFilterPredicate(tagsSelections: BuilderTagsType[]) {
   const validSelections = tagsSelections.filter(
-    ({key, values}) => key && values.length
+    ({tagKey: key, values}) => key && values.length
   )
 
   if (!validSelections.length) {
@@ -147,7 +147,7 @@ export function formatTagFilterPredicate(tagsSelections: BuilderTagsType[]) {
 }
 
 export function formatTagKeyFilterCall(tagsSelections: BuilderTagsType[]) {
-  const keys = tagsSelections.map(({key}) => key)
+  const keys = tagsSelections.map(({tagKey: key}) => key)
 
   if (!keys.length) {
     return ''
@@ -169,7 +169,7 @@ export function tagToFlux(tag: BuilderTagsType) {
   return tag.values
     .map(
       value =>
-        `r["${tag.key}"] == "${value
+        `r["${tag.tagKey}"] == "${value
           .replace(/\\/g, '\\\\')
           .replace(/"/g, '\\"')}"`
     )

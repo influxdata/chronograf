@@ -22,21 +22,18 @@ export const AGG_WINDOW_AUTO = 'auto'
 
 export interface TagSelectorState extends BuilderTagsType {
   tagIndex: number
-  aggregateFunctionType: BuilderAggregateFunctionType
 
   keysStatus: RemoteDataState
   keys: string[]
-  key: string
   keysSearchTerm: string
 
   valuesSearchTerm: string
   valuesStatus?: RemoteDataState
-  values: string[]
   selectedValues: string[]
 }
 
 export interface BuilderTagsType {
-  key: string
+  tagKey: string
   values: string[]
   aggregateFunctionType: BuilderAggregateFunctionType
 }

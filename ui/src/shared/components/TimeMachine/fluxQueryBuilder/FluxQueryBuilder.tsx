@@ -1,5 +1,5 @@
 // Libraries
-import React, {useMemo, useState} from 'react'
+import React, {useMemo} from 'react'
 import {connect} from 'react-redux'
 
 import BuilderCard from './BuilderCard'
@@ -16,7 +16,7 @@ import AggregationSelector from './AggregationSelector'
 import TagSelector from './TagSelector'
 import {fluxPeriodFromRangeSeconds} from 'src/tempVars/utils/replace'
 import moment from 'moment'
-import {TimeMachineQueryProps} from './types'
+import {TagSelectorState, TimeMachineQueryProps} from './types'
 import {addTagSelectorThunk} from './actions/thunks'
 
 interface OwnProps extends TimeMachineQueryProps {
@@ -24,12 +24,15 @@ interface OwnProps extends TimeMachineQueryProps {
   onShowEditor: () => void
 }
 
-type Props = OwnProps & typeof mdtp
+type Props = OwnProps & typeof mdtp & ReturnType<typeof mstp>
+
 const FluxQueryBuilder = ({
   source,
   timeRange,
+  tags,
   onSubmit,
   onShowEditor,
+  onAddTagSelector,
 }: Props) => {
   const defaultPeriod = useMemo(() => {
     if (timeRange) {
@@ -44,10 +47,6 @@ const FluxQueryBuilder = ({
     }
   }, [timeRange])
 
-  // TODO demo selectors are to be replaced by a real implementation
-  const [tagSelectors, setTagSelectors] = useState(1)
-  const [activeTagSelectors, setActiveTagSelectors] = useState([0])
-
   return (
     <div className="flux-query-builder" data-testid="flux-query-builder">
       <div className="flux-query-builder--cards">
@@ -57,15 +56,12 @@ const FluxQueryBuilder = ({
               <BuilderCard.Header title="From" />
               <BucketsSelector source={source} timeRange={timeRange} />
             </BuilderCard>
-            {activeTagSelectors.map(i => (
+            {tags.map(tag => (
               <TagSelector
-                key={i}
-                tagIndex={i}
-                onRemoveTagSelector={ix =>
-                  setActiveTagSelectors(
-                    activeTagSelectors.filter(x => x !== ix)
-                  )
-                }
+                source={source}
+                timeRange={timeRange}
+                key={tag.tagIndex}
+                tagIndex={tag.tagIndex}
               />
             ))}
             <Button
@@ -73,8 +69,7 @@ const FluxQueryBuilder = ({
               customClass="flux-query-builder--add-card-button"
               icon={IconFont.PlusSkinny}
               onClick={() => {
-                setActiveTagSelectors([...activeTagSelectors, tagSelectors])
-                setTagSelectors(tagSelectors + 1)
+                onAddTagSelector(source, timeRange)
               }}
               shape={ButtonShape.Square}
             />
@@ -100,8 +95,13 @@ const FluxQueryBuilder = ({
     </div>
   )
 }
+const mstp = (state: any) => {
+  return {
+    tags: state?.fluxQueryBuilder?.tags as TagSelectorState[],
+  }
+}
 const mdtp = {
   onAddTagSelector: addTagSelectorThunk,
 }
 
-export default connect(null, mdtp)(FluxQueryBuilder)
+export default connect(mstp, mdtp)(FluxQueryBuilder)

@@ -1,10 +1,25 @@
-import React, {ChangeEvent, useEffect, useMemo, useState} from 'react'
+import React, {ChangeEvent, Dispatch, useEffect, useMemo} from 'react'
+import {connect} from 'react-redux'
 import BuilderCard from './BuilderCard'
 import DefaultDebouncer from 'src/shared/utils/debouncer'
-import {RemoteDataState, BuilderAggregateFunctionType} from 'src/types'
+import {
+  RemoteDataState,
+  BuilderAggregateFunctionType,
+  Source,
+  TimeRange,
+} from 'src/types'
 import SearchableDropdown from '../../SearchableDropdown'
 import WaitingText from '../../WaitingText'
-import {TagSelectorState} from './types'
+import {TagSelectorState, TimeMachineQueryProps} from './types'
+import {
+  changeFunctionTypeThunk,
+  removeTagSelectorThunk,
+  searchTagKeysThunk,
+  searchTagValuesThunk,
+  selectTagKeyThunk,
+  selectTagValuesThunk,
+} from './actions/thunks'
+import {changeKeysSearchTerm, changeValuesSearchTerm} from './actions/tags'
 
 const SEARCH_DEBOUNCE_MS = 400
 
@@ -28,7 +43,7 @@ interface Callbacks {
   onSearchValues: (tagIndex: number) => void
   onSelectValues: (tagIndex: number, values: string[]) => void
 }
-type Props = TagSelectorState & Callbacks
+type Props = TagSelectorState & Callbacks & TimeMachineQueryProps
 
 const TagSelector = (props: Props) => {
   const {
@@ -61,7 +76,7 @@ const TagSelectorBody = (props: Props) => {
     tagIndex,
     keys,
     keysStatus,
-    key,
+    tagKey: key,
     onSelectKey,
     valuesSearchTerm,
     onChangeValuesSearchTerm,
@@ -71,7 +86,6 @@ const TagSelectorBody = (props: Props) => {
     onSearchKeys,
     selectedValues,
   } = props
-
   if (keysStatus === RemoteDataState.Error) {
     return <BuilderCard.Empty>Failed to load tag keys</BuilderCard.Empty>
   }
@@ -153,7 +167,7 @@ const TagSelectorBody = (props: Props) => {
 const TagSelectorValues = (props: Props) => {
   const {
     keysStatus,
-    key,
+    tagKey: key,
     tagIndex,
     values,
     valuesStatus,
@@ -234,118 +248,47 @@ const TagSelectorValues = (props: Props) => {
   )
 }
 
-// TODO replace demo UI by a real implementation
-const DEMO_LOAD_DELAY = 1000
-interface DemoTagSelectorProps {
+interface OwnProps {
+  source: Source
+  timeRange: TimeRange
   tagIndex: number
-  onRemoveTagSelector: (tagIndex: number) => void
-}
-const DemoTagSelector = ({
-  tagIndex,
-  onRemoveTagSelector,
-}: DemoTagSelectorProps) => {
-  const [aggregateFunctionType, setAggregateFunctionType] = useState(
-    'filter' as BuilderAggregateFunctionType
-  )
-  const [keysChanged, setKeysChanged] = useState(0)
-  const [keysStatus, setKeysStatus] = useState(RemoteDataState.NotStarted)
-  const [keys, setKeys] = useState([] as string[])
-  const [key, setKey] = useState('')
-  const [valuesSearchTerm, setValuesSearchTerm] = useState('')
-  const [values, setValues] = useState([] as string[])
-  const [selectedValues, setSelectedValues] = useState([] as string[])
-  const [valuesChanged, setValuesChanged] = useState(0)
-  const [valuesStatus, setValuesStatus] = useState(undefined)
-  const [keysSearchTerm, setKeysSearchTerm] = useState('')
-
-  useEffect(() => {
-    setKeysStatus(RemoteDataState.NotStarted)
-    setTimeout(() => setKeysStatus(RemoteDataState.Loading), DEMO_LOAD_DELAY)
-    setTimeout(() => {
-      setKeysStatus(RemoteDataState.Done)
-      const newKeys = [
-        '_measurement',
-        '_field',
-        'tag1',
-        'tag2',
-        'tag3',
-      ].filter(x => x.includes(keysSearchTerm))
-      setKeys(newKeys)
-      if (!newKeys.includes(key)) {
-        setKey(newKeys.length ? newKeys[0] : '')
-      }
-      setValuesStatus(RemoteDataState.NotStarted)
-      setValuesChanged(valuesChanged + 1)
-    }, DEMO_LOAD_DELAY * 2)
-  }, [keysChanged])
-
-  useEffect(() => {
-    setValuesStatus(RemoteDataState.NotStarted)
-    setTimeout(() => setValuesStatus(RemoteDataState.Loading), DEMO_LOAD_DELAY)
-    setTimeout(() => {
-      setValuesStatus(RemoteDataState.Done)
-      let demoValues: string[]
-      if (aggregateFunctionType === 'filter') {
-        if (key) {
-          demoValues = 'a a1 a2 a3 a4 a5 a6 a7 a8 ba b2 b3 b4 c1 c3 ca2 ca3 ca4 ca5 ca6 ca7'.split(
-            ' '
-          )
-        } else {
-          demoValues = []
-        }
-      } else {
-        demoValues = '_measurement _field tag1 tag2 tag3'.split(' ')
-      }
-      const newVals = demoValues.filter(v => v.includes(valuesSearchTerm))
-      setValues(newVals)
-      setSelectedValues(selectedValues.filter(x => newVals.includes(x)))
-    }, DEMO_LOAD_DELAY * 2)
-  }, [valuesChanged])
-  return (
-    <TagSelector
-      tagIndex={tagIndex}
-      aggregateFunctionType={aggregateFunctionType}
-      onRemoveTagSelector={onRemoveTagSelector}
-      onChangeFunctionType={(i, type) => {
-        console.error('DemoTagSelector.onChangeFunctionType', type, i)
-        setAggregateFunctionType(type)
-      }}
-      keysStatus={keysStatus}
-      keys={keys}
-      key={key}
-      onSelectKey={(i, k) => {
-        console.error('DemoTagSelector.onKeyChange', k, i)
-        setKey(k)
-        setSelectedValues([])
-        setValuesChanged(valuesChanged + 1)
-      }}
-      keysSearchTerm={keysSearchTerm}
-      onChangeKeysSearchTerm={(i, term) => {
-        console.error('DemoTagSelector.onChangeKeysSearchTerm', term, i)
-        setKeysSearchTerm(term)
-      }}
-      onSearchKeys={i => {
-        setKeysChanged(valuesChanged + 1)
-        console.error('DemoTagSelector.onSearchKeys', i)
-      }}
-      valuesSearchTerm={valuesSearchTerm}
-      onChangeValuesSearchTerm={(i, term) => {
-        console.error('DemoTagSelector.onChangeValuesSearchTerm', term, i)
-        setValuesSearchTerm(term)
-      }}
-      onSearchValues={i => {
-        setValuesChanged(valuesChanged + 1)
-        console.error('DemoTagSelector.onSearchValues', i)
-      }}
-      valuesStatus={valuesStatus}
-      values={values}
-      selectedValues={selectedValues}
-      onSelectValues={(i, newValues) => {
-        console.error('DemoTagSelector.onSelectValues', newValues, i)
-        setSelectedValues(newValues)
-      }}
-    />
-  )
 }
 
-export default DemoTagSelector
+const mdtp = (dispatch: Dispatch<any>, {source, timeRange}) => {
+  return {
+    onRemoveTagSelector: (tagIndex: number) => {
+      dispatch(removeTagSelectorThunk(source, timeRange, tagIndex))
+    },
+    onChangeFunctionType: (
+      tagIndex: number,
+      type: BuilderAggregateFunctionType
+    ) => {
+      dispatch(changeFunctionTypeThunk(source, timeRange, tagIndex, type))
+    },
+    onSelectKey: (tagIndex: number, key: string) => {
+      dispatch(selectTagKeyThunk(source, timeRange, tagIndex, key))
+    },
+    onChangeKeysSearchTerm: (tagIndex: number, term: string) => {
+      dispatch(changeKeysSearchTerm(tagIndex, term))
+    },
+    onSearchKeys: (tagIndex: number) => {
+      dispatch(searchTagKeysThunk(source, timeRange, tagIndex))
+    },
+    onChangeValuesSearchTerm: (tagIndex: number, term: string) => {
+      dispatch(changeValuesSearchTerm(tagIndex, term))
+    },
+    onSearchValues: (tagIndex: number) => {
+      dispatch(searchTagValuesThunk(source, timeRange, tagIndex))
+    },
+    onSelectValues: (tagIndex: number, values: string[]) => {
+      dispatch(selectTagValuesThunk(source, timeRange, tagIndex, values))
+    },
+  }
+}
+
+const mstp = (state: any, {tagIndex}: OwnProps): TagSelectorState => {
+  const tags = state?.fluxQueryBuilder?.tags as TagSelectorState[]
+  return tags[tagIndex]
+}
+
+export default connect(mstp, mdtp)(TagSelector)
