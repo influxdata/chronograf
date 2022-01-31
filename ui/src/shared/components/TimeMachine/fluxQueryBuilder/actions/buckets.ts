@@ -1,21 +1,11 @@
 import {RemoteDataState} from 'src/types'
 
 export type BucketSelectorAction =
-  | ActionChangeBucketsState
-  | ActionSelectBucket
-  | ActionFilterBuckets
+  | ReturnType<typeof changeBucketsState>
+  | ReturnType<typeof selectBucket>
+  | ReturnType<typeof filterBuckets>
 
-export interface ActionChangeBucketsState {
-  type: 'FQB_BUCKETS_CHANGE'
-  payload: {
-    state: RemoteDataState
-    buckets?: string[]
-  }
-}
-export function changeBucketsState(
-  state: RemoteDataState,
-  buckets?: string[]
-): ActionChangeBucketsState {
+export function changeBucketsState(state: RemoteDataState, buckets?: string[]) {
   return {
     type: 'FQB_BUCKETS_CHANGE',
     payload: {
@@ -25,13 +15,7 @@ export function changeBucketsState(
   }
 }
 
-export interface ActionSelectBucket {
-  type: 'FQB_BUCKETS_SELECT'
-  payload: {
-    bucket: string
-  }
-}
-export function selectBucket(bucket: string): ActionSelectBucket {
+export function selectBucket(bucket: string) {
   return {
     type: 'FQB_BUCKETS_SELECT',
     payload: {
@@ -40,13 +24,7 @@ export function selectBucket(bucket: string): ActionSelectBucket {
   }
 }
 
-export interface ActionFilterBuckets {
-  type: 'FQB_BUCKETS_FILTER'
-  payload: {
-    term: string
-  }
-}
-export function filterBuckets(term: string): ActionFilterBuckets {
+export function filterBuckets(term: string) {
   return {
     type: 'FQB_BUCKETS_FILTER',
     payload: {
