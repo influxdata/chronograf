@@ -132,10 +132,14 @@ class QueryBuilderFetcher {
     }
   }
 
-  public clearCache(): void {
+  public cancelPendingQueries(): void {
     this.cancelFindBuckets()
     this.findKeysQueries.forEach((_, i) => this.cancelFindKeys(i))
     this.findValuesQueries.forEach((_, i) => this.cancelFindValues(i))
+  }
+
+  public clearCache(): void {
+    this.cancelPendingQueries()
     this.findBucketsCache = {}
     this.findKeysCache = {}
     this.findValuesCache = {}
