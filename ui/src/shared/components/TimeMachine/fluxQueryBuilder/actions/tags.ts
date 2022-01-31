@@ -1,32 +1,23 @@
 import {BuilderAggregateFunctionType} from 'src/types'
 
 export type TagSelectorAction =
-  | ActionAddTagSelector
-  | ActionRemoveTagSelector
-  | ActionChangeFunctionType
-  | ActionSelectKey
-  | ActionChangeKeysSearchTerm
-  | ActionSearchKeys
-  | ActionSelectValues
-  | ActionChangeValuesSearchTerm
-  | ActionSearchValues
+  | ReturnType<typeof addTagSelector>
+  | ReturnType<typeof removeTagSelector>
+  | ReturnType<typeof changeFunctionType>
+  | ReturnType<typeof selectKey>
+  | ReturnType<typeof changeKeysSearchTerm>
+  | ReturnType<typeof searchKeys>
+  | ReturnType<typeof selectValues>
+  | ReturnType<typeof changeValuesSearchTerm>
+  | ReturnType<typeof searchValues>
 
-export interface ActionAddTagSelector {
-  type: 'FQB_TAG_ADD'
-}
-export function addTagSelector(): ActionAddTagSelector {
+export function addTagSelector() {
   return {
     type: 'FQB_TAG_ADD',
   }
 }
 
-export interface ActionRemoveTagSelector {
-  type: 'FQB_TAG_REMOVE'
-  payload: {
-    tagId: string
-  }
-}
-export function removeTagSelector(tagId: string): ActionRemoveTagSelector {
+export function removeTagSelector(tagId: string) {
   return {
     type: 'FQB_TAG_REMOVE',
     payload: {
@@ -35,17 +26,10 @@ export function removeTagSelector(tagId: string): ActionRemoveTagSelector {
   }
 }
 
-export interface ActionChangeFunctionType {
-  type: 'FQB_TAG_CHANGE_TYPE'
-  payload: {
-    tagId: string
-    type: BuilderAggregateFunctionType
-  }
-}
 export function changeFunctionType(
   tagId: string,
   type: BuilderAggregateFunctionType
-): ActionChangeFunctionType {
+) {
   return {
     type: 'FQB_TAG_CHANGE_TYPE',
     payload: {
@@ -55,14 +39,7 @@ export function changeFunctionType(
   }
 }
 
-export interface ActionSelectKey {
-  type: 'FQB_TAG_SELECT_KEY'
-  payload: {
-    tagId: string
-    key: string
-  }
-}
-export function selectKey(tagId: string, key: string): ActionSelectKey {
+export function selectKey(tagId: string, key: string) {
   return {
     type: 'FQB_TAG_SELECT_KEY',
     payload: {
@@ -72,17 +49,7 @@ export function selectKey(tagId: string, key: string): ActionSelectKey {
   }
 }
 
-export interface ActionChangeKeysSearchTerm {
-  type: 'FQB_TAG_CHANGE_KEY_SEARCHTERM'
-  payload: {
-    tagId: string
-    term: string
-  }
-}
-export function changeKeysSearchTerm(
-  tagId: string,
-  term: string
-): ActionChangeKeysSearchTerm {
+export function changeKeysSearchTerm(tagId: string, term: string) {
   return {
     type: 'FQB_TAG_CHANGE_KEY_SEARCHTERM',
     payload: {
@@ -92,13 +59,7 @@ export function changeKeysSearchTerm(
   }
 }
 
-export interface ActionSearchKeys {
-  type: 'FQB_TAG_SEARCH_KEY'
-  payload: {
-    tagId: string
-  }
-}
-export function searchKeys(tagId: string): ActionSearchKeys {
+export function searchKeys(tagId: string) {
   return {
     type: 'FQB_TAG_SEARCH_KEY',
     payload: {
@@ -107,17 +68,7 @@ export function searchKeys(tagId: string): ActionSearchKeys {
   }
 }
 
-export interface ActionSelectValues {
-  type: 'FQB_TAG_SELECT_VALUES'
-  payload: {
-    tagId: string
-    values: string[]
-  }
-}
-export function selectValues(
-  tagId: string,
-  values: string[]
-): ActionSelectValues {
+export function selectValues(tagId: string, values: string[]) {
   return {
     type: 'FQB_TAG_SELECT_VALUES',
     payload: {
@@ -127,17 +78,7 @@ export function selectValues(
   }
 }
 
-export interface ActionChangeValuesSearchTerm {
-  type: 'FQB_TAG_CHANGE_VALUES_SEARCHTERM'
-  payload: {
-    tagId: string
-    term: string
-  }
-}
-export function changeValuesSearchTerm(
-  tagId: string,
-  term: string
-): ActionChangeValuesSearchTerm {
+export function changeValuesSearchTerm(tagId: string, term: string) {
   return {
     type: 'FQB_TAG_CHANGE_VALUES_SEARCHTERM',
     payload: {
@@ -147,13 +88,7 @@ export function changeValuesSearchTerm(
   }
 }
 
-export interface ActionSearchValues {
-  type: 'FQB_TAG_SEARCH_VALUES'
-  payload: {
-    tagId: string
-  }
-}
-export function searchValues(tagId: string): ActionSearchValues {
+export function searchValues(tagId: string) {
   return {
     type: 'FQB_TAG_SEARCH_VALUES',
     payload: {
