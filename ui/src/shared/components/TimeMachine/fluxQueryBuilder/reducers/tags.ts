@@ -34,7 +34,7 @@ const aggregationReducer = (
           keys: [],
           keysSearchTerm: '',
           keysStatus: RemoteDataState.NotStarted,
-          selectedKey: '',
+          key: '',
           values: [],
           valuesSearchTerm: '',
           valuesStatus: undefined,
@@ -63,7 +63,7 @@ const aggregationReducer = (
     }
     case 'FQB_TAG_SELECT_KEY': {
       return changeTagSelector(state, action.payload.tagId, () => ({
-        selectedKey: action.payload.key,
+        key: action.payload.key,
       }))
     }
     case 'FQB_TAG_SELECT_VALUES': {

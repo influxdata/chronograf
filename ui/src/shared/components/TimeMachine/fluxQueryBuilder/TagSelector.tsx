@@ -59,7 +59,7 @@ const TagSelectorBody = (props: Props) => {
     tagId,
     keys,
     keysStatus,
-    selectedKey,
+    key,
     onSelectKey,
     valuesSearchTerm,
     onChangeValuesSearchTerm,
@@ -96,7 +96,7 @@ const TagSelectorBody = (props: Props) => {
   const placeholderText =
     aggregateFunctionType === 'group'
       ? 'Search group column values'
-      : `Search ${selectedKey} tag values`
+      : `Search ${key} tag values`
   return (
     <>
       <BuilderCard.Menu testID={`tag-selector--container`}>
@@ -111,10 +111,10 @@ const TagSelectorBody = (props: Props) => {
           >
             <SearchableDropdown
               items={keys}
-              onChoose={(key: string) => onSelectKey(tagId, key)}
+              onChoose={(k: string) => onSelectKey(tagId, k)}
               searchTerm={keysSearchTerm}
               onChangeSearchTerm={onKeyTermChange}
-              selected={selectedKey}
+              selected={key}
               buttonSize="btn-sm"
               className="dropdown-stretch"
               status={keysStatus}
@@ -151,7 +151,7 @@ const TagSelectorBody = (props: Props) => {
 const TagSelectorValues = (props: Props) => {
   const {
     keysStatus,
-    selectedKey,
+    key,
     tagId,
     values,
     valuesStatus,
@@ -176,7 +176,7 @@ const TagSelectorValues = (props: Props) => {
   if (valuesStatus === RemoteDataState.Error) {
     return (
       <BuilderCard.Empty>
-        {`Failed to load tag values for ${selectedKey}`}
+        {`Failed to load tag values for ${key}`}
       </BuilderCard.Empty>
     )
   }
@@ -248,7 +248,7 @@ const DemoTagSelector = ({
   const [keysChanged, setKeysChanged] = useState(0)
   const [keysStatus, setKeysStatus] = useState(RemoteDataState.NotStarted)
   const [keys, setKeys] = useState([] as string[])
-  const [selectedKey, setSelectedKey] = useState('')
+  const [key, setKey] = useState('')
   const [valuesSearchTerm, setValuesSearchTerm] = useState('')
   const [values, setValues] = useState([] as string[])
   const [selectedValues, setSelectedValues] = useState([] as string[])
@@ -269,8 +269,8 @@ const DemoTagSelector = ({
         'tag3',
       ].filter(x => x.includes(keysSearchTerm))
       setKeys(newKeys)
-      if (!newKeys.includes(selectedKey)) {
-        setSelectedKey(newKeys.length ? newKeys[0] : '')
+      if (!newKeys.includes(key)) {
+        setKey(newKeys.length ? newKeys[0] : '')
       }
       setValuesStatus(RemoteDataState.NotStarted)
       setValuesChanged(valuesChanged + 1)
@@ -284,7 +284,7 @@ const DemoTagSelector = ({
       setValuesStatus(RemoteDataState.Done)
       let demoValues: string[]
       if (aggregateFunctionType === 'filter') {
-        if (selectedKey) {
+        if (key) {
           demoValues = 'a a1 a2 a3 a4 a5 a6 a7 a8 ba b2 b3 b4 c1 c3 ca2 ca3 ca4 ca5 ca6 ca7'.split(
             ' '
           )
@@ -310,10 +310,10 @@ const DemoTagSelector = ({
       }}
       keysStatus={keysStatus}
       keys={keys}
-      selectedKey={selectedKey}
-      onSelectKey={(i, key) => {
-        console.error('DemoTagSelector.onKeyChange', key, i)
-        setSelectedKey(key)
+      key={key}
+      onSelectKey={(i, k) => {
+        console.error('DemoTagSelector.onKeyChange', k, i)
+        setKey(k)
         setSelectedValues([])
         setValuesChanged(valuesChanged + 1)
       }}
