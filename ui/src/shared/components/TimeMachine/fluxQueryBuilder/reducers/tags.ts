@@ -81,6 +81,11 @@ const aggregationReducer = (
         valuesStatus: RemoteDataState.Loading,
       }))
     }
+    case 'FQB_TAG_KEY_STATUS': {
+      return changeTagSelector(state, action.payload.tagId, () => ({
+        keysStatus: action.payload.status,
+      }))
+    }
   }
 
   return state

@@ -1,4 +1,4 @@
-import {BuilderAggregateFunctionType} from 'src/types'
+import {BuilderAggregateFunctionType, RemoteDataState} from 'src/types'
 
 export type TagSelectorAction =
   | ReturnType<typeof addTagSelector>
@@ -10,6 +10,7 @@ export type TagSelectorAction =
   | ReturnType<typeof selectValues>
   | ReturnType<typeof changeValuesSearchTerm>
   | ReturnType<typeof searchValues>
+  | ReturnType<typeof setBuilderTagKeysStatus>
 
 export function addTagSelector() {
   return {
@@ -93,6 +94,19 @@ export function searchValues(tagId: string) {
     type: 'FQB_TAG_SEARCH_VALUES' as const,
     payload: {
       tagId,
+    },
+  }
+}
+
+export function setBuilderTagKeysStatus(
+  tagId: string,
+  status: RemoteDataState
+) {
+  return {
+    type: 'FQB_TAG_KEY_STATUS' as const,
+    payload: {
+      tagId,
+      status,
     },
   }
 }
