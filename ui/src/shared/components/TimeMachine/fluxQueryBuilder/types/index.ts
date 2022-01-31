@@ -35,3 +35,9 @@ export interface BuilderTagsType {
   values: string[]
   aggregateFunctionType: BuilderAggregateFunctionType
 }
+
+export interface QueryBuilderState {
+  buckets: BucketSelectorState
+  aggregation: AggregationSelectorState
+  tags: TagSelectorState[]
+}
