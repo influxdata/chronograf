@@ -61,6 +61,7 @@ const aggregationReducer = (
       return changeTagSelector(state, action.payload.tagIndex, () => ({
         aggregateFunctionType: action.payload.type,
         selectedValues: [],
+        valuesSearchTerm: '',
       }))
     }
     case 'FQB_TAG_CHANGE_KEY_SEARCHTERM': {

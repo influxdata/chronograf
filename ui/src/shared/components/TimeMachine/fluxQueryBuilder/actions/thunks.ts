@@ -57,11 +57,11 @@ export const loadTagSelectorThunk = (
     return
   }
   const tagState = tags[tagIndex]
-  dispatch(tagActions.setKeysStatus(tagIndex, RemoteDataState.Loading))
 
   try {
     if (tagState.aggregateFunctionType === 'filter') {
       const searchTerm = tagState.keysSearchTerm
+      dispatch(tagActions.setKeysStatus(tagIndex, RemoteDataState.Loading))
       const keys = await queryBuilderFetcher.findKeys(tagIndex, {
         source,
         bucket: selectedBucket,
@@ -160,6 +160,8 @@ const loadTagSelectorValuesThunk = (
         return acc
       }, [])
       values = [...values, ...ADDITIONAL_GROUP_BY_COLUMNS]
+      const valuesSearchTerm = (tagState.valuesSearchTerm || '').toLowerCase()
+      values = values.filter(x => x.includes(valuesSearchTerm))
       selectedValues = tagState.selectedValues.filter(x => values.includes(x))
     }
 
