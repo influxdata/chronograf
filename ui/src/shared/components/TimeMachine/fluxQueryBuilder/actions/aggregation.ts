@@ -1,15 +1,9 @@
 export type AggregationSelectorAction =
-  | ActionSetPeriod
-  | ActionSetFillMissing
-  | ActionSetSelectedFunctions
+  | ReturnType<typeof setPeriod>
+  | ReturnType<typeof setFillMissing>
+  | ReturnType<typeof setSelectedFunctions>
 
-export interface ActionSetPeriod {
-  type: 'FQB_AGG_PERIOD'
-  payload: {
-    period: string
-  }
-}
-export function setPeriod(period: string): ActionSetPeriod {
+export function setPeriod(period: string) {
   return {
     type: 'FQB_AGG_PERIOD',
     payload: {
@@ -18,13 +12,7 @@ export function setPeriod(period: string): ActionSetPeriod {
   }
 }
 
-export interface ActionSetFillMissing {
-  type: 'FQB_AGG_FILL_MISSING'
-  payload: {
-    fillMissing: boolean
-  }
-}
-export function setFillMissing(fillMissing: boolean): ActionSetFillMissing {
+export function setFillMissing(fillMissing: boolean) {
   return {
     type: 'FQB_AGG_FILL_MISSING',
     payload: {
@@ -33,15 +21,7 @@ export function setFillMissing(fillMissing: boolean): ActionSetFillMissing {
   }
 }
 
-export interface ActionSetSelectedFunctions {
-  type: 'FQB_AGG_SELECTED_FNS'
-  payload: {
-    functions: string[]
-  }
-}
-export function setSelectedFunctions(
-  functions: string[]
-): ActionSetSelectedFunctions {
+export function setSelectedFunctions(functions: string[]) {
   return {
     type: 'FQB_AGG_SELECTED_FNS',
     payload: {
