@@ -30,19 +30,7 @@ function renderType(type: BuilderAggregateFunctionType) {
   return 'Filter'
 }
 
-interface Callbacks {
-  onRemoveTagSelector: (tagIndex: number) => void
-  onChangeFunctionType: (
-    tagIndex: number,
-    type: BuilderAggregateFunctionType
-  ) => void
-  onSelectKey: (tagIndex: number, key: string) => void
-  onChangeKeysSearchTerm: (tagIndex: number, searchTerm: string) => void
-  onSearchKeys: (tagIndex: number) => void
-  onChangeValuesSearchTerm: (tagIndex: number, searchTerm: string) => void
-  onSearchValues: (tagIndex: number) => void
-  onSelectValues: (tagIndex: number, values: string[]) => void
-}
+type Callbacks = ReturnType<typeof mdtp>
 type Props = TagSelectorState & Callbacks & TimeMachineQueryProps
 
 const TagSelector = (props: Props) => {
@@ -58,11 +46,9 @@ const TagSelector = (props: Props) => {
       <BuilderCard.DropdownHeader
         options={['Filter', 'Group']}
         selectedOption={renderType(aggregateFunctionType)}
-        onDelete={
-          tagIndex !== 0 ? () => onRemoveTagSelector(tagIndex) : undefined
-        }
+        onDelete={tagIndex !== 0 ? () => onRemoveTagSelector() : undefined}
         onSelect={val =>
-          onChangeFunctionType(tagIndex, val === 'Filter' ? 'filter' : 'group')
+          onChangeFunctionType(val === 'Filter' ? 'filter' : 'group')
         }
       />
       <TagSelectorBody {...props} />
@@ -73,7 +59,6 @@ const TagSelector = (props: Props) => {
 const TagSelectorBody = (props: Props) => {
   const {
     aggregateFunctionType,
-    tagIndex,
     keys,
     keysStatus,
     tagKey: key,
@@ -101,12 +86,12 @@ const TagSelectorBody = (props: Props) => {
   const debouncer = useMemo(() => new DefaultDebouncer(), [])
   useEffect(() => () => debouncer.cancelAll(), [])
   function onValueTermChange(e: ChangeEvent<HTMLInputElement>) {
-    onChangeValuesSearchTerm(tagIndex, e.target.value)
-    debouncer.call(() => onSearchValues(tagIndex), SEARCH_DEBOUNCE_MS)
+    onChangeValuesSearchTerm(e.target.value)
+    debouncer.call(() => onSearchValues(), SEARCH_DEBOUNCE_MS)
   }
   function onKeyTermChange(term: string) {
-    onChangeKeysSearchTerm(tagIndex, term)
-    debouncer.call(() => onSearchKeys(tagIndex), SEARCH_DEBOUNCE_MS)
+    onChangeKeysSearchTerm(term)
+    debouncer.call(() => onSearchKeys(), SEARCH_DEBOUNCE_MS)
   }
 
   const placeholderText =
@@ -127,7 +112,7 @@ const TagSelectorBody = (props: Props) => {
           >
             <SearchableDropdown
               items={keys}
-              onChoose={(k: string) => onSelectKey(tagIndex, k)}
+              onChoose={(k: string) => onSelectKey(k)}
               searchTerm={keysSearchTerm}
               onChangeSearchTerm={onKeyTermChange}
               selected={key}
@@ -224,7 +209,6 @@ const TagSelectorValues = (props: Props) => {
           const active = selectedValues.includes(value)
           const onChange = () =>
             onSelectValues(
-              tagIndex,
               active
                 ? selectedValues.filter((x: string) => x !== value)
                 : [value, ...selectedValues]
@@ -254,33 +238,30 @@ interface OwnProps {
   tagIndex: number
 }
 
-const mdtp = (dispatch: Dispatch<any>, {source, timeRange}) => {
+const mdtp = (dispatch: Dispatch<any>, {source, timeRange, tagIndex}) => {
   return {
-    onRemoveTagSelector: (tagIndex: number) => {
+    onRemoveTagSelector: () => {
       dispatch(removeTagSelectorThunk(source, timeRange, tagIndex))
     },
-    onChangeFunctionType: (
-      tagIndex: number,
-      type: BuilderAggregateFunctionType
-    ) => {
+    onChangeFunctionType: (type: BuilderAggregateFunctionType) => {
       dispatch(changeFunctionTypeThunk(source, timeRange, tagIndex, type))
     },
-    onSelectKey: (tagIndex: number, key: string) => {
+    onSelectKey: (key: string) => {
       dispatch(selectTagKeyThunk(source, timeRange, tagIndex, key))
     },
-    onChangeKeysSearchTerm: (tagIndex: number, term: string) => {
+    onChangeKeysSearchTerm: (term: string) => {
       dispatch(changeKeysSearchTerm(tagIndex, term))
     },
-    onSearchKeys: (tagIndex: number) => {
+    onSearchKeys: () => {
       dispatch(searchTagKeysThunk(source, timeRange, tagIndex))
     },
-    onChangeValuesSearchTerm: (tagIndex: number, term: string) => {
+    onChangeValuesSearchTerm: (term: string) => {
       dispatch(changeValuesSearchTerm(tagIndex, term))
     },
-    onSearchValues: (tagIndex: number) => {
+    onSearchValues: () => {
       dispatch(searchTagValuesThunk(source, timeRange, tagIndex))
     },
-    onSelectValues: (tagIndex: number, values: string[]) => {
+    onSelectValues: (values: string[]) => {
       dispatch(selectTagValuesThunk(source, timeRange, tagIndex, values))
     },
   }
