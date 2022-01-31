@@ -32,6 +32,7 @@ function changeTagSelector(
       ...state[index],
       ...fn(state[index], index),
     }
+    state = [...state]
   }
   return state
 }
