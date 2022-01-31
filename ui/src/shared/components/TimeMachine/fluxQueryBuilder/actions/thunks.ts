@@ -1,0 +1,291 @@
+import {Dispatch} from 'react'
+import {RemoteDataState, Source, TimeRange} from 'src/types'
+import {isCancellationError} from 'src/types/promises'
+import {queryBuilderFetcher} from '../apis/QueryBuilderFetcher'
+import {QueryBuilderState} from '../types'
+
+import * as tagActions from './tags'
+import * as bucketActions from './buckets'
+type GetState = () => {fluxQueryBuilder: QueryBuilderState}
+
+export const removeTagSelectorThunk = (
+  source: Source,
+  timeRange: TimeRange,
+  tagIndex: number
+) => (
+  dispatch: Dispatch<
+    tagActions.TagSelectorAction | ReturnType<typeof loadTagSelectorThunk>
+  >
+) => {
+  queryBuilderFetcher.cancelFindValues(tagIndex)
+  queryBuilderFetcher.cancelFindKeys(tagIndex)
+
+  dispatch(tagActions.removeTagSelector(tagIndex))
+  dispatch(loadTagSelectorThunk(source, timeRange, tagIndex))
+}
+
+export const loadTagSelectorThunk = (
+  source: Source,
+  timeRange: TimeRange,
+  tagIndex: number
+) => async (
+  dispatch: Dispatch<
+    | ReturnType<typeof tagActions.setKeysStatus>
+    | ReturnType<typeof tagActions.selectKey>
+    | ReturnType<typeof tagActions.setKeys>
+    | ReturnType<typeof loadTagSelectorValuesThunk>
+  >,
+  getState: GetState
+) => {
+  const {
+    fluxQueryBuilder: {
+      tags,
+      buckets: {selectedBucket},
+    },
+  } = getState()
+
+  if (tagIndex < 0 || !tags[tagIndex] || !selectedBucket) {
+    return
+  }
+  const tagState = tags[tagIndex]
+  dispatch(tagActions.setKeysStatus(tagIndex, RemoteDataState.Loading))
+
+  try {
+    const searchTerm = tagState.keysSearchTerm
+    const keys = await queryBuilderFetcher.findKeys(tagIndex, {
+      source,
+      bucket: selectedBucket,
+      searchTerm,
+      timeRange,
+      tagsSelections: tags.slice(0, tagIndex),
+    })
+
+    const {key} = tagState
+
+    if (!key) {
+      let defaultKey: string
+
+      if (tagIndex === 0 && keys.includes('_measurement')) {
+        defaultKey = '_measurement'
+      } else {
+        defaultKey = keys[0]
+      }
+
+      dispatch(tagActions.selectKey(tagIndex, defaultKey))
+    } else if (!keys.includes(key)) {
+      // Even if the selected key didn't come back in the results, let it be
+      // selected anyway
+      keys.unshift(key)
+    }
+
+    dispatch(tagActions.setKeys(tagIndex, keys))
+    dispatch(loadTagSelectorValuesThunk(source, timeRange, tagIndex))
+  } catch (e) {
+    if (isCancellationError(e)) {
+      return
+    }
+
+    console.error(e)
+    dispatch(tagActions.setKeysStatus(tagIndex, RemoteDataState.Error))
+  }
+}
+
+const loadTagSelectorValuesThunk = (
+  source: Source,
+  timeRange: TimeRange,
+  tagIndex: number
+) => async (
+  dispatch: Dispatch<
+    | ReturnType<typeof tagActions.setValuesStatus>
+    | ReturnType<typeof tagActions.setValues>
+    | ReturnType<typeof loadTagSelectorValuesThunk>
+  >,
+  getState: GetState
+) => {
+  const {
+    fluxQueryBuilder: {
+      tags,
+      buckets: {selectedBucket},
+    },
+  } = getState()
+
+  if (tagIndex < 0 || !tags[tagIndex] || !selectedBucket) {
+    return
+  }
+
+  dispatch(tagActions.setValuesStatus(tagIndex, RemoteDataState.Loading))
+  const tagState = tags[tagIndex]
+
+  try {
+    const values = await queryBuilderFetcher.findValues(tagIndex, {
+      source,
+      bucket: selectedBucket,
+      tagsSelections: tags.slice(0, tagIndex),
+      key: tagState.key,
+      searchTerm: tagState.valuesSearchTerm,
+      timeRange,
+    })
+
+    for (const selectedValue of tagState.selectedValues) {
+      // Even if the selected values didn't come back in the results, let them
+      // be selected anyway
+      if (!values.includes(selectedValue)) {
+        values.unshift(selectedValue)
+      }
+    }
+
+    dispatch(tagActions.setValues(tagIndex, values))
+    dispatch(loadTagSelectorThunk(source, timeRange, tagIndex + 1))
+  } catch (e) {
+    if (isCancellationError(e)) {
+      return
+    }
+
+    console.error(e)
+    dispatch(tagActions.setValuesStatus(tagIndex, RemoteDataState.Error))
+  }
+}
+
+export const loadBucketsThunk = (
+  source: Source,
+  timeRange: TimeRange
+) => async (
+  dispatch: Dispatch<
+    | ReturnType<typeof bucketActions.setBucketsStatus>
+    | ReturnType<typeof bucketActions.selectBucket>
+    | ReturnType<typeof bucketActions.setBuckets>
+    | ReturnType<typeof selectBucketThunk>
+  >,
+  getState: GetState
+) => {
+  dispatch(bucketActions.setBucketsStatus(RemoteDataState.Loading))
+
+  try {
+    const allBuckets = await queryBuilderFetcher.findBuckets(source)
+
+    const systemBuckets = allBuckets.filter(b => b.startsWith('_'))
+    const userBuckets = allBuckets.filter(b => !b.startsWith('_'))
+    const buckets = [...userBuckets, ...systemBuckets]
+
+    dispatch(bucketActions.setBuckets(buckets))
+    dispatch(bucketActions.setBucketsStatus(RemoteDataState.Done))
+
+    const {
+      fluxQueryBuilder: {
+        buckets: {selectedBucket},
+      },
+    } = getState()
+    if (selectedBucket && buckets.includes(selectedBucket)) {
+      dispatch(selectBucketThunk(source, timeRange, selectedBucket))
+    } else {
+      dispatch(selectBucketThunk(source, timeRange, buckets[0], true))
+    }
+  } catch (e) {
+    if (e.name === 'CancellationError') {
+      return
+    }
+
+    console.error(e)
+    dispatch(bucketActions.setBucketsStatus(RemoteDataState.Error))
+  }
+}
+
+export const selectBucketThunk = (
+  source: Source,
+  timeRange: TimeRange,
+  bucket: string,
+  resetSelections: boolean = false
+) => (
+  dispatch: Dispatch<
+    | ReturnType<typeof bucketActions.selectBucket>
+    | ReturnType<typeof tagActions.reset>
+    | ReturnType<typeof loadTagSelectorThunk>
+  >
+) => {
+  dispatch(bucketActions.selectBucket(bucket))
+  if (resetSelections) {
+    queryBuilderFetcher.cancelPendingQueries()
+    dispatch(tagActions.reset())
+  }
+  dispatch(loadTagSelectorThunk(source, timeRange, 0))
+}
+
+export const selectTagKeyThunk = (
+  source: Source,
+  timeRange: TimeRange,
+  tagIndex: number,
+  key: string
+) => (
+  dispatch: Dispatch<
+    | ReturnType<typeof tagActions.selectKey>
+    | ReturnType<typeof loadTagSelectorValuesThunk>
+  >
+) => {
+  dispatch(tagActions.selectKey(tagIndex, key))
+  dispatch(loadTagSelectorValuesThunk(source, timeRange, tagIndex))
+}
+
+export const selectTagValuesThunk = (
+  source: Source,
+  timeRange: TimeRange,
+  tagIndex: number,
+  values: string[]
+) => (
+  dispatch: Dispatch<
+    | ReturnType<typeof tagActions.selectValues>
+    | ReturnType<typeof addTagSelectorThunk>
+    | ReturnType<typeof loadTagSelectorThunk>
+  >,
+  getState: GetState
+) => {
+  const {
+    fluxQueryBuilder: {tags},
+  } = getState()
+  const currentTag = tags[tagIndex]
+  if (!currentTag) {
+    return
+  }
+  dispatch(tagActions.selectValues(tagIndex, values))
+
+  // don't add a new tag filter if we're grouping
+  if (currentTag.aggregateFunctionType === 'group') {
+    return
+  }
+
+  if (tagIndex === tags.length - 1 && values.length) {
+    dispatch(addTagSelectorThunk(source, timeRange))
+  } else {
+    dispatch(loadTagSelectorThunk(source, timeRange, tagIndex + 1))
+  }
+}
+export const addTagSelectorThunk = (source: Source, timeRange: TimeRange) => (
+  dispatch: Dispatch<
+    | ReturnType<typeof tagActions.addTagSelector>
+    | ReturnType<typeof loadTagSelectorThunk>
+  >,
+  getState: GetState
+) => {
+  dispatch(tagActions.addTagSelector())
+  const {
+    fluxQueryBuilder: {tags},
+  } = getState()
+  dispatch(
+    loadTagSelectorThunk(source, timeRange, tags[tags.length - 1].tagIndex)
+  )
+}
+
+export const searchTagValuesThunk = (
+  source: Source,
+  timeRange: TimeRange,
+  tagIndex: number
+) => (dispatch: Dispatch<ReturnType<typeof loadTagSelectorValuesThunk>>) => {
+  dispatch(loadTagSelectorValuesThunk(source, timeRange, tagIndex))
+}
+//
+export const searchTagKeysThunk = (
+  source: Source,
+  timeRange: TimeRange,
+  tagIndex: number
+) => (dispatch: Dispatch<ReturnType<typeof loadTagSelectorThunk>>) => {
+  dispatch(loadTagSelectorThunk(source, timeRange, tagIndex))
+}

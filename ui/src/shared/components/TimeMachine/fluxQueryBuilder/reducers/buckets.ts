@@ -48,6 +48,18 @@ const bucketsReducer = (
         selectedBucket: action.payload.bucket,
       }
     }
+    case 'FQB_BUCKETS_STATUS': {
+      return {
+        ...state,
+        status: action.payload.status,
+      }
+    }
+    case 'FQB_BUCKETS_BUCKETS': {
+      return {
+        ...state,
+        buckets: action.payload.buckets,
+      }
+    }
   }
 
   return state

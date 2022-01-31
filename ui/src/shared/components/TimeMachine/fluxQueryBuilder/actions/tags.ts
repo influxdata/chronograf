@@ -10,7 +10,11 @@ export type TagSelectorAction =
   | ReturnType<typeof selectValues>
   | ReturnType<typeof changeValuesSearchTerm>
   | ReturnType<typeof searchValues>
-  | ReturnType<typeof setTagKeysStatus>
+  | ReturnType<typeof setKeysStatus>
+  | ReturnType<typeof setKeys>
+  | ReturnType<typeof setValuesStatus>
+  | ReturnType<typeof setValues>
+  | ReturnType<typeof reset>
 
 export function addTagSelector() {
   return {
@@ -37,6 +41,12 @@ export function changeFunctionType(
       tagIndex,
       type,
     },
+  }
+}
+
+export function reset() {
+  return {
+    type: 'FQB_TAG_RESET' as const,
   }
 }
 
@@ -98,12 +108,42 @@ export function searchValues(tagIndex: number) {
   }
 }
 
-export function setTagKeysStatus(tagIndex: number, status: RemoteDataState) {
+export function setKeysStatus(tagIndex: number, status: RemoteDataState) {
   return {
     type: 'FQB_TAG_KEY_STATUS' as const,
     payload: {
       tagIndex,
       status,
+    },
+  }
+}
+
+export function setValuesStatus(tagIndex: number, status: RemoteDataState) {
+  return {
+    type: 'FQB_TAG_VALUES_STATUS' as const,
+    payload: {
+      tagIndex,
+      status,
+    },
+  }
+}
+
+export function setKeys(tagIndex: number, keys: string[]) {
+  return {
+    type: 'FQB_TAG_KEYS' as const,
+    payload: {
+      tagIndex,
+      keys,
+    },
+  }
+}
+
+export function setValues(tagIndex: number, values: string[]) {
+  return {
+    type: 'FQB_TAG_VALUES' as const,
+    payload: {
+      tagIndex,
+      values,
     },
   }
 }

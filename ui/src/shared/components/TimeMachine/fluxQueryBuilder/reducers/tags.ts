@@ -41,6 +41,24 @@ const aggregationReducer = (
         },
       ]
     }
+    case 'FQB_TAG_RESET': {
+      return [
+        {
+          tagIndex: state.length,
+          aggregateFunctionType: state.length
+            ? state[0].aggregateFunctionType
+            : 'filter',
+          keys: [],
+          keysSearchTerm: '',
+          keysStatus: RemoteDataState.NotStarted,
+          key: '',
+          values: [],
+          valuesSearchTerm: '',
+          valuesStatus: undefined,
+          selectedValues: [],
+        },
+      ]
+    }
     case 'FQB_TAG_REMOVE': {
       const id = action.payload.tagIndex
       return state.filter(({tagIndex}) => tagIndex !== id)
@@ -83,6 +101,23 @@ const aggregationReducer = (
     case 'FQB_TAG_KEY_STATUS': {
       return changeTagSelector(state, action.payload.tagIndex, () => ({
         keysStatus: action.payload.status,
+      }))
+    }
+    case 'FQB_TAG_VALUES_STATUS': {
+      return changeTagSelector(state, action.payload.tagIndex, () => ({
+        valuesStatus: action.payload.status,
+      }))
+    }
+    case 'FQB_TAG_KEYS': {
+      return changeTagSelector(state, action.payload.tagIndex, () => ({
+        keys: action.payload.keys,
+        keysStatus: RemoteDataState.Done,
+      }))
+    }
+    case 'FQB_TAG_VALUES': {
+      return changeTagSelector(state, action.payload.tagIndex, () => ({
+        values: action.payload.values,
+        valuesStatus: RemoteDataState.Done,
       }))
     }
   }
