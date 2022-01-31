@@ -57,10 +57,10 @@ class QueryBuilderFetcher {
   }
 
   public async findKeys(
-    tagId: number,
+    tagIndex: number,
     options: FindKeysOptions
   ): Promise<string[]> {
-    this.cancelFindKeys(tagId)
+    this.cancelFindKeys(tagIndex)
 
     const {source, tagsSelections, ...rest} = options
     const cacheKey = JSON.stringify({
@@ -76,7 +76,7 @@ class QueryBuilderFetcher {
 
     const pendingResult = findKeys(options)
 
-    this.findKeysQueries[tagId] = pendingResult
+    this.findKeysQueries[tagIndex] = pendingResult
 
     pendingResult.promise
       .then(result => {
@@ -87,18 +87,18 @@ class QueryBuilderFetcher {
     return pendingResult.promise
   }
 
-  public cancelFindKeys(tagId: number): void {
-    if (this.findKeysQueries[tagId]) {
-      this.findKeysQueries[tagId].cancel()
-      this.findKeysQueries[tagId] = undefined
+  public cancelFindKeys(tagIndex: number): void {
+    if (this.findKeysQueries[tagIndex]) {
+      this.findKeysQueries[tagIndex].cancel()
+      this.findKeysQueries[tagIndex] = undefined
     }
   }
 
   public async findValues(
-    tagId: number,
+    tagIndex: number,
     options: FindValuesOptions
   ): Promise<string[]> {
-    this.cancelFindValues(tagId)
+    this.cancelFindValues(tagIndex)
 
     const {source, tagsSelections, ...rest} = options
     const cacheKey = JSON.stringify({
@@ -114,7 +114,7 @@ class QueryBuilderFetcher {
 
     const pendingResult = findValues(options)
 
-    this.findValuesQueries[tagId] = pendingResult
+    this.findValuesQueries[tagIndex] = pendingResult
 
     pendingResult.promise
       .then(result => {
@@ -125,10 +125,10 @@ class QueryBuilderFetcher {
     return pendingResult.promise
   }
 
-  public cancelFindValues(tagId: number): void {
-    if (this.findValuesQueries[tagId]) {
-      this.findValuesQueries[tagId].cancel()
-      this.findValuesQueries[tagId] = undefined
+  public cancelFindValues(tagIndex: number): void {
+    if (this.findValuesQueries[tagIndex]) {
+      this.findValuesQueries[tagIndex].cancel()
+      this.findValuesQueries[tagIndex] = undefined
     }
   }
 

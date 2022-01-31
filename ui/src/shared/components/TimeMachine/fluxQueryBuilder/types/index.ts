@@ -16,7 +16,7 @@ export interface AggregationSelectorState {
 export const AGG_WINDOW_AUTO = 'auto'
 
 export interface TagSelectorState extends BuilderTagsType {
-  tagId: number
+  tagIndex: number
   aggregateFunctionType: BuilderAggregateFunctionType
 
   keysStatus: RemoteDataState

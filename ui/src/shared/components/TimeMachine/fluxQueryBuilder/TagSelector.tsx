@@ -16,23 +16,23 @@ function renderType(type: BuilderAggregateFunctionType) {
 }
 
 interface Callbacks {
-  onRemoveTagSelector: (tagId: number) => void
+  onRemoveTagSelector: (tagIndex: number) => void
   onChangeFunctionType: (
-    tagId: number,
+    tagIndex: number,
     type: BuilderAggregateFunctionType
   ) => void
-  onSelectKey: (tagId: number, key: string) => void
-  onChangeKeysSearchTerm: (tagId: number, searchTerm: string) => void
-  onSearchKeys: (tagId: number) => void
-  onChangeValuesSearchTerm: (tagId: number, searchTerm: string) => void
-  onSearchValues: (tagId: number) => void
-  onSelectValues: (tagId: number, values: string[]) => void
+  onSelectKey: (tagIndex: number, key: string) => void
+  onChangeKeysSearchTerm: (tagIndex: number, searchTerm: string) => void
+  onSearchKeys: (tagIndex: number) => void
+  onChangeValuesSearchTerm: (tagIndex: number, searchTerm: string) => void
+  onSearchValues: (tagIndex: number) => void
+  onSelectValues: (tagIndex: number, values: string[]) => void
 }
 type Props = TagSelectorState & Callbacks
 
 const TagSelector = (props: Props) => {
   const {
-    tagId,
+    tagIndex,
     aggregateFunctionType,
     onRemoveTagSelector,
     onChangeFunctionType,
@@ -43,9 +43,11 @@ const TagSelector = (props: Props) => {
       <BuilderCard.DropdownHeader
         options={['Filter', 'Group']}
         selectedOption={renderType(aggregateFunctionType)}
-        onDelete={tagId !== 0 ? () => onRemoveTagSelector(tagId) : undefined}
+        onDelete={
+          tagIndex !== 0 ? () => onRemoveTagSelector(tagIndex) : undefined
+        }
         onSelect={val =>
-          onChangeFunctionType(tagId, val === 'Filter' ? 'filter' : 'group')
+          onChangeFunctionType(tagIndex, val === 'Filter' ? 'filter' : 'group')
         }
       />
       <TagSelectorBody {...props} />
@@ -56,7 +58,7 @@ const TagSelector = (props: Props) => {
 const TagSelectorBody = (props: Props) => {
   const {
     aggregateFunctionType,
-    tagId,
+    tagIndex,
     keys,
     keysStatus,
     key,
@@ -85,12 +87,12 @@ const TagSelectorBody = (props: Props) => {
   const debouncer = useMemo(() => new DefaultDebouncer(), [])
   useEffect(() => () => debouncer.cancelAll(), [])
   function onValueTermChange(e: ChangeEvent<HTMLInputElement>) {
-    onChangeValuesSearchTerm(tagId, e.target.value)
-    debouncer.call(() => onSearchValues(tagId), SEARCH_DEBOUNCE_MS)
+    onChangeValuesSearchTerm(tagIndex, e.target.value)
+    debouncer.call(() => onSearchValues(tagIndex), SEARCH_DEBOUNCE_MS)
   }
   function onKeyTermChange(term: string) {
-    onChangeKeysSearchTerm(tagId, term)
-    debouncer.call(() => onSearchKeys(tagId), SEARCH_DEBOUNCE_MS)
+    onChangeKeysSearchTerm(tagIndex, term)
+    debouncer.call(() => onSearchKeys(tagIndex), SEARCH_DEBOUNCE_MS)
   }
 
   const placeholderText =
@@ -111,7 +113,7 @@ const TagSelectorBody = (props: Props) => {
           >
             <SearchableDropdown
               items={keys}
-              onChoose={(k: string) => onSelectKey(tagId, k)}
+              onChoose={(k: string) => onSelectKey(tagIndex, k)}
               searchTerm={keysSearchTerm}
               onChangeSearchTerm={onKeyTermChange}
               selected={key}
@@ -152,7 +154,7 @@ const TagSelectorValues = (props: Props) => {
   const {
     keysStatus,
     key,
-    tagId,
+    tagIndex,
     values,
     valuesStatus,
     selectedValues,
@@ -208,13 +210,13 @@ const TagSelectorValues = (props: Props) => {
           const active = selectedValues.includes(value)
           const onChange = () =>
             onSelectValues(
-              tagId,
+              tagIndex,
               active
                 ? selectedValues.filter((x: string) => x !== value)
                 : [value, ...selectedValues]
             )
 
-          const divId = `flxts${tagId}_${value}`
+          const divId = `flxts${tagIndex}_${value}`
           return (
             <div
               className="flux-query-builder--list-item"
@@ -235,11 +237,11 @@ const TagSelectorValues = (props: Props) => {
 // TODO replace demo UI by a real implementation
 const DEMO_LOAD_DELAY = 1000
 interface DemoTagSelectorProps {
-  tagId: number
-  onRemoveTagSelector: (tagId: number) => void
+  tagIndex: number
+  onRemoveTagSelector: (tagIndex: number) => void
 }
 const DemoTagSelector = ({
-  tagId,
+  tagIndex,
   onRemoveTagSelector,
 }: DemoTagSelectorProps) => {
   const [aggregateFunctionType, setAggregateFunctionType] = useState(
@@ -301,7 +303,7 @@ const DemoTagSelector = ({
   }, [valuesChanged])
   return (
     <TagSelector
-      tagId={tagId}
+      tagIndex={tagIndex}
       aggregateFunctionType={aggregateFunctionType}
       onRemoveTagSelector={onRemoveTagSelector}
       onChangeFunctionType={(i, type) => {

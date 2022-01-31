@@ -6,10 +6,10 @@ export const initialState: TagSelectorState[] = []
 
 function changeTagSelector(
   state: TagSelectorState[],
-  tagId: number,
+  tagIndex: number,
   fn: (tagState: TagSelectorState, index: number) => Partial<TagSelectorState>
 ): TagSelectorState[] {
-  const index = state.findIndex(({tagId: id}) => id === tagId)
+  const index = state.findIndex(({tagIndex: id}) => id === tagIndex)
   if (index !== -1) {
     state[index] = {
       ...state[index],
@@ -28,7 +28,7 @@ const aggregationReducer = (
       return [
         ...state,
         {
-          tagId: state.length,
+          tagIndex: state.length,
           aggregateFunctionType: 'filter',
           keys: [],
           keysSearchTerm: '',
@@ -42,46 +42,46 @@ const aggregationReducer = (
       ]
     }
     case 'FQB_TAG_REMOVE': {
-      const id = action.payload.tagId
-      return state.filter(({tagId}) => tagId !== id)
+      const id = action.payload.tagIndex
+      return state.filter(({tagIndex}) => tagIndex !== id)
     }
     case 'FQB_TAG_CHANGE_TYPE': {
-      return changeTagSelector(state, action.payload.tagId, () => ({
+      return changeTagSelector(state, action.payload.tagIndex, () => ({
         aggregateFunctionType: action.payload.type,
       }))
     }
     case 'FQB_TAG_CHANGE_KEY_SEARCHTERM': {
-      return changeTagSelector(state, action.payload.tagId, () => ({
+      return changeTagSelector(state, action.payload.tagIndex, () => ({
         keysSearchTerm: action.payload.term,
       }))
     }
     case 'FQB_TAG_CHANGE_VALUES_SEARCHTERM': {
-      return changeTagSelector(state, action.payload.tagId, () => ({
+      return changeTagSelector(state, action.payload.tagIndex, () => ({
         valuesSearchTerm: action.payload.term,
       }))
     }
     case 'FQB_TAG_SELECT_KEY': {
-      return changeTagSelector(state, action.payload.tagId, () => ({
+      return changeTagSelector(state, action.payload.tagIndex, () => ({
         key: action.payload.key,
       }))
     }
     case 'FQB_TAG_SELECT_VALUES': {
-      return changeTagSelector(state, action.payload.tagId, () => ({
+      return changeTagSelector(state, action.payload.tagIndex, () => ({
         selectedValues: action.payload.values,
       }))
     }
     case 'FQB_TAG_SEARCH_KEY': {
-      return changeTagSelector(state, action.payload.tagId, () => ({
+      return changeTagSelector(state, action.payload.tagIndex, () => ({
         keysStatus: RemoteDataState.Loading,
       }))
     }
     case 'FQB_TAG_SEARCH_VALUES': {
-      return changeTagSelector(state, action.payload.tagId, () => ({
+      return changeTagSelector(state, action.payload.tagIndex, () => ({
         valuesStatus: RemoteDataState.Loading,
       }))
     }
     case 'FQB_TAG_KEY_STATUS': {
-      return changeTagSelector(state, action.payload.tagId, () => ({
+      return changeTagSelector(state, action.payload.tagIndex, () => ({
         keysStatus: action.payload.status,
       }))
     }
