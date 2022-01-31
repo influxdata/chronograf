@@ -1,12 +1,21 @@
 import {Dispatch} from 'react'
-import {RemoteDataState, Source, TimeRange} from 'src/types'
+import {
+  BuilderAggregateFunctionType,
+  RemoteDataState,
+  Source,
+  TimeRange,
+} from 'src/types'
 import {isCancellationError} from 'src/types/promises'
 import {queryBuilderFetcher} from '../apis/QueryBuilderFetcher'
 import {QueryBuilderState} from '../types'
 
 import * as tagActions from './tags'
 import * as bucketActions from './buckets'
+
 type GetState = () => {fluxQueryBuilder: QueryBuilderState}
+
+// We don't show these columns in results but they're able to be grouped on for most queries
+const ADDITIONAL_GROUP_BY_COLUMNS = ['_start', '_stop', '_time']
 
 export const removeTagSelectorThunk = (
   source: Source,
@@ -51,34 +60,38 @@ export const loadTagSelectorThunk = (
   dispatch(tagActions.setKeysStatus(tagIndex, RemoteDataState.Loading))
 
   try {
-    const searchTerm = tagState.keysSearchTerm
-    const keys = await queryBuilderFetcher.findKeys(tagIndex, {
-      source,
-      bucket: selectedBucket,
-      searchTerm,
-      timeRange,
-      tagsSelections: tags.slice(0, tagIndex),
-    })
+    if (tagState.aggregateFunctionType === 'filter') {
+      const searchTerm = tagState.keysSearchTerm
+      const keys = await queryBuilderFetcher.findKeys(tagIndex, {
+        source,
+        bucket: selectedBucket,
+        searchTerm,
+        timeRange,
+        tagsSelections: tags
+          .slice(0, tagIndex)
+          .filter(x => x.aggregateFunctionType === 'filter'),
+      })
 
-    const {key} = tagState
+      const {key} = tagState
 
-    if (!key) {
-      let defaultKey: string
+      if (!key) {
+        let defaultKey: string
 
-      if (tagIndex === 0 && keys.includes('_measurement')) {
-        defaultKey = '_measurement'
-      } else {
-        defaultKey = keys[0]
+        if (tagIndex === 0 && keys.includes('_measurement')) {
+          defaultKey = '_measurement'
+        } else {
+          defaultKey = keys[0]
+        }
+
+        dispatch(tagActions.selectKey(tagIndex, defaultKey))
+      } else if (!keys.includes(key)) {
+        // Even if the selected key didn't come back in the results, let it be
+        // selected anyway
+        keys.unshift(key)
       }
 
-      dispatch(tagActions.selectKey(tagIndex, defaultKey))
-    } else if (!keys.includes(key)) {
-      // Even if the selected key didn't come back in the results, let it be
-      // selected anyway
-      keys.unshift(key)
+      dispatch(tagActions.setKeys(tagIndex, keys))
     }
-
-    dispatch(tagActions.setKeys(tagIndex, keys))
     dispatch(loadTagSelectorValuesThunk(source, timeRange, tagIndex))
   } catch (e) {
     if (isCancellationError(e)) {
@@ -98,6 +111,7 @@ const loadTagSelectorValuesThunk = (
   dispatch: Dispatch<
     | ReturnType<typeof tagActions.setValuesStatus>
     | ReturnType<typeof tagActions.setValues>
+    | ReturnType<typeof tagActions.selectValues>
     | ReturnType<typeof loadTagSelectorValuesThunk>
   >,
   getState: GetState
@@ -117,24 +131,42 @@ const loadTagSelectorValuesThunk = (
   const tagState = tags[tagIndex]
 
   try {
-    const values = await queryBuilderFetcher.findValues(tagIndex, {
-      source,
-      bucket: selectedBucket,
-      tagsSelections: tags.slice(0, tagIndex),
-      key: tagState.key,
-      searchTerm: tagState.valuesSearchTerm,
-      timeRange,
-    })
-
-    for (const selectedValue of tagState.selectedValues) {
-      // Even if the selected values didn't come back in the results, let them
-      // be selected anyway
-      if (!values.includes(selectedValue)) {
-        values.unshift(selectedValue)
+    let values: string[]
+    const originalSelected = tagState.selectedValues || []
+    let selectedValues = originalSelected
+    if (tagState.aggregateFunctionType === 'filter') {
+      values = await queryBuilderFetcher.findValues(tagIndex, {
+        source,
+        bucket: selectedBucket,
+        tagsSelections: tags
+          .slice(0, tagIndex)
+          .filter(x => x.aggregateFunctionType === 'filter'),
+        key: tagState.key,
+        searchTerm: tagState.valuesSearchTerm,
+        timeRange,
+      })
+      for (const selectedValue of tagState.selectedValues) {
+        // Even if the selected values didn't come back in the results, let them
+        // be selected anyway
+        if (!values.includes(selectedValue)) {
+          values.unshift(selectedValue)
+        }
       }
+    } else {
+      values = tags.slice(0, tagIndex).reduce((acc, tag) => {
+        if (tag.aggregateFunctionType === 'filter' && tag.key) {
+          acc.push(tag.key)
+        }
+        return acc
+      }, [])
+      values = [...values, ...ADDITIONAL_GROUP_BY_COLUMNS]
+      selectedValues = tagState.selectedValues.filter(x => values.includes(x))
     }
 
     dispatch(tagActions.setValues(tagIndex, values))
+    if (selectedValues !== originalSelected) {
+      dispatch(tagActions.selectValues(tagIndex, selectedValues))
+    }
     dispatch(loadTagSelectorThunk(source, timeRange, tagIndex + 1))
   } catch (e) {
     if (isCancellationError(e)) {
@@ -281,11 +313,26 @@ export const searchTagValuesThunk = (
 ) => (dispatch: Dispatch<ReturnType<typeof loadTagSelectorValuesThunk>>) => {
   dispatch(loadTagSelectorValuesThunk(source, timeRange, tagIndex))
 }
-//
+
 export const searchTagKeysThunk = (
   source: Source,
   timeRange: TimeRange,
   tagIndex: number
 ) => (dispatch: Dispatch<ReturnType<typeof loadTagSelectorThunk>>) => {
+  dispatch(loadTagSelectorThunk(source, timeRange, tagIndex))
+}
+
+export const changeFunctionTypeThunk = (
+  source: Source,
+  timeRange: TimeRange,
+  tagIndex: number,
+  type: BuilderAggregateFunctionType
+) => (
+  dispatch: Dispatch<
+    | ReturnType<typeof loadTagSelectorThunk>
+    | ReturnType<typeof tagActions.changeFunctionType>
+  >
+) => {
+  dispatch(tagActions.changeFunctionType(tagIndex, type))
   dispatch(loadTagSelectorThunk(source, timeRange, tagIndex))
 }
