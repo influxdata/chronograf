@@ -1,9 +1,9 @@
 import {AggregationSelectorAction} from '../actions/aggregation'
-import {AggregationSelectorState} from '../types'
+import {AggregationSelectorState, AGG_WINDOW_AUTO} from '../types'
 
 export const initialState: AggregationSelectorState = {
   fillMissing: false,
-  period: 'auto',
+  period: AGG_WINDOW_AUTO,
   selectedFunctions: ['mean'],
 }
 

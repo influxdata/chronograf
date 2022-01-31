@@ -7,15 +7,16 @@ import {DURATIONS} from 'src/shared/constants/queryBuilder'
 import {connect} from 'react-redux'
 import {notify} from 'src/shared/actions/notifications'
 import {fluxWizardError} from 'src/shared/copy/notifications'
+import {AGG_WINDOW_AUTO} from './types'
 
 function isDurationParseable(duration: string): boolean {
   const durationRegExp = /^(?:[1-9][0-9]*(?:y|mo|w|d|h|ms|s|m|us|µs|ns))+$/g
   return !!duration.match(durationRegExp)
 }
 interface Props {
-  selected: string | 'auto'
+  selected: string
   autoPeriod: string
-  onChoose: (value: string | 'auto') => void
+  onChoose: (value: string) => void
 }
 
 const WindowPeriod = ({selected, autoPeriod, onChoose}: Props) => {
@@ -25,7 +26,7 @@ const WindowPeriod = ({selected, autoPeriod, onChoose}: Props) => {
 
   let items = DURATIONS
   const autoValue = `auto (${autoPeriod})`
-  if (selected === 'auto') {
+  if (selected === AGG_WINDOW_AUTO) {
     selected = autoValue
   }
   if (!items.includes(selected) && selected !== autoValue) {
@@ -62,7 +63,7 @@ const WindowPeriod = ({selected, autoPeriod, onChoose}: Props) => {
               setCustomDuration(value ?? '')
               return
             }
-            onChoose(text.startsWith('auto') ? 'auto' : text)
+            onChoose(text.startsWith(AGG_WINDOW_AUTO) ? AGG_WINDOW_AUTO : text)
           }}
           selected={selected}
           buttonSize="btn-sm"
