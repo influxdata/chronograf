@@ -1,8 +1,25 @@
 import {TagSelectorAction} from '../actions/tags'
 import {TagSelectorState} from '../types'
-import {RemoteDataState} from 'src/types'
+import {BuilderAggregateFunctionType, RemoteDataState} from 'src/types'
 
 export const initialState: TagSelectorState[] = []
+export function initialSelectorState(
+  tagIndex: number = 0,
+  aggregateFunctionType: BuilderAggregateFunctionType = 'filter'
+): TagSelectorState {
+  return {
+    tagIndex,
+    aggregateFunctionType,
+    keys: [],
+    keysSearchTerm: '',
+    keysStatus: RemoteDataState.NotStarted,
+    key: '',
+    values: [],
+    valuesSearchTerm: '',
+    valuesStatus: undefined,
+    selectedValues: [],
+  }
+}
 
 function changeTagSelector(
   state: TagSelectorState[],
@@ -25,38 +42,14 @@ const aggregationReducer = (
 ): TagSelectorState[] => {
   switch (action.type) {
     case 'FQB_TAG_ADD': {
-      return [
-        ...state,
-        {
-          tagIndex: state.length,
-          aggregateFunctionType: 'filter',
-          keys: [],
-          keysSearchTerm: '',
-          keysStatus: RemoteDataState.NotStarted,
-          key: '',
-          values: [],
-          valuesSearchTerm: '',
-          valuesStatus: undefined,
-          selectedValues: [],
-        },
-      ]
+      return [...state, initialSelectorState(state.length)]
     }
     case 'FQB_TAG_RESET': {
       return [
-        {
-          tagIndex: state.length,
-          aggregateFunctionType: state.length
-            ? state[0].aggregateFunctionType
-            : 'filter',
-          keys: [],
-          keysSearchTerm: '',
-          keysStatus: RemoteDataState.NotStarted,
-          key: '',
-          values: [],
-          valuesSearchTerm: '',
-          valuesStatus: undefined,
-          selectedValues: [],
-        },
+        initialSelectorState(
+          0,
+          state.length ? state[0].aggregateFunctionType : 'filter'
+        ),
       ]
     }
     case 'FQB_TAG_REMOVE': {
@@ -66,6 +59,7 @@ const aggregationReducer = (
     case 'FQB_TAG_CHANGE_TYPE': {
       return changeTagSelector(state, action.payload.tagIndex, () => ({
         aggregateFunctionType: action.payload.type,
+        selectedValues: [],
       }))
     }
     case 'FQB_TAG_CHANGE_KEY_SEARCHTERM': {
