@@ -1,10 +1,10 @@
 // Libraries
 import React, {useMemo, useState} from 'react'
+import {connect} from 'react-redux'
 
 import BuilderCard from './BuilderCard'
 import BucketsSelector from './BucketsSelector'
 import FancyScrollbar from '../../FancyScrollbar'
-import {Source, TimeRange} from 'src/types'
 import {
   Button,
   ButtonShape,
@@ -16,18 +16,20 @@ import AggregationSelector from './AggregationSelector'
 import TagSelector from './TagSelector'
 import {fluxPeriodFromRangeSeconds} from 'src/tempVars/utils/replace'
 import moment from 'moment'
+import {TimeMachineQueryProps} from './types'
+import {addTagSelectorThunk} from './actions/thunks'
 
-interface Props {
-  source: Source
-  timeRange: TimeRange
+interface OwnProps extends TimeMachineQueryProps {
   onSubmit: () => void
   onShowEditor: () => void
 }
+
+type Props = OwnProps & typeof mdtp
 const FluxQueryBuilder = ({
   source,
+  timeRange,
   onSubmit,
   onShowEditor,
-  timeRange,
 }: Props) => {
   const defaultPeriod = useMemo(() => {
     if (timeRange) {
@@ -53,7 +55,7 @@ const FluxQueryBuilder = ({
           <div className="builder-card--list">
             <BuilderCard testID="bucket-selector">
               <BuilderCard.Header title="From" />
-              <BucketsSelector source={source} />
+              <BucketsSelector source={source} timeRange={timeRange} />
             </BuilderCard>
             {activeTagSelectors.map(i => (
               <TagSelector
@@ -98,5 +100,8 @@ const FluxQueryBuilder = ({
     </div>
   )
 }
+const mdtp = {
+  onAddTagSelector: addTagSelectorThunk,
+}
 
-export default FluxQueryBuilder
+export default connect(null, mdtp)(FluxQueryBuilder)

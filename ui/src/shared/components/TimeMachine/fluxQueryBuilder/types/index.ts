@@ -1,4 +1,9 @@
-import {BuilderAggregateFunctionType, RemoteDataState} from 'src/types'
+import {
+  BuilderAggregateFunctionType,
+  RemoteDataState,
+  Source,
+  TimeRange,
+} from 'src/types'
 
 export interface BucketSelectorState {
   selectedBucket?: string
@@ -40,4 +45,9 @@ export interface QueryBuilderState {
   buckets: BucketSelectorState
   aggregation: AggregationSelectorState
   tags: TagSelectorState[]
+}
+
+export interface TimeMachineQueryProps {
+  source: Source
+  timeRange: TimeRange
 }

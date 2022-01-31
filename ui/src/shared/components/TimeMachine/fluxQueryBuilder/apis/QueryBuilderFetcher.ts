@@ -23,8 +23,8 @@ function tagSelectionKey(tags: BuilderTagsType[]): any[] {
 }
 class QueryBuilderFetcher {
   private findBucketsQuery?: CancelableQuery
-  private findKeysQueries: Array<CancelableQuery | undefined>
-  private findValuesQueries: Array<CancelableQuery | undefined>
+  private findKeysQueries: Array<CancelableQuery | undefined> = []
+  private findValuesQueries: Array<CancelableQuery | undefined> = []
   private findKeysCache: {[key: string]: string[]} = {}
   private findValuesCache: {[key: string]: string[]} = {}
   private findBucketsCache: {[key: string]: string[]} = {}
@@ -136,7 +136,9 @@ class QueryBuilderFetcher {
   public cancelPendingQueries(): void {
     this.cancelFindBuckets()
     this.findKeysQueries.forEach((_, i) => this.cancelFindKeys(i))
+    this.findKeysQueries = []
     this.findValuesQueries.forEach((_, i) => this.cancelFindValues(i))
+    this.findValuesQueries = []
   }
 
   public clearCache(): void {

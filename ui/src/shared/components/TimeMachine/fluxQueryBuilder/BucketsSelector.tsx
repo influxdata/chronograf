@@ -7,42 +7,52 @@ import classnames from 'classnames'
 import BuilderCard from './BuilderCard'
 
 // Types
-import {RemoteDataState, Source} from 'src/types'
-import {BucketSelectorState} from './types'
-import {
-  filterBuckets,
-  selectBucket,
-  changeBucketsState,
-} from './actions/buckets'
-import {getBuckets} from 'src/flux/components/DatabaseList'
+import {RemoteDataState} from 'src/types'
+import {BucketSelectorState, TimeMachineQueryProps} from './types'
+import {loadBucketsThunk, selectBucketThunk} from './actions/thunks'
+import {setBucketsSearchTerm} from './actions/buckets'
 
 interface Callbacks {
-  onFilterBuckets: typeof filterBuckets
-  onSelectBucket: typeof selectBucket
-  onChangeBucketsState: typeof changeBucketsState
+  onFilterBuckets: typeof setBucketsSearchTerm
+  onSelectBucket: typeof selectBucketThunk
+  onLoadBuckets: typeof loadBucketsThunk
 }
-type Props = BucketSelectorState & Callbacks
+type Props = TimeMachineQueryProps & BucketSelectorState & Callbacks
+
+const filterBuckets = (buckets: string[], term: string): string[] => {
+  const searchTerm = term.toLocaleLowerCase()
+  let list = buckets.filter((bucket: string) =>
+    bucket.toLocaleLowerCase().includes(searchTerm)
+  )
+  if (list.length > 200) {
+    list = list.slice(0, 200)
+  }
+
+  return list
+}
 
 const BucketsSelector = ({
+  source,
+  timeRange,
   selectedBucket,
-  buckets,
+  buckets: passedBuckets,
   status,
   searchTerm,
   onSelectBucket,
   onFilterBuckets,
 }: Props) => {
   if (status === RemoteDataState.Done) {
-    if (!buckets.length) {
+    if (!passedBuckets.length) {
       return (
         <BuilderCard.Empty>
-          {searchTerm ? (
-            <i>No buckets matched your search</i>
-          ) : (
-            <i>No buckets found</i>
-          )}
+          <i>No buckets found</i>
         </BuilderCard.Empty>
       )
     }
+    const buckets = useMemo(() => {
+      return filterBuckets(passedBuckets, searchTerm)
+    }, [passedBuckets, searchTerm])
+
     return (
       <>
         <BuilderCard.Menu>
@@ -55,7 +65,7 @@ const BucketsSelector = ({
             onKeyUp={e => {
               if (e.key === 'Escape') {
                 e.stopPropagation()
-                onSelectBucket('')
+                onFilterBuckets('')
               }
             }}
             spellCheck={false}
@@ -69,7 +79,7 @@ const BucketsSelector = ({
                 className={classnames('flux-query-builder--list-item', {
                   active: bucket === selectedBucket,
                 })}
-                onClick={() => onSelectBucket(bucket)}
+                onClick={() => onSelectBucket(source, timeRange, bucket)}
                 key={bucket}
               >
                 {bucket}
@@ -94,22 +104,10 @@ const BucketsSelector = ({
   )
 }
 
-const InitializeBucketsSelector = (props: {source: Source} & Props) => {
-  useMemo(() => props.onChangeBucketsState(RemoteDataState.Loading, []), [])
+const InitializeBucketsSelector = (props: Props) => {
   useEffect(() => {
-    getBuckets(props.source)
-      .then(buckets => {
-        props.onChangeBucketsState(RemoteDataState.Done, buckets)
-        const selectedBucket = buckets.includes(props.selectedBucket)
-          ? props.selectedBucket
-          : ''
-        props.onSelectBucket(selectedBucket)
-      })
-      .catch(e => {
-        console.error(e)
-        props.onChangeBucketsState(RemoteDataState.Error)
-      })
-  }, [])
+    props.onLoadBuckets(props.source, props.timeRange)
+  }, [props.source, props.timeRange])
 
   return <BucketsSelector {...props}></BucketsSelector>
 }
@@ -117,8 +115,9 @@ const mstp = (state: any): BucketSelectorState => {
   return state?.fluxQueryBuilder?.buckets as BucketSelectorState
 }
 const mdtp: Callbacks = {
-  onFilterBuckets: filterBuckets,
-  onSelectBucket: selectBucket,
-  onChangeBucketsState: changeBucketsState,
+  onLoadBuckets: loadBucketsThunk,
+  onFilterBuckets: setBucketsSearchTerm,
+  onSelectBucket: selectBucketThunk,
 }
-export default connect(mstp, mdtp)(InitializeBucketsSelector)
+const connector = connect(mstp, mdtp)
+export default connector(InitializeBucketsSelector)
