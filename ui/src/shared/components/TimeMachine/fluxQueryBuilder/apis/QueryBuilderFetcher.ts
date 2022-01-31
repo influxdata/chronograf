@@ -10,9 +10,17 @@ import {
 // Types
 import {CancelBox} from 'src/types/promises'
 import {Source} from 'src/types'
+import {BuilderTagsType} from '../types'
 
 type CancelableQuery = CancelBox<string[]>
 
+function tagSelectionKey(tags: BuilderTagsType[]): any[] {
+  return tags.map(x => ({
+    k: x.key || '',
+    v: x.values || [],
+    t: x.aggregateFunctionType,
+  }))
+}
 class QueryBuilderFetcher {
   private findBucketsQuery?: CancelableQuery
   private findKeysQueries: {[tagId: string]: CancelableQuery | undefined} = {}
@@ -54,8 +62,12 @@ class QueryBuilderFetcher {
   ): Promise<string[]> {
     this.cancelFindKeys(tagId)
 
-    const {source, ...rest} = options
-    const cacheKey = source.id + JSON.stringify(rest)
+    const {source, tagsSelections, ...rest} = options
+    const cacheKey = JSON.stringify({
+      id: source.id,
+      tags: tagSelectionKey(tagsSelections),
+      ...rest,
+    })
     const cachedResult = this.findKeysCache[cacheKey]
 
     if (cachedResult) {
@@ -88,8 +100,12 @@ class QueryBuilderFetcher {
   ): Promise<string[]> {
     this.cancelFindValues(tagId)
 
-    const {source, ...rest} = options
-    const cacheKey = source.id + JSON.stringify(rest)
+    const {source, tagsSelections, ...rest} = options
+    const cacheKey = JSON.stringify({
+      id: source.id,
+      tags: tagSelectionKey(tagsSelections),
+      ...rest,
+    })
     const cachedResult = this.findValuesCache[cacheKey]
 
     if (cachedResult) {
