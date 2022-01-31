@@ -14,9 +14,9 @@ import {Source} from 'src/types'
 type CancelableQuery = CancelBox<string[]>
 
 class QueryBuilderFetcher {
-  private findBucketsQuery: CancelableQuery
-  private findKeysQueries: {[tagId: string]: CancelableQuery} = {}
-  private findValuesQueries: {[tagId: string]: CancelableQuery} = {}
+  private findBucketsQuery?: CancelableQuery
+  private findKeysQueries: {[tagId: string]: CancelableQuery | undefined} = {}
+  private findValuesQueries: {[tagId: string]: CancelableQuery | undefined} = {}
   private findKeysCache: {[key: string]: string[]} = {}
   private findValuesCache: {[key: string]: string[]} = {}
   private findBucketsCache: {[key: string]: string[]} = {}
@@ -44,6 +44,7 @@ class QueryBuilderFetcher {
   public cancelFindBuckets(): void {
     if (this.findBucketsQuery) {
       this.findBucketsQuery.cancel()
+      this.findBucketsQuery = undefined
     }
   }
 
@@ -77,6 +78,7 @@ class QueryBuilderFetcher {
   public cancelFindKeys(tagId: string): void {
     if (this.findKeysQueries[tagId]) {
       this.findKeysQueries[tagId].cancel()
+      this.findKeysQueries[tagId] = undefined
     }
   }
 
@@ -110,10 +112,14 @@ class QueryBuilderFetcher {
   public cancelFindValues(tagId: string): void {
     if (this.findValuesQueries[tagId]) {
       this.findValuesQueries[tagId].cancel()
+      this.findValuesQueries[tagId] = undefined
     }
   }
 
   public clearCache(): void {
+    this.cancelFindBuckets()
+    Object.keys(this.findKeysQueries).forEach(x => this.cancelFindKeys(x))
+    Object.keys(this.findValuesQueries).forEach(x => this.cancelFindValues(x))
     this.findBucketsCache = {}
     this.findKeysCache = {}
     this.findValuesCache = {}
