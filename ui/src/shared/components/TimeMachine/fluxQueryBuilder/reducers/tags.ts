@@ -77,6 +77,8 @@ const aggregationReducer = (
     case 'FQB_TAG_SELECT_KEY': {
       return changeTagSelector(state, action.payload.tagIndex, () => ({
         tagKey: action.payload.key,
+        values: [],
+        aggregateFunctionType: 'filter',
       }))
     }
     case 'FQB_TAG_SELECT_VALUES': {
