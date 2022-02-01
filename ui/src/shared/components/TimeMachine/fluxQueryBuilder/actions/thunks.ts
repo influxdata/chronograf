@@ -135,22 +135,27 @@ const loadTagSelectorValuesThunk = (
     let selectedValues = originalSelected
     if (tagState.aggregateFunctionType === 'filter') {
       dispatch(tagActions.setValuesStatus(tagIndex, RemoteDataState.Loading))
-      values = await queryBuilderFetcher.findValues(tagIndex, {
-        source,
-        bucket: selectedBucket,
-        tagsSelections: tags
-          .slice(0, tagIndex)
-          .filter(x => x.aggregateFunctionType === 'filter'),
-        key: tagState.tagKey,
-        searchTerm: tagState.valuesSearchTerm,
-        timeRange,
-      })
-      for (const selectedValue of tagState.tagValues) {
-        // Even if the selected values didn't come back in the results, let them
-        // be selected anyway
-        if (!values.includes(selectedValue)) {
-          values.unshift(selectedValue)
+      if (tagState.tagKey) {
+        values = await queryBuilderFetcher.findValues(tagIndex, {
+          source,
+          bucket: selectedBucket,
+          tagsSelections: tags
+            .slice(0, tagIndex)
+            .filter(x => x.aggregateFunctionType === 'filter'),
+          key: tagState.tagKey,
+          searchTerm: tagState.valuesSearchTerm,
+          timeRange,
+        })
+        for (const selectedValue of tagState.tagValues) {
+          // Even if the selected values didn't come back in the results, let them
+          // be selected anyway
+          if (!values.includes(selectedValue)) {
+            values.unshift(selectedValue)
+          }
         }
+      } else {
+        values = []
+        selectedValues = originalSelected.length ? [] : originalSelected
       }
     } else {
       values = tags.slice(0, tagIndex).reduce((acc, tag) => {
