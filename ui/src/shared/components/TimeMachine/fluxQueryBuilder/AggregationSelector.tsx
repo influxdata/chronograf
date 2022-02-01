@@ -8,7 +8,7 @@ import {ComponentSize, SlideToggle} from 'src/reusable_ui'
 import ReactTooltip from 'react-tooltip'
 import BuilderCard from './BuilderCard'
 import WindowPeriod from './WindowPeriod'
-import {FUNCTION_NAMES} from 'src/shared/constants/queryBuilder'
+import {FUNCTION_NAMES} from './util/constants'
 import {AggregationSelectorState} from './types'
 import {actionCreators} from './actions/aggregation'
 

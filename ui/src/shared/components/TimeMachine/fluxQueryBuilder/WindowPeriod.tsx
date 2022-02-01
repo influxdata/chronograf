@@ -2,7 +2,7 @@ import React, {useState, PureComponent} from 'react'
 import onClickOutside from 'react-onclickoutside'
 
 import Dropdown from 'src/shared/components/Dropdown'
-import {DURATIONS} from 'src/shared/constants/queryBuilder'
+import {DURATIONS} from './util/constants'
 
 import {connect} from 'react-redux'
 import {notify} from 'src/shared/actions/notifications'
