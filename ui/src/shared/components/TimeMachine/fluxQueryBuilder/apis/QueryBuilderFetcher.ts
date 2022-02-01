@@ -100,6 +100,10 @@ class QueryBuilderFetcher {
     options: FindValuesOptions
   ): Promise<string[]> {
     this.cancelFindValues(tagIndex)
+    if (!options.key) {
+      // return no values when key is missing
+      return []
+    }
 
     const {source, tagsSelections, ...rest} = options
     const cacheKey = JSON.stringify({
