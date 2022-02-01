@@ -72,7 +72,7 @@ class QueryBuilderFetcher {
     const cachedResult = this.findKeysCache[cacheKey]
 
     if (cachedResult) {
-      return Promise.resolve(cachedResult)
+      return Promise.resolve([...cachedResult])
     }
 
     const pendingResult = findKeys(options)
@@ -114,7 +114,7 @@ class QueryBuilderFetcher {
     const cachedResult = this.findValuesCache[cacheKey]
 
     if (cachedResult) {
-      return Promise.resolve(cachedResult)
+      return Promise.resolve([...cachedResult])
     }
 
     const pendingResult = findValues(options)
