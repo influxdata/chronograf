@@ -101,7 +101,7 @@ class QueryBuilderFetcher {
   ): Promise<string[]> {
     this.cancelFindValues(tagIndex)
     if (!options.key) {
-      // return no values when key is missing
+      // return no values for no key
       return []
     }
 
