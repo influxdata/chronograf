@@ -1,6 +1,6 @@
-import {genFlux} from 'src/shared/constants/queryBuilder'
+import {genFlux} from 'src/shared/components/TimeMachine/fluxQueryBuilder/util/constants'
 
-describe('queryBuilder', () => {
+describe('fluxQueryBuilder/util/constants', () => {
   describe('genFlux', () => {
     test('derivative', () => {
       const actual = genFlux('derivative', '200d')
