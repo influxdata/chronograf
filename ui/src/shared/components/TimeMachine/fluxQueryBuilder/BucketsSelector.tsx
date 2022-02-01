@@ -79,7 +79,7 @@ const BucketsSelector = ({
                 className={classnames('flux-query-builder--list-item', {
                   active: bucket === selectedBucket,
                 })}
-                onClick={() => onSelectBucket(source, timeRange, bucket)}
+                onClick={() => onSelectBucket(source, timeRange, bucket, true)}
                 key={bucket}
               >
                 {bucket}
