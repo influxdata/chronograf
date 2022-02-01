@@ -89,18 +89,23 @@ export function findValues({
   // requires Flux package to work which we will put in the query
   const searchFilter = !searchTerm
     ? ''
-    : `\n  |> filter(fn: (r) => r._value =~ regexp.compile(v: "(?i:" + regexp.quoteMeta(v: "${searchTerm}") + ")"))`
+    : `\n  |> filter(fn: (r) => r._value =~ regexp.compile(v: "(?i:" + regexp.quoteMeta(v: "${fluxString(
+        searchTerm
+      )}") + ")"))`
 
-  // TODO: Use the `v1.tagValues` function from the Flux standard library once
-  // this issue is resolved: https://github.com/influxdata/flux/issues/1071
+  // 1.x InfluxDB requires the _value column to produce correct distinct values
+  const v1ExtraKeep = !(source.version || '').startsWith('2')
+    ? ', "_value"'
+    : ''
+
   const query = `import "regexp"
   
-  from(bucket: "${bucket}")
+  from(bucket: "${fluxString(bucket)}")
   |> range(${timeRangeArguments})
   |> filter(fn: ${tagFilters})
-  |> keep(columns: ["${key}"])
+  |> keep(columns: ["${fluxString(key)}"${v1ExtraKeep}])
   |> group()
-  |> distinct(column: "${key}")${searchFilter}
+  |> distinct(column: "${fluxString(key)}")${searchFilter}
   |> limit(n: ${limit})
   |> sort()`
 
@@ -167,11 +172,9 @@ export function formatTimeRangeArguments(timeRange: TimeRange): string {
 
 export function tagToFlux(tag: BuilderTagsType) {
   return tag.tagValues
-    .map(
-      value =>
-        `r["${tag.tagKey}"] == "${value
-          .replace(/\\/g, '\\\\')
-          .replace(/"/g, '\\"')}"`
-    )
+    .map(value => `r["${tag.tagKey}"] == "${fluxString(value)}"`)
     .join(' or ')
+}
+export function fluxString(s: string = '') {
+  return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
 }
