@@ -2,12 +2,11 @@ import React, {useState, PureComponent} from 'react'
 import onClickOutside from 'react-onclickoutside'
 
 import Dropdown from 'src/shared/components/Dropdown'
-import {DURATIONS} from './util/constants'
+import {AGG_WINDOW_AUTO, DURATIONS} from './util/constants'
 
 import {connect} from 'react-redux'
 import {notify} from 'src/shared/actions/notifications'
 import {fluxWizardError} from 'src/shared/copy/notifications'
-import {AGG_WINDOW_AUTO} from './types'
 
 function isDurationParseable(duration: string): boolean {
   const durationRegExp = /^(?:[1-9][0-9]*(?:y|mo|w|d|h|ms|s|m|us|µs|ns))+$/g

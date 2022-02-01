@@ -18,8 +18,6 @@ export interface AggregationSelectorState {
   selectedFunctions: string[]
 }
 
-export const AGG_WINDOW_AUTO = 'auto'
-
 export interface TagSelectorState extends BuilderTagsType {
   tagIndex: number
 

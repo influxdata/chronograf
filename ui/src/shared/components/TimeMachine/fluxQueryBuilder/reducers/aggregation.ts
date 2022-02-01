@@ -1,5 +1,6 @@
 import {AggregationSelectorAction} from '../actions/aggregation'
-import {AggregationSelectorState, AGG_WINDOW_AUTO} from '../types'
+import {AggregationSelectorState} from '../types'
+import {AGG_WINDOW_AUTO} from '../util/constants'
 
 export const initialState: AggregationSelectorState = {
   fillMissing: false,
