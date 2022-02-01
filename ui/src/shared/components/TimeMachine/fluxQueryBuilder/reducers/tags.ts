@@ -95,9 +95,24 @@ const aggregationReducer = (
       }))
     }
     case 'FQB_TAG_KEY_STATUS': {
-      return changeTagSelector(state, action.payload.tagIndex, () => ({
-        keysStatus: action.payload.status,
-      }))
+      const {tagIndex, status} = action.payload
+      if (state[tagIndex] === undefined) {
+        return state
+      }
+      state[tagIndex] = {
+        ...state[tagIndex],
+        keysStatus: status,
+      }
+      if (status === RemoteDataState.Loading) {
+        state[tagIndex].valuesStatus = RemoteDataState.NotStarted
+        for (let i = tagIndex + 1; i < state.length; i++) {
+          state[i] = {
+            ...state[i],
+            keysStatus: RemoteDataState.NotStarted,
+          }
+        }
+      }
+      return [...state]
     }
     case 'FQB_TAG_VALUES_STATUS': {
       return changeTagSelector(state, action.payload.tagIndex, () => ({
