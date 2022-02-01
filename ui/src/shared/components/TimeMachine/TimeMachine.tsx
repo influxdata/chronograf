@@ -1,5 +1,5 @@
 // Libraries
-import React, {PureComponent} from 'react'
+import React, {PureComponent, useMemo} from 'react'
 import _ from 'lodash'
 
 // Components
@@ -53,6 +53,7 @@ import {
 } from 'src/types'
 import {SourceOption} from 'src/types/sources'
 import {Links, ScriptStatus} from 'src/types/flux'
+import {queryBuilderFetcher} from './fluxQueryBuilder/apis/QueryBuilderFetcher'
 
 interface ConnectedProps {
   script: string
@@ -558,6 +559,10 @@ class TimeMachine extends PureComponent<Props, State> {
 }
 
 const ConnectedTimeMachine = (props: PassedProps & ManualRefreshProps) => {
+  useMemo(() => {
+    // reset flux query builder cache, so that new timemachine start with a fresh cache
+    queryBuilderFetcher.clearCache()
+  }, [])
   return (
     <TimeMachineContextConsumer>
       {(container: TimeMachineContainer) => {
