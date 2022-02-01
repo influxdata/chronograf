@@ -26,11 +26,10 @@ function changeTagSelector(
   tagIndex: number,
   fn: (tagState: TagSelectorState, index: number) => Partial<TagSelectorState>
 ): TagSelectorState[] {
-  const index = state.findIndex(({tagIndex: id}) => id === tagIndex)
-  if (index !== -1) {
-    state[index] = {
-      ...state[index],
-      ...fn(state[index], index),
+  if (state[tagIndex]) {
+    state[tagIndex] = {
+      ...state[tagIndex],
+      ...fn(state[tagIndex], tagIndex),
     }
     state = [...state]
   }
@@ -55,7 +54,9 @@ const aggregationReducer = (
     }
     case 'FQB_TAG_REMOVE': {
       const id = action.payload.tagIndex
-      return state.filter(({tagIndex}) => tagIndex !== id)
+      return state
+        .filter(({tagIndex}) => tagIndex !== id)
+        .map((tag, tagIndex) => ({...tag, tagIndex}))
     }
     case 'FQB_TAG_CHANGE_TYPE': {
       return changeTagSelector(state, action.payload.tagIndex, () => ({
