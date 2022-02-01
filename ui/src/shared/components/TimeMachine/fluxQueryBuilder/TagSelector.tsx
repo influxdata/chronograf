@@ -69,7 +69,7 @@ const TagSelectorBody = (props: Props) => {
     keysSearchTerm,
     onChangeKeysSearchTerm,
     onSearchKeys,
-    selectedValues,
+    tagValues: selectedValues,
   } = props
   if (aggregateFunctionType === 'filter') {
     if (keysStatus === RemoteDataState.Error) {
@@ -162,7 +162,7 @@ const TagSelectorValues = (props: Props) => {
     tagIndex,
     values,
     valuesStatus,
-    selectedValues,
+    tagValues: selectedValues,
     onSelectValues,
   } = props
   if (keysStatus === RemoteDataState.NotStarted) {

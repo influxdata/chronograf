@@ -17,7 +17,7 @@ export function initialSelectorState(
     values: [],
     valuesSearchTerm: '',
     valuesStatus: undefined,
-    selectedValues: [],
+    tagValues: [],
   }
 }
 
@@ -60,7 +60,7 @@ const aggregationReducer = (
     case 'FQB_TAG_CHANGE_TYPE': {
       return changeTagSelector(state, action.payload.tagIndex, () => ({
         aggregateFunctionType: action.payload.type,
-        selectedValues: [],
+        tagValues: [],
         valuesSearchTerm: '',
       }))
     }
@@ -83,7 +83,7 @@ const aggregationReducer = (
     }
     case 'FQB_TAG_SELECT_VALUES': {
       return changeTagSelector(state, action.payload.tagIndex, () => ({
-        selectedValues: action.payload.values,
+        tagValues: action.payload.values,
       }))
     }
     case 'FQB_TAG_SEARCH_KEY': {

@@ -131,7 +131,7 @@ const loadTagSelectorValuesThunk = (
 
   try {
     let values: string[]
-    const originalSelected = tagState.selectedValues || []
+    const originalSelected = tagState.tagValues || []
     let selectedValues = originalSelected
     if (tagState.aggregateFunctionType === 'filter') {
       dispatch(tagActions.setValuesStatus(tagIndex, RemoteDataState.Loading))
@@ -145,7 +145,7 @@ const loadTagSelectorValuesThunk = (
         searchTerm: tagState.valuesSearchTerm,
         timeRange,
       })
-      for (const selectedValue of tagState.selectedValues) {
+      for (const selectedValue of tagState.tagValues) {
         // Even if the selected values didn't come back in the results, let them
         // be selected anyway
         if (!values.includes(selectedValue)) {
@@ -162,7 +162,7 @@ const loadTagSelectorValuesThunk = (
       values = [...values, ...ADDITIONAL_GROUP_BY_COLUMNS]
       const valuesSearchTerm = (tagState.valuesSearchTerm || '').toLowerCase()
       values = values.filter(x => x.includes(valuesSearchTerm))
-      selectedValues = tagState.selectedValues.filter(x => values.includes(x))
+      selectedValues = tagState.tagValues.filter(x => values.includes(x))
     }
 
     dispatch(tagActions.setValues(tagIndex, values))

@@ -29,12 +29,12 @@ export interface TagSelectorState extends BuilderTagsType {
 
   valuesSearchTerm: string
   valuesStatus?: RemoteDataState
-  selectedValues: string[]
+  values: string[]
 }
 
 export interface BuilderTagsType {
   tagKey: string
-  values: string[]
+  tagValues: string[]
   aggregateFunctionType: BuilderAggregateFunctionType
 }
 
