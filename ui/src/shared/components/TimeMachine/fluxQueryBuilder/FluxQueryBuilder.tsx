@@ -14,10 +14,9 @@ import {
 } from 'src/reusable_ui'
 import AggregationSelector from './AggregationSelector'
 import TagSelector from './TagSelector'
-import {fluxPeriodFromRangeSeconds} from 'src/tempVars/utils/replace'
-import moment from 'moment'
 import {TagSelectorState, TimeMachineQueryProps} from './types'
 import {addTagSelectorThunk} from './actions/thunks'
+import timeRangeWindowPeriod from './util/timeRangeWindowPeriod'
 
 interface OwnProps extends TimeMachineQueryProps {
   onSubmit: () => void
@@ -34,18 +33,9 @@ const FluxQueryBuilder = ({
   onShowEditor,
   onAddTagSelector,
 }: Props) => {
-  const defaultPeriod = useMemo(() => {
-    if (timeRange) {
-      if (timeRange.seconds) {
-        return fluxPeriodFromRangeSeconds(timeRange.seconds)
-      }
-      // calculate from upper / lower
-      const seconds = Math.round(
-        moment(timeRange.upper).diff(moment(timeRange.lower)) / 1000
-      )
-      return fluxPeriodFromRangeSeconds(seconds)
-    }
-  }, [timeRange])
+  const defaultPeriod = useMemo(() => timeRangeWindowPeriod(timeRange), [
+    timeRange,
+  ])
 
   return (
     <div className="flux-query-builder" data-testid="flux-query-builder">
