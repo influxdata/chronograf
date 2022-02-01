@@ -6,6 +6,11 @@ import {TimeRange, Source} from 'src/types'
 import {CancelBox} from 'src/types/promises'
 import {parseResponse} from 'src/shared/parsing/flux/response'
 import {BuilderTagsType} from '../types'
+import {
+  fluxString,
+  formatTimeRangeArguments,
+  tagToFlux,
+} from '../util/generateFlux'
 
 const DEFAULT_TIME_RANGE: TimeRange = {lower: 'now() - 30d', lowerFlux: '-30d'}
 const DEFAULT_LIMIT = 200
@@ -158,23 +163,9 @@ export function formatTagKeyFilterCall(tagsSelections: BuilderTagsType[]) {
     return ''
   }
 
-  const fnBody = keys.map(key => `r._value != "${key}"`).join(' and ')
+  const fnBody = keys
+    .map(key => `r._value != "${fluxString(key)}"`)
+    .join(' and ')
 
   return `\n  |> filter(fn: (r) => ${fnBody})`
-}
-
-export function formatTimeRangeArguments(timeRange: TimeRange): string {
-  const start = timeRange.lowerFlux ? timeRange.lowerFlux : timeRange.lower
-  return timeRange.upper
-    ? `start: ${start}, stop: ${timeRange.upper}`
-    : `start: ${start}`
-}
-
-export function tagToFlux(tag: BuilderTagsType) {
-  return tag.tagValues
-    .map(value => `r["${tag.tagKey}"] == "${fluxString(value)}"`)
-    .join(' or ')
-}
-export function fluxString(s: string = '') {
-  return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
 }
