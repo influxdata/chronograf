@@ -5,7 +5,7 @@ import {
   findValues,
   FindKeysOptions,
   FindValuesOptions,
-} from './queryBuilder'
+} from './fluxQueries'
 
 // Types
 import {CancelBox} from 'src/types/promises'
@@ -153,4 +153,5 @@ class QueryBuilderFetcher {
   }
 }
 
-export const queryBuilderFetcher = new QueryBuilderFetcher()
+const queryBuilderFetcher = new QueryBuilderFetcher()
+export default queryBuilderFetcher

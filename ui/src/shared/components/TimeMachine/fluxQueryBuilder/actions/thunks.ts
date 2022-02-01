@@ -6,7 +6,7 @@ import {
   TimeRange,
 } from 'src/types'
 import {isCancellationError} from 'src/types/promises'
-import {queryBuilderFetcher} from '../apis/QueryBuilderFetcher'
+import queryBuilderFetcher from '../apis/queryBuilderFetcher'
 import {QueryBuilderState} from '../types'
 
 import * as tagActions from './tags'
