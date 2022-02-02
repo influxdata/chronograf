@@ -56,7 +56,7 @@ export function findKeys({
 
   const query = `import "regexp"
   
-  from(bucket: "${bucket}")
+from(bucket: "${bucket}")
   |> range(${timeRangeArguments})
   |> filter(fn: ${tagFilters})
   |> keys()
@@ -105,7 +105,7 @@ export function findValues({
 
   const query = `import "regexp"
   
-  from(bucket: "${fluxString(bucket)}")
+from(bucket: "${fluxString(bucket)}")
   |> range(${timeRangeArguments})
   |> filter(fn: ${tagFilters})
   |> keep(columns: ["${fluxString(key)}"${v1ExtraKeep}])
