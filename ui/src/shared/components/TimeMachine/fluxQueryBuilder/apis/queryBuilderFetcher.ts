@@ -79,11 +79,10 @@ class QueryBuilderFetcher {
 
     this.findKeysQueries[tagIndex] = pendingResult
 
-    pendingResult.promise
-      .then(result => {
-        this.findKeysCache[cacheKey] = result
-      })
-      .catch(() => {})
+    pendingResult.promise = pendingResult.promise.then(result => {
+      this.findKeysCache[cacheKey] = [...result]
+      return result
+    })
 
     return pendingResult.promise
   }
@@ -121,11 +120,10 @@ class QueryBuilderFetcher {
 
     this.findValuesQueries[tagIndex] = pendingResult
 
-    pendingResult.promise
-      .then(result => {
-        this.findValuesCache[cacheKey] = result
-      })
-      .catch(() => {})
+    pendingResult.promise = pendingResult.promise.then(result => {
+      this.findValuesCache[cacheKey] = [...result]
+      return result
+    })
 
     return pendingResult.promise
   }
