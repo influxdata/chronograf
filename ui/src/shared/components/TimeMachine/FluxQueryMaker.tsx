@@ -118,7 +118,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
             <Button
               key={1}
               text={'Run Script'}
-              onClick={this.handleSubmitScript}
+              onClick={() => this.handleSubmitScript()}
               size={ComponentSize.ExtraSmall}
               color={ComponentColor.Primary}
             />,
@@ -194,14 +194,10 @@ class FluxQueryMaker extends PureComponent<Props, State> {
     this.handleCursorPosition(cursorPosition)
   }
 
-  private handleSubmitScript = () => {
-    const {
-      onChangeScript,
-      onUpdateStatus,
-      onManualRefresh,
-      draftScript,
-    } = this.props
+  private handleSubmitScript = (script?: string) => {
+    const {onChangeScript, onUpdateStatus, onManualRefresh} = this.props
     const {draftScriptStatus} = this.state
+    const draftScript = script ? script : this.props.draftScript
 
     onChangeScript(draftScript)
     onManualRefresh()

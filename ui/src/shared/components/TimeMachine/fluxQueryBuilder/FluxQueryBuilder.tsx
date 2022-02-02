@@ -18,6 +18,7 @@ import AggregationSelector from './AggregationSelector'
 import TagSelector from './TagSelector'
 import {notify as notifyActionCreator} from 'src/shared/actions/notifications'
 import {
+  fluxWizardError,
   notifyCopyToClipboardFailed,
   notifyCopyToClipboardSuccess,
 } from 'src/shared/copy/notifications'
@@ -28,7 +29,7 @@ import {RemoteDataState} from 'src/types'
 import {buildQuery} from './util/generateFlux'
 
 interface OwnProps extends TimeMachineQueryProps {
-  onSubmit: () => void
+  onSubmit: (script: string) => void
   onShowEditor: () => void
   isRunnable: boolean
 }
@@ -123,7 +124,19 @@ const FluxQueryBuilder = ({
             <Button
               size={ComponentSize.ExtraSmall}
               color={ComponentColor.Primary}
-              onClick={onSubmit}
+              onClick={() => {
+                try {
+                  const script = buildQuery(builderState)
+                  onSubmit(script)
+                } catch (ex) {
+                  console.error(ex)
+                  notify(
+                    fluxWizardError(
+                      'Unable to build flux script: ' + ex.message
+                    )
+                  )
+                }
+              }}
               status={
                 isRunnable ? ComponentStatus.Default : ComponentStatus.Disabled
               }
