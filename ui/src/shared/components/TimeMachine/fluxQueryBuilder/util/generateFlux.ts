@@ -26,7 +26,7 @@ export function buildQuery(state: QueryBuilderState): string | undefined {
   let query = 'from(bucket: "${bucket}'
   query += '\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStart)'
   state.tags.forEach(tag => {
-    query += formatTagFluxFunction(tag)
+    query += formatTagSelectorFilter(tag)
   })
 
   const functions = state.aggregation.selectedFunctions
@@ -40,7 +40,7 @@ export function buildQuery(state: QueryBuilderState): string | undefined {
     .join('\n\n')
 }
 
-function formatTagFluxFunction(tag: BuilderTagsType) {
+function formatTagSelectorFilter(tag: BuilderTagsType) {
   if (!tag.tagKey) {
     return ''
   }
@@ -60,6 +60,7 @@ function formatTagFluxFunction(tag: BuilderTagsType) {
       .join(', ')}])`
   }
 }
+
 function formatAggregationFunction(
   fn: string,
   period: string,
