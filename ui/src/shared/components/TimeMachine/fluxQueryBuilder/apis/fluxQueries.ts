@@ -97,10 +97,13 @@ export function findValues({
         searchTerm
       )}") + ")"))`
 
-  // 1.x InfluxDB requires the _value column to produce correct distinct values
-  const v1ExtraKeep = !(source.version || '').startsWith('2')
-    ? ', "_value"'
-    : ''
+  // 1.x InfluxDB produce wrong results when _field tag is filtered,
+  // experiments showed that keeping an extra column is a workaround
+  const v1ExtraKeep =
+    (source.version || '').startsWith('1.') &&
+    tagsSelections.some(x => x.tagKey === '_field' && x.tagValues?.length)
+      ? ', "_field"'
+      : ''
 
   const query = `import "regexp"
   
