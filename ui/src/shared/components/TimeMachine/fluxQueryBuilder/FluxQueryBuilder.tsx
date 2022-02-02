@@ -10,17 +10,20 @@ import {
   ButtonShape,
   ComponentColor,
   ComponentSize,
+  ComponentStatus,
   IconFont,
 } from 'src/reusable_ui'
 import AggregationSelector from './AggregationSelector'
 import TagSelector from './TagSelector'
-import {TagSelectorState, TimeMachineQueryProps} from './types'
+import {QueryBuilderState, TimeMachineQueryProps} from './types'
 import {addTagSelectorThunk} from './actions/thunks'
 import timeRangeWindowPeriod from './util/timeRangeWindowPeriod'
+import {RemoteDataState} from 'src/types'
 
 interface OwnProps extends TimeMachineQueryProps {
   onSubmit: () => void
   onShowEditor: () => void
+  runEnabled: boolean
 }
 
 type Props = OwnProps & typeof mdtp & ReturnType<typeof mstp>
@@ -29,6 +32,7 @@ const FluxQueryBuilder = ({
   source,
   timeRange,
   tags,
+  runEnabled,
   onSubmit,
   onShowEditor,
   onAddTagSelector,
@@ -77,6 +81,9 @@ const FluxQueryBuilder = ({
               size={ComponentSize.ExtraSmall}
               color={ComponentColor.Primary}
               onClick={onSubmit}
+              status={
+                runEnabled ? ComponentStatus.Default : ComponentStatus.Disabled
+              }
               text="Run"
             />
           </div>
@@ -86,8 +93,12 @@ const FluxQueryBuilder = ({
   )
 }
 const mstp = (state: any) => {
+  const fluxQueryBuilder = state?.fluxQueryBuilder as QueryBuilderState
   return {
-    tags: state?.fluxQueryBuilder?.tags as TagSelectorState[],
+    tags: fluxQueryBuilder.tags,
+    runEnabled:
+      fluxQueryBuilder.buckets.status === RemoteDataState.Done &&
+      !!fluxQueryBuilder.buckets.selectedBucket,
   }
 }
 const mdtp = {
