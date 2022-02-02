@@ -1,6 +1,7 @@
 // Libraries
 import React, {useMemo} from 'react'
 import {connect} from 'react-redux'
+import copyToClipboard from 'copy-to-clipboard'
 
 import BuilderCard from './BuilderCard'
 import BucketsSelector from './BucketsSelector'
@@ -15,10 +16,16 @@ import {
 } from 'src/reusable_ui'
 import AggregationSelector from './AggregationSelector'
 import TagSelector from './TagSelector'
+import {notify as notifyActionCreator} from 'src/shared/actions/notifications'
+import {
+  notifyCopyToClipboardFailed,
+  notifyCopyToClipboardSuccess,
+} from 'src/shared/copy/notifications'
 import {QueryBuilderState, TimeMachineQueryProps} from './types'
 import {addTagSelectorThunk} from './actions/thunks'
 import timeRangeWindowPeriod from './util/timeRangeWindowPeriod'
 import {RemoteDataState} from 'src/types'
+import {buildQuery} from './util/generateFlux'
 
 interface OwnProps extends TimeMachineQueryProps {
   onSubmit: () => void
@@ -33,6 +40,8 @@ const FluxQueryBuilder = ({
   timeRange,
   tags,
   isRunnable,
+  builderState,
+  notify,
   onSubmit,
   onShowEditor,
   onAddTagSelector,
@@ -86,7 +95,27 @@ const FluxQueryBuilder = ({
                 isRunnable ? ComponentStatus.Default : ComponentStatus.Disabled
               }
               onClick={e => {
-                // TODO perform copy, notify about success/failure
+                let success = false
+                try {
+                  const script = buildQuery(builderState)
+                  success = !!script && copyToClipboard(script)
+                } catch (ex) {
+                  console.error('Build query failed', ex)
+                }
+
+                notify(
+                  success
+                    ? notifyCopyToClipboardSuccess(
+                        null,
+                        'Query builder flux script has been copied to clipboard.',
+                        ''
+                      )
+                    : notifyCopyToClipboardFailed(
+                        null,
+                        'Query builder flux script was not copied to clipboard.',
+                        ''
+                      )
+                )
                 e.stopPropagation()
                 e.preventDefault()
               }}
@@ -98,7 +127,7 @@ const FluxQueryBuilder = ({
               status={
                 isRunnable ? ComponentStatus.Default : ComponentStatus.Disabled
               }
-              text="Run"
+              text="Submit"
             />
           </div>
         </AggregationSelector>
@@ -109,6 +138,7 @@ const FluxQueryBuilder = ({
 const mstp = (state: any) => {
   const fluxQueryBuilder = state?.fluxQueryBuilder as QueryBuilderState
   return {
+    builderState: fluxQueryBuilder,
     tags: fluxQueryBuilder.tags,
     isRunnable:
       fluxQueryBuilder.buckets.status === RemoteDataState.Done &&
@@ -117,6 +147,7 @@ const mstp = (state: any) => {
 }
 const mdtp = {
   onAddTagSelector: addTagSelectorThunk,
+  notify: notifyActionCreator,
 }
 
 export default connect(mstp, mdtp)(FluxQueryBuilder)
