@@ -77,7 +77,7 @@ const FluxQueryBuilder = ({
               size={ComponentSize.ExtraSmall}
               color={ComponentColor.Primary}
               onClick={onSubmit}
-              text="Submit"
+              text="Run"
             />
           </div>
         </AggregationSelector>
