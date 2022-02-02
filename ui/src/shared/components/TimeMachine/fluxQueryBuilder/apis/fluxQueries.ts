@@ -45,7 +45,7 @@ export function findKeys({
   timeRange = DEFAULT_TIME_RANGE,
   limit = DEFAULT_LIMIT,
 }: FindKeysOptions): CancelBox<string[]> {
-  const tagFilters = formatTagFilterPredicate(tagsSelections)
+  const tagFilter = formatTagFilter(tagsSelections)
   const previousKeyFilter = formatTagKeyFilterCall(tagsSelections)
   const timeRangeArguments = formatTimeRangeArguments(timeRange)
 
@@ -57,8 +57,7 @@ export function findKeys({
   const query = `import "regexp"
   
 from(bucket: "${bucket}")
-  |> range(${timeRangeArguments})
-  |> filter(fn: ${tagFilters})
+  |> range(${timeRangeArguments})${tagFilter}
   |> keys()
   |> keep(columns: ["_value"])
   |> distinct()${searchFilter}${previousKeyFilter}
@@ -88,7 +87,7 @@ export function findValues({
   timeRange = DEFAULT_TIME_RANGE,
   limit = DEFAULT_LIMIT,
 }: FindValuesOptions): CancelBox<string[]> {
-  const tagFilters = formatTagFilterPredicate(tagsSelections)
+  const tagFilter = formatTagFilter(tagsSelections)
   const timeRangeArguments = formatTimeRangeArguments(timeRange)
 
   // requires Flux package to work which we will put in the query
@@ -106,8 +105,7 @@ export function findValues({
   const query = `import "regexp"
   
 from(bucket: "${fluxString(bucket)}")
-  |> range(${timeRangeArguments})
-  |> filter(fn: ${tagFilters})
+  |> range(${timeRangeArguments})${tagFilter}
   |> keep(columns: ["${fluxString(key)}"${v1ExtraKeep}])
   |> group()
   |> distinct(column: "${fluxString(key)}")${searchFilter}
@@ -142,18 +140,18 @@ export function extractCol(csv: string, colName: string): string[] {
   return []
 }
 
-export function formatTagFilterPredicate(tagsSelections: BuilderTagsType[]) {
+export function formatTagFilter(tagsSelections: BuilderTagsType[]) {
   const validSelections = tagsSelections.filter(
     ({tagKey, tagValues}) => tagKey && tagValues.length
   )
 
   if (!validSelections.length) {
-    return '(r) => true'
+    return ''
   }
 
-  const calls = validSelections.map(tag => `(${tagToFlux(tag)})`).join(' and ')
+  const body = validSelections.map(tag => `(${tagToFlux(tag)})`).join(' and ')
 
-  return `(r) => ${calls}`
+  return `\n  |> filter(fn: (r) => ${body})`
 }
 
 export function formatTagKeyFilterCall(tagsSelections: BuilderTagsType[]) {
