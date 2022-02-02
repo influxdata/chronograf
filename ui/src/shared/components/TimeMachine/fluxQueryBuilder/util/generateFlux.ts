@@ -23,8 +23,8 @@ export function buildQuery(state: QueryBuilderState): string | undefined {
   if (!bucket) {
     return
   }
-  let query = 'from(bucket: "${bucket}'
-  query += '\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStart)'
+  let query = `from(bucket: "${fluxString(bucket)}")`
+  query += '\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)'
   state.tags.forEach(tag => {
     query += formatTagSelectorFilter(tag)
   })
