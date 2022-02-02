@@ -23,7 +23,7 @@ import {RemoteDataState} from 'src/types'
 interface OwnProps extends TimeMachineQueryProps {
   onSubmit: () => void
   onShowEditor: () => void
-  runEnabled: boolean
+  isRunnable: boolean
 }
 
 type Props = OwnProps & typeof mdtp & ReturnType<typeof mstp>
@@ -32,7 +32,7 @@ const FluxQueryBuilder = ({
   source,
   timeRange,
   tags,
-  runEnabled,
+  isRunnable,
   onSubmit,
   onShowEditor,
   onAddTagSelector,
@@ -78,11 +78,25 @@ const FluxQueryBuilder = ({
               titleText="Switch to Flux Query Editor"
             />
             <Button
+              shape={ButtonShape.Square}
+              size={ComponentSize.ExtraSmall}
+              titleText="Copy builder query to clipboard"
+              icon={IconFont.Duplicate}
+              status={
+                isRunnable ? ComponentStatus.Default : ComponentStatus.Disabled
+              }
+              onClick={e => {
+                // TODO perform copy, notify about success/failure
+                e.stopPropagation()
+                e.preventDefault()
+              }}
+            />
+            <Button
               size={ComponentSize.ExtraSmall}
               color={ComponentColor.Primary}
               onClick={onSubmit}
               status={
-                runEnabled ? ComponentStatus.Default : ComponentStatus.Disabled
+                isRunnable ? ComponentStatus.Default : ComponentStatus.Disabled
               }
               text="Run"
             />
@@ -96,7 +110,7 @@ const mstp = (state: any) => {
   const fluxQueryBuilder = state?.fluxQueryBuilder as QueryBuilderState
   return {
     tags: fluxQueryBuilder.tags,
-    runEnabled:
+    isRunnable:
       fluxQueryBuilder.buckets.status === RemoteDataState.Done &&
       !!fluxQueryBuilder.buckets.selectedBucket,
   }
