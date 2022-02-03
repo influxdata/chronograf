@@ -157,6 +157,7 @@ const TagSelectorBody = (props: Props) => {
 
 const TagSelectorValues = (props: Props) => {
   const {
+    aggregateFunctionType,
     keysStatus,
     tagKey: key,
     tagIndex,
@@ -165,20 +166,22 @@ const TagSelectorValues = (props: Props) => {
     tagValues: selectedValues,
     onSelectValues,
   } = props
-  if (keysStatus === RemoteDataState.NotStarted) {
-    return (
-      <BuilderCard.Empty>
-        <WaitingText text="Waiting for tag keys" />
-      </BuilderCard.Empty>
-    )
-  }
+  if (aggregateFunctionType === 'filter') {
+    if (keysStatus === RemoteDataState.NotStarted) {
+      return (
+        <BuilderCard.Empty>
+          <WaitingText text="Waiting for tag keys" />
+        </BuilderCard.Empty>
+      )
+    }
 
-  if (keysStatus === RemoteDataState.Loading) {
-    return (
-      <BuilderCard.Empty>
-        <WaitingText text="Loading tag keys" />
-      </BuilderCard.Empty>
-    )
+    if (keysStatus === RemoteDataState.Loading) {
+      return (
+        <BuilderCard.Empty>
+          <WaitingText text="Loading tag keys" />
+        </BuilderCard.Empty>
+      )
+    }
   }
   if (valuesStatus === RemoteDataState.Error) {
     return (
