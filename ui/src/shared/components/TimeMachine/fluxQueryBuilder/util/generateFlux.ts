@@ -12,7 +12,7 @@ export function formatTimeRangeArguments(timeRange: TimeRange): string {
 
 export function tagToFlux(tag: BuilderTagsType) {
   return tag.tagValues
-    .map(value => `r["${fluxString(tag.tagKey)}"] == "${fluxString(value)}"`)
+    .map(value => `r[${fluxString(tag.tagKey)}] == ${fluxString(value)}`)
     .join(' or ')
 }
 
@@ -21,7 +21,7 @@ export function buildQuery(state: QueryBuilderState): string | undefined {
   if (!bucket) {
     return
   }
-  let query = `from(bucket: "${fluxString(bucket)}")`
+  let query = `from(bucket: ${fluxString(bucket)})`
   query += '\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)'
   state.tags.forEach(tag => {
     query += formatTagSelectorFilter(tag)
@@ -54,7 +54,7 @@ function formatTagSelectorFilter(tag: BuilderTagsType) {
       return '' // do not group when no values selected
     }
     return `\n  |> group(columns: [${tag.tagValues
-      .map(x => `"${fluxString(x)}"`)
+      .map(x => fluxString(x))
       .join(', ')}])`
   }
 }

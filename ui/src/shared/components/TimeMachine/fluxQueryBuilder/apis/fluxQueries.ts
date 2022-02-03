@@ -90,9 +90,9 @@ export function findValues({
   // requires Flux package to work which we will put in the query
   const searchFilter = !searchTerm
     ? ''
-    : `\n  |> filter(fn: (r) => r._value =~ regexp.compile(v: "(?i:" + regexp.quoteMeta(v: "${fluxString(
+    : `\n  |> filter(fn: (r) => r._value =~ regexp.compile(v: "(?i:" + regexp.quoteMeta(v: ${fluxString(
         searchTerm
-      )}") + ")"))`
+      )}) + ")"))`
 
   // 1.x InfluxDB produce wrong results when _field tag is filtered,
   // experiments showed that keeping an extra column is a workaround
@@ -104,11 +104,11 @@ export function findValues({
 
   const query = `import "regexp"
   
-from(bucket: "${fluxString(bucket)}")
+from(bucket: ${fluxString(bucket)})
   |> range(${timeRangeArguments})${tagFilter}
-  |> keep(columns: ["${fluxString(key)}"${v1ExtraKeep}])
+  |> keep(columns: [${fluxString(key)}${v1ExtraKeep}])
   |> group()
-  |> distinct(column: "${fluxString(key)}")${searchFilter}
+  |> distinct(column: ${fluxString(key)})${searchFilter}
   |> limit(n: ${limit})
   |> sort()`
 
@@ -161,9 +161,7 @@ export function formatTagKeyFilterCall(tagsSelections: BuilderTagsType[]) {
     return ''
   }
 
-  const fnBody = keys
-    .map(key => `r._value != "${fluxString(key)}"`)
-    .join(' and ')
+  const fnBody = keys.map(key => `r._value != ${fluxString(key)}`).join(' and ')
 
   return `\n  |> filter(fn: (r) => ${fnBody})`
 }
