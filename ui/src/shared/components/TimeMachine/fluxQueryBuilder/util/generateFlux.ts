@@ -1,3 +1,4 @@
+import fluxString from 'src/flux/helpers/fluxString'
 import {TimeRange} from 'src/types'
 import {BuilderTagsType, QueryBuilderState} from '../types'
 import {AGG_WINDOW_AUTO, FUNCTIONS} from './constants'
@@ -13,9 +14,6 @@ export function tagToFlux(tag: BuilderTagsType) {
   return tag.tagValues
     .map(value => `r["${fluxString(tag.tagKey)}"] == "${fluxString(value)}"`)
     .join(' or ')
-}
-export function fluxString(s: string = '') {
-  return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
 }
 
 export function buildQuery(state: QueryBuilderState): string | undefined {

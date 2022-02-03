@@ -6,11 +6,8 @@ import {TimeRange, Source} from 'src/types'
 import {CancelBox} from 'src/types/promises'
 import {parseResponse} from 'src/shared/parsing/flux/response'
 import {BuilderTagsType} from '../types'
-import {
-  fluxString,
-  formatTimeRangeArguments,
-  tagToFlux,
-} from '../util/generateFlux'
+import {formatTimeRangeArguments, tagToFlux} from '../util/generateFlux'
+import fluxString from 'src/flux/helpers/fluxString'
 
 const DEFAULT_TIME_RANGE: TimeRange = {lower: 'now() - 30d', lowerFlux: '-30d'}
 const DEFAULT_LIMIT = 200
