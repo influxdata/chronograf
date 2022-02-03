@@ -104,7 +104,6 @@
     "dygraphs": "2.1.0",
     "encoding-down": "^5.0.4",
     "fast.js": "^0.1.1",
-    "fixed-data-table-2": "^0.8.13",
     "he": "^1.1.1",
     "level-js": "^3.0.0",
     "levelup": "^3.1.1",
