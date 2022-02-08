@@ -72,18 +72,6 @@ export const AUTO_FUNCTIONS: QueryFn[] = [
   },
 ]
 
-export const getDefaultAutoFunctions = (activeGraphType: string): QueryFn[] => {
-  if (activeGraphType === 'mosaic') {
-    return [
-      {
-        name: 'last',
-        flux: (period, fillValues) => genFlux('last', period, fillValues),
-      },
-    ]
-  }
-  return AUTO_FUNCTIONS
-}
-
 export const FUNCTIONS: QueryFn[] = [
   AUTO_FUNCTIONS[0],
   AUTO_FUNCTIONS[1],
