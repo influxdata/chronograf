@@ -5,7 +5,7 @@ import {BucketSelectorState} from '../types'
 export const initialState: BucketSelectorState = {
   selectedBucket: '',
   buckets: [],
-  status: RemoteDataState.Loading,
+  status: RemoteDataState.NotStarted,
   searchTerm: '',
 }
 
