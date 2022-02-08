@@ -66,7 +66,7 @@ function formatAggregationFunction(
 ) {
   const fnSpec = FUNCTIONS.find(spec => spec.name === fn)
   if (!fnSpec) {
-    return '\n  |> yield(name: "${fn}")'
+    return `\n  |> yield(name: "${fn}")`
   }
 
   return `\n  ${fnSpec.flux(
