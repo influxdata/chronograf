@@ -27,11 +27,11 @@ function changeTagSelector(
   fn: (tagState: TagSelectorState, index: number) => Partial<TagSelectorState>
 ): TagSelectorState[] {
   if (state[tagIndex]) {
+    state = [...state]
     state[tagIndex] = {
       ...state[tagIndex],
       ...fn(state[tagIndex], tagIndex),
     }
-    state = [...state]
   }
   return state
 }
@@ -102,6 +102,7 @@ const aggregationReducer = (
       if (state[tagIndex] === undefined) {
         return state
       }
+      state = [...state]
       state[tagIndex] = {
         ...state[tagIndex],
         keysStatus: status,
@@ -115,7 +116,7 @@ const aggregationReducer = (
           }
         }
       }
-      return [...state]
+      return state
     }
     case 'FQB_TAG_VALUES_STATUS': {
       return changeTagSelector(state, action.payload.tagIndex, () => ({
