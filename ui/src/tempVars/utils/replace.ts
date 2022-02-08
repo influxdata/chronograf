@@ -7,7 +7,7 @@ import {
   TemplateValue,
 } from 'src/types/tempVars'
 import {TEMP_VAR_INTERVAL} from 'src/shared/constants'
-const DESIRED_POINTS_PER_GRAPH = 360
+export const DESIRED_POINTS_PER_GRAPH = 360
 
 export const computeInterval = (durationMs: number): number => {
   return Math.round(durationMs / DESIRED_POINTS_PER_GRAPH)
@@ -170,31 +170,6 @@ export const templateInternalReplace = (template: Template): string => {
     .replace(':database:', `"${db}"`)
     .replace(':measurement:', `"${measurement}"`)
     .replace(':tagKey:', `"${tagKey}"`)
-}
-
-export function fluxPeriodFromRangeSeconds(seconds: number) {
-  seconds = Math.round(seconds / DESIRED_POINTS_PER_GRAPH)
-  if (!(seconds > 1)) {
-    return '1s'
-  }
-  let retVal = ''
-  if (seconds >= 86400) {
-    retVal += `${Math.trunc(seconds / 86400)}d`
-    seconds %= 86400
-  }
-  if (seconds >= 3600) {
-    retVal += `${Math.trunc(seconds / 3600)}h`
-    seconds %= 3600
-  }
-  if (seconds >= 60) {
-    retVal += `${Math.trunc(seconds / 60)}m`
-    seconds %= 60
-    return seconds === 0 ? retVal : `${retVal}${seconds}s`
-  }
-  if (seconds > 0) {
-    retVal += `${seconds}s`
-  }
-  return retVal
 }
 
 export default templateReplace

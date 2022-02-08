@@ -1,5 +1,5 @@
 import moment from 'moment'
-import {fluxPeriodFromRangeSeconds} from 'src/tempVars/utils/replace'
+import {DESIRED_POINTS_PER_GRAPH} from 'src/tempVars/utils/replace'
 import {TimeRange} from 'src/types'
 
 function timeRangeWindowPeriod(timeRange: TimeRange | undefined) {
@@ -13,6 +13,31 @@ function timeRangeWindowPeriod(timeRange: TimeRange | undefined) {
     )
     return fluxPeriodFromRangeSeconds(seconds)
   }
+}
+
+export function fluxPeriodFromRangeSeconds(seconds: number) {
+  seconds = Math.round(seconds / DESIRED_POINTS_PER_GRAPH)
+  if (!(seconds > 1)) {
+    return '1s'
+  }
+  let retVal = ''
+  if (seconds >= 86400) {
+    retVal += `${Math.trunc(seconds / 86400)}d`
+    seconds %= 86400
+  }
+  if (seconds >= 3600) {
+    retVal += `${Math.trunc(seconds / 3600)}h`
+    seconds %= 3600
+  }
+  if (seconds >= 60) {
+    retVal += `${Math.trunc(seconds / 60)}m`
+    seconds %= 60
+    return seconds === 0 ? retVal : `${retVal}${seconds}s`
+  }
+  if (seconds > 0) {
+    retVal += `${seconds}s`
+  }
+  return retVal
 }
 
 export default timeRangeWindowPeriod
