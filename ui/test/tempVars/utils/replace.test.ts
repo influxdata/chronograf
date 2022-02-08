@@ -1,7 +1,4 @@
-import templateReplace, {
-  fluxPeriodFromRangeSeconds,
-  replaceInterval,
-} from 'src/tempVars/utils/replace'
+import templateReplace, {replaceInterval} from 'src/tempVars/utils/replace'
 import {TemplateType, TemplateValueType} from 'src/types/tempVars'
 
 describe('templates.utils.replace', () => {
@@ -490,50 +487,6 @@ describe('templates.utils.replace', () => {
 
       // Should not be dependent on order
       expect(templateReplace(query, templates.reverse())).toEqual(expected)
-    })
-  })
-  describe('fluxPeriodFromRangeSeconds', () => {
-    ;[
-      {
-        seconds: 0,
-        expected: '1s',
-      },
-      {
-        seconds: Number.NaN,
-        expected: '1s',
-      },
-      {
-        seconds: 359,
-        expected: '1s',
-      },
-      {
-        seconds: 900,
-        expected: '3s',
-      },
-      {
-        seconds: 6 * 3600,
-        expected: '1m',
-      },
-      {
-        seconds: 24 * 3600,
-        expected: '4m',
-      },
-      {
-        seconds: 7 * 24 * 3600,
-        expected: '28m',
-      },
-      {
-        seconds: 30 * 24 * 3600,
-        expected: '2h',
-      },
-      {
-        seconds: 37 * 24 * 3600 + 900,
-        expected: '2h28m3s',
-      },
-    ].forEach(test => {
-      it(`returns ${test.expected} having ${test.seconds} on input`, () => {
-        expect(fluxPeriodFromRangeSeconds(test.seconds)).toEqual(test.expected)
-      })
     })
   })
 })

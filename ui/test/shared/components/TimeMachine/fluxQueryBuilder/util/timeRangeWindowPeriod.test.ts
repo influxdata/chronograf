@@ -16,6 +16,11 @@ describe('fluxQueryBuilder/util/timeRangeWindowPeriod', () => {
         expect: '1s',
       },
       {
+        name: 'NaN',
+        seconds: Number.NaN,
+        expect: '1s',
+      },
+      {
         name: '1 hour',
         seconds: 3600,
         expect: '10s',
