@@ -4,12 +4,19 @@ import AJAX from 'src/utils/ajax'
 import {Source, SchemaFilter} from 'src/types'
 import recordProperty from 'src/flux/helpers/recordProperty'
 import fluxString from 'src/flux/helpers/fluxString'
+import parseValuesColumn from 'src/shared/parsing/flux/values'
 
-export const measurements = async (
+export const fetchMeasurements = async (
   source: Source,
   bucket: string
-): Promise<any> => {
-  return tagValues({bucket, source, tagKey: '_measurement', limit: 0})
+): Promise<string[]> => {
+  const csvResponse = await tagValues({
+    bucket,
+    source,
+    tagKey: '_measurement',
+    limit: 0,
+  })
+  return parseValuesColumn(csvResponse)
 }
 
 export const fields = async (
