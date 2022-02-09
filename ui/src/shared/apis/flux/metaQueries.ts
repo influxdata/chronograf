@@ -88,7 +88,7 @@ export const fetchTagValues = async ({
   const countFunc = count ? '\n  |> count()' : ''
 
   const script = `
-from(bucket: "${bucket}")
+from(bucket:${fluxString(bucket)})
   |> range(${rangeArguments(timeRange)})
   |> keep(columns: [${fluxString(tagKey)}])
   |> group()
