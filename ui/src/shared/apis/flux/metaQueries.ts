@@ -9,13 +9,12 @@ export const fetchMeasurements = async (
   source: Source,
   bucket: string
 ): Promise<string[]> => {
-  const csvResponse = await tagValues({
+  return fetchTagValues({
     bucket,
     source,
     tagKey: '_measurement',
     limit: 0,
   })
-  return parseValuesColumn(csvResponse)
 }
 
 // Fetch all the fields and their associated measurement
@@ -59,14 +58,14 @@ interface TagValuesParams {
   count?: boolean
 }
 
-export const tagValues = async ({
+export const fetchTagValues = async ({
   bucket,
   source,
   tagKey,
   limit,
   searchTerm = '',
   count = false,
-}: TagValuesParams): Promise<string> => {
+}: TagValuesParams): Promise<string[]> => {
   let regexFilter = ''
   if (searchTerm) {
     regexFilter = `\n  |> filter(fn: (r) => r["_value"] =~ /${searchTerm}/)`
@@ -85,10 +84,14 @@ from(bucket: "${bucket}")
   )})${regexFilter}${limitFunc}${countFunc}
   `
 
-  return proxy(source, script)
+  const csvResponse = await proxy(source, script)
+  return parseValuesColumn(csvResponse)
 }
 
-export const proxy = async (source: Source, script: string) => {
+export const proxy = async (
+  source: Source,
+  script: string
+): Promise<string> => {
   const mark = encodeURIComponent('?')
   const minimizedScript = script.replace(/\s/g, '') // server cannot handle whitespace
   const dialect = {annotations: ['group', 'datatype', 'default']}
@@ -103,7 +106,7 @@ export const proxy = async (source: Source, script: string) => {
       headers: {'Content-Type': 'application/json'},
     })
 
-    return response.data
+    return response.data.toString()
   } catch (error) {
     handleError(error)
   }

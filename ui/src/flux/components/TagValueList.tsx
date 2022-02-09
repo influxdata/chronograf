@@ -7,10 +7,9 @@ import LoaderSkeleton from 'src/flux/components/LoaderSkeleton'
 import LoadingSpinner from 'src/flux/components/LoadingSpinner'
 
 // apis
-import {tagValues as fetchTagValues} from 'src/shared/apis/flux/metaQueries'
+import {fetchTagValues} from 'src/shared/apis/flux/metaQueries'
 
 // Utils
-import parseValuesColumn from 'src/shared/parsing/flux/values'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 
@@ -56,7 +55,7 @@ class TagValueList extends PureComponent<Props, State> {
   public async componentDidMount() {
     this.setState({loading: RemoteDataState.Loading})
     try {
-      const tagValues = await this.fetchTagValues()
+      const tagValues = await this.fetchData()
       this.setState({
         tagValues,
         loading: RemoteDataState.Done,
@@ -166,20 +165,17 @@ class TagValueList extends PureComponent<Props, State> {
     return `Load next ${TAG_VALUES_LIMIT} values for ${tagKey}`
   }
 
-  private fetchTagValues = async (): Promise<string[]> => {
+  private fetchData = async (): Promise<string[]> => {
     const {source, db, tagKey} = this.props
     const {searchTerm, limit} = this.state
 
-    const response = await fetchTagValues({
+    return await fetchTagValues({
       source,
       bucket: db,
       tagKey,
       limit,
       searchTerm,
     })
-
-    const tagValues = parseValuesColumn(response)
-    return tagValues
   }
 
   private onSearch = (e: ChangeEvent<HTMLInputElement>) => {
@@ -190,7 +186,7 @@ class TagValueList extends PureComponent<Props, State> {
       () => {
         try {
           this.debouncer.call(async () => {
-            const tagValues = await this.fetchTagValues()
+            const tagValues = await this.fetchData()
             this.setState({tagValues})
           }, 50)
         } catch (error) {
@@ -219,7 +215,7 @@ class TagValueList extends PureComponent<Props, State> {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       async () => {
         try {
-          const tagValues = await this.fetchTagValues()
+          const tagValues = await this.fetchData()
           this.setState({
             tagValues,
             loading: RemoteDataState.Done,
