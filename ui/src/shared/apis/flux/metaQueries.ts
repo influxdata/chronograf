@@ -2,7 +2,6 @@ import _ from 'lodash'
 
 import AJAX from 'src/utils/ajax'
 import {Source, SchemaFilter} from 'src/types'
-import recordProperty from 'src/flux/helpers/recordProperty'
 import fluxString from 'src/flux/helpers/fluxString'
 import parseValuesColumn from 'src/shared/parsing/flux/values'
 
@@ -92,9 +91,7 @@ export const tagValues = async ({
 }: TagValuesParams): Promise<string> => {
   let regexFilter = ''
   if (searchTerm) {
-    regexFilter = `\n  |> filter(fn: (r) => ${recordProperty(
-      tagKey
-    )} =~ /${searchTerm}/)`
+    regexFilter = `\n  |> filter(fn: (r) => r["_value"] =~ /${searchTerm}/)`
   }
 
   const limitFunc = count || !limit ? '' : `\n  |> limit(n:${limit})`
