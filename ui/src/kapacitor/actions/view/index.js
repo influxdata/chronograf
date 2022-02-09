@@ -145,6 +145,14 @@ export const updateRuleValues = (ruleID, trigger, values) => ({
   },
 })
 
+export const updateNoRecoveries = (ruleID, noRecoveries) => ({
+  type: 'UPDATE_RULE_NORECOVERIES',
+  payload: {
+    ruleID,
+    noRecoveries,
+  },
+})
+
 export const updateMessage = (ruleID, message) => ({
   type: 'UPDATE_RULE_MESSAGE',
   payload: {

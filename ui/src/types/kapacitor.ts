@@ -122,6 +122,7 @@ type TICKScript = string
 // AlertNodes defines all possible kapacitor interactions with an alert.
 interface AlertNodes {
   stateChangesOnly: boolean
+  noRecoveries: boolean
   useFlapping: boolean
   post: Post[]
   tcp: TCP[]

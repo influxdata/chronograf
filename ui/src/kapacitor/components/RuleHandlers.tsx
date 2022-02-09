@@ -19,6 +19,7 @@ interface HandlerWithText extends Handler {
 interface RuleActions {
   updateAlertNodes: (id: string, handlersOnThisAlert: Handler[]) => void
   updateMessage: (id: string, e: MouseEvent<HTMLInputElement>) => void
+  updateNoRecoveries: (id: string, noRecoveries: boolean) => void
   updateDetails: () => void
 }
 
@@ -121,8 +122,8 @@ class RuleHandlers extends PureComponent<Props, State> {
       : 'Add a Handler'
 
     const ruleSectionClassName = handlersOnThisAlert.length
-      ? 'rule-section--row rule-section--row-first rule-section--border-bottom'
-      : 'rule-section--row rule-section--row-first rule-section--row-last'
+      ? 'rule-section--row rule-section--border-bottom'
+      : 'rule-section--row rule-section--row-last'
 
     const selectedHandlerWithText: HandlerWithText = this.addNicknameText(
       selectedHandler
@@ -132,6 +133,18 @@ class RuleHandlers extends PureComponent<Props, State> {
       <div className="rule-section">
         <h3 className="rule-section--heading">Alert Handlers</h3>
         <div className="rule-section--body">
+          <div className="rule-section--row rule-section--row-first rule-section--border-bottom">
+            <div className="form-control-static handler-checkbox">
+              <input
+                name="noRecoveries"
+                id="noRecoveries"
+                type="checkbox"
+                defaultChecked={rule.alertNodes.noRecoveries}
+                onClick={this.handleNoRecoveries}
+              />
+              <label htmlFor="noRecoveries">Don't send alert on condition recovery</label>
+            </div>
+          </div>
           <div className={ruleSectionClassName}>
             <p>Send this Alert to:</p>
             <Dropdown
@@ -164,6 +177,11 @@ class RuleHandlers extends PureComponent<Props, State> {
         </div>
       </div>
     )
+  }
+
+  private handleNoRecoveries = (e) {
+    const {ruleActions, rule} = this.props
+    ruleActions.updateNoRecoveries(rule.id, e.target.checked)
   }
 
   private handleChooseHandler = (ep: HandlerWithText): (() => void) => () => {

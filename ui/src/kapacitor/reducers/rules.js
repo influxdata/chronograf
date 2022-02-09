@@ -76,6 +76,15 @@ export default function rules(state = {}, action) {
       })
     }
 
+    case 'UPDATE_RULE_NORECOVERIES': {
+      const {ruleID, noRecoveries} = action.payload
+      return Object.assign({}, state, {
+        [ruleID]: Object.assign({}, state[ruleID], {
+          alertNodes: {...state[ruleID].alertNodes, noRecoveries: noRecoveries}
+        }),
+      })
+    }
+
     case 'UPDATE_RULE_ALERT_NODES': {
       const {ruleID, alerts} = action.payload
       const alertNodesByType = {}
