@@ -134,7 +134,8 @@ class RuleHandlers extends PureComponent<Props, State> {
         <h3 className="rule-section--heading">Alert Handlers</h3>
         <div className="rule-section--body">
           <div className="rule-section--row rule-section--row-first rule-section--border-bottom">
-            <div className="form-control-static handler-checkbox">
+            <p>Alert Options:</p>
+            <div className="form-control-static">
               <input
                 name="noRecoveries"
                 id="noRecoveries"
