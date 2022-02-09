@@ -9,4 +9,7 @@ describe('Flux.helpers.rangeArguments', () => {
   it('formats absolute time range', () => {
     expect(rangeArguments({lower: 'a', upper: 'b'})).toBe('start: a, stop: b')
   })
+  it('formats absolute time range with upper now()', () => {
+    expect(rangeArguments({lower: 'a', upper: 'now()'})).toBe('start: a')
+  })
 })
