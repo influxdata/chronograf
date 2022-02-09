@@ -65,6 +65,7 @@ class MeasurementsList extends PureComponent<Props, State> {
     const {source, db, notify, loading} = this.props
     const {searchTerm} = this.state
     const measurementEntries = Object.entries(this.props.measurements)
+    measurementEntries.sort((a, b) => a[0].localeCompare(b[0]))
 
     if (loading === RemoteDataState.Error) {
       return (
