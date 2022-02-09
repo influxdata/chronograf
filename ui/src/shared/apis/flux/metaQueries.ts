@@ -49,26 +49,19 @@ export const fieldsByMeasurement = async (
   return proxy(source, script)
 }
 
-export const tagKeys = async (
+export const fetchTagKeys = async (
   source: Source,
-  bucket: string,
-  filter: SchemaFilter[]
-): Promise<string> => {
-  let tagKeyFilter = ''
-
-  if (filter.length) {
-    const predicates = filter.map(({key}) => `r._value != ${fluxString(key)}`)
-    tagKeyFilter = `\n   |> filter(fn: (r) => (${predicates.join(' and ')}) )`
-  }
-
+  bucket: string
+): Promise<string[]> => {
   const script = `
 from(bucket:${fluxString(bucket)}) 
   |> range(start: -30d) 
   |> keys()
   |> keep(columns: ["_value"])
-  |> distinct()${tagKeyFilter}`
+  |> distinct()`
 
-  return proxy(source, script)
+  const response = await proxy(source, script)
+  return parseValuesColumn(response)
 }
 
 interface TagValuesParams {

@@ -2,8 +2,7 @@
 import {PureComponent} from 'react'
 
 // Utils
-import parseValuesColumn from 'src/shared/parsing/flux/values'
-import {tagKeys as fetchTagKeysAsync} from 'src/shared/apis/flux/metaQueries'
+import {fetchTagKeys} from 'src/shared/apis/flux/metaQueries'
 
 // Types
 import {Source, RemoteDataState} from 'src/types'
@@ -29,21 +28,18 @@ class FetchTagKeys extends PureComponent<Props, State> {
   }
 
   public componentDidMount() {
-    this.fetchTagKeys()
+    this.fetchData()
   }
 
   public render() {
     return this.props.children(this.state.tagKeys, this.state.loading)
   }
 
-  private async fetchTagKeys() {
+  private async fetchData() {
     const {source, bucket} = this.props
     this.setState({loading: RemoteDataState.Loading})
     try {
-      const tagKeysResults = await fetchTagKeysAsync(source, bucket, [])
-
-      const tagKeys = parseValuesColumn(tagKeysResults)
-
+      const tagKeys = await fetchTagKeys(source, bucket)
       this.setState({tagKeys, loading: RemoteDataState.Done})
     } catch (error) {
       this.setState({loading: RemoteDataState.Error})
