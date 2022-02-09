@@ -12,6 +12,7 @@ import {
   updateRuleName,
   deleteRuleSuccess,
   updateRuleStatusSuccess,
+  updateNoRecoveries,
 } from 'src/kapacitor/actions/view'
 
 describe('Kapacitor.Reducers.rules', () => {
@@ -192,5 +193,22 @@ describe('Kapacitor.Reducers.rules', () => {
       updateRuleStatusSuccess(ruleID, status)
     )
     expect(newState[ruleID].status).toBe(status)
+  })
+
+  it('can set noRecoveries', () => {
+    const ruleID = 1
+
+    const initialState = {
+      [ruleID]: {
+        id: ruleID,
+        queryID: 988,
+        alertNodes: {
+          noRecoveries: false,
+        },
+      },
+    }
+
+    const newState = reducer(initialState, updateNoRecoveries(ruleID, true))
+    expect(newState[ruleID].alertNodes.noRecoveries).toBe(true)
   })
 })
