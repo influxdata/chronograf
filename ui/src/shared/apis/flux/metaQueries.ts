@@ -24,7 +24,7 @@ export const fields = async (
   bucket: string,
   filter: SchemaFilter[],
   limit: number
-): Promise<any> => {
+): Promise<string> => {
   return await tagValues({
     bucket,
     source,
@@ -38,7 +38,7 @@ export const fields = async (
 export const fieldsByMeasurement = async (
   source: Source,
   bucket: string
-): Promise<any> => {
+): Promise<string> => {
   const script = `
   from(bucket:${fluxString(bucket)})
     |> range(start: -30d)
@@ -54,7 +54,7 @@ export const tagKeys = async (
   source: Source,
   bucket: string,
   filter: SchemaFilter[]
-): Promise<any> => {
+): Promise<string> => {
   let tagKeyFilter = ''
 
   if (filter.length) {
@@ -89,7 +89,7 @@ export const tagValues = async ({
   limit,
   searchTerm = '',
   count = false,
-}: TagValuesParams): Promise<any> => {
+}: TagValuesParams): Promise<string> => {
   let regexFilter = ''
   if (searchTerm) {
     regexFilter = `\n  |> filter(fn: (r) => ${recordProperty(
@@ -117,7 +117,7 @@ export const tagsFromMeasurement = async (
   source: Source,
   bucket: string,
   measurement: string
-): Promise<any> => {
+): Promise<string> => {
   const script = `
     from(bucket:${fluxString(bucket)}}) 
       |> range(start:-30d) 
