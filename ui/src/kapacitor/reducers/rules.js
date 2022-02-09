@@ -80,7 +80,7 @@ export default function rules(state = {}, action) {
       const {ruleID, noRecoveries} = action.payload
       return Object.assign({}, state, {
         [ruleID]: Object.assign({}, state[ruleID], {
-          alertNodes: {...state[ruleID].alertNodes, noRecoveries: noRecoveries}
+          alertNodes: {...state[ruleID].alertNodes, noRecoveries},
         }),
       })
     }

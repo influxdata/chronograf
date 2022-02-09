@@ -144,7 +144,9 @@ class RuleHandlers extends PureComponent<Props, State> {
                 defaultChecked={rule.alertNodes.noRecoveries}
                 onClick={this.handleNoRecoveries}
               />
-              <label htmlFor="noRecoveries">Don't send alert on condition recovery</label>
+              <label htmlFor="noRecoveries">
+                Don't send alert on condition recovery
+              </label>
             </div>
             <div className="form-control-static">
               <input
@@ -154,7 +156,9 @@ class RuleHandlers extends PureComponent<Props, State> {
                 defaultChecked={rule.alertNodes.stateChangesOnly}
                 onClick={this.handleStateChangesOnly}
               />
-              <label htmlFor="stateChangesOnly">Send alert only when condition state changes</label>
+              <label htmlFor="stateChangesOnly">
+                Send alert only when condition state changes
+              </label>
             </div>
           </div>
           <div className={ruleSectionClassName}>
@@ -191,7 +195,7 @@ class RuleHandlers extends PureComponent<Props, State> {
     )
   }
 
-  private handleNoRecoveries = (e) {
+  private handleNoRecoveries = e => {
     const {ruleActions, rule} = this.props
     ruleActions.updateNoRecoveries(rule.id, e.target.checked)
   }
