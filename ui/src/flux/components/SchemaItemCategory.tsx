@@ -19,6 +19,7 @@ import {
 // Types
 import {Source, NotificationAction, TimeRange} from 'src/types'
 import {CategoryTree} from 'src/flux/components/SchemaExplorerTree'
+import TimeRangeLabel from 'src/shared/components/TimeRangeLabel'
 
 export enum CategoryType {
   Measurements = 'measurements',
@@ -71,6 +72,9 @@ class SchemaItemCategory extends PureComponent<
           <div className="flex-schema-item-group flux-schema-item--expandable">
             <div className="flux-schema--expander" />
             {this.categoryName}
+            <span className="flux-schema--type">
+              (<TimeRangeLabel timeRange={this.props.timeRange} />)
+            </span>
           </div>
         </div>
         {!isUnopened && (
