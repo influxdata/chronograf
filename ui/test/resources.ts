@@ -157,6 +157,7 @@ export const kapacitorRules = [
     alertNodes: {
       typeOf: 'alert',
       stateChangesOnly: true,
+      noRecoveries: false,
       useFlapping: false,
       post: [],
       tcp: [],
@@ -255,6 +256,7 @@ export const kapacitorRules = [
     alertNodes: {
       typeOf: 'alert',
       stateChangesOnly: true,
+      noRecoveries: false,
       useFlapping: false,
       post: [],
       tcp: [],
@@ -330,6 +332,7 @@ export const kapacitorRules = [
     alertNodes: {
       typeOf: 'alert',
       stateChangesOnly: true,
+      noRecoveries: false,
       useFlapping: false,
       post: [],
       tcp: [],
