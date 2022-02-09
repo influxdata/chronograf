@@ -5,7 +5,6 @@ import {Position} from 'codemirror'
 // Components
 import SchemaExplorer from 'src/flux/components/SchemaExplorer'
 import FluxEditor from 'src/flux/components/FluxEditor'
-import FluxScriptWizard from 'src/shared/components/TimeMachine/FluxScriptWizard'
 import Threesizer from 'src/shared/components/threesizer/Threesizer'
 import {Button, ComponentSize, ComponentColor} from 'src/reusable_ui'
 import FluxFunctionsToolbar from 'src/flux/components/flux_functions_toolbar/FluxFunctionsToolbar'
@@ -26,13 +25,14 @@ import {getSuggestions} from 'src/flux/helpers/suggestions'
 import {insertFluxFunction} from 'src/flux/helpers/scriptInsertion'
 
 // Types
-import {NotificationAction, Source} from 'src/types'
+import {NotificationAction, Source, TimeRange} from 'src/types'
 import {
   Suggestion,
   Links,
   ScriptStatus,
   FluxToolbarFunction,
 } from 'src/types/flux'
+import FluxQueryBuilder from './fluxQueryBuilder/FluxQueryBuilder'
 
 const CHECK_SCRIPT_DELAY = 600
 const VALID_SCRIPT_STATUS = {type: 'success', text: ''}
@@ -40,6 +40,7 @@ const VALID_SCRIPT_STATUS = {type: 'success', text: ''}
 interface ConnectedProps {
   fluxProportions: number[]
   onSetFluxProportions: (fluxProportions: number[]) => void
+  timeRange: TimeRange
 }
 
 interface PassedProps {
@@ -88,82 +89,88 @@ class FluxQueryMaker extends PureComponent<Props, State> {
       draftScript,
       fluxProportions,
       onSetFluxProportions,
+      timeRange,
     } = this.props
-    const {suggestions, isWizardActive, draftScriptStatus} = this.state
-
-    const [leftSize, middleSize, rightSize] = fluxProportions
-
-    const divisions = [
-      {
-        name: 'Schema',
-        size: leftSize,
-        headerButtons: [],
-        menuOptions: [],
-        render: () => <SchemaExplorer source={source} notify={notify} />,
-        headerOrientation: HANDLE_VERTICAL,
-      },
-      {
-        name: 'Script',
-        size: middleSize,
-        customClass: 'flux-query-maker--script',
-        headerOrientation: HANDLE_VERTICAL,
-        headerButtons: [
-          <Button
-            key={0}
-            text={'Script Wizard'}
-            onClick={this.handleShowWizard}
-            size={ComponentSize.ExtraSmall}
-          />,
-          <Button
-            key={1}
-            text={'Run Script'}
-            onClick={this.handleSubmitScript}
-            size={ComponentSize.ExtraSmall}
-            color={ComponentColor.Primary}
-          />,
-        ],
-        menuOptions: [],
-        render: visibility => (
-          <FluxEditor
-            status={draftScriptStatus}
-            script={draftScript}
-            visibility={visibility}
-            suggestions={suggestions}
-            onChangeScript={this.handleChangeDraftScript}
-            onSubmitScript={this.handleSubmitScript}
-            onShowWizard={this.handleShowWizard}
-            onCursorChange={this.handleCursorPosition}
-          />
-        ),
-      },
-      {
-        name: 'Flux Functions',
-        size: rightSize,
-        headerButtons: [],
-        menuOptions: [],
-        render: () => (
-          <FluxFunctionsToolbar
-            onInsertFluxFunction={this.handleInsertFluxFunction}
-          />
-        ),
-        headerOrientation: HANDLE_VERTICAL,
-      },
-    ]
+    if (!this.state.isWizardActive) {
+      const {suggestions, draftScriptStatus} = this.state
+      const [leftSize, middleSize, rightSize] = fluxProportions
+      const divisions = [
+        {
+          name: 'Schema',
+          size: leftSize,
+          headerButtons: [],
+          menuOptions: [],
+          render: () => <SchemaExplorer source={source} notify={notify} />,
+          headerOrientation: HANDLE_VERTICAL,
+        },
+        {
+          name: 'Script',
+          size: middleSize,
+          customClass: 'flux-query-maker--script',
+          headerOrientation: HANDLE_VERTICAL,
+          headerButtons: [
+            <Button
+              key={0}
+              text={'Query Builder'}
+              onClick={this.handleShowWizard}
+              size={ComponentSize.ExtraSmall}
+            />,
+            <Button
+              key={1}
+              text={'Run Script'}
+              onClick={this.handleSubmitScript}
+              size={ComponentSize.ExtraSmall}
+              color={ComponentColor.Primary}
+            />,
+          ],
+          menuOptions: [],
+          render: visibility => (
+            <FluxEditor
+              status={draftScriptStatus}
+              script={draftScript}
+              visibility={visibility}
+              suggestions={suggestions}
+              onChangeScript={this.handleChangeDraftScript}
+              onSubmitScript={this.handleSubmitScript}
+              onShowWizard={this.handleShowWizard}
+              onCursorChange={this.handleCursorPosition}
+            />
+          ),
+        },
+        {
+          name: 'Flux Functions',
+          size: rightSize,
+          headerButtons: [],
+          menuOptions: [],
+          render: () => (
+            <FluxFunctionsToolbar
+              onInsertFluxFunction={this.handleInsertFluxFunction}
+            />
+          ),
+          headerOrientation: HANDLE_VERTICAL,
+        },
+      ]
+      return (
+        <div className="flux-script-wizard">
+          <div className="flux-script-wizard--children">
+            <Threesizer
+              orientation={HANDLE_VERTICAL}
+              divisions={divisions}
+              containerClass="page-contents"
+              onResize={onSetFluxProportions}
+            />
+          </div>
+        </div>
+      )
+    }
 
     return (
-      <FluxScriptWizard
+      <FluxQueryBuilder
         source={source}
-        isWizardActive={isWizardActive}
-        onSetIsWizardActive={this.handleSetIsWizardActive}
-        onAddToScript={this.handleAddToScript}
-      >
-        <Threesizer
-          orientation={HANDLE_VERTICAL}
-          divisions={divisions}
-          containerClass="page-contents"
-          onResize={onSetFluxProportions}
-        />
-      </FluxScriptWizard>
+        timeRange={timeRange}
+        onSubmit={this.handleSubmitBuilderScript}
+        onShowEditor={this.handleShowEditor}
+      />
     )
   }
 
@@ -204,19 +211,18 @@ class FluxQueryMaker extends PureComponent<Props, State> {
     }
   }
 
+  private handleSubmitBuilderScript = async (script: string) => {
+    await this.handleChangeDraftScript(script)
+    this.props.onChangeScript(script)
+    this.handleSubmitScript()
+  }
+
   private handleShowWizard = (): void => {
     this.setState({isWizardActive: true})
   }
 
-  private handleSetIsWizardActive = (isWizardActive: boolean): void => {
-    this.setState({isWizardActive})
-  }
-
-  private handleAddToScript = async (draftScript): Promise<void> => {
-    const {onChangeDraftScript} = this.props
-
-    await onChangeDraftScript(draftScript)
-    this.handleSubmitScript()
+  private handleShowEditor = (): void => {
+    this.setState({isWizardActive: false})
   }
 
   private handleChangeDraftScript = async (
@@ -257,6 +263,7 @@ const ConnectedFluxQueryMaker = (props: PassedProps) => (
     {(container: TimeMachineContainer) => (
       <FluxQueryMaker
         {...props}
+        timeRange={container.state.timeRange}
         fluxProportions={container.state.fluxProportions}
         onSetFluxProportions={container.handleSetFluxProportions}
       />

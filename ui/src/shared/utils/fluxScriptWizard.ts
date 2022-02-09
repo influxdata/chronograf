@@ -2,63 +2,11 @@ import {isEmpty} from 'lodash'
 
 import {TIMERANGE_START, WINDOW_PERIOD} from 'src/flux/helpers/templates'
 
-import {proxy} from 'src/utils/queryUrlGenerator'
-import {parseMetaQuery} from 'src/tempVars/parsing'
-
 import {RemoteDataState} from 'src/types'
 import {ComponentStatus} from 'src/reusable_ui'
 
 export interface DBsToRPs {
   [databaseName: string]: string[]
-}
-
-export async function fetchDBsToRPs(proxyLink: string): Promise<DBsToRPs> {
-  const dbsQuery = 'SHOW DATABASES'
-  const dbsResp = await proxy({source: proxyLink, query: dbsQuery})
-  const dbs = parseMetaQuery(dbsQuery, dbsResp.data).sort()
-
-  const rpsQuery = dbs
-    .map(db => `SHOW RETENTION POLICIES ON "${db}"`)
-    .join('; ')
-
-  const rpsResp = await proxy({source: proxyLink, query: rpsQuery})
-
-  const dbsToRPs: DBsToRPs = dbs.reduce((acc, db, i) => {
-    const series = rpsResp.data.results[i].series[0]
-    const namesIndex = series.columns.indexOf('name')
-    const rpNames = series.values.map(row => row[namesIndex])
-
-    return {...acc, [db]: rpNames}
-  }, {})
-
-  return dbsToRPs
-}
-
-export async function fetchMeasurements(
-  proxyLink: string,
-  database: string
-): Promise<string[]> {
-  const query = `SHOW MEASUREMENTS ON "${database}"`
-  const resp = await proxy({source: proxyLink, query})
-  const measurements = parseMetaQuery(query, resp.data)
-
-  measurements.sort()
-
-  return measurements
-}
-
-export async function fetchFields(
-  proxyLink: string,
-  database: string,
-  measurement: string
-): Promise<string[]> {
-  const query = `SHOW FIELD KEYS ON "${database}" FROM "${measurement}"`
-  const resp = await proxy({source: proxyLink, query})
-  const fields = parseMetaQuery(query, resp.data)
-
-  fields.sort()
-
-  return fields
 }
 
 export function formatDBwithRP(db: string, rp: string): string {

@@ -7,7 +7,7 @@ import {
   TemplateValue,
 } from 'src/types/tempVars'
 import {TEMP_VAR_INTERVAL} from 'src/shared/constants'
-const DESIRED_POINTS_PER_GRAPH = 360
+export const DESIRED_POINTS_PER_GRAPH = 360
 
 export const computeInterval = (durationMs: number): number => {
   return Math.round(durationMs / DESIRED_POINTS_PER_GRAPH)
