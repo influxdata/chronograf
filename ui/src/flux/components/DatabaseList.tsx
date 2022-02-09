@@ -3,13 +3,14 @@ import React, {PureComponent} from 'react'
 import DatabaseListItem from 'src/flux/components/DatabaseListItem'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import {Source, NotificationAction} from 'src/types'
+import {Source, NotificationAction, TimeRange} from 'src/types'
 import {executeQuery} from 'src/shared/apis/flux/query'
 import {parseResponse} from 'src/shared/parsing/flux/response'
 import {isEqual} from 'lodash'
 
 interface Props {
   source: Source
+  timeRange: TimeRange
   notify: NotificationAction
 }
 
@@ -71,11 +72,17 @@ class DatabaseList extends PureComponent<Props, State> {
 
   public render() {
     const {databases} = this.state
-    const {source, notify} = this.props
+    const {source, timeRange, notify} = this.props
 
     return databases.map(db => {
       return (
-        <DatabaseListItem db={db} key={db} source={source} notify={notify} />
+        <DatabaseListItem
+          db={db}
+          key={db}
+          source={source}
+          timeRange={timeRange}
+          notify={notify}
+        />
       )
     })
   }
