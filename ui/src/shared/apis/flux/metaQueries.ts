@@ -18,21 +18,6 @@ export const fetchMeasurements = async (
   return parseValuesColumn(csvResponse)
 }
 
-export const fields = async (
-  source: Source,
-  bucket: string,
-  filter: SchemaFilter[],
-  limit: number
-): Promise<string> => {
-  return await tagValues({
-    bucket,
-    source,
-    tagKey: '_field',
-    limit,
-    filter,
-  })
-}
-
 // Fetch all the fields and their associated measurement
 export const fieldsByMeasurement = async (
   source: Source,
