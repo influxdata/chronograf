@@ -3,6 +3,7 @@ import _ from 'lodash'
 import AJAX from 'src/utils/ajax'
 import {Source, SchemaFilter} from 'src/types'
 import recordProperty from 'src/flux/helpers/recordProperty'
+import fluxString from 'src/flux/helpers/fluxString'
 
 export const measurements = async (
   source: Source,
@@ -32,7 +33,7 @@ export const fieldsByMeasurement = async (
   bucket: string
 ): Promise<any> => {
   const script = `
-  from(bucket: "${bucket}")
+  from(bucket:${fluxString(bucket)})
     |> range(start: -30d)
     |> group(columns: ["_field", "_measurement"], mode: "by")
     |> distinct(column: "_field")
@@ -50,13 +51,12 @@ export const tagKeys = async (
   let tagKeyFilter = ''
 
   if (filter.length) {
-    const predicates = filter.map(({key}) => `r._value != "${key}"`)
-
+    const predicates = filter.map(({key}) => `r._value != ${fluxString(key)}`)
     tagKeyFilter = `\n   |> filter(fn: (r) => (${predicates.join(' and ')}) )`
   }
 
   const script = `
-from(bucket:"${bucket}") 
+from(bucket:${fluxString(bucket)}) 
   |> range(start: -30d) 
   |> keys()
   |> keep(columns: ["_value"])
@@ -96,9 +96,11 @@ export const tagValues = async ({
   const script = `
 from(bucket: "${bucket}")
   |> range(start: -30d)
-  |> keep(columns: ["${tagKey}"])
+  |> keep(columns: [${fluxString(tagKey)}])
   |> group()
-  |> distinct(column: "${tagKey}")${regexFilter}${limitFunc}${countFunc}
+  |> distinct(column: ${fluxString(
+    tagKey
+  )})${regexFilter}${limitFunc}${countFunc}
   `
 
   return proxy(source, script)
@@ -110,9 +112,9 @@ export const tagsFromMeasurement = async (
   measurement: string
 ): Promise<any> => {
   const script = `
-    from(bucket:"${bucket}") 
+    from(bucket:${fluxString(bucket)}}) 
       |> range(start:-30d) 
-      |> filter(fn:(r) => r._measurement == "${measurement}") 
+      |> filter(fn:(r) => r._measurement == ${fluxString(measurement)}") 
       |> group() 
       |> keys()
       |> keep(columns: ["_value"])
