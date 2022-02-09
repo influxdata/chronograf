@@ -6,8 +6,9 @@ import {TimeRange, Source} from 'src/types'
 import {CancelBox} from 'src/types/promises'
 import {parseResponse} from 'src/shared/parsing/flux/response'
 import {BuilderTagsType} from '../types'
-import {formatTimeRangeArguments, tagToFlux} from '../util/generateFlux'
+import {tagToFlux} from '../util/generateFlux'
 import fluxString from 'src/flux/helpers/fluxString'
+import rangeArguments from 'src/flux/helpers/rangeArguments'
 
 const DEFAULT_TIME_RANGE: TimeRange = {lower: 'now() - 30d', lowerFlux: '-30d'}
 const DEFAULT_LIMIT = 200
@@ -44,7 +45,7 @@ export function findKeys({
 }: FindKeysOptions): CancelBox<string[]> {
   const tagFilter = formatTagFilter(tagsSelections)
   const previousKeyFilter = formatTagKeyFilterCall(tagsSelections)
-  const timeRangeArguments = formatTimeRangeArguments(timeRange)
+  const timeRangeArguments = rangeArguments(timeRange)
 
   // requires Flux package to work which we will put in the query
   const searchFilter = !searchTerm
@@ -85,7 +86,7 @@ export function findValues({
   limit = DEFAULT_LIMIT,
 }: FindValuesOptions): CancelBox<string[]> {
   const tagFilter = formatTagFilter(tagsSelections)
-  const timeRangeArguments = formatTimeRangeArguments(timeRange)
+  const timeRangeArguments = rangeArguments(timeRange)
 
   // requires Flux package to work which we will put in the query
   const searchFilter = !searchTerm
