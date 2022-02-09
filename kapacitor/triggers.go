@@ -119,12 +119,6 @@ func Trigger(rule chronograf.AlertRule) (string, error) {
 		`
 	}
 
-	if rule.AlertNodes.IsNoRecoveries {
-		trigger += `
-				.noRecoveries()
-		`
-	}
-
 	trigger += AllAlerts
 
 	if rule.Details != "" {
