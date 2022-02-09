@@ -3,7 +3,9 @@ import _ from 'lodash'
 import AJAX from 'src/utils/ajax'
 import {Source, SchemaFilter} from 'src/types'
 import fluxString from 'src/flux/helpers/fluxString'
-import parseValuesColumn from 'src/shared/parsing/flux/values'
+import parseValuesColumn, {
+  parseFieldsByMeasurements,
+} from 'src/shared/parsing/flux/values'
 
 export const fetchMeasurements = async (
   source: Source,
@@ -18,10 +20,13 @@ export const fetchMeasurements = async (
 }
 
 // Fetch all the fields and their associated measurement
-export const fieldsByMeasurement = async (
+export const fetchFieldsByMeasurement = async (
   source: Source,
   bucket: string
-): Promise<string> => {
+): Promise<{
+  fields: string[]
+  fieldsByMeasurements: {[measurement: string]: string[]}
+}> => {
   const script = `
   from(bucket:${fluxString(bucket)})
     |> range(start: -30d)
@@ -30,7 +35,8 @@ export const fieldsByMeasurement = async (
     |> group()
     |> map(fn: (r) => ({_measurement: r._measurement, _field: r._field}))
   `
-  return proxy(source, script)
+  const response = await proxy(source, script)
+  return parseFieldsByMeasurements(response)
 }
 
 export const fetchTagKeys = async (

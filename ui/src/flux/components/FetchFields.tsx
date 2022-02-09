@@ -2,8 +2,7 @@
 import {PureComponent} from 'react'
 
 // Utils
-import {fieldsByMeasurement as fetchFieldsByMeasurementAsync} from 'src/shared/apis/flux/metaQueries'
-import {parseFieldsByMeasurements} from 'src/shared/parsing/flux/values'
+import {fetchFieldsByMeasurement} from 'src/shared/apis/flux/metaQueries'
 
 // Types
 import {Source, RemoteDataState} from 'src/types'
@@ -46,10 +45,9 @@ class FetchFields extends PureComponent<Props, State> {
     const {source, bucket} = this.props
     this.setState({loading: RemoteDataState.Loading})
     try {
-      const fieldsResults = await fetchFieldsByMeasurementAsync(source, bucket)
-
-      const {fields, fieldsByMeasurements} = parseFieldsByMeasurements(
-        fieldsResults
+      const {fields, fieldsByMeasurements} = await fetchFieldsByMeasurement(
+        source,
+        bucket
       )
 
       this.setState({
