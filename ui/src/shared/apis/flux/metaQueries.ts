@@ -113,23 +113,6 @@ from(bucket: "${bucket}")
   return proxy(source, script)
 }
 
-export const tagsFromMeasurement = async (
-  source: Source,
-  bucket: string,
-  measurement: string
-): Promise<string> => {
-  const script = `
-    from(bucket:${fluxString(bucket)}}) 
-      |> range(start:-30d) 
-      |> filter(fn:(r) => r._measurement == ${fluxString(measurement)}") 
-      |> group() 
-      |> keys()
-      |> keep(columns: ["_value"])
-  `
-
-  return proxy(source, script)
-}
-
 export const proxy = async (source: Source, script: string) => {
   const mark = encodeURIComponent('?')
   const minimizedScript = script.replace(/\s/g, '') // server cannot handle whitespace
