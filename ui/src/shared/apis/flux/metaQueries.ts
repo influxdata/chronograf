@@ -85,27 +85,20 @@ export const tagValues = async ({
 }: TagValuesParams): Promise<any> => {
   let regexFilter = ''
   if (searchTerm) {
-    regexFilter = `|> filter(fn: (r) => ${recordProperty(
+    regexFilter = `\n  |> filter(fn: (r) => ${recordProperty(
       tagKey
     )} =~ /${searchTerm}/)`
   }
 
-  const limitFunc = count || !limit ? '' : `|> limit(n:${limit})`
-  const countFunc = count ? '|> count()' : ''
-
-  const predicate = '(r) => true'
+  const limitFunc = count || !limit ? '' : `\n  |> limit(n:${limit})`
+  const countFunc = count ? '\n  |> count()' : ''
 
   const script = `
-    import "influxdata/influxdb/v1"
-    v1.tagValues(
-      bucket: "${bucket}",
-      predicate: ${predicate},
-      tag: "${tagKey}",
-      start: -30d,
-    )
-     ${regexFilter}
-     ${limitFunc}
-     ${countFunc}
+from(bucket: "${bucket}")
+  |> range(start: -30d)
+  |> keep(columns: ["${tagKey}"])
+  |> group()
+  |> distinct(column: "${tagKey}")${regexFilter}${limitFunc}${countFunc}
   `
 
   return proxy(source, script)
