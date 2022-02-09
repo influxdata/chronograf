@@ -123,9 +123,9 @@ export const tagsFromMeasurement = async (
 
 export const proxy = async (source: Source, script: string) => {
   const mark = encodeURIComponent('?')
-  const garbage = script.replace(/\s/g, '') // server cannot handle whitespace
+  const minimizedScript = script.replace(/\s/g, '') // server cannot handle whitespace
   const dialect = {annotations: ['group', 'datatype', 'default']}
-  const data = {query: garbage, dialect}
+  const data = {query: minimizedScript, dialect}
   const base = source.links.flux
 
   try {
