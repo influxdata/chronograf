@@ -8,12 +8,7 @@ export const measurements = async (
   source: Source,
   bucket: string
 ): Promise<any> => {
-  const script = `
-    import "influxdata/influxdb/v1"
-    v1.measurements(bucket:"${bucket}")
-    `
-
-  return proxy(source, script)
+  return tagValues({bucket, source, tagKey: '_measurement', limit: 0})
 }
 
 export const fields = async (
@@ -100,7 +95,7 @@ export const tagValues = async ({
     )} =~ /${searchTerm}/)`
   }
 
-  const limitFunc = count ? '' : `|> limit(n:${limit})`
+  const limitFunc = count || !limit ? '' : `|> limit(n:${limit})`
   const countFunc = count ? '|> count()' : ''
 
   const predicate = '(r) => true'
