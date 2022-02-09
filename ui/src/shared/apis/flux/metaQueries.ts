@@ -52,20 +52,15 @@ export const tagKeys = async (
   if (filter.length) {
     const predicates = filter.map(({key}) => `r._value != "${key}"`)
 
-    tagKeyFilter = `|> filter(fn: (r) => ${predicates.join(' and ')} )`
+    tagKeyFilter = `\n   |> filter(fn: (r) => (${predicates.join(' and ')}) )`
   }
 
-  const predicate = '(r) => true'
-
   const script = `
-    import "influxdata/influxdb/v1"
-    v1.tagKeys(
-      bucket: "${bucket}",
-      predicate: ${predicate},
-      start: -30d,
-    )
-    ${tagKeyFilter}
-    `
+from(bucket:"${bucket}") 
+  |> range(start: -30d) 
+  |> keys()
+  |> keep(columns: ["_value"])
+  |> distinct()${tagKeyFilter}`
 
   return proxy(source, script)
 }
