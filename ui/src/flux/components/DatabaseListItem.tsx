@@ -61,12 +61,14 @@ class DatabaseListItem extends PureComponent<Props, State> {
           <SchemaExplorerTree
             bucket={db}
             source={source}
+            timeRange={timeRange}
             key={db + ':' + timeRange.lower + ':' + timeRange.upper}
           >
             {tree => (
               <SchemaItemCategories
                 db={db}
                 source={source}
+                timeRange={timeRange}
                 notify={notify}
                 categoryTree={tree}
               />

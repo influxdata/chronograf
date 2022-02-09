@@ -14,13 +14,14 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 
 // types
-import {Source, NotificationAction, RemoteDataState} from 'src/types'
+import {Source, NotificationAction, RemoteDataState, TimeRange} from 'src/types'
 
 const TAG_VALUES_LIMIT = 25
 
 interface Props {
   db: string
   source: Source
+  timeRange: TimeRange
   tagKey: string
   notify: NotificationAction
   onAddFilter?: (value: {[k: string]: string}) => void
@@ -166,11 +167,12 @@ class TagValueList extends PureComponent<Props, State> {
   }
 
   private fetchData = async (): Promise<string[]> => {
-    const {source, db, tagKey} = this.props
+    const {source, timeRange, db, tagKey} = this.props
     const {searchTerm, limit} = this.state
 
     return await fetchTagValues({
       source,
+      timeRange,
       bucket: db,
       tagKey,
       limit,

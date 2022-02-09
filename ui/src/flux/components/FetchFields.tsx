@@ -5,10 +5,11 @@ import {PureComponent} from 'react'
 import {fetchFieldsByMeasurement} from 'src/shared/apis/flux/metaQueries'
 
 // Types
-import {Source, RemoteDataState} from 'src/types'
+import {Source, RemoteDataState, TimeRange} from 'src/types'
 
 interface Props {
   source: Source
+  timeRange: TimeRange
   bucket: string
   children: (fields, fieldsByMeasurement, fieldsLoading) => JSX.Element
 }
@@ -42,11 +43,12 @@ class FetchFields extends PureComponent<Props, State> {
   }
 
   private async fetchFields() {
-    const {source, bucket} = this.props
+    const {source, timeRange, bucket} = this.props
     this.setState({loading: RemoteDataState.Loading})
     try {
       const {fields, fieldsByMeasurements} = await fetchFieldsByMeasurement(
         source,
+        timeRange,
         bucket
       )
 

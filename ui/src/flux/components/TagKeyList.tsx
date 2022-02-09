@@ -9,11 +9,12 @@ import LoaderSkeleton from 'src/flux/components/LoaderSkeleton'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 // types
-import {Source, NotificationAction, RemoteDataState} from 'src/types'
+import {Source, NotificationAction, RemoteDataState, TimeRange} from 'src/types'
 
 interface Props {
   db: string
   source: Source
+  timeRange: TimeRange
   tagKeys: string[]
   notify: NotificationAction
   loading: RemoteDataState
@@ -41,7 +42,7 @@ class TagKeyList extends PureComponent<Props, State> {
   }
 
   private get tagKeys(): JSX.Element | JSX.Element[] {
-    const {db, source, notify, loading} = this.props
+    const {db, source, timeRange, notify, loading} = this.props
 
     if (loading === RemoteDataState.Error) {
       return (
@@ -65,6 +66,7 @@ class TagKeyList extends PureComponent<Props, State> {
         <TagKeyListItem
           db={db}
           source={source}
+          timeRange={timeRange}
           tagKey={tagKey}
           key={tagKey}
           notify={notify}

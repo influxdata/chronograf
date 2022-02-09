@@ -1,14 +1,16 @@
 import _ from 'lodash'
 
 import AJAX from 'src/utils/ajax'
-import {Source, SchemaFilter} from 'src/types'
+import {Source, SchemaFilter, TimeRange} from 'src/types'
 import fluxString from 'src/flux/helpers/fluxString'
 import parseValuesColumn, {
   parseFieldsByMeasurements,
 } from 'src/shared/parsing/flux/values'
+import rangeArguments from 'src/flux/helpers/rangeArguments'
 
 export const fetchMeasurements = async (
   source: Source,
+  timeRange: TimeRange,
   bucket: string
 ): Promise<string[]> => {
   return fetchTagValues({
@@ -16,12 +18,14 @@ export const fetchMeasurements = async (
     source,
     tagKey: '_measurement',
     limit: 0,
+    timeRange,
   })
 }
 
 // Fetch all the fields and their associated measurement
 export const fetchFieldsByMeasurement = async (
   source: Source,
+  timeRange: TimeRange,
   bucket: string
 ): Promise<{
   fields: string[]
@@ -29,7 +33,7 @@ export const fetchFieldsByMeasurement = async (
 }> => {
   const script = `
   from(bucket:${fluxString(bucket)})
-    |> range(start: -30d)
+    |> range(${rangeArguments(timeRange)})
     |> group(columns: ["_field", "_measurement"], mode: "by")
     |> distinct(column: "_field")
     |> group()
@@ -41,11 +45,12 @@ export const fetchFieldsByMeasurement = async (
 
 export const fetchTagKeys = async (
   source: Source,
+  timeRange: TimeRange,
   bucket: string
 ): Promise<string[]> => {
   const script = `
 from(bucket:${fluxString(bucket)}) 
-  |> range(start: -30d) 
+  |> range(${rangeArguments(timeRange)}) 
   |> keys()
   |> keep(columns: ["_value"])
   |> distinct()`
@@ -56,6 +61,7 @@ from(bucket:${fluxString(bucket)})
 
 interface TagValuesParams {
   source: Source
+  timeRange: TimeRange
   bucket: string
   tagKey: string
   limit: number
@@ -68,6 +74,7 @@ export const fetchTagValues = async ({
   bucket,
   source,
   tagKey,
+  timeRange,
   limit,
   searchTerm = '',
   count = false,
@@ -82,7 +89,7 @@ export const fetchTagValues = async ({
 
   const script = `
 from(bucket: "${bucket}")
-  |> range(start: -30d)
+  |> range(${rangeArguments(timeRange)})
   |> keep(columns: [${fluxString(tagKey)}])
   |> group()
   |> distinct(column: ${fluxString(

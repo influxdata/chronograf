@@ -5,10 +5,11 @@ import {PureComponent} from 'react'
 import {fetchTagKeys} from 'src/shared/apis/flux/metaQueries'
 
 // Types
-import {Source, RemoteDataState} from 'src/types'
+import {Source, RemoteDataState, TimeRange} from 'src/types'
 
 interface Props {
   source: Source
+  timeRange: TimeRange
   bucket: string
   children: (tagKeys, tagsLoading) => JSX.Element
 }
@@ -36,10 +37,10 @@ class FetchTagKeys extends PureComponent<Props, State> {
   }
 
   private async fetchData() {
-    const {source, bucket} = this.props
+    const {source, timeRange, bucket} = this.props
     this.setState({loading: RemoteDataState.Loading})
     try {
-      const tagKeys = await fetchTagKeys(source, bucket)
+      const tagKeys = await fetchTagKeys(source, timeRange, bucket)
       this.setState({tagKeys, loading: RemoteDataState.Done})
     } catch (error) {
       this.setState({loading: RemoteDataState.Error})
