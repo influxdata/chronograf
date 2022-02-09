@@ -20,6 +20,7 @@ interface RuleActions {
   updateAlertNodes: (id: string, handlersOnThisAlert: Handler[]) => void
   updateMessage: (id: string, e: MouseEvent<HTMLInputElement>) => void
   updateNoRecoveries: (id: string, noRecoveries: boolean) => void
+  updateStateChangesOnly: (id: string, stateChangesOnly: boolean) => void
   updateDetails: () => void
 }
 
@@ -145,6 +146,16 @@ class RuleHandlers extends PureComponent<Props, State> {
               />
               <label htmlFor="noRecoveries">Don't send alert on condition recovery</label>
             </div>
+            <div className="form-control-static">
+              <input
+                name="stateChangesOnly"
+                id="stateChangesOnly"
+                type="checkbox"
+                defaultChecked={rule.alertNodes.stateChangesOnly}
+                onClick={this.handleStateChangesOnly}
+              />
+              <label htmlFor="stateChangesOnly">Send alert only when condition state changes</label>
+            </div>
           </div>
           <div className={ruleSectionClassName}>
             <p>Send this Alert to:</p>
@@ -183,6 +194,11 @@ class RuleHandlers extends PureComponent<Props, State> {
   private handleNoRecoveries = (e) {
     const {ruleActions, rule} = this.props
     ruleActions.updateNoRecoveries(rule.id, e.target.checked)
+  }
+
+  private handleStateChangesOnly = e => {
+    const {ruleActions, rule} = this.props
+    ruleActions.updateStateChangesOnly(rule.id, e.target.checked)
   }
 
   private handleChooseHandler = (ep: HandlerWithText): (() => void) => () => {

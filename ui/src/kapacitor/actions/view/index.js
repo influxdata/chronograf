@@ -153,6 +153,14 @@ export const updateNoRecoveries = (ruleID, noRecoveries) => ({
   },
 })
 
+export const updateStateChangesOnly = (ruleID, stateChangesOnly) => ({
+  type: 'UPDATE_RULE_STATECHANGESONLY',
+  payload: {
+    ruleID,
+    stateChangesOnly,
+  },
+})
+
 export const updateMessage = (ruleID, message) => ({
   type: 'UPDATE_RULE_MESSAGE',
   payload: {

@@ -13,6 +13,7 @@ import {
   deleteRuleSuccess,
   updateRuleStatusSuccess,
   updateNoRecoveries,
+  updateStateChangesOnly,
 } from 'src/kapacitor/actions/view'
 
 describe('Kapacitor.Reducers.rules', () => {
@@ -210,5 +211,25 @@ describe('Kapacitor.Reducers.rules', () => {
 
     const newState = reducer(initialState, updateNoRecoveries(ruleID, true))
     expect(newState[ruleID].alertNodes.noRecoveries).toBe(true)
+  })
+
+  it('can set stateChangesOnly', () => {
+    const ruleID = 1
+
+    const initialState = {
+      [ruleID]: {
+        id: ruleID,
+        queryID: 988,
+        alertNodes: {
+          stateChangesOnly: true,
+        },
+      },
+    }
+
+    const newState = reducer(
+      initialState,
+      updateStateChangesOnly(ruleID, false)
+    )
+    expect(newState[ruleID].alertNodes.stateChangesOnly).toBe(false)
   })
 })
