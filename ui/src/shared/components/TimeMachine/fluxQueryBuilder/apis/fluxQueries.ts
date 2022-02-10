@@ -20,8 +20,7 @@ export interface FindBucketsOptions {
 
 export function findBuckets(source: Source): CancelBox<string[]> {
   const query = `buckets()
-  |> sort(columns: ["name"])
-  |> limit(n: ${DEFAULT_LIMIT})`
+  |> sort(columns: ["name"])`
 
   return extractBoxedCol(runQuery(source, query), 'name')
 }
