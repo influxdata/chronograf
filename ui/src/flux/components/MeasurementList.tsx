@@ -128,7 +128,9 @@ class MeasurementsList extends PureComponent<Props, State> {
     return (
       <div className="flux-schema-tree flux-schema--child">
         <div className="flux-schema--item no-hover" onClick={this.handleClick}>
-          <div className="no-results">No more measurements.</div>
+          <div className="no-results">
+            No measurements in the selected time range.
+          </div>
         </div>
       </div>
     )
