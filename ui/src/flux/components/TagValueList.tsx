@@ -151,7 +151,9 @@ class TagValueList extends PureComponent<Props, State> {
       <div className="flux-schema-tree flux-schema--child">
         <div className="flux-schema--item no-hover" onClick={this.handleClick}>
           <div className="no-results">
-            No tag values in the selected time range.
+            {`No ${
+              term ? 'matching ' : ''
+            }tag values in the selected time range.`}
           </div>
         </div>
       </div>

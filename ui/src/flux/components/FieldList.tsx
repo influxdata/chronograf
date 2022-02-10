@@ -94,9 +94,9 @@ class FieldList extends PureComponent<Props, State> {
     return (
       <div className="flux-schema-tree flux-schema--child">
         <div className="flux-schema--item no-hover" onClick={this.handleClick}>
-          <div className="no-results">
-            No fields in the selected time range.
-          </div>
+          <div className="no-results">{`No ${
+            term ? 'matching ' : ''
+          }fields in the selected time range.`}</div>
         </div>
       </div>
     )
