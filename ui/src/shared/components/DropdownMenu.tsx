@@ -127,6 +127,7 @@ const DropdownMenu: FunctionComponent<Props> = ({
             url={addNew.url}
             text={addNew.text}
             handler={addNew.handler}
+            stopPropagation={addNew.stopPropagation}
           />
         )}
       </FancyScrollbar>
