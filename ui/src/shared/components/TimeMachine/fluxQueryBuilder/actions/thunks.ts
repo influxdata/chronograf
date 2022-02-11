@@ -99,9 +99,7 @@ export const loadTagSelectorThunk = (
         keys.unshift(key)
       }
 
-      dispatch(
-        tagActions.setKeys(tagIndex, keys, truncated, tagState.keysLimit)
-      )
+      dispatch(tagActions.setKeys(tagIndex, keys, truncated))
     }
     dispatch(loadTagSelectorValuesThunk(source, timeRange, tagIndex))
   } catch (e) {
@@ -184,14 +182,7 @@ const loadTagSelectorValuesThunk = (
       selectedValues = tagState.tagValues.filter(x => values.includes(x))
     }
 
-    dispatch(
-      tagActions.setValues(
-        tagIndex,
-        values,
-        valuesTruncated,
-        tagState.valuesLimit
-      )
-    )
+    dispatch(tagActions.setValues(tagIndex, values, valuesTruncated))
     if (selectedValues !== originalSelected) {
       dispatch(tagActions.selectValues(tagIndex, selectedValues))
     }

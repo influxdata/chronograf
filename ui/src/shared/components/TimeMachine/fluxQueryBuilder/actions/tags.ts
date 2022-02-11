@@ -128,19 +128,13 @@ export function setValuesStatus(tagIndex: number, status: RemoteDataState) {
   }
 }
 
-export function setKeys(
-  tagIndex: number,
-  keys: string[],
-  truncated: boolean,
-  limit: number
-) {
+export function setKeys(tagIndex: number, keys: string[], truncated: boolean) {
   return {
     type: 'FQB_TAG_KEYS' as const,
     payload: {
       tagIndex,
       keys,
       truncated,
-      limit,
     },
   }
 }
@@ -148,8 +142,7 @@ export function setKeys(
 export function setValues(
   tagIndex: number,
   values: string[],
-  truncated: boolean,
-  limit: number
+  truncated: boolean
 ) {
   return {
     type: 'FQB_TAG_VALUES' as const,
@@ -157,7 +150,6 @@ export function setValues(
       tagIndex,
       values,
       truncated,
-      limit,
     },
   }
 }

@@ -133,7 +133,6 @@ const aggregationReducer = (
         keys: action.payload.keys,
         keysStatus: RemoteDataState.Done,
         keysTruncated: action.payload.truncated,
-        keysLimit: action.payload.limit,
       }))
     }
     case 'FQB_TAG_VALUES': {
@@ -141,7 +140,6 @@ const aggregationReducer = (
         values: action.payload.values,
         valuesStatus: RemoteDataState.Done,
         valuesTruncated: action.payload.truncated,
-        valuesLimit: action.payload.limit,
       }))
     }
   }
