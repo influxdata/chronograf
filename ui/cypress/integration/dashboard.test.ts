@@ -2,7 +2,7 @@ describe('variables', () => {
   beforeEach(cy.setupConnection)
   
   it('create dashboard', () => {
-    cy.visit('http://localhost:8888/')
+    cy.visit('/')
     cy.clickNav(4, 'Dashboards')
     cy.getByTitle('Create Dashboard')
       .click()

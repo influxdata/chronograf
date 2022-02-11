@@ -116,7 +116,7 @@ it('default connetion to influxdb v2', ()=> {
   })
   
   it('create data queries in data explore',() =>{
-    cy.visit('http://localhost:8888')
+    cy.visit('/')
     cy.clickNav(4, 'Dashboards')
     cy.getByTitle('Create Dashboard').click()
     cy.getByTestID('rename-dashboard')

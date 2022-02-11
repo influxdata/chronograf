@@ -1,0 +1,10 @@
+---
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30086
+        hostPort: 8086
+        listenAddress: "0.0.0.0"
+---

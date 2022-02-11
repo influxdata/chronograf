@@ -62,7 +62,7 @@ cy.get('input[id="Default Retention Policy"]').clear()
 
 
 export const setupConnection = () => {
-  cy.visit('http://localhost:8888/')
+  cy.visit('/')
   // cy.waitFor('#tooltip', {timeout: 20000});
   cy.get('h1', {timeout: 10000}).should('be.visible')
   cy.get('h1').then($a => {
