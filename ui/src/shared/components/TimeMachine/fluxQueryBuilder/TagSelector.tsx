@@ -25,6 +25,8 @@ import {
   increaseKeysLimit,
   increaseValuesLimit,
 } from './actions/tags'
+import {ButtonShape, ComponentSize, IconFont} from 'src/reusable_ui/types'
+import {Button} from 'src/reusable_ui'
 
 const SEARCH_DEBOUNCE_MS = 400
 
@@ -71,6 +73,7 @@ const TagSelectorBody = (props: Props) => {
     onSelectKey,
     valuesSearchTerm,
     onChangeValuesSearchTerm,
+    onIncreaseValuesLimit,
     onSearchValues,
     keysSearchTerm,
     onChangeKeysSearchTerm,
@@ -109,6 +112,10 @@ const TagSelectorBody = (props: Props) => {
   function onLoadMoreKeys() {
     onIncreaseKeysLimit()
     debouncer.call(() => onSearchKeys(), SEARCH_DEBOUNCE_MS)
+  }
+  function onLoadMoreValues() {
+    onIncreaseValuesLimit()
+    debouncer.call(() => onSearchValues(), SEARCH_DEBOUNCE_MS)
   }
 
   const placeholderText =
@@ -170,12 +177,12 @@ const TagSelectorBody = (props: Props) => {
           />
         ) : undefined}
       </BuilderCard.Menu>
-      <TagSelectorValues {...props} />
+      <TagSelectorValues {...props} onLoadMoreValues={onLoadMoreValues} />
     </>
   )
 }
 
-const TagSelectorValues = (props: Props) => {
+const TagSelectorValues = (props: Props & {onLoadMoreValues: () => void}) => {
   const {
     aggregateFunctionType,
     keysStatus,
@@ -186,6 +193,7 @@ const TagSelectorValues = (props: Props) => {
     valuesTruncated,
     tagValues: selectedValues,
     onSelectValues,
+    onLoadMoreValues,
   } = props
   if (aggregateFunctionType === 'filter') {
     if (keysStatus === RemoteDataState.NotStarted) {
@@ -259,7 +267,16 @@ const TagSelectorValues = (props: Props) => {
         })}
         {valuesTruncated && aggregateFunctionType === 'filter' ? (
           <div className="flux-query-builder--list-item" key={`__truncated`}>
-            Truncated
+            <Button
+              text="Load More Values"
+              onClick={e => {
+                e.stopPropagation()
+                onLoadMoreValues()
+              }}
+              size={ComponentSize.ExtraSmall}
+              shape={ButtonShape.StretchToFit}
+              icon={IconFont.Plus}
+            />
           </div>
         ) : undefined}
       </div>

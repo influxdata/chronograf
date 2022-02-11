@@ -155,6 +155,7 @@ const loadTagSelectorValuesThunk = (
           key: tagState.tagKey,
           searchTerm: tagState.valuesSearchTerm,
           timeRange,
+          limit: tagState.valuesLimit,
         })
         values = data.result
         valuesTruncated = data.truncated
