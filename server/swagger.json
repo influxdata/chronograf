@@ -4237,31 +4237,6 @@
         "fields"
       ]
     },
-    "KapacitorNode": {
-      "type": "object",
-      "description": "Represents a node in the kapacitor TICKscript graph",
-      "required": ["name"],
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Name of the kapacitor node e.g. slack"
-        },
-        "args": {
-          "type": "array",
-          "description": "All arguments to the named node",
-          "items": {
-            "type": "string"
-          }
-        },
-        "properties": {
-          "type": "array",
-          "description": "All properties attached to the kapacitor node",
-          "items": {
-            "$ref": "#/definitions/KapacitorProperty"
-          }
-        }
-      }
-    },
     "Field": {
       "type": "object",
       "required": ["type", "value"],
@@ -4460,14 +4435,46 @@
           "areTagsAccepted": true
         },
         "every": "30s",
-        "alerts": ["alerta"],
-        "alertNodes": [
-          {
-            "name": "alerta",
-            "args": [],
-            "properties": []
-          }
-        ],
+        "alertNodes": {
+          "typeOf": "alert",
+          "stateChangesOnly": true,
+          "noRecoveries": false,
+          "useFlapping": false,
+          "post": [],
+          "tcp": [],
+          "email": [],
+          "exec": [],
+          "log": [],
+          "victorOps": [],
+          "pagerDuty": [],
+          "pagerDuty2": [],
+          "pushover": [],
+          "sensu": [],
+          "slack": [],
+          "telegram": [],
+          "alerta": [
+            {
+              "token": "",
+              "resource": "res",
+              "event": "evt",
+              "environment": "env",
+              "group": "grp",
+              "value": "val",
+              "origin": "kapacitor",
+              "service": [
+                "svc"
+              ]
+            }
+          ],
+          "opsGenie": [],
+          "opsGenie2": [],
+          "talk": [],
+          "kafka": [],
+          "serviceNow": null,
+          "bigPanda": null,
+          "teams": null,
+          "zenoss": null
+        },
         "message": "too much spam",
         "details": "muh body",
         "trigger": "threshold",
@@ -4476,7 +4483,7 @@
           "value": "10"
         },
         "name": "Untitled Rule",
-        "tickscript": "var db = 'telegraf'\n\nvar rp = 'autogen'\n\nvar measurement = 'cpu'\n\nvar groupBy = []\n\nvar whereFilter = lambda: TRUE\n\nvar period = 10m\n\nvar every = 30s\n\nvar name = 'Untitled Rule'\n\nvar idVar = name + ':{{.Group}}'\n\nvar message = 'too much spam'\n\nvar idTag = 'alertID'\n\nvar levelTag = 'level'\n\nvar messageField = 'message'\n\nvar durationField = 'duration'\n\nvar outputDB = 'chronograf'\n\nvar outputRP = 'autogen'\n\nvar outputMeasurement = 'alerts'\n\nvar triggerType = 'threshold'\n\nvar details = 'muh body'\n\nvar crit = 10\n\nvar data = stream\n    |from()\n        .database(db)\n        .retentionPolicy(rp)\n        .measurement(measurement)\n        .groupBy(groupBy)\n        .where(whereFilter)\n    |window()\n        .period(period)\n        .every(every)\n        .align()\n    |max('usage_system')\n        .as('value')\n\nvar trigger = data\n    |alert()\n        .crit(lambda: \"value\" > crit)\n        .stateChangesOnly()\n        .message(message)\n        .id(idVar)\n        .idTag(idTag)\n        .levelTag(levelTag)\n        .messageField(messageField)\n        .durationField(durationField)\n        .details(details)\n        .alerta()\n\ntrigger\n    |influxDBOut()\n        .create()\n        .database(outputDB)\n        .retentionPolicy(outputRP)\n        .measurement(outputMeasurement)\n        .tag('alertName', name)\n        .tag('triggerType', triggerType)\n\ntrigger\n    |httpOut('output')\n",
+        "tickscript": "var db = 'telegraf'\n\nvar rp = 'autogen'\n\nvar measurement = 'cpu'\n\nvar groupBy = []\n\nvar whereFilter = lambda: TRUE\n\nvar period = 10m\n\nvar every = 30s\n\nvar name = 'Untitled Rule'\n\nvar idVar = name + ':{{.Group}}'\n\nvar message = 'too much spam'\n\nvar idTag = 'alertID'\n\nvar levelTag = 'level'\n\nvar messageField = 'message'\n\nvar durationField = 'duration'\n\nvar outputDB = 'chronograf'\n\nvar outputRP = 'autogen'\n\nvar outputMeasurement = 'alerts'\n\nvar triggerType = 'threshold'\n\nvar details = 'muh body'\n\nvar crit = 10\n\nvar data = stream\n    |from()\n        .database(db)\n        .retentionPolicy(rp)\n        .measurement(measurement)\n        .groupBy(groupBy)\n        .where(whereFilter)\n    |window()\n        .period(period)\n        .every(every)\n        .align()\n    |max('usage_system')\n        .as('value')\n\nvar trigger = data\n    |alert()\n        .crit(lambda: \"value\" > crit)\n        .stateChangesOnly()\n        .message(message)\n        .id(idVar)\n        .idTag(idTag)\n        .levelTag(levelTag)\n        .messageField(messageField)\n        .durationField(durationField)\n        .details(details)\n        .alerta()\n        .resource('res')\n        .event('evt')\n        .environment('env')\n        .group('grp')\n        .value('val')\n        .origin('kapacitor')\n        .services('svc')\n        .correlated()\n\ntrigger\n    |influxDBOut()\n        .create()\n        .database(outputDB)\n        .retentionPolicy(outputRP)\n        .measurement(outputMeasurement)\n        .tag('alertName', name)\n        .tag('triggerType', triggerType)\n\ntrigger\n    |httpOut('output')\n",
         "type": "stream",
         "dbrps": [
           {
@@ -4513,43 +4520,480 @@
           "type": "string",
           "description": "Golang duration string specifying how often the alert condition is checked"
         },
-        "alerts": {
-          "type": "array",
-          "description": "Array of alerting services to warn if the alert is triggered",
-          "items": {
-            "type": "string",
-            "enum": [
-              "alerta",
-              "post",
-              "http",
-              "kafka",
-              "opsgenie",
-              "opsgenie2",
-              "pagerduty",
-              "pagerduty2",
-              "victorops",
-              "email",
-              "exec",
-              "log",
-              "pushover",
-              "sensu",
-              "slack",
-              "smtp",
-              "talk",
-              "telegram",
-              "tcp",
-              "serviceNow",
-              "bigPanda",
-              "teams",
-              "zenoss"
-            ]
-          }
-        },
         "alertNodes": {
-          "type": "array",
-          "description": "Arguments and properties to add to alert",
-          "items": {
-            "$ref": "#/definitions/KapacitorNode"
+          "type": "object",
+          "description": "Arguments and properties for alerts. Disabled alerts are unset or empty arrays.",
+          "properties": {
+            "typeOf": {
+              "description": "Object type",
+              "type": "string",
+              "enum": ["alert"]
+            },
+            "stateChangesOnly": {
+              "description": "Only send alerts when state criticality changes",
+              "type": "boolean"
+            },
+            "noRecoveries": {
+              "description": "Do not send alerts when state recovers from criticality",
+              "type": "boolean"
+            },
+            "useFlapping": {
+              "description": "Enable flapping detection to prevent flood of alerts from rapid changes",
+              "type": "boolean"
+            },
+            "post": {
+              "description": "Parameters for POST notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "description": "POST destination",
+                    "type": "string"
+                  },
+                  "headers": {
+                    "description": "Headers to be added to POST request",
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "example": {
+                      "Content-Type": "application/json"
+                    }
+                  }
+                }
+              }
+            },
+            "tcp": {
+              "description": "Parameters for TCP notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "address": {
+                    "description": "Address and port to send the alert to",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "email": {
+              "description": "Parameters for email notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "to": {
+                    "description": "Destination email address",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "exec": {
+              "description": "Parameters for exec notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "command": {
+                    "description": "Space-separated command and args to execute",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "log": {
+              "description": "Parameters for log notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "filePath": {
+                    "description": "Absolute path to the log file which will be created if it does not exist",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "victorOps": {
+              "description": "Parameters for VictorOps notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "routingKey": {
+                    "description": "Routing key used to map alerts to teams",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "pagerDuty": {
+              "description": "Parameters for PagerDuty notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "serviceKey": {
+                    "description": "GUID of Generic API integration",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "pagerDuty2": {
+              "description": "Parameters for PagerDuty v2 notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "serviceKey": {
+                    "description": "GUID of Generic API integration",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "pushover": {
+              "description": "Parameters for Pushover notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "userKey": {
+                    "description": "User/group key",
+                    "type": "string"
+                  },
+                  "device": {
+                    "description": "Device name to alert specific devices (comma separated to specify multiple)",
+                    "type": "string"
+                  },
+                  "title": {
+                    "description": "Notification title, otherwise app name is used",
+                    "type": "string"
+                  },
+                  "url": {
+                    "description": "Supplementary URL to show with notification",
+                    "type": "string"
+                  },
+                  "urlTitle": {
+                    "description": "Title for supplementary URL, otherwise just URL is shown",
+                    "type": "string"
+                  },
+                  "sound": {
+                    "description": "Name of supported sound to override the user's default sound choice",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "sensu": {
+              "description": "Parameters for sensu notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "description": "Check source used to create a proxy client for external resources",
+                    "type": "string"
+                  },
+                  "handlers": {
+                    "description": "Sensu event handlers for taking action on events",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "slack": {
+              "description": "Parameters for Slack notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "channel": {
+                    "description": "Channel to post messages to",
+                    "type": "string"
+                  },
+                  "username": {
+                    "description": "Slack bot username",
+                    "type": "string"
+                  },
+                  "iconEmoji": {
+                    "description": "Emoji name surrounded by : characters will replace the normal user icon for the Slack bot",
+                    "type": "string"
+                  },
+                  "workspace": {
+                    "description": "Slack workspace for the alert handler",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "telegram": {
+              "description": "Parameters for Telegram notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "chatId": {
+                    "description": "Telegram user/group ID to post messages to",
+                    "type": "string"
+                  },
+                  "parseMode": {
+                    "description": "Specify the mode used to render the message",
+                    "type": "string",
+                    "enum": ["Markdown", "HTML"]
+                  },
+                  "disableWebPagePreview": {
+                    "description": "Disables link previews in alert messages",
+                    "type": "boolean"
+                  },
+                  "disableNotification": {
+                    "description": "Disables notifications on iOS devices and disables sounds on Android devices",
+                    "type": "boolean"
+                  }
+                }
+              }
+            },
+            "alerta": {
+              "description": "Parameters for Alerta notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "description": "Authentication token (overrides global config)",
+                    "type": "string"
+                  },
+                  "resource": {
+                    "description": "Resource under alarm",
+                    "type": "string"
+                  },
+                  "event": {
+                    "description": "Event name",
+                    "type": "string"
+                  },
+                  "environment": {
+                    "description": "Affected environment",
+                    "type": "string"
+                  },
+                  "group": {
+                    "description": "Event type group",
+                    "type": "string"
+                  },
+                  "value": {
+                    "description": "Event value",
+                    "type": "string"
+                  },
+                  "origin": {
+                    "description": "Name of monitoring component that generated alert",
+                    "type": "string"
+                  },
+                  "service": {
+                    "description": "List of affected services",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "opsGenie": {
+              "description": "Parameters for OpsGenie notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "teams": {
+                    "description": "Teams the alert will be routed to",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "recipients": {
+                    "description": "Single user, group, escalation or schedule to alert",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "opsGenie2": {
+              "description": "Parameters for OpsGenie v2 notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "teams": {
+                    "description": "Teams the alert will be routed to",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "recipients": {
+                    "description": "Single user, group, escalation or schedule to alert",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "talk": {
+              "description": "Parameters for Jane Talk notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                }
+              }
+            },
+            "kafka": {
+              "description": "Parameters for Kafka notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "cluster": {
+                    "description": "Cluster to notify",
+                    "type": "string"
+                  },
+                  "kafka-topic": {
+                    "description": "Topic to notify",
+                    "type": "string"
+                  },
+                  "template": {
+                    "description": "Notification template",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "serviceNow": {
+              "description": "Parameters for ServiceNow notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "description": "Notification source",
+                    "type": "string"
+                  },
+                  "node": {
+                    "description": "Notification node",
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "Notification type",
+                    "type": "string"
+                  },
+                  "resource": {
+                    "description": "Notification resource",
+                    "type": "string"
+                  },
+                  "metric_name": {
+                    "description": "Metric name",
+                    "type": "string"
+                  },
+                  "message_key": {
+                    "description": "Message key",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "bigPanda": {
+              "description": "Parameters for BigPanda notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "app-key": {
+                    "description": "App key",
+                    "type": "string"
+                  },
+                  "primary-property": {
+                    "description": "Primary property",
+                    "type": "string"
+                  },
+                  "secondary-property": {
+                    "description": "Secondary property",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "teams": {
+              "description": "Parameters for Teams notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "channel-url": {
+                    "description": "Channel URL to override global configuration",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "zenoss": {
+              "description": "Parameters for Zenoss notifications",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "description": "Action",
+                    "type": "string"
+                  },
+                  "method": {
+                    "description": "Method",
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "Type",
+                    "type": "string"
+                  },
+                  "tid": {
+                    "description": "TID",
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "device": {
+                    "description": "Device",
+                    "type": "string"
+                  },
+                  "component": {
+                    "description": "Component",
+                    "type": "string"
+                  },
+                  "evclasskey": {
+                    "description": "Event Class Key",
+                    "type": "string"
+                  },
+                  "evclass": {
+                    "description": "Event Class",
+                    "type": "string"
+                  }
+                }
+              }
+            }
           }
         },
         "message": {
