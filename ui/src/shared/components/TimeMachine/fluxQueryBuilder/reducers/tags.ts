@@ -80,6 +80,11 @@ const aggregationReducer = (
         valuesSearchTerm: action.payload.term,
       }))
     }
+    case 'FQB_TAG_INC_KEYS_LIMIT': {
+      return changeTagSelector(state, action.payload.tagIndex, tagState => ({
+        keysLimit: (tagState.keysLimit || 0) + FQB_RESULTS_LIMIT,
+      }))
+    }
     case 'FQB_TAG_SELECT_KEY': {
       return changeTagSelector(state, action.payload.tagIndex, () => ({
         tagKey: action.payload.key,
@@ -100,6 +105,11 @@ const aggregationReducer = (
     case 'FQB_TAG_SEARCH_VALUES': {
       return changeTagSelector(state, action.payload.tagIndex, () => ({
         valuesStatus: RemoteDataState.Loading,
+      }))
+    }
+    case 'FQB_TAG_INC_VALUES_LIMIT': {
+      return changeTagSelector(state, action.payload.tagIndex, tagState => ({
+        valuesLimit: (tagState.valuesLimit || 0) + FQB_RESULTS_LIMIT,
       }))
     }
     case 'FQB_TAG_KEY_STATUS': {

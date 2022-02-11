@@ -6,9 +6,11 @@ export type TagSelectorAction =
   | ReturnType<typeof changeFunctionType>
   | ReturnType<typeof selectKey>
   | ReturnType<typeof changeKeysSearchTerm>
+  | ReturnType<typeof increaseKeysLimit>
   | ReturnType<typeof searchKeys>
   | ReturnType<typeof selectValues>
   | ReturnType<typeof changeValuesSearchTerm>
+  | ReturnType<typeof increaseValuesLimit>
   | ReturnType<typeof searchValues>
   | ReturnType<typeof setKeysStatus>
   | ReturnType<typeof setKeys>
@@ -70,6 +72,15 @@ export function changeKeysSearchTerm(tagIndex: number, term: string) {
   }
 }
 
+export function increaseKeysLimit(tagIndex: number) {
+  return {
+    type: 'FQB_TAG_INC_KEYS_LIMIT' as const,
+    payload: {
+      tagIndex,
+    },
+  }
+}
+
 export function searchKeys(tagIndex: number) {
   return {
     type: 'FQB_TAG_SEARCH_KEY' as const,
@@ -95,6 +106,15 @@ export function changeValuesSearchTerm(tagIndex: number, term: string) {
     payload: {
       tagIndex,
       term,
+    },
+  }
+}
+
+export function increaseValuesLimit(tagIndex: number) {
+  return {
+    type: 'FQB_TAG_INC_VALUES_LIMIT' as const,
+    payload: {
+      tagIndex,
     },
   }
 }

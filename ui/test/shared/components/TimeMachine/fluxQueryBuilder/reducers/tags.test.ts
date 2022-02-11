@@ -19,8 +19,11 @@ import {
   searchValues,
   setKeysStatus,
   setValuesStatus,
+  increaseKeysLimit,
+  increaseValuesLimit,
 } from 'src/shared/components/TimeMachine/fluxQueryBuilder/actions/tags'
 import {BuilderAggregateFunctionType, RemoteDataState} from 'src/types'
+import {FQB_RESULTS_LIMIT} from 'src/shared/components/TimeMachine/fluxQueryBuilder/apis/fluxQueries'
 
 describe('fluxQueryBuilder/reducers/tags', () => {
   it('has empty initial state', () => {
@@ -80,6 +83,26 @@ describe('fluxQueryBuilder/reducers/tags', () => {
     expect(reducedState).toEqual([
       state[0],
       {...state[1], valuesSearchTerm: newVal},
+    ])
+    expect(Object.is(state, reducedState)).toBe(false)
+    expect(Object.is(state[1], reducedState[1])).toBe(false)
+  })
+  it('should handle increaseKeysLimit', () => {
+    const state = [initialSelectorState(0), initialSelectorState(1)]
+    const reducedState = reducer(state, increaseKeysLimit(1))
+    expect(reducedState).toEqual([
+      state[0],
+      {...state[1], keysLimit: state[1].keysLimit + FQB_RESULTS_LIMIT},
+    ])
+    expect(Object.is(state, reducedState)).toBe(false)
+    expect(Object.is(state[1], reducedState[1])).toBe(false)
+  })
+  it('should handle increaseValuesLimit', () => {
+    const state = [initialSelectorState(0), initialSelectorState(1)]
+    const reducedState = reducer(state, increaseValuesLimit(1))
+    expect(reducedState).toEqual([
+      state[0],
+      {...state[1], valuesLimit: state[1].valuesLimit + FQB_RESULTS_LIMIT},
     ])
     expect(Object.is(state, reducedState)).toBe(false)
     expect(Object.is(state[1], reducedState[1])).toBe(false)
