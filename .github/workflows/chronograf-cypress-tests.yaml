@@ -1,0 +1,63 @@
+name: "chronograf/cypress"
+
+on: workflow_dispatch
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.16.4'
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.6.3
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1.2.0
+        with:
+          cluster_name: "chronograf-testing"
+          config: .github/workflows/resources/kind-config.yaml
+
+      - name: Create Enterprise Test Resources
+        run: |
+          kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.15.1/cert-manager.yaml
+          sleep 30 # wait for CertManager
+          kubectl apply -f .github/workflows/resources/test-reources.yaml
+          kubectl create secret generic influxdb-license --from-literal=INFLUXDB_ENTERPRISE_LICENSE_KEY=${INFLUXDB_ENTERPRISE_LICENSE_KEY}
+          helm repo add influxdata https://helm.influxdata.com/
+          helm upgrade --install influxdb influxdata/influxdb-enterprise --namespace default --set-string envFromSecret=influxdb-license --set-string data.service.type=NodePort
+          kubectl patch svc influxdb-influxdb-enterprise-data --type=json -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":30086}]'
+        env:
+          INFLUXDB_ENTERPRISE_LICENSE_KEY: "${{ secrets.INFLUXDB_ENTERPRISE_LICENSE_KEY }}"
+
+      - name: Chronograf
+        run: |
+          npm install --global yarn forever
+          make
+          RUNNER_TRACKING_ID="" && forever start -l forever.log -o out.log -e err.log ./chronograf
+
+      - name: Chronograf test url
+        run: |
+          echo "InfluxDB data node status: $(curl -Isk "https://localhost:8086/ping" | head -n 1)"
+          echo "Chronograf status: $(curl -Isk "http://localhost:8888" | head -n 1)"
+
+      - name: Cypress
+        uses: addnab/docker-run-action@v3
+        with:
+          image: cypress/included:8.7.0
+          options: -it -v ${{ github.workspace }}/ui:/ui -w /ui --add-host=host.docker.internal:host-gateway
+          shell: sh
+          run: |
+            npx browserslist@latest --update-db
+            cypress run --browser chrome --config baseUrl=http://host.docker.internal:8888
+

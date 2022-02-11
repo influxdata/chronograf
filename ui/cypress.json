@@ -1,6 +1,6 @@
 {
   "$schema": "https://on.cypress.io/cypress.schema.json",
-  "baseUrl": "http://localhost:8888/sources/2/dashboards",
+  "baseUrl": "http://localhost:8888",
   "video": false,
   "env": {
     "ALLOW_SCREENSHOT": true
