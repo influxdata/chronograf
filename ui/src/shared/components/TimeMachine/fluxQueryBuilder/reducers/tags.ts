@@ -22,6 +22,7 @@ export function initialSelectorState(
     valuesStatus: undefined,
     valuesTruncated: false,
     tagValues: [],
+    valuesLimit: FQB_RESULTS_LIMIT,
   }
 }
 
@@ -139,7 +140,8 @@ const aggregationReducer = (
       return changeTagSelector(state, action.payload.tagIndex, () => ({
         values: action.payload.values,
         valuesStatus: RemoteDataState.Done,
-        valuesTruncated: action.payload.valuesTruncated,
+        valuesTruncated: action.payload.truncated,
+        valuesLimit: action.payload.limit,
       }))
     }
   }

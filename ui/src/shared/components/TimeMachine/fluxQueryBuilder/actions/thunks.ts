@@ -184,7 +184,14 @@ const loadTagSelectorValuesThunk = (
       selectedValues = tagState.tagValues.filter(x => values.includes(x))
     }
 
-    dispatch(tagActions.setValues(tagIndex, values, valuesTruncated))
+    dispatch(
+      tagActions.setValues(
+        tagIndex,
+        values,
+        valuesTruncated,
+        tagState.valuesLimit
+      )
+    )
     if (selectedValues !== originalSelected) {
       dispatch(tagActions.selectValues(tagIndex, selectedValues))
     }

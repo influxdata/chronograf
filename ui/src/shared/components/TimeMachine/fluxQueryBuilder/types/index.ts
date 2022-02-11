@@ -31,6 +31,7 @@ export interface TagSelectorState extends BuilderTagsType {
   valuesStatus?: RemoteDataState
   values: string[]
   valuesTruncated: boolean
+  valuesLimit: number
 }
 
 export interface BuilderTagsType {

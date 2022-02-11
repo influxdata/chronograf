@@ -148,14 +148,16 @@ export function setKeys(
 export function setValues(
   tagIndex: number,
   values: string[],
-  truncated: boolean
+  truncated: boolean,
+  limit: number
 ) {
   return {
     type: 'FQB_TAG_VALUES' as const,
     payload: {
       tagIndex,
       values,
-      valuesTruncated: truncated,
+      truncated,
+      limit,
     },
   }
 }
