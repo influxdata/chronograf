@@ -139,12 +139,17 @@ export function setKeys(tagIndex: number, keys: string[], truncated: boolean) {
   }
 }
 
-export function setValues(tagIndex: number, values: string[]) {
+export function setValues(
+  tagIndex: number,
+  values: string[],
+  truncated: boolean
+) {
   return {
     type: 'FQB_TAG_VALUES' as const,
     payload: {
       tagIndex,
       values,
+      valuesTruncated: truncated,
     },
   }
 }

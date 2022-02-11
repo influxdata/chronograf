@@ -139,6 +139,7 @@ const loadTagSelectorValuesThunk = (
 
   try {
     let values: string[]
+    let valuesTruncated = false
     const originalSelected = tagState.tagValues || []
     let selectedValues = originalSelected
     if (tagState.aggregateFunctionType === 'filter') {
@@ -155,6 +156,7 @@ const loadTagSelectorValuesThunk = (
           timeRange,
         })
         values = data.result
+        valuesTruncated = data.truncated
         for (const selectedValue of tagState.tagValues) {
           // Even if the selected values didn't come back in the results, let them
           // be selected anyway
@@ -179,7 +181,7 @@ const loadTagSelectorValuesThunk = (
       selectedValues = tagState.tagValues.filter(x => values.includes(x))
     }
 
-    dispatch(tagActions.setValues(tagIndex, values))
+    dispatch(tagActions.setValues(tagIndex, values, valuesTruncated))
     if (selectedValues !== originalSelected) {
       dispatch(tagActions.selectValues(tagIndex, selectedValues))
     }

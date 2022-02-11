@@ -18,6 +18,7 @@ export function initialSelectorState(
     values: [],
     valuesSearchTerm: '',
     valuesStatus: undefined,
+    valuesTruncated: false,
     tagValues: [],
   }
 }
@@ -135,6 +136,7 @@ const aggregationReducer = (
       return changeTagSelector(state, action.payload.tagIndex, () => ({
         values: action.payload.values,
         valuesStatus: RemoteDataState.Done,
+        valuesTruncated: action.payload.valuesTruncated,
       }))
     }
   }
