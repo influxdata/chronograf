@@ -72,6 +72,7 @@ export const loadTagSelectorThunk = (
           tagsSelections: tags
             .slice(0, tagIndex)
             .filter(x => x.aggregateFunctionType === 'filter'),
+          limit: tagState.keysLimit,
         }
       )
 
@@ -98,7 +99,9 @@ export const loadTagSelectorThunk = (
         keys.unshift(key)
       }
 
-      dispatch(tagActions.setKeys(tagIndex, keys, truncated))
+      dispatch(
+        tagActions.setKeys(tagIndex, keys, truncated, tagState.keysLimit)
+      )
     }
     dispatch(loadTagSelectorValuesThunk(source, timeRange, tagIndex))
   } catch (e) {

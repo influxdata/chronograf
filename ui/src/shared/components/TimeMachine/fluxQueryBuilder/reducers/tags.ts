@@ -1,6 +1,7 @@
 import {TagSelectorAction} from '../actions/tags'
 import {TagSelectorState} from '../types'
 import {BuilderAggregateFunctionType, RemoteDataState} from 'src/types'
+import {FQB_RESULTS_LIMIT} from '../apis/fluxQueries'
 
 export const initialState: TagSelectorState[] = []
 export function initialSelectorState(
@@ -14,6 +15,7 @@ export function initialSelectorState(
     keysSearchTerm: '',
     keysStatus: RemoteDataState.NotStarted,
     keysTruncated: false,
+    keysLimit: FQB_RESULTS_LIMIT,
     tagKey: '',
     values: [],
     valuesSearchTerm: '',
@@ -129,7 +131,8 @@ const aggregationReducer = (
       return changeTagSelector(state, action.payload.tagIndex, () => ({
         keys: action.payload.keys,
         keysStatus: RemoteDataState.Done,
-        keysTruncated: action.payload.keysTruncated,
+        keysTruncated: action.payload.truncated,
+        keysLimit: action.payload.limit,
       }))
     }
     case 'FQB_TAG_VALUES': {

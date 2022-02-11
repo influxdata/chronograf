@@ -104,7 +104,7 @@ describe('fluxQueryBuilder/reducers/tags', () => {
     ;[true, false].forEach(truncated => {
       const newVal = ['newK']
       const state = [initialSelectorState(0), initialSelectorState(1)]
-      const reducedState = reducer(state, setKeys(1, newVal, truncated))
+      const reducedState = reducer(state, setKeys(1, newVal, truncated, 400))
       expect(reducedState).toEqual([
         state[0],
         {
@@ -112,6 +112,7 @@ describe('fluxQueryBuilder/reducers/tags', () => {
           keys: newVal,
           keysTruncated: truncated,
           keysStatus: RemoteDataState.Done,
+          keysLimit: 400,
         },
       ])
       expect(Object.is(state, reducedState)).toBe(false)
