@@ -1,4 +1,4 @@
-import React, {ChangeEvent, Dispatch, useEffect, useMemo} from 'react'
+import React, {ChangeEvent, Dispatch, useEffect, useMemo, useState} from 'react'
 import {connect} from 'react-redux'
 import BuilderCard from './BuilderCard'
 import DefaultDebouncer from 'src/shared/utils/debouncer'
@@ -27,6 +27,7 @@ import {
 } from './actions/tags'
 import {ButtonShape, ComponentSize, IconFont} from 'src/reusable_ui/types'
 import {Button} from 'src/reusable_ui'
+import LoadingSpinner from 'src/reusable_ui/components/spinners/LoadingSpinner'
 
 const SEARCH_DEBOUNCE_MS = 400
 
@@ -212,7 +213,11 @@ const TagSelectorValues = (props: Props & {onLoadMoreValues: () => void}) => {
       )
     }
   }
+  const [loadFinished, setLoadFinished] = useState(false)
   if (valuesStatus === RemoteDataState.Error) {
+    if (loadFinished) {
+      setLoadFinished(false)
+    }
     return (
       <BuilderCard.Empty>
         {`Failed to load tag values for ${key}`}
@@ -220,25 +225,33 @@ const TagSelectorValues = (props: Props & {onLoadMoreValues: () => void}) => {
     )
   }
   if (valuesStatus === RemoteDataState.NotStarted) {
+    if (loadFinished) {
+      setLoadFinished(false)
+    }
     return (
       <BuilderCard.Empty>
         <WaitingText text="Waiting for tag values" />
       </BuilderCard.Empty>
     )
   }
-  if (valuesStatus === RemoteDataState.Loading) {
+  if (!loadFinished && valuesStatus === RemoteDataState.Loading) {
     return (
       <BuilderCard.Empty>
         <WaitingText text="Loading tag values" />
       </BuilderCard.Empty>
     )
   }
-  if (valuesStatus === RemoteDataState.Done && !values.length) {
-    return (
-      <BuilderCard.Empty>
-        No values found <small>in the current time range</small>
-      </BuilderCard.Empty>
-    )
+  if (valuesStatus === RemoteDataState.Done) {
+    if (!loadFinished) {
+      setLoadFinished(true)
+    }
+    if (!values.length) {
+      return (
+        <BuilderCard.Empty>
+          No values found <small>in the current time range</small>
+        </BuilderCard.Empty>
+      )
+    }
   }
   return (
     <BuilderCard.Body>
@@ -267,16 +280,20 @@ const TagSelectorValues = (props: Props & {onLoadMoreValues: () => void}) => {
         })}
         {valuesTruncated && aggregateFunctionType === 'filter' ? (
           <div className="flux-query-builder--list-item" key={`__truncated`}>
-            <Button
-              text="Load More Values"
-              onClick={e => {
-                e.stopPropagation()
-                onLoadMoreValues()
-              }}
-              size={ComponentSize.ExtraSmall}
-              shape={ButtonShape.StretchToFit}
-              icon={IconFont.Plus}
-            />
+            {valuesStatus !== RemoteDataState.Loading ? (
+              <Button
+                text="Load More Values"
+                onClick={e => {
+                  e.stopPropagation()
+                  onLoadMoreValues()
+                }}
+                size={ComponentSize.ExtraSmall}
+                shape={ButtonShape.StretchToFit}
+                icon={IconFont.Plus}
+              />
+            ) : (
+              <LoadingSpinner />
+            )}
           </div>
         ) : undefined}
       </div>
