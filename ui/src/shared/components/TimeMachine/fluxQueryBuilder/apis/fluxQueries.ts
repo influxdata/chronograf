@@ -22,7 +22,7 @@ export function findBuckets(
   {limit = FQB_RESULTS_LIMIT}: FindBucketsOptions
 ): CancelBox<TruncatedResult<string[]>> {
   const query = `buckets()
-  |> sort(columns: ["name"])${limit ? ` |> limit(n: ${limit})` : ''}`
+  |> sort(columns: ["name"])${limit > 0 ? ` |> limit(n: ${limit})` : ''}`
 
   return extractBoxedCol(runQuery(source, query), 'name', limit)
 }

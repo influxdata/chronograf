@@ -33,11 +33,15 @@ class QueryBuilderFetcher {
 
   public async findBuckets(
     source: Source,
-    limit?: FindBucketsOptions
+    options?: FindBucketsOptions
   ): Promise<TruncatedResult<string[]>> {
     this.cancelFindBuckets()
 
-    const cachedResult = this.findBucketsCache[source.id]
+    const cacheKey = JSON.stringify({
+      id: source.id,
+      limit: options.limit,
+    })
+    const cachedResult = this.findBucketsCache[cacheKey]
 
     if (cachedResult) {
       return Promise.resolve({
@@ -46,12 +50,12 @@ class QueryBuilderFetcher {
       })
     }
 
-    const pendingResult = findBuckets(source, limit)
+    const pendingResult = findBuckets(source, options)
     this.findBucketsQuery = pendingResult
 
     pendingResult.promise
       .then(t => {
-        this.findBucketsCache[source.id] = {
+        this.findBucketsCache[cacheKey] = {
           result: t.result,
           truncated: t.truncated,
         }
