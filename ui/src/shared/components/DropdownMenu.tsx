@@ -1,4 +1,4 @@
-import React, {FunctionComponent} from 'react'
+import React, {FunctionComponent, MouseEvent} from 'react'
 import {Link} from 'react-router'
 
 import classnames from 'classnames'
@@ -24,15 +24,26 @@ interface AddNew {
   url?: string
   text: string
   handler?: () => void
+  stopPropagation?: boolean
 }
 
-const AddNewButton: FunctionComponent<AddNew> = ({url, text, handler}) => {
+const AddNewButton: FunctionComponent<AddNew> = ({
+  url,
+  text,
+  handler,
+  stopPropagation,
+}) => {
   if (handler) {
     return (
       <li className="multi-select--apply">
         <Button
           text={text}
-          onClick={handler}
+          onClick={(e: MouseEvent) => {
+            if (stopPropagation) {
+              e.stopPropagation()
+            }
+            handler()
+          }}
           color={ComponentColor.Default}
           size={ComponentSize.ExtraSmall}
           shape={ButtonShape.StretchToFit}
