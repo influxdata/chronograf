@@ -19,7 +19,12 @@ import {
   selectTagKeyThunk,
   selectTagValuesThunk,
 } from './actions/thunks'
-import {changeKeysSearchTerm, changeValuesSearchTerm} from './actions/tags'
+import {
+  changeKeysSearchTerm,
+  changeValuesSearchTerm,
+  increaseKeysLimit,
+  increaseValuesLimit,
+} from './actions/tags'
 
 const SEARCH_DEBOUNCE_MS = 400
 
@@ -61,6 +66,7 @@ const TagSelectorBody = (props: Props) => {
     aggregateFunctionType,
     keys,
     keysStatus,
+    keysTruncated,
     tagKey: key,
     onSelectKey,
     valuesSearchTerm,
@@ -68,6 +74,7 @@ const TagSelectorBody = (props: Props) => {
     onSearchValues,
     keysSearchTerm,
     onChangeKeysSearchTerm,
+    onIncreaseKeysLimit,
     onSearchKeys,
     tagValues: selectedValues,
   } = props
@@ -99,6 +106,10 @@ const TagSelectorBody = (props: Props) => {
     onChangeKeysSearchTerm(term)
     debouncer.call(() => onSearchKeys(), SEARCH_DEBOUNCE_MS)
   }
+  function onLoadMoreKeys() {
+    onIncreaseKeysLimit()
+    debouncer.call(() => onSearchKeys(), SEARCH_DEBOUNCE_MS)
+  }
 
   const placeholderText =
     aggregateFunctionType === 'group'
@@ -125,6 +136,15 @@ const TagSelectorBody = (props: Props) => {
               buttonSize="btn-sm"
               className="dropdown-stretch"
               status={keysStatus}
+              addNew={
+                aggregateFunctionType === 'filter' && keysTruncated
+                  ? {
+                      text: 'Load More',
+                      stopPropagation: true,
+                      handler: onLoadMoreKeys,
+                    }
+                  : undefined
+              }
             />
             {selectedValues.length ? (
               <div
@@ -163,6 +183,7 @@ const TagSelectorValues = (props: Props) => {
     tagIndex,
     values,
     valuesStatus,
+    valuesTruncated,
     tagValues: selectedValues,
     onSelectValues,
   } = props
@@ -236,6 +257,11 @@ const TagSelectorValues = (props: Props) => {
             </div>
           )
         })}
+        {valuesTruncated && aggregateFunctionType === 'filter' ? (
+          <div className="flux-query-builder--list-item" key={`__truncated`}>
+            Truncated
+          </div>
+        ) : undefined}
       </div>
     </BuilderCard.Body>
   )
@@ -261,11 +287,17 @@ const mdtp = (dispatch: Dispatch<any>, {source, timeRange, tagIndex}) => {
     onChangeKeysSearchTerm: (term: string) => {
       dispatch(changeKeysSearchTerm(tagIndex, term))
     },
+    onIncreaseKeysLimit: () => {
+      dispatch(increaseKeysLimit(tagIndex))
+    },
     onSearchKeys: () => {
       dispatch(searchTagKeysThunk(source, timeRange, tagIndex))
     },
     onChangeValuesSearchTerm: (term: string) => {
       dispatch(changeValuesSearchTerm(tagIndex, term))
+    },
+    onIncreaseValuesLimit: () => {
+      dispatch(increaseValuesLimit(tagIndex))
     },
     onSearchValues: () => {
       dispatch(searchTagValuesThunk(source, timeRange, tagIndex))
