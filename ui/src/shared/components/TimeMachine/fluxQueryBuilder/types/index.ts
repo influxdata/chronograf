@@ -24,6 +24,7 @@ export interface TagSelectorState extends BuilderTagsType {
   keysStatus: RemoteDataState
   keys: string[]
   keysSearchTerm: string
+  keysTruncated: boolean
 
   valuesSearchTerm: string
   valuesStatus?: RemoteDataState

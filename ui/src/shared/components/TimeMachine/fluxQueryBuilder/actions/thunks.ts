@@ -62,15 +62,18 @@ export const loadTagSelectorThunk = (
     if (tagState.aggregateFunctionType === 'filter') {
       const searchTerm = tagState.keysSearchTerm
       dispatch(tagActions.setKeysStatus(tagIndex, RemoteDataState.Loading))
-      const {result: keys} = await queryBuilderFetcher.findKeys(tagIndex, {
-        source,
-        bucket: selectedBucket,
-        searchTerm,
-        timeRange,
-        tagsSelections: tags
-          .slice(0, tagIndex)
-          .filter(x => x.aggregateFunctionType === 'filter'),
-      })
+      const {result: keys, truncated} = await queryBuilderFetcher.findKeys(
+        tagIndex,
+        {
+          source,
+          bucket: selectedBucket,
+          searchTerm,
+          timeRange,
+          tagsSelections: tags
+            .slice(0, tagIndex)
+            .filter(x => x.aggregateFunctionType === 'filter'),
+        }
+      )
 
       const {tagKey: key} = tagState
 
@@ -95,7 +98,7 @@ export const loadTagSelectorThunk = (
         keys.unshift(key)
       }
 
-      dispatch(tagActions.setKeys(tagIndex, keys))
+      dispatch(tagActions.setKeys(tagIndex, keys, truncated))
     }
     dispatch(loadTagSelectorValuesThunk(source, timeRange, tagIndex))
   } catch (e) {

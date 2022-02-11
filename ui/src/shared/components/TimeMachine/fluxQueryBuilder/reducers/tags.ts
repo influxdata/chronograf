@@ -13,6 +13,7 @@ export function initialSelectorState(
     keys: [],
     keysSearchTerm: '',
     keysStatus: RemoteDataState.NotStarted,
+    keysTruncated: false,
     tagKey: '',
     values: [],
     valuesSearchTerm: '',
@@ -127,6 +128,7 @@ const aggregationReducer = (
       return changeTagSelector(state, action.payload.tagIndex, () => ({
         keys: action.payload.keys,
         keysStatus: RemoteDataState.Done,
+        keysTruncated: action.payload.keysTruncated,
       }))
     }
     case 'FQB_TAG_VALUES': {

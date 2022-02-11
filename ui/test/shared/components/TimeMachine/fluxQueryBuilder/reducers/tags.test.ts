@@ -101,15 +101,22 @@ describe('fluxQueryBuilder/reducers/tags', () => {
     expect(Object.is(state[1], reducedState[1])).toBe(false)
   })
   it('should handle setKeys', () => {
-    const newVal = ['newK']
-    const state = [initialSelectorState(0), initialSelectorState(1)]
-    const reducedState = reducer(state, setKeys(1, newVal))
-    expect(reducedState).toEqual([
-      state[0],
-      {...state[1], keys: newVal, keysStatus: RemoteDataState.Done},
-    ])
-    expect(Object.is(state, reducedState)).toBe(false)
-    expect(Object.is(state[1], reducedState[1])).toBe(false)
+    ;[true, false].forEach(truncated => {
+      const newVal = ['newK']
+      const state = [initialSelectorState(0), initialSelectorState(1)]
+      const reducedState = reducer(state, setKeys(1, newVal, truncated))
+      expect(reducedState).toEqual([
+        state[0],
+        {
+          ...state[1],
+          keys: newVal,
+          keysTruncated: truncated,
+          keysStatus: RemoteDataState.Done,
+        },
+      ])
+      expect(Object.is(state, reducedState)).toBe(false)
+      expect(Object.is(state[1], reducedState[1])).toBe(false)
+    })
   })
   it('should handle setValues', () => {
     const newVal = ['newV']
