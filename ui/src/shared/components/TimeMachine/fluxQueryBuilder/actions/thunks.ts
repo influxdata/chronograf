@@ -62,7 +62,7 @@ export const loadTagSelectorThunk = (
     if (tagState.aggregateFunctionType === 'filter') {
       const searchTerm = tagState.keysSearchTerm
       dispatch(tagActions.setKeysStatus(tagIndex, RemoteDataState.Loading))
-      const keys = await queryBuilderFetcher.findKeys(tagIndex, {
+      const {result: keys} = await queryBuilderFetcher.findKeys(tagIndex, {
         source,
         bucket: selectedBucket,
         searchTerm,
@@ -141,7 +141,7 @@ const loadTagSelectorValuesThunk = (
     if (tagState.aggregateFunctionType === 'filter') {
       dispatch(tagActions.setValuesStatus(tagIndex, RemoteDataState.Loading))
       if (tagState.tagKey) {
-        values = await queryBuilderFetcher.findValues(tagIndex, {
+        const data = await queryBuilderFetcher.findValues(tagIndex, {
           source,
           bucket: selectedBucket,
           tagsSelections: tags
@@ -151,6 +151,7 @@ const loadTagSelectorValuesThunk = (
           searchTerm: tagState.valuesSearchTerm,
           timeRange,
         })
+        values = data.result
         for (const selectedValue of tagState.tagValues) {
           // Even if the selected values didn't come back in the results, let them
           // be selected anyway
@@ -205,7 +206,9 @@ export const loadBucketsThunk = (
   dispatch(bucketActions.setBucketsStatus(RemoteDataState.Loading))
 
   try {
-    const allBuckets = await queryBuilderFetcher.findBuckets(source)
+    const {result: allBuckets} = await queryBuilderFetcher.findBuckets(source, {
+      limit: -1,
+    })
 
     const systemBuckets = allBuckets.filter(b => b.startsWith('_'))
     const userBuckets = allBuckets.filter(b => !b.startsWith('_'))

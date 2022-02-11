@@ -11,18 +11,20 @@ import fluxString from 'src/flux/helpers/fluxString'
 import rangeArguments from 'src/flux/helpers/rangeArguments'
 
 const DEFAULT_TIME_RANGE: TimeRange = {lower: 'now() - 30d', lowerFlux: '-30d'}
-const DEFAULT_LIMIT = 200
+export const FQB_RESULTS_LIMIT = 200
 
 export interface FindBucketsOptions {
-  url: string
-  orgID: string
+  limit?: number
 }
 
-export function findBuckets(source: Source): CancelBox<string[]> {
+export function findBuckets(
+  source: Source,
+  {limit = FQB_RESULTS_LIMIT}: FindBucketsOptions
+): CancelBox<TruncatedResult<string[]>> {
   const query = `buckets()
-  |> sort(columns: ["name"])`
+  |> sort(columns: ["name"])${limit ? ` |> limit(n: ${limit})` : ''}`
 
-  return extractBoxedCol(runQuery(source, query), 'name')
+  return extractBoxedCol(runQuery(source, query), 'name', limit)
 }
 
 export interface FindKeysOptions {
@@ -34,14 +36,19 @@ export interface FindKeysOptions {
   limit?: number
 }
 
+export interface TruncatedResult<T> {
+  result: T
+  truncated: boolean
+}
+
 export function findKeys({
   source,
   bucket,
   tagsSelections,
   searchTerm = '',
   timeRange = DEFAULT_TIME_RANGE,
-  limit = DEFAULT_LIMIT,
-}: FindKeysOptions): CancelBox<string[]> {
+  limit = FQB_RESULTS_LIMIT,
+}: FindKeysOptions): CancelBox<TruncatedResult<string[]>> {
   const tagFilter = formatTagFilter(tagsSelections)
   const previousKeyFilter = formatTagKeyFilterCall(tagsSelections)
   const timeRangeArguments = rangeArguments(timeRange)
@@ -62,7 +69,7 @@ from(bucket: "${bucket}")
   |> sort()
   |> limit(n: ${limit})`
 
-  return extractBoxedCol(runQuery(source, query), '_value')
+  return extractBoxedCol(runQuery(source, query), '_value', limit)
 }
 
 export interface FindValuesOptions {
@@ -82,8 +89,8 @@ export function findValues({
   key,
   searchTerm = '',
   timeRange = DEFAULT_TIME_RANGE,
-  limit = DEFAULT_LIMIT,
-}: FindValuesOptions): CancelBox<string[]> {
+  limit = FQB_RESULTS_LIMIT,
+}: FindValuesOptions): CancelBox<TruncatedResult<string[]>> {
   const tagFilter = formatTagFilter(tagsSelections)
   const timeRangeArguments = rangeArguments(timeRange)
 
@@ -109,24 +116,26 @@ from(bucket: ${fluxString(bucket)})
   |> keep(columns: [${fluxString(key)}${v1ExtraKeep}])
   |> group()
   |> distinct(column: ${fluxString(key)})${searchFilter}
-  |> limit(n: ${limit})
-  |> sort()`
+  |> sort()
+  |> limit(n: ${limit})`
 
-  return extractBoxedCol(runQuery(source, query), '_value')
+  return extractBoxedCol(runQuery(source, query), '_value', limit)
 }
 
-export function extractBoxedCol(
+function extractBoxedCol(
   resp: CancelBox<RunQueryResult>,
-  colName: string
-): CancelBox<string[]> {
-  const promise = resp.promise.then<string[]>(result => {
-    return extractCol(result.csv, colName)
+  colName: string,
+  limit: number
+): CancelBox<TruncatedResult<string[]>> {
+  const promise = resp.promise.then(({csv}) => {
+    const result = extractCol(csv, colName)
+    return {result, truncated: result.length === limit}
   })
 
   return {promise, cancel: resp.cancel}
 }
 
-export function extractCol(csv: string, colName: string): string[] {
+function extractCol(csv: string, colName: string): string[] {
   const tables = parseResponse(csv)
   if (tables && tables.length > 0) {
     const data = tables[0].data

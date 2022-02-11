@@ -5,6 +5,8 @@ import {
   findValues,
   FindKeysOptions,
   FindValuesOptions,
+  TruncatedResult,
+  FindBucketsOptions,
 } from './fluxQueries'
 
 // Types
@@ -12,7 +14,7 @@ import {CancelBox} from 'src/types/promises'
 import {Source} from 'src/types'
 import {BuilderTagsType} from '../types'
 
-type CancelableQuery = CancelBox<string[]>
+type CancelableQuery = CancelBox<string[] | TruncatedResult<string[]>>
 
 function tagSelectionKey(tags: BuilderTagsType[]): any[] {
   return tags.map(x => ({
@@ -25,25 +27,34 @@ class QueryBuilderFetcher {
   private findBucketsQuery?: CancelableQuery
   private findKeysQueries: Array<CancelableQuery | undefined> = []
   private findValuesQueries: Array<CancelableQuery | undefined> = []
-  private findKeysCache: {[key: string]: string[]} = {}
-  private findValuesCache: {[key: string]: string[]} = {}
-  private findBucketsCache: {[key: string]: string[]} = {}
+  private findKeysCache: {[key: string]: TruncatedResult<string[]>} = {}
+  private findValuesCache: {[key: string]: TruncatedResult<string[]>} = {}
+  private findBucketsCache: {[key: string]: TruncatedResult<string[]>} = {}
 
-  public async findBuckets(source: Source): Promise<string[]> {
+  public async findBuckets(
+    source: Source,
+    limit?: FindBucketsOptions
+  ): Promise<TruncatedResult<string[]>> {
     this.cancelFindBuckets()
 
     const cachedResult = this.findBucketsCache[source.id]
 
     if (cachedResult) {
-      return Promise.resolve(cachedResult)
+      return Promise.resolve({
+        result: cachedResult.result,
+        truncated: cachedResult.truncated,
+      })
     }
 
-    const pendingResult = findBuckets(source)
+    const pendingResult = findBuckets(source, limit)
     this.findBucketsQuery = pendingResult
 
     pendingResult.promise
-      .then(result => {
-        this.findBucketsCache[source.id] = result
+      .then(t => {
+        this.findBucketsCache[source.id] = {
+          result: t.result,
+          truncated: t.truncated,
+        }
       })
       .catch(() => {})
 
@@ -60,7 +71,7 @@ class QueryBuilderFetcher {
   public async findKeys(
     tagIndex: number,
     options: FindKeysOptions
-  ): Promise<string[]> {
+  ): Promise<TruncatedResult<string[]>> {
     this.cancelFindKeys(tagIndex)
 
     const {source, tagsSelections, ...rest} = options
@@ -72,16 +83,22 @@ class QueryBuilderFetcher {
     const cachedResult = this.findKeysCache[cacheKey]
 
     if (cachedResult) {
-      return Promise.resolve([...cachedResult])
+      return Promise.resolve({
+        result: [...cachedResult.result],
+        truncated: cachedResult.truncated,
+      })
     }
 
     const pendingResult = findKeys(options)
 
     this.findKeysQueries[tagIndex] = pendingResult
 
-    pendingResult.promise = pendingResult.promise.then(result => {
-      this.findKeysCache[cacheKey] = [...result]
-      return result
+    pendingResult.promise = pendingResult.promise.then(t => {
+      this.findKeysCache[cacheKey] = {
+        result: [...t.result],
+        truncated: t.truncated,
+      }
+      return t
     })
 
     return pendingResult.promise
@@ -97,11 +114,11 @@ class QueryBuilderFetcher {
   public async findValues(
     tagIndex: number,
     options: FindValuesOptions
-  ): Promise<string[]> {
+  ): Promise<TruncatedResult<string[]>> {
     this.cancelFindValues(tagIndex)
     if (!options.key) {
       // return no values for no key
-      return []
+      return {result: [], truncated: false}
     }
 
     const {source, tagsSelections, ...rest} = options
@@ -113,16 +130,22 @@ class QueryBuilderFetcher {
     const cachedResult = this.findValuesCache[cacheKey]
 
     if (cachedResult) {
-      return Promise.resolve([...cachedResult])
+      return Promise.resolve({
+        result: [...cachedResult.result],
+        truncated: cachedResult.truncated,
+      })
     }
 
     const pendingResult = findValues(options)
 
     this.findValuesQueries[tagIndex] = pendingResult
 
-    pendingResult.promise = pendingResult.promise.then(result => {
-      this.findValuesCache[cacheKey] = [...result]
-      return result
+    pendingResult.promise = pendingResult.promise.then(t => {
+      this.findValuesCache[cacheKey] = {
+        result: [...t.result],
+        truncated: t.truncated,
+      }
+      return t
     })
 
     return pendingResult.promise
