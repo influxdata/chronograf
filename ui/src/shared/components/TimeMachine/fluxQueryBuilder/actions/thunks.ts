@@ -213,9 +213,7 @@ export const loadBucketsThunk = (
   dispatch(bucketActions.setBucketsStatus(RemoteDataState.Loading))
 
   try {
-    const {result: allBuckets} = await queryBuilderFetcher.findBuckets(source, {
-      limit: -1,
-    })
+    const {result: allBuckets} = await queryBuilderFetcher.findBuckets(source)
 
     const systemBuckets = allBuckets.filter(b => b.startsWith('_'))
     const userBuckets = allBuckets.filter(b => !b.startsWith('_'))

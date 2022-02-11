@@ -14,12 +14,12 @@ const DEFAULT_TIME_RANGE: TimeRange = {lower: 'now() - 30d', lowerFlux: '-30d'}
 export const FQB_RESULTS_LIMIT = 200
 
 export interface FindBucketsOptions {
-  limit?: number
+  limit: number
 }
 
 export function findBuckets(
   source: Source,
-  {limit = FQB_RESULTS_LIMIT}: FindBucketsOptions
+  {limit}: FindBucketsOptions
 ): CancelBox<TruncatedResult<string[]>> {
   const query = `buckets()
   |> sort(columns: ["name"])${limit > 0 ? ` |> limit(n: ${limit})` : ''}`

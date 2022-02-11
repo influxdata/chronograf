@@ -27,23 +27,26 @@ class QueryBuilderFetcher {
   private findBucketsQuery?: CancelableQuery
   private findKeysQueries: Array<CancelableQuery | undefined> = []
   private findValuesQueries: Array<CancelableQuery | undefined> = []
-  private findKeysCache: {[key: string]: TruncatedResult<string[]>} = {}
-  private findValuesCache: {[key: string]: TruncatedResult<string[]>} = {}
-  private findBucketsCache: {[key: string]: TruncatedResult<string[]>} = {}
+  private findKeysCache: {
+    [key: string]: TruncatedResult<string[]> & {limit: number}
+  } = {}
+  private findValuesCache: {
+    [key: string]: TruncatedResult<string[]> & {limit: number}
+  } = {}
+  private findBucketsCache: {
+    [key: string]: TruncatedResult<string[]> & {limit: number}
+  } = {}
 
   public async findBuckets(
     source: Source,
-    options?: FindBucketsOptions
+    options: FindBucketsOptions = {limit: Number.MAX_SAFE_INTEGER}
   ): Promise<TruncatedResult<string[]>> {
     this.cancelFindBuckets()
 
-    const cacheKey = JSON.stringify({
-      id: source.id,
-      limit: options.limit,
-    })
+    const cacheKey = source.id
     const cachedResult = this.findBucketsCache[cacheKey]
 
-    if (cachedResult) {
+    if (cachedResult && options.limit <= cachedResult.limit) {
       return Promise.resolve({
         result: cachedResult.result,
         truncated: cachedResult.truncated,
@@ -58,6 +61,7 @@ class QueryBuilderFetcher {
         this.findBucketsCache[cacheKey] = {
           result: t.result,
           truncated: t.truncated,
+          limit: options.limit,
         }
       })
       .catch(() => {})
@@ -78,7 +82,7 @@ class QueryBuilderFetcher {
   ): Promise<TruncatedResult<string[]>> {
     this.cancelFindKeys(tagIndex)
 
-    const {source, tagsSelections, ...rest} = options
+    const {source, tagsSelections, limit, ...rest} = options
     const cacheKey = JSON.stringify({
       id: source.id,
       tags: tagSelectionKey(tagsSelections),
@@ -86,7 +90,7 @@ class QueryBuilderFetcher {
     })
     const cachedResult = this.findKeysCache[cacheKey]
 
-    if (cachedResult) {
+    if (cachedResult && limit <= cachedResult.limit) {
       return Promise.resolve({
         result: [...cachedResult.result],
         truncated: cachedResult.truncated,
@@ -101,6 +105,7 @@ class QueryBuilderFetcher {
       this.findKeysCache[cacheKey] = {
         result: [...t.result],
         truncated: t.truncated,
+        limit,
       }
       return t
     })
@@ -125,7 +130,7 @@ class QueryBuilderFetcher {
       return {result: [], truncated: false}
     }
 
-    const {source, tagsSelections, ...rest} = options
+    const {source, tagsSelections, limit, ...rest} = options
     const cacheKey = JSON.stringify({
       id: source.id,
       tags: tagSelectionKey(tagsSelections),
@@ -133,7 +138,7 @@ class QueryBuilderFetcher {
     })
     const cachedResult = this.findValuesCache[cacheKey]
 
-    if (cachedResult) {
+    if (cachedResult && limit <= cachedResult.limit) {
       return Promise.resolve({
         result: [...cachedResult.result],
         truncated: cachedResult.truncated,
@@ -148,6 +153,7 @@ class QueryBuilderFetcher {
       this.findValuesCache[cacheKey] = {
         result: [...t.result],
         truncated: t.truncated,
+        limit,
       }
       return t
     })
