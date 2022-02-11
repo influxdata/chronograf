@@ -149,7 +149,7 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 
 	/* Documentation */
 	router.GET("/swagger.json", Spec())
-	router.GET("/docs", Redoc("/swagger.json"))
+	router.GET("/docs", Redoc("swagger.json"))
 
 	/* Health */
 	router.GET("/ping", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) })
