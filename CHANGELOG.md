@@ -4,6 +4,8 @@
 
 ### Bug Fixes
 
+1. [#5862](https://github.com/influxdata/chronograf/pull/5862): Respect BASE_PATH when serving API docs.
+
 ### Other
 
 1. [#5851](https://github.com/influxdata/chronograf/pull/5851): Remove fixed-table-2 to resolve CVE-2022-0235.
