@@ -2,7 +2,7 @@
 
 ### Features
 
-1. [#5852](https://github.com/influxdata/chronograf/pull/5852): Add flux query builder.
+1. [#5852](https://github.com/influxdata/chronograf/pull/5852): Add Flux Query Builder.
 1. [#5858](https://github.com/influxdata/chronograf/pull/5858): Use time range in flux Schema Explorer.
 
 ### Bug Fixes
