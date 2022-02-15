@@ -126,12 +126,27 @@ async function AJAX<T = any>(
   }
 }
 
-export async function getAJAX<T = any>(url: string): Promise<AxiosResponse<T>> {
+export async function getAJAX<T = any>(url: string): Promise<{data: T}> {
   try {
-    return await axios.request<T>({method: 'GET', url: addBasepath(url, false)})
-  } catch (error) {
-    console.error(error)
-    throw error
+    const response = await fetch(addBasepath(url, false), {
+      method: 'GET',
+    })
+    if (response.ok) {
+      return {data: (await response.json()) as T}
+    }
+    const data = await response.text()
+    console.error(
+      'failed to GET url:',
+      url,
+      'status:',
+      response.statusText,
+      'response:',
+      data
+    )
+    Promise.reject(new Error(response.statusText || `error ${response.status}`))
+  } catch (e) {
+    console.error('failed to GET url:', url, 'error:', e)
+    return Promise.reject(e)
   }
 }
 
