@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import axios, {AxiosResponse, Method} from 'axios'
+import axios, {AxiosResponse} from 'axios'
 
 let links
 export const setAJAXLinks = ({updatedLinks}): void => {
@@ -76,7 +76,7 @@ interface RequestParams {
   url?: string | string[]
   resource?: string
   id?: string
-  method?: Method
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
   data?: object | string
   params?: object
   headers?: object
