@@ -8,7 +8,6 @@ import {
 } from 'src/dashboards/utils/dashboardSwitcherLinks'
 import {instantiateProtoboard} from 'src/dashboards/utils/protoboardToDashboard'
 
-import {AxiosResponse} from 'axios'
 import {
   DashboardsResponse,
   GetDashboards,
@@ -21,7 +20,7 @@ export const getDashboards: GetDashboards = () => {
   return AJAX<DashboardsResponse>({
     method: 'GET',
     resource: 'dashboards',
-  }) as Promise<AxiosResponse<DashboardsResponse>>
+  }) as Promise<{data: DashboardsResponse}>
 }
 
 export const loadDashboardLinks = async (
