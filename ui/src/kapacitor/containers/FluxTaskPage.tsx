@@ -25,6 +25,7 @@ import {
   notifyCopyToClipboardSuccess,
 } from 'src/shared/copy/notifications'
 import {updateFluxTaskStatus} from '../actions/view'
+import errorMessage from '../utils/errorMessage'
 
 interface Params {
   taskID: string
@@ -41,18 +42,6 @@ interface Props {
 
 const noop = () => undefined
 const numLogsToRender = 200
-function errorMessage(e: any): unknown {
-  if (!e) {
-    return e
-  }
-  if (e.message) {
-    return e.message
-  }
-  if (e.statusText) {
-    return e.statusText
-  }
-  return e
-}
 
 const LogsTable: FC<{task: FluxTask; kapacitor: Kapacitor}> = ({
   task,
