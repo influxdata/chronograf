@@ -1,6 +1,11 @@
 name: "chronograf/cypress"
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'test-cypress'
+      - 'master'
 
 jobs:
   e2e:
