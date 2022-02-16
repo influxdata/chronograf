@@ -35,7 +35,8 @@ jobs:
     environment:
       DOCKER_TAG: chronograf-20210828
       GO111MODULE: "ON"
-    machine: true
+    machine:
+      image: ubuntu-2004:202201-02
     steps:
       - checkout
       - run: |
@@ -58,7 +59,8 @@ jobs:
     environment:
       DOCKER_TAG: chronograf-20210828
       GO111MODULE: "ON"
-    machine: true
+    machine:
+      image: ubuntu-2004:202201-02
     steps:
       - attach_workspace:
           at: /home/circleci
@@ -86,7 +88,8 @@ jobs:
     environment:
       DOCKER_TAG: chronograf-20210828
       GO111MODULE: "ON"
-    machine: true
+    machine:
+      image: ubuntu-2004:202201-02
     steps:
       - attach_workspace:
           at: /home/circleci
@@ -116,7 +119,8 @@ jobs:
     environment:
       DOCKER_TAG: chronograf-20210828
       GO111MODULE: "ON"
-    machine: true
+    machine:
+      image: ubuntu-2004:202201-02
     steps:
       - attach_workspace:
           at: /home/circleci
