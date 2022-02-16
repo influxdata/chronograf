@@ -92,7 +92,6 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.0.0",
-    "axios": "^0.21.1",
     "babel-polyfill": "^6.26.0",
     "bignumber.js": "^4.0.2",
     "calculate-size": "^1.1.1",
