@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Setup Go
         uses: actions/setup-go@v2
@@ -60,7 +60,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: cypress/included:8.7.0
-          options: -it -v ${{ github.workspace }}/ui:/ui -w /ui --add-host=host.docker.internal:host-gateway
+          options: -i -v ${{ github.workspace }}/ui:/ui -w /ui --add-host=host.docker.internal:host-gateway
           shell: sh
           run: |
             npx browserslist@latest --update-db
