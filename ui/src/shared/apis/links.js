@@ -1,4 +1,4 @@
-import {getAJAX, setAJAXLinks} from 'utils/ajax'
+import {getAJAX, setAJAXLinks} from 'src/utils/ajax'
 
 import {linksLink} from 'shared/constants'
 
