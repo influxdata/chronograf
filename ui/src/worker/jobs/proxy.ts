@@ -19,7 +19,7 @@ const proxy = async (msg: ProxyMsg): Promise<{data: any}> => {
       body: JSON.stringify(body),
     })
     if (response.ok) {
-      return {data: await response.json()}
+      return {data: response.status === 204 ? '' : await response.json()}
     }
     const data = await response.text()
     console.error(

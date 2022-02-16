@@ -9,7 +9,7 @@ const get = async (msg: Message): Promise<any> => {
       method: 'GET',
     })
     if (response.ok) {
-      return response.json()
+      return response.status === 204 ? '' : await response.json()
     }
     const data = await response.text()
     console.error(
