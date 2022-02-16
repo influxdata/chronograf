@@ -1,6 +1,6 @@
 import {Source, Kapacitor} from 'src/types'
 
-const ActiveKapacitorFromSources = (
+const activeKapacitorFromSources = (
   source: Source,
   sources: Source[]
 ): Kapacitor => {
@@ -17,4 +17,4 @@ const ActiveKapacitorFromSources = (
   return kapacitors.find(k => k.active) || kapacitors[0]
 }
 
-export default ActiveKapacitorFromSources
+export default activeKapacitorFromSources

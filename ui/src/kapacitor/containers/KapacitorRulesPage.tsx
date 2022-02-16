@@ -6,7 +6,7 @@ import {connect} from 'react-redux'
 import {pingKapacitor} from 'src/shared/apis'
 
 // Utils
-import ActiveKapacitorFromSources from 'src/kapacitor/utils/ActiveKapacitorFromSources'
+import activeKapacitorFromSources from 'src/kapacitor/utils/activeKapacitorFromSources'
 import {notifyKapacitorConnectionFailed} from 'src/shared/copy/notifications'
 
 // Actions
@@ -162,7 +162,7 @@ export class KapacitorRulesPage extends PureComponent<Props, State> {
 
   private get kapacitor(): Kapacitor {
     const {sources, source} = this.props
-    return ActiveKapacitorFromSources(source, sources)
+    return activeKapacitorFromSources(source, sources)
   }
 
   private handleSetActiveKapacitor = async (
