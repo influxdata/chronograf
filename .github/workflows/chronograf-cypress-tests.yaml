@@ -63,6 +63,7 @@ jobs:
           options: -i -v ${{ github.workspace }}/ui:/ui -w /ui --add-host=host.docker.internal:host-gateway
           shell: sh
           run: |
+            yarn install
             npx browserslist@latest --update-db
             cypress run --browser chrome --config baseUrl=http://host.docker.internal:8888
 
