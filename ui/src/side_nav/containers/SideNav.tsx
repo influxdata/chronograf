@@ -103,6 +103,7 @@ class SideNav extends PureComponent<Props> {
             'alerts',
             'alert-rules',
             'tickscript',
+            'tickscripts',
             'flux-tasks',
             'fluxtasks',
           ]}
@@ -169,6 +170,7 @@ class SideNav extends PureComponent<Props> {
         </Authorized>
         <NavBlock
           highlightWhen={['manage-sources', 'kapacitors']}
+          highlightUnless={['alert-rules', 'tickscripts', 'fluxtasks']}
           icon="wrench"
           link={`${sourcePrefix}/manage-sources`}
           location={location}
