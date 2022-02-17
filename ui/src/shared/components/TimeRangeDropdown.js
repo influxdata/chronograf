@@ -2,8 +2,6 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import moment from 'moment'
-import {connect} from 'react-redux'
-import _ from 'lodash'
 
 import OnClickOutside from 'shared/components/OnClickOutside'
 import FancyScrollbar from 'shared/components/FancyScrollbar'
@@ -12,17 +10,8 @@ import CustomTimeRangeOverlay from 'shared/components/CustomTimeRangeOverlay'
 import {timeRanges} from 'shared/data/timeRanges'
 import {DROPDOWN_MENU_MAX_HEIGHT} from 'shared/constants/index'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import {TimeZones} from 'src/types'
-
-const dateFormat = 'YYYY-MM-DD HH:mm'
+import TimeRangeLabel from './TimeRangeLabel'
 const emptyTime = {lower: '', upper: ''}
-const format = (t, timeZone) => {
-  const m = moment(t.replace(/'/g, ''))
-  if (timeZone === TimeZones.UTC) {
-    m.utc()
-  }
-  return m.format(dateFormat)
-}
 
 class TimeRangeDropdown extends Component {
   constructor(props) {
@@ -38,22 +27,6 @@ class TimeRangeDropdown extends Component {
       isCustomTimeRangeOpen: false,
       customTimeRange,
     }
-  }
-
-  findTimeRangeInputValue = ({upper, lower}) => {
-    if (upper && lower) {
-      if (upper === 'now()') {
-        return `${format(lower, this.props.timeZone)} - Now`
-      }
-
-      return `${format(lower, this.props.timeZone)} - ${format(
-        upper,
-        this.props.timeZone
-      )}`
-    }
-
-    const selected = timeRanges.find(range => range.lower === lower)
-    return selected ? selected.inputValue : 'Custom'
   }
 
   handleClickOutside = () => {
@@ -111,7 +84,7 @@ class TimeRangeDropdown extends Component {
           >
             <span className="icon clock" />
             <span className="dropdown-selected">
-              {this.findTimeRangeInputValue(selected)}
+              <TimeRangeLabel timeRange={selected} />
             </span>
             <span className="caret" />
           </div>
@@ -181,10 +154,6 @@ TimeRangeDropdown.propTypes = {
   onChooseTimeRange: func.isRequired,
   preventCustomTimeRange: bool,
   page: string,
-  timeZone: string,
 }
 
-const mstp = state => ({
-  timeZone: _.get(state, ['app', 'persisted', 'timeZone']),
-})
-export default connect(mstp)(OnClickOutside(ErrorHandling(TimeRangeDropdown)))
+export default OnClickOutside(ErrorHandling(TimeRangeDropdown))

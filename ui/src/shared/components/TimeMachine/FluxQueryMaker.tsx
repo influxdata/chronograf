@@ -100,7 +100,13 @@ class FluxQueryMaker extends PureComponent<Props, State> {
           size: leftSize,
           headerButtons: [],
           menuOptions: [],
-          render: () => <SchemaExplorer source={source} notify={notify} />,
+          render: () => (
+            <SchemaExplorer
+              source={source}
+              timeRange={timeRange}
+              notify={notify}
+            />
+          ),
           headerOrientation: HANDLE_VERTICAL,
         },
         {

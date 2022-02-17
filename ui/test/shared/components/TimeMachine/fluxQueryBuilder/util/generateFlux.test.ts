@@ -4,19 +4,10 @@ import {initialState as initialAggState} from 'src/shared/components/TimeMachine
 import {QueryBuilderState} from 'src/shared/components/TimeMachine/fluxQueryBuilder/types'
 import {
   buildQuery,
-  formatTimeRangeArguments,
   tagToFlux,
 } from 'src/shared/components/TimeMachine/fluxQueryBuilder/util/generateFlux'
 
 describe('fluxQueryBuilder/util/generateFlux', () => {
-  test('formatTimeRangeArguments', () => {
-    expect(formatTimeRangeArguments({lower: 'xyz', lowerFlux: '-10s'})).toBe(
-      'start: -10s'
-    )
-    expect(formatTimeRangeArguments({lower: 'a', upper: 'b'})).toBe(
-      'start: a, stop: b'
-    )
-  })
   test('tagToFlux', () => {
     expect(
       tagToFlux({

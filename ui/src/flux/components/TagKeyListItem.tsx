@@ -11,11 +11,12 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {OpenState} from 'src/flux/constants/explorer'
 
 // types
-import {Source, NotificationAction} from 'src/types'
+import {Source, NotificationAction, TimeRange} from 'src/types'
 
 interface Props {
   db: string
   source: Source
+  timeRange: TimeRange
   tagKey: string
   notify: NotificationAction
   onAddFilter?: (value: {[k: string]: string}) => void
@@ -36,7 +37,7 @@ class TagKeyListItem extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {db, source, tagKey, notify} = this.props
+    const {db, source, timeRange, tagKey, notify} = this.props
     const {opened} = this.state
     const isOpen = opened === OpenState.OPENED
     const isUnopen = opened === OpenState.UNOPENED
@@ -61,6 +62,7 @@ class TagKeyListItem extends PureComponent<Props, State> {
             <TagValueList
               db={db}
               source={source}
+              timeRange={timeRange}
               tagKey={tagKey}
               notify={notify}
               onAddFilter={this.props.onAddFilter}

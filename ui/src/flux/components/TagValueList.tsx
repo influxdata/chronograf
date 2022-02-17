@@ -7,21 +7,21 @@ import LoaderSkeleton from 'src/flux/components/LoaderSkeleton'
 import LoadingSpinner from 'src/flux/components/LoadingSpinner'
 
 // apis
-import {tagValues as fetchTagValues} from 'src/shared/apis/flux/metaQueries'
+import {fetchTagValues} from 'src/shared/apis/flux/metaQueries'
 
 // Utils
-import parseValuesColumn from 'src/shared/parsing/flux/values'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 
 // types
-import {Source, NotificationAction, RemoteDataState} from 'src/types'
+import {Source, NotificationAction, RemoteDataState, TimeRange} from 'src/types'
 
 const TAG_VALUES_LIMIT = 25
 
 interface Props {
   db: string
   source: Source
+  timeRange: TimeRange
   tagKey: string
   notify: NotificationAction
   onAddFilter?: (value: {[k: string]: string}) => void
@@ -56,7 +56,7 @@ class TagValueList extends PureComponent<Props, State> {
   public async componentDidMount() {
     this.setState({loading: RemoteDataState.Loading})
     try {
-      const tagValues = await this.fetchTagValues()
+      const tagValues = await this.fetchData()
       this.setState({
         tagValues,
         loading: RemoteDataState.Done,
@@ -150,7 +150,11 @@ class TagValueList extends PureComponent<Props, State> {
     return (
       <div className="flux-schema-tree flux-schema--child">
         <div className="flux-schema--item no-hover" onClick={this.handleClick}>
-          <div className="no-results">No more tag values.</div>
+          <div className="no-results">
+            {`No ${
+              term ? 'matching ' : ''
+            }tag values in the selected time range.`}
+          </div>
         </div>
       </div>
     )
@@ -166,20 +170,18 @@ class TagValueList extends PureComponent<Props, State> {
     return `Load next ${TAG_VALUES_LIMIT} values for ${tagKey}`
   }
 
-  private fetchTagValues = async (): Promise<string[]> => {
-    const {source, db, tagKey} = this.props
+  private fetchData = async (): Promise<string[]> => {
+    const {source, timeRange, db, tagKey} = this.props
     const {searchTerm, limit} = this.state
 
-    const response = await fetchTagValues({
+    return await fetchTagValues({
       source,
+      timeRange,
       bucket: db,
       tagKey,
       limit,
       searchTerm,
     })
-
-    const tagValues = parseValuesColumn(response)
-    return tagValues
   }
 
   private onSearch = (e: ChangeEvent<HTMLInputElement>) => {
@@ -190,7 +192,7 @@ class TagValueList extends PureComponent<Props, State> {
       () => {
         try {
           this.debouncer.call(async () => {
-            const tagValues = await this.fetchTagValues()
+            const tagValues = await this.fetchData()
             this.setState({tagValues})
           }, 50)
         } catch (error) {
@@ -219,7 +221,7 @@ class TagValueList extends PureComponent<Props, State> {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       async () => {
         try {
-          const tagValues = await this.fetchTagValues()
+          const tagValues = await this.fetchData()
           this.setState({
             tagValues,
             loading: RemoteDataState.Done,

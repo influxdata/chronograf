@@ -2,14 +2,14 @@
 import {PureComponent} from 'react'
 
 // Utils
-import {measurements as fetchMeasurementsAsync} from 'src/shared/apis/flux/metaQueries'
-import parseValuesColumn from 'src/shared/parsing/flux/values'
+import {fetchMeasurements} from 'src/shared/apis/flux/metaQueries'
 
 // Types
-import {Source, RemoteDataState} from 'src/types'
+import {Source, RemoteDataState, TimeRange} from 'src/types'
 
 interface Props {
   source: Source
+  timeRange: TimeRange
   bucket: string
   children: (measurements, measurementsLoading) => JSX.Element
 }
@@ -17,14 +17,6 @@ interface Props {
 interface State {
   measurements: string[]
   loading: RemoteDataState
-}
-
-export async function fetchFluxMeasurements(
-  source: Source,
-  bucket: string
-): Promise<string[]> {
-  const measurementResults = await fetchMeasurementsAsync(source, bucket)
-  return parseValuesColumn(measurementResults)
 }
 
 class FetchMeasurements extends PureComponent<Props, State> {
@@ -36,18 +28,18 @@ class FetchMeasurements extends PureComponent<Props, State> {
     }
   }
   public componentDidMount() {
-    this.fetchMeasurements()
+    this.fetchData()
   }
 
   public render() {
     return this.props.children(this.state.measurements, this.state.loading)
   }
 
-  private async fetchMeasurements() {
-    const {source, bucket} = this.props
+  private async fetchData() {
+    const {source, timeRange, bucket} = this.props
     this.setState({loading: RemoteDataState.Loading})
     try {
-      const measurements = await fetchFluxMeasurements(source, bucket)
+      const measurements = await fetchMeasurements(source, timeRange, bucket)
       this.setState({measurements, loading: RemoteDataState.Done})
     } catch (error) {
       this.setState({loading: RemoteDataState.Error})

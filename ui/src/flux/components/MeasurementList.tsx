@@ -65,6 +65,7 @@ class MeasurementsList extends PureComponent<Props, State> {
     const {source, db, notify, loading} = this.props
     const {searchTerm} = this.state
     const measurementEntries = Object.entries(this.props.measurements)
+    measurementEntries.sort((a, b) => a[0].localeCompare(b[0]))
 
     if (loading === RemoteDataState.Error) {
       return (
@@ -127,7 +128,11 @@ class MeasurementsList extends PureComponent<Props, State> {
     return (
       <div className="flux-schema-tree flux-schema--child">
         <div className="flux-schema--item no-hover" onClick={this.handleClick}>
-          <div className="no-results">No more measurements.</div>
+          <div className="no-results">
+            {`No ${
+              term ? 'matching ' : ''
+            }measurements in the selected time range.`}
+          </div>
         </div>
       </div>
     )

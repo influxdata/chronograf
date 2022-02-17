@@ -8,11 +8,12 @@ import SchemaItemCategory, {
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 // Types
-import {Source, NotificationAction} from 'src/types'
+import {Source, NotificationAction, TimeRange} from 'src/types'
 import {CategoryTree} from 'src/flux/components/SchemaExplorerTree'
 
 interface Props {
   source: Source
+  timeRange: TimeRange
   db: string
   categoryTree: CategoryTree
   notify: NotificationAction
@@ -21,12 +22,13 @@ interface Props {
 @ErrorHandling
 class SchemaItemCategories extends PureComponent<Props> {
   public render() {
-    const {source, db, categoryTree, notify} = this.props
+    const {source, timeRange, db, categoryTree, notify} = this.props
 
     return (
       <>
         <SchemaItemCategory
           source={source}
+          timeRange={timeRange}
           db={db}
           type={CategoryType.Measurements}
           categoryTree={categoryTree}
@@ -34,6 +36,7 @@ class SchemaItemCategories extends PureComponent<Props> {
         />
         <SchemaItemCategory
           source={source}
+          timeRange={timeRange}
           db={db}
           type={CategoryType.Tags}
           categoryTree={categoryTree}
@@ -41,6 +44,7 @@ class SchemaItemCategories extends PureComponent<Props> {
         />
         <SchemaItemCategory
           source={source}
+          timeRange={timeRange}
           db={db}
           type={CategoryType.Fields}
           categoryTree={categoryTree}

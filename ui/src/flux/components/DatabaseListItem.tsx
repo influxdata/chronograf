@@ -8,12 +8,13 @@ import SchemaExplorerTree from 'src/flux/components/SchemaExplorerTree'
 import {OpenState} from 'src/flux/constants/explorer'
 
 // Types
-import {Source, NotificationAction} from 'src/types'
+import {Source, NotificationAction, TimeRange} from 'src/types'
 import SchemaItemCategories from 'src/flux/components/SchemaItemCategories'
 
 interface Props {
   db: string
   source: Source
+  timeRange: TimeRange
   notify: NotificationAction
 }
 
@@ -49,7 +50,7 @@ class DatabaseListItem extends PureComponent<Props, State> {
   }
 
   private get categories(): JSX.Element {
-    const {db, source, notify} = this.props
+    const {db, source, timeRange, notify} = this.props
     const {opened} = this.state
     const isOpen = opened === OpenState.OPENED
     const isUnopen = opened === OpenState.UNOPENED
@@ -57,11 +58,17 @@ class DatabaseListItem extends PureComponent<Props, State> {
     if (!isUnopen) {
       return (
         <div className={`flux-schema--children ${isOpen ? '' : 'hidden'}`}>
-          <SchemaExplorerTree bucket={db} source={source} key={db}>
+          <SchemaExplorerTree
+            bucket={db}
+            source={source}
+            timeRange={timeRange}
+            key={db + ':' + timeRange.lower + ':' + timeRange.upper}
+          >
             {tree => (
               <SchemaItemCategories
                 db={db}
                 source={source}
+                timeRange={timeRange}
                 notify={notify}
                 categoryTree={tree}
               />

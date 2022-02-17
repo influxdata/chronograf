@@ -1,82 +1,67 @@
 import _ from 'lodash'
 
 import AJAX from 'src/utils/ajax'
-import {Source, SchemaFilter} from 'src/types'
-import recordProperty from 'src/flux/helpers/recordProperty'
+import {Source, SchemaFilter, TimeRange} from 'src/types'
+import fluxString from 'src/flux/helpers/fluxString'
+import parseValuesColumn, {
+  parseFieldsByMeasurements,
+} from 'src/shared/parsing/flux/values'
+import rangeArguments from 'src/flux/helpers/rangeArguments'
 
-export const measurements = async (
+export const fetchMeasurements = async (
   source: Source,
+  timeRange: TimeRange,
   bucket: string
-): Promise<any> => {
-  const script = `
-    import "influxdata/influxdb/v1"
-    v1.measurements(bucket:"${bucket}")
-    `
-
-  return proxy(source, script)
-}
-
-export const fields = async (
-  source: Source,
-  bucket: string,
-  filter: SchemaFilter[],
-  limit: number
-): Promise<any> => {
-  return await tagValues({
+): Promise<string[]> => {
+  return fetchTagValues({
     bucket,
     source,
-    tagKey: '_field',
-    limit,
-    filter,
+    tagKey: '_measurement',
+    limit: 0,
+    timeRange,
   })
 }
 
 // Fetch all the fields and their associated measurement
-export const fieldsByMeasurement = async (
+export const fetchFieldsByMeasurement = async (
   source: Source,
+  timeRange: TimeRange,
   bucket: string
-): Promise<any> => {
+): Promise<{
+  fields: string[]
+  fieldsByMeasurements: {[measurement: string]: string[]}
+}> => {
   const script = `
-  from(bucket: "${bucket}")
-    |> range(start: -30d)
+  from(bucket:${fluxString(bucket)})
+    |> range(${rangeArguments(timeRange)})
     |> group(columns: ["_field", "_measurement"], mode: "by")
     |> distinct(column: "_field")
     |> group()
     |> map(fn: (r) => ({_measurement: r._measurement, _field: r._field}))
   `
-  return proxy(source, script)
+  const response = await proxy(source, script)
+  return parseFieldsByMeasurements(response)
 }
 
-export const tagKeys = async (
+export const fetchTagKeys = async (
   source: Source,
-  bucket: string,
-  filter: SchemaFilter[]
-): Promise<any> => {
-  let tagKeyFilter = ''
-
-  if (filter.length) {
-    const predicates = filter.map(({key}) => `r._value != "${key}"`)
-
-    tagKeyFilter = `|> filter(fn: (r) => ${predicates.join(' and ')} )`
-  }
-
-  const predicate = '(r) => true'
-
+  timeRange: TimeRange,
+  bucket: string
+): Promise<string[]> => {
   const script = `
-    import "influxdata/influxdb/v1"
-    v1.tagKeys(
-      bucket: "${bucket}",
-      predicate: ${predicate},
-      start: -30d,
-    )
-    ${tagKeyFilter}
-    `
+from(bucket:${fluxString(bucket)}) 
+  |> range(${rangeArguments(timeRange)}) 
+  |> keys()
+  |> keep(columns: ["_value"])
+  |> distinct()`
 
-  return proxy(source, script)
+  const response = await proxy(source, script)
+  return parseValuesColumn(response)
 }
 
 interface TagValuesParams {
   source: Source
+  timeRange: TimeRange
   bucket: string
   tagKey: string
   limit: number
@@ -85,64 +70,45 @@ interface TagValuesParams {
   count?: boolean
 }
 
-export const tagValues = async ({
+export const fetchTagValues = async ({
   bucket,
   source,
   tagKey,
+  timeRange,
   limit,
   searchTerm = '',
   count = false,
-}: TagValuesParams): Promise<any> => {
+}: TagValuesParams): Promise<string[]> => {
   let regexFilter = ''
   if (searchTerm) {
-    regexFilter = `|> filter(fn: (r) => ${recordProperty(
-      tagKey
-    )} =~ /${searchTerm}/)`
+    regexFilter = `\n  |> filter(fn: (r) => r["_value"] =~ /${searchTerm}/)`
   }
 
-  const limitFunc = count ? '' : `|> limit(n:${limit})`
-  const countFunc = count ? '|> count()' : ''
-
-  const predicate = '(r) => true'
+  const limitFunc = count || !limit ? '' : `\n  |> limit(n:${limit})`
+  const countFunc = count ? '\n  |> count()' : ''
 
   const script = `
-    import "influxdata/influxdb/v1"
-    v1.tagValues(
-      bucket: "${bucket}",
-      predicate: ${predicate},
-      tag: "${tagKey}",
-      start: -30d,
-    )
-     ${regexFilter}
-     ${limitFunc}
-     ${countFunc}
+from(bucket:${fluxString(bucket)})
+  |> range(${rangeArguments(timeRange)})
+  |> keep(columns: [${fluxString(tagKey)}])
+  |> group()
+  |> distinct(column: ${fluxString(
+    tagKey
+  )})${regexFilter}${limitFunc}${countFunc}
   `
 
-  return proxy(source, script)
+  const csvResponse = await proxy(source, script)
+  return parseValuesColumn(csvResponse)
 }
 
-export const tagsFromMeasurement = async (
+export const proxy = async (
   source: Source,
-  bucket: string,
-  measurement: string
-): Promise<any> => {
-  const script = `
-    from(bucket:"${bucket}") 
-      |> range(start:-30d) 
-      |> filter(fn:(r) => r._measurement == "${measurement}") 
-      |> group() 
-      |> keys()
-      |> keep(columns: ["_value"])
-  `
-
-  return proxy(source, script)
-}
-
-export const proxy = async (source: Source, script: string) => {
+  script: string
+): Promise<string> => {
   const mark = encodeURIComponent('?')
-  const garbage = script.replace(/\s/g, '') // server cannot handle whitespace
+  const minimizedScript = script.replace(/\s/g, '') // server cannot handle whitespace
   const dialect = {annotations: ['group', 'datatype', 'default']}
-  const data = {query: garbage, dialect}
+  const data = {query: minimizedScript, dialect}
   const base = source.links.flux
 
   try {
@@ -153,7 +119,7 @@ export const proxy = async (source: Source, script: string) => {
       headers: {'Content-Type': 'application/json'},
     })
 
-    return response.data
+    return response.data.toString()
   } catch (error) {
     handleError(error)
   }

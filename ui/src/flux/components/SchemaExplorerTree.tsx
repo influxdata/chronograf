@@ -9,11 +9,12 @@ import FetchTagKeys from 'src/flux/components/FetchTagKeys'
 import FetchFields from 'src/flux/components/FetchFields'
 
 // Types
-import {Source, RemoteDataState} from 'src/types'
+import {Source, RemoteDataState, TimeRange} from 'src/types'
 
 interface Props {
   bucket: string
   source: Source
+  timeRange: TimeRange
   children: (tree: CategoryTree) => JSX.Element
 }
 
@@ -33,14 +34,18 @@ export interface CategoryTree {
 @ErrorHandling
 class SchemaExplorerTree extends PureComponent<Props> {
   public render() {
-    const {source, bucket} = this.props
+    const {source, timeRange, bucket} = this.props
 
     return (
-      <FetchMeasurements source={source} bucket={bucket}>
+      <FetchMeasurements source={source} timeRange={timeRange} bucket={bucket}>
         {(measurements, measurementsLoading) => (
-          <FetchTagKeys source={source} bucket={bucket}>
+          <FetchTagKeys source={source} timeRange={timeRange} bucket={bucket}>
             {(tagKeys, tagsLoading) => (
-              <FetchFields source={source} bucket={bucket}>
+              <FetchFields
+                source={source}
+                timeRange={timeRange}
+                bucket={bucket}
+              >
                 {(fields, fieldsByMeasurements, fieldsLoading) =>
                   this.props.children(
                     this.tree(

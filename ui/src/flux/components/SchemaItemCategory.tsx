@@ -17,8 +17,9 @@ import {
 } from 'src/shared/utils/TimeMachineContext'
 
 // Types
-import {Source, NotificationAction} from 'src/types'
+import {Source, NotificationAction, TimeRange} from 'src/types'
 import {CategoryTree} from 'src/flux/components/SchemaExplorerTree'
+import TimeRangeLabel from 'src/shared/components/TimeRangeLabel'
 
 export enum CategoryType {
   Measurements = 'measurements',
@@ -32,6 +33,7 @@ interface ConnectedProps {
 
 interface PassedProps {
   source: Source
+  timeRange: TimeRange
   notify: NotificationAction
   db: string
   categoryTree: CategoryTree
@@ -70,6 +72,9 @@ class SchemaItemCategory extends PureComponent<
           <div className="flex-schema-item-group flux-schema-item--expandable">
             <div className="flux-schema--expander" />
             {this.categoryName}
+            <span className="flux-schema--type">
+              (<TimeRangeLabel timeRange={this.props.timeRange} />)
+            </span>
           </div>
         </div>
         {!isUnopened && (
@@ -93,7 +98,7 @@ class SchemaItemCategory extends PureComponent<
   }
 
   private get itemList(): JSX.Element {
-    const {type, db, source, notify, categoryTree} = this.props
+    const {type, db, timeRange, source, notify, categoryTree} = this.props
 
     switch (type) {
       case CategoryType.Measurements:
@@ -125,6 +130,7 @@ class SchemaItemCategory extends PureComponent<
           <TagKeyList
             db={db}
             source={source}
+            timeRange={timeRange}
             notify={notify}
             tagKeys={categoryTree.tagKeys}
             loading={categoryTree.tagsLoading}
