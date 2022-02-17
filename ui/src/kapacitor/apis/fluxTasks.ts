@@ -4,7 +4,8 @@ import {FluxTask, Kapacitor} from 'src/types'
 
 const tasksBatchLimit = 500
 export const getFluxTasks = async (
-  kapacitor: Kapacitor
+  kapacitor: Kapacitor,
+  signal?: AbortSignal
 ): Promise<FluxTask[]> => {
   const taskIds: Record<string, FluxTask> = {}
   let lastID = ''
@@ -19,6 +20,7 @@ export const getFluxTasks = async (
         encodeURIComponent(
           `/kapacitor/v1/api/v2/tasks?limit=${tasksBatchLimit}&after=${lastID}`
         ),
+      signal,
     })
     if (!tasks || !tasks.length) {
       break
