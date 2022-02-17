@@ -73,13 +73,18 @@ interface NavBlockProps {
   location?: string
   className?: string
   highlightWhen: string[]
+  highlightUnless?: string[]
 }
 
 class NavBlock extends PureComponent<NavBlockProps> {
   public render() {
-    const {location, className, highlightWhen} = this.props
-    const {length} = _.intersection(_.split(location, '/'), highlightWhen)
-    const isActive = !!length
+    const {location, className, highlightWhen, highlightUnless} = this.props
+    const locationParts = _.split(location, '/')
+    const {length} = _.intersection(locationParts, highlightWhen)
+    let isActive = !!length
+    if (isActive && highlightUnless) {
+      isActive = !_.intersection(locationParts, highlightUnless)
+    }
 
     const children = React.Children.map(
       this.props.children,
