@@ -66,6 +66,8 @@ export const getRules = kapacitor => {
   })
 }
 
+const tasksBatchLimit = 500
+
 export const getFluxTasks = async kapacitor => {
   const taskIds = {}
   let lastID = ''
@@ -78,7 +80,7 @@ export const getFluxTasks = async kapacitor => {
         kapacitor.links.proxy +
         '?path=' +
         encodeURIComponent(
-          `/kapacitor/v1/api/v2/tasks?limit=500&after=${lastID}`
+          `/kapacitor/v1/api/v2/tasks?limit=${tasksBatchLimit}&after=${lastID}`
         ),
     })
     if (!tasks || !tasks.length) {
@@ -94,6 +96,10 @@ export const getFluxTasks = async kapacitor => {
       taskIds[x.id] = x
     })
     if (noNewData) {
+      break
+    }
+    if (tasks.length < tasksBatchLimit) {
+      // less data returned, last chunk
       break
     }
   }
