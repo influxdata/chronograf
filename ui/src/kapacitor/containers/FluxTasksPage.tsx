@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import {FluxTask, Kapacitor, Source} from 'src/types'
 import KapacitorScopedPage from './KapacitorScopedPage'
 import {useDispatch} from 'react-redux'
@@ -23,24 +23,19 @@ const Contents = ({
   source: Source
 }) => {
   const [loading, setLoading] = useState(true)
-  const [nameFilter, setNameFilter] = useState('')
   const [reloadRequired, setReloadRequired] = useState(0)
   const [error, setError] = useState(undefined)
-  const [list, setList] = useState<FluxTask[] | null>(null)
+  const [allList, setAllList] = useState<FluxTask[] | null>(null)
   const dispatch = useDispatch()
-  const filter = useDebounce(nameFilter)
   useEffect(() => {
     setLoading(true)
     const fetchData = async () => {
       try {
-        let data = (await getFluxTasks(kapacitor)) as FluxTask[]
-        if (data && filter) {
-          data = data.filter(x => x.name.includes(filter))
-        }
-        setList(data)
+        const data = (await getFluxTasks(kapacitor)) as FluxTask[]
+        setAllList(data)
       } catch (e) {
         if (e.status === 404) {
-          setList(null)
+          setAllList(null)
         } else {
           console.error(e)
           setError(
@@ -56,7 +51,15 @@ const Contents = ({
       }
     }
     fetchData()
-  }, [kapacitor, reloadRequired, filter])
+  }, [kapacitor, reloadRequired])
+  const [nameFilter, setNameFilter] = useState('')
+  const filter = useDebounce(nameFilter)
+  const list = useMemo(() => {
+    if (allList && allList.length && filter) {
+      return allList.filter(x => x.name.includes(filter))
+    }
+    return allList
+  }, [allList, filter])
 
   if (error) {
     return (
@@ -86,7 +89,7 @@ const Contents = ({
           <input
             type="text"
             className="form-control input-sm"
-            placeholder="Search name"
+            placeholder="Filter by name"
             value={nameFilter}
             onChange={e => {
               setNameFilter(e.target.value)
@@ -116,8 +119,8 @@ const Contents = ({
               const status = task.status === 'active' ? 'inactive' : 'active'
               updateFluxTaskStatus(kapacitor, task, status)
                 .then(() => {
-                  setList(
-                    list.map(x => (x.id === task.id ? {...task, status} : x))
+                  setAllList(
+                    allList.map(x => (x.id === task.id ? {...task, status} : x))
                   )
                   dispatch(
                     notify(notifyFluxTaskStatusUpdated(task.name, status))
