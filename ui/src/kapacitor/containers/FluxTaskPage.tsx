@@ -289,9 +289,9 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
           </Radio>
           <button
             className="btn btn-default btn-sm"
-            title="Return to Tasks"
+            title="Return to Flux Tasks"
             onClick={() => {
-              router.push(`/sources/${source.id}/alert-rules`)
+              router.push(`/sources/${source.id}/flux-tasks`)
             }}
           >
             Exit
