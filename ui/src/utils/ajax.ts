@@ -101,7 +101,7 @@ async function AJAX<T = any>(
     signal,
   }: RequestParams,
   excludeBasepath = false
-): Promise<AJAXResponse<T> | (AJAXResponse<T> & Links)> {
+): Promise<AJAXResponse<T> & Partial<Links>> {
   url = addBasepath(url, excludeBasepath)
   let body: string | undefined
 
