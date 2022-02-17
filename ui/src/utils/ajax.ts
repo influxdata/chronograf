@@ -1,3 +1,5 @@
+import {CancellationError} from 'src/types/promises'
+
 /* eslint-disable @typescript-eslint/ban-types */
 let links
 export const setAJAXLinks = ({updatedLinks}): void => {
@@ -84,6 +86,7 @@ interface RequestParams {
   data?: object | string
   params?: Record<string, string>
   headers?: Record<string, string>
+  signal?: AbortSignal
 }
 
 async function AJAX<T = any>(
@@ -95,6 +98,7 @@ async function AJAX<T = any>(
     data: requestData,
     params,
     headers: requestHeaders,
+    signal,
   }: RequestParams,
   excludeBasepath = false
 ): Promise<AJAXResponse<T> | (AJAXResponse<T> & Links)> {
@@ -123,7 +127,12 @@ async function AJAX<T = any>(
     method: method as string,
     body,
     headers: requestHeaders,
-  })
+    signal,
+  }).catch(e =>
+    e.name === 'AbortError'
+      ? Promise.reject(new CancellationError())
+      : Promise.reject(e)
+  )
   let data: string | T
   if (fetchResponse.status === 204) {
     data = ''
