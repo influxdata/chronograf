@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import {AxiosResponse} from 'axios'
 import {getDeep} from 'src/utils/wrappers'
 
 import {proxy} from 'src/utils/queryUrlGenerator'
@@ -192,7 +191,7 @@ export const getLayouts = () =>
   AJAX({
     method: 'GET',
     resource: 'layouts',
-  }) as Promise<AxiosResponse<LayoutsResponse>>
+  }) as Promise<{data: LayoutsResponse}>
 
 export const getAppsForHost = async (
   proxyLink: string,

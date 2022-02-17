@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/ban-types */
-import axios, {AxiosResponse, Method} from 'axios'
+import {CancellationError} from 'src/types/promises'
 
+/* eslint-disable @typescript-eslint/ban-types */
 let links
 export const setAJAXLinks = ({updatedLinks}): void => {
   links = updatedLinks
@@ -13,6 +13,12 @@ const addBasepath = (url, excludeBasepath): string => {
   return excludeBasepath ? url : `${basepath}${url}`
 }
 
+interface AJAXResponse<T = any> {
+  data: T
+  status: number
+  statusText: string
+  headers: any
+}
 interface Links {
   auth: object
   logoutLink: object
@@ -76,11 +82,11 @@ interface RequestParams {
   url?: string | string[]
   resource?: string
   id?: string
-  method?: Method
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
   data?: object | string
-  params?: object
-  headers?: object
-  validateStatus?: (status: number) => boolean
+  params?: Record<string, string>
+  headers?: Record<string, string>
+  signal?: AbortSignal
 }
 
 async function AJAX<T = any>(
@@ -89,49 +95,98 @@ async function AJAX<T = any>(
     resource = null,
     id = null,
     method = 'GET',
-    data = {},
-    params = {},
-    headers = {},
+    data: requestData,
+    params,
+    headers: requestHeaders,
+    signal,
   }: RequestParams,
   excludeBasepath = false
-): Promise<(T | (T & {links: object})) | AxiosResponse<T>> {
-  try {
-    url = addBasepath(url, excludeBasepath)
+): Promise<AJAXResponse<T> & Partial<Links>> {
+  url = addBasepath(url, excludeBasepath)
+  let body: string | undefined
 
-    if (resource && links) {
-      url = id
-        ? addBasepath(`${links[resource]}/${id}`, excludeBasepath)
-        : addBasepath(`${links[resource]}`, excludeBasepath)
-    }
-
-    const response = await axios.request<T>({
-      url,
-      method,
-      data,
-      params,
-      headers,
-    })
-
-    // TODO: Just return the unadulterated response without grafting auth, me,
-    // and logoutLink onto this object, once those are retrieved via their own
-    // AJAX request and action creator.
-    return links ? generateResponseWithLinks(response, links) : response
-  } catch (error) {
-    const {response} = error
-    if (response) {
-      throw links ? generateResponseWithLinks(response, links) : response // eslint-disable-line no-throw-literal
-    } else {
-      throw error
+  if (resource && links) {
+    url = id
+      ? addBasepath(`${links[resource]}/${id}`, excludeBasepath)
+      : addBasepath(`${links[resource]}`, excludeBasepath)
+  }
+  if (params) {
+    const queryString = new URLSearchParams(params)
+    if (queryString) {
+      url += `?` + queryString
     }
   }
+  if (requestData) {
+    body =
+      typeof requestData === 'string'
+        ? requestData
+        : JSON.stringify(requestData)
+  }
+
+  const fetchResponse = await fetch(url, {
+    method: method as string,
+    body,
+    headers: requestHeaders,
+    signal,
+  }).catch(e =>
+    e.name === 'AbortError'
+      ? Promise.reject(new CancellationError())
+      : Promise.reject(e)
+  )
+  let data: string | T
+  if (fetchResponse.status === 204) {
+    data = ''
+  } else {
+    const isText = (fetchResponse.headers.get('content-type') || '').includes(
+      'text/'
+    )
+    data = isText ? await fetchResponse.text() : await fetchResponse.json()
+  }
+  const headers = {}
+  fetchResponse.headers.forEach((v, k) => (headers[k] = v))
+
+  const response = {
+    status: fetchResponse.status,
+    statusText: fetchResponse.statusText,
+    data: data as T,
+    headers,
+  }
+
+  const retVal = links ? generateResponseWithLinks(response, links) : response
+  if (!fetchResponse.ok) {
+    throw retVal // eslint-disable-line no-throw-literal
+  }
+  return retVal
 }
 
-export async function getAJAX<T = any>(url: string): Promise<AxiosResponse<T>> {
+export async function getAJAX<T = any>(url: string): Promise<{data: T}> {
   try {
-    return await axios.request<T>({method: 'GET', url: addBasepath(url, false)})
-  } catch (error) {
-    console.error(error)
-    throw error
+    const response = await fetch(addBasepath(url, false), {
+      method: 'GET',
+    })
+    if (response.ok) {
+      const isText = (response.headers.get('content-type') || '').includes(
+        'text/'
+      )
+      const responseData =
+        isText || response.status === 204
+          ? await response.text()
+          : await response.json()
+      return {data: responseData as T}
+    }
+    const data = await response.text()
+    console.error(
+      'failed to GET url:',
+      url,
+      'status:',
+      response.statusText,
+      'response:',
+      data
+    )
+    Promise.reject(new Error(response.statusText || `error ${response.status}`))
+  } catch (e) {
+    console.error('failed to GET url:', url, 'error:', e)
+    return Promise.reject(e)
   }
 }
 

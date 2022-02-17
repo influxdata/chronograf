@@ -249,8 +249,6 @@ const kapacitorLogHeaders = {
 }
 
 export const getLogStreamByRuleID = (kapacitor, ruleID, signal) => {
-  // axios doesn't support the chunked transfer encoding response kapacitor uses for logs
-  // AJAX adds basepath, but we need to supply it directly to fetch
   const url = `${kapacitor.links.proxy}?path=/kapacitor/v1preview/logs?task=${ruleID}`
   const basepath = window.basepath || ''
 

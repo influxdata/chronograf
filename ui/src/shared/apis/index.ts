@@ -2,7 +2,6 @@ import AJAX from 'src/utils/ajax'
 import {AlertTypes} from 'src/kapacitor/constants'
 import {Kapacitor, Source, Service, NewService, QueryConfig} from 'src/types'
 import {SpecificConfigOptions} from 'src/types/kapacitor'
-import {Method} from 'axios'
 
 export const getSources = () => {
   return AJAX({
@@ -59,11 +58,10 @@ export const deleteSource = (source: Source) => {
 
 export const pingKapacitor = async (kapacitor: Kapacitor): Promise<void> => {
   try {
-    const data = await AJAX({
+    await AJAX({
       method: 'GET',
       url: kapacitor.links.ping,
     })
-    return data
   } catch (error) {
     console.error(error)
     throw error
@@ -202,7 +200,7 @@ export const updateKapacitorConfigSection = (
   const path = `/kapacitor/v1/config/${section}/${config}`
 
   const params = {
-    method: 'POST' as Method,
+    method: 'POST' as const,
     url: kapacitor.links.proxy,
     params: {
       path,
@@ -332,7 +330,7 @@ export const deleteKapacitorTask = (kapacitor: Kapacitor, id) => {
 
 export const kapacitorProxy = (
   kapacitor: Kapacitor,
-  method: Method,
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
   path,
   body?
 ) => {
