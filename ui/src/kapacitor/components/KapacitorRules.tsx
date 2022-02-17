@@ -3,7 +3,6 @@ import {Link} from 'react-router'
 
 import KapacitorRulesTable from 'src/kapacitor/components/KapacitorRulesTable'
 import TasksTable from 'src/kapacitor/components/TasksTable'
-import FluxTasksTable from 'src/kapacitor/components/FluxTasksTable'
 
 import {Source, AlertRule, Kapacitor, FluxTask} from 'src/types'
 
@@ -14,8 +13,6 @@ interface KapacitorRulesProps {
   fluxTasks: FluxTask[]
   onDelete: (rule: AlertRule) => void
   onChangeRuleStatus: (rule: AlertRule) => void
-  onChangeFluxTaskStatus: (task: FluxTask) => void
-  onDeleteFluxTask: (task: FluxTask) => void
 }
 
 const KapacitorRules: FC<KapacitorRulesProps> = ({
@@ -24,9 +21,6 @@ const KapacitorRules: FC<KapacitorRulesProps> = ({
   rules,
   onDelete,
   onChangeRuleStatus,
-  onChangeFluxTaskStatus,
-  onDeleteFluxTask,
-  fluxTasks = [],
 }) => {
   const builderRules = rules.filter((r: AlertRule) => r.query)
   const builderHeader = `${builderRules.length} Alert Rule${
@@ -35,9 +29,6 @@ const KapacitorRules: FC<KapacitorRulesProps> = ({
   const scriptsHeader = `${rules.length} TICKscript${
     rules.length === 1 ? '' : 's'
   }`
-  const fluxTasksHeader = fluxTasks
-    ? `${fluxTasks.length} Flux Task${fluxTasks.length === 1 ? '' : 's'}`
-    : `Flux Tasks`
   const kapacitorLink = `/sources/${source.id}/kapacitors/${kapacitor.id}`
 
   return (
@@ -82,21 +73,6 @@ const KapacitorRules: FC<KapacitorRulesProps> = ({
           />
         </div>
       </div>
-      {fluxTasks ? (
-        <div className="panel">
-          <div className="panel-heading">
-            <h2 className="panel-title">{fluxTasksHeader}</h2>
-          </div>
-          <div className="panel-body">
-            <FluxTasksTable
-              kapacitorLink={kapacitorLink}
-              tasks={fluxTasks}
-              onDelete={onDeleteFluxTask}
-              onChangeTaskStatus={onChangeFluxTaskStatus}
-            />
-          </div>
-        </div>
-      ) : null}
     </div>
   )
 }
