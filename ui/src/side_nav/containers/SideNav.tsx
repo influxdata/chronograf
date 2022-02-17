@@ -99,7 +99,13 @@ class SideNav extends PureComponent<Props> {
           <NavHeader link={`${sourcePrefix}/dashboards`} title="Dashboards" />
         </NavBlock>
         <NavBlock
-          highlightWhen={['alerts', 'alert-rules', 'tickscript']}
+          highlightWhen={[
+            'alerts',
+            'alert-rules',
+            'tickscript',
+            'flux-tasks',
+            'fluxtasks',
+          ]}
           icon="alerts"
           link={`${sourcePrefix}/alert-rules`}
           location={location}
