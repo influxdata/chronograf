@@ -19,6 +19,7 @@ import {
 } from 'src/shared/copy/notifications'
 import useDebounce from '../../utils/useDebounce'
 import {Button, ButtonShape, IconFont} from 'src/reusable_ui'
+import {isCancellationError} from 'src/types/promises'
 
 const Contents = ({
   kapacitor,
@@ -34,28 +35,32 @@ const Contents = ({
   const dispatch = useDispatch()
   useEffect(() => {
     setLoading(true)
+    const ac = new AbortController()
     const fetchData = async () => {
       try {
-        const data = await getFluxTasks(kapacitor)
+        const data = await getFluxTasks(kapacitor, ac.signal)
         setAllList(data)
       } catch (e) {
-        if (e.status === 404) {
-          setAllList(null)
-        } else {
-          console.error(e)
-          setError(
-            new Error(
-              e?.data?.message
-                ? e.data.message
-                : `Cannot load flux task: ${errorMessage(e)}`
+        if (!isCancellationError(e)) {
+          if (e.status === 404) {
+            setAllList(null)
+          } else {
+            console.error(e)
+            setError(
+              new Error(
+                e?.data?.message
+                  ? e.data.message
+                  : `Cannot load flux tasks: ${errorMessage(e)}`
+              )
             )
-          )
+          }
         }
       } finally {
         setLoading(false)
       }
     }
     fetchData()
+    return () => ac.abort()
   }, [kapacitor, reloadRequired])
   const [nameFilter, setNameFilter] = useState('')
   const filter = useDebounce(nameFilter)
