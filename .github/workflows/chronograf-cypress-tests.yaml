@@ -50,6 +50,7 @@ jobs:
           npm install --global yarn forever
           make
           RUNNER_TRACKING_ID="" && (forever start -l forever.log -o out.log -e err.log ./chronograf)
+          sleep 10
 
       - name: Chronograf test url
         run: |
