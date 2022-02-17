@@ -58,11 +58,10 @@ export const deleteSource = (source: Source) => {
 
 export const pingKapacitor = async (kapacitor: Kapacitor): Promise<void> => {
   try {
-    const data = await AJAX({
+    await AJAX({
       method: 'GET',
       url: kapacitor.links.ping,
     })
-    return data
   } catch (error) {
     console.error(error)
     throw error
