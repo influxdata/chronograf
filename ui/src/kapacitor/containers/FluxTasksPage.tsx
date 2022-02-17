@@ -108,7 +108,7 @@ const Contents = ({
             onDelete={(task: FluxTask) => {
               deleteFluxTask(kapacitor, task)
                 .then(() => {
-                  setReloadRequired(reloadRequired + 1)
+                  setAllList(allList.filter(x => x.id === task.id))
                   dispatch(notify(notifyAlertRuleDeleted(task.name)))
                 })
                 .catch(() => {
