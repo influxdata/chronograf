@@ -16,7 +16,7 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import PageSpinner from 'src/shared/components/PageSpinner'
 
 import {Source, Kapacitor, FluxTask, LogItem} from 'src/types'
-import {getFluxTask, getFluxTaskLogs} from '../apis'
+import {getFluxTask, getFluxTaskLogs} from '../apis/fluxTasks'
 import LogsTableRow from '../components/LogsTableRow'
 import {useDispatch} from 'react-redux'
 import {notify} from 'src/shared/actions/notifications'

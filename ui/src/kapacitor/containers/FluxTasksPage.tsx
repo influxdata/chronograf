@@ -2,7 +2,11 @@ import React, {useEffect, useMemo, useState} from 'react'
 import {FluxTask, Kapacitor, Source} from 'src/types'
 import KapacitorScopedPage from './KapacitorScopedPage'
 import {useDispatch} from 'react-redux'
-import {deleteFluxTask, getFluxTasks, updateFluxTaskStatus} from '../apis'
+import {
+  deleteFluxTask,
+  getFluxTasks,
+  updateFluxTaskStatus,
+} from '../apis/fluxTasks'
 import errorMessage from '../utils/errorMessage'
 import PageSpinner from 'src/shared/components/PageSpinner'
 import FluxTasksTable from '../components/FluxTasksTable'
@@ -32,7 +36,7 @@ const Contents = ({
     setLoading(true)
     const fetchData = async () => {
       try {
-        const data = (await getFluxTasks(kapacitor)) as FluxTask[]
+        const data = await getFluxTasks(kapacitor)
         setAllList(data)
       } catch (e) {
         if (e.status === 404) {

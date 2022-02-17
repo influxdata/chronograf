@@ -6,12 +6,15 @@ import {
   getRule as getRuleAJAX,
   deleteRule as deleteRuleAPI,
   updateRuleStatus as updateRuleStatusAPI,
-  updateFluxTaskStatus as updateFluxTaskStatusAPI,
-  deleteFluxTask as deleteFluxTaskAPI,
   createTask as createTaskAJAX,
   updateTask as updateTaskAJAX,
-  getFluxTasks,
 } from 'src/kapacitor/apis'
+import {
+  updateFluxTaskStatus as updateFluxTaskStatusAPI,
+  deleteFluxTask as deleteFluxTaskAPI,
+  getFluxTasks,
+} from 'src/kapacitor/apis/fluxTasks'
+
 import {errorThrown} from 'shared/actions/errors'
 
 import {
