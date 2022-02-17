@@ -60,7 +60,11 @@ export class KapacitorScopedPage extends PureComponent<Props, State> {
         kapacitors && kapacitors.length
           ? kapacitors.find(x => x.active) || kapacitors[0]
           : undefined
-
+      if (kapacitor) {
+        pingKapacitor(kapacitor).catch(() => {
+          this.props.notify(notifyKapacitorConnectionFailed())
+        })
+      }
       this.setState({kapacitors, kapacitor, loading: RemoteDataState.Done})
     })
   }
