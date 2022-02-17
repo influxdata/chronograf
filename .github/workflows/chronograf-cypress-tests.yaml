@@ -47,18 +47,16 @@ jobs:
 
       - name: Chronograf
         run: |
-          npm install --global yarn forever
+          npm install --global yarn
           make
-          RUNNER_TRACKING_ID="" && (forever start -l forever.log -o out.log -e err.log ./chronograf)
+          RUNNER_TRACKING_ID="" && (nohup ./chronograf > out.log 2>&1 &)
           sleep 10
 
       - name: Chronograf test url
         run: |
           echo "InfluxDB data node status: $(curl -Isk "https://localhost:8086/ping" | head -n 1)"
           echo "Chronograf status: $(curl -Isk "http://localhost:8888" | head -n 1)"
-          cat forever.log || exit 0
           cat out.log || exit 0
-          cat err.log || exit 0
 
       - name: Cypress
         uses: addnab/docker-run-action@v3
