@@ -114,6 +114,9 @@ class SideNav extends PureComponent<Props> {
           <NavListItem link={`${sourcePrefix}/alert-rules`}>
             Manage Tasks
           </NavListItem>
+          <NavListItem link={`${sourcePrefix}/flux-tasks`}>
+            Flux Tasks
+          </NavListItem>
           <NavListItem link={`${sourcePrefix}/alerts`}>
             Alert History
           </NavListItem>
