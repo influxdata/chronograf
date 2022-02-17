@@ -14,6 +14,7 @@ import {
   notifyFluxTaskStatusUpdateFailed,
 } from 'src/shared/copy/notifications'
 import useDebounce from '../../utils/useDebounce'
+import {Button, ButtonShape, IconFont} from 'src/reusable_ui'
 
 const Contents = ({
   kapacitor,
@@ -84,7 +85,7 @@ const Contents = ({
   }
   return (
     <div className="panel">
-      <div className="panel-heading">
+      <div className="panel-heading" style={{gap: '5px'}}>
         <div className="search-widget" style={{flexGrow: 1}}>
           <input
             type="text"
@@ -98,6 +99,12 @@ const Contents = ({
           />
           <span className="icon search" />
         </div>
+        <Button
+          titleText="Reload"
+          shape={ButtonShape.Square}
+          icon={IconFont.Refresh}
+          onClick={() => setReloadRequired(reloadRequired + 1)}
+        />
       </div>
       <div className="panel-body">
         {loading ? (
