@@ -55,9 +55,9 @@ jobs:
         run: |
           echo "InfluxDB data node status: $(curl -Isk "https://localhost:8086/ping" | head -n 1)"
           echo "Chronograf status: $(curl -Isk "http://localhost:8888" | head -n 1)"
-          test -f forever.log && cat forever.log
-          test -f out.log && cat out.log
-          test -f err.log && cat err.log
+          cat forever.log || exit 0
+          cat out.log || exit 0
+          cat err.log || exit 0
 
       - name: Cypress
         uses: addnab/docker-run-action@v3
