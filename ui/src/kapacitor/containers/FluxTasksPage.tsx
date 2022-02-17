@@ -91,6 +91,7 @@ const Contents = ({
             className="form-control input-sm"
             placeholder="Filter by name"
             value={nameFilter}
+            disabled={loading}
             onChange={e => {
               setNameFilter(e.target.value)
             }}
