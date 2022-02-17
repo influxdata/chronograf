@@ -109,7 +109,7 @@ const Contents = ({
           <span className="icon search" />
         </div>
         <Button
-          titleText="Reload"
+          titleText="Reload Flux Tasks"
           shape={ButtonShape.Square}
           icon={IconFont.Refresh}
           onClick={() => setReloadRequired(reloadRequired + 1)}
