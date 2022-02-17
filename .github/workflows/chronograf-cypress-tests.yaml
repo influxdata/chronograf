@@ -49,7 +49,7 @@ jobs:
         run: |
           npm install --global yarn forever
           make
-          RUNNER_TRACKING_ID="" && forever start -l forever.log -o out.log -e err.log ./chronograf
+          RUNNER_TRACKING_ID="" && (forever start -l forever.log -o out.log -e err.log ./chronograf)
 
       - name: Chronograf test url
         run: |
@@ -66,4 +66,11 @@ jobs:
             yarn install
             npx browserslist@latest --update-db
             cypress run --browser chrome --config baseUrl=http://host.docker.internal:8888
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: logs
+          path: ui/*.log
+          retention-days: 5
 
