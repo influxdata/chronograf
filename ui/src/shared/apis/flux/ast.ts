@@ -12,7 +12,6 @@ export const getAST = async (request: ASTRequest) => {
     method: 'POST',
     url,
     data: {body},
-    validateStatus: () => true,
   })
 
   if (status !== 200) {

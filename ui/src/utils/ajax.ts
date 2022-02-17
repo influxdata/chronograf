@@ -84,7 +84,6 @@ interface RequestParams {
   data?: object | string
   params?: Record<string, string>
   headers?: Record<string, string>
-  validateStatus?: (status: number) => boolean
 }
 
 async function AJAX<T = any>(
@@ -98,7 +97,7 @@ async function AJAX<T = any>(
     headers: requestHeaders,
   }: RequestParams,
   excludeBasepath = false
-): Promise<(T | (T & {links: object})) | AJAXResponse<T>> {
+): Promise<AJAXResponse<T> | (AJAXResponse<T> & Links)> {
   url = addBasepath(url, excludeBasepath)
   let body: string | undefined
 
