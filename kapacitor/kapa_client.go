@@ -2,7 +2,6 @@ package kapacitor
 
 import (
 	"errors"
-	"math"
 	"regexp"
 	"strings"
 	"sync"
@@ -16,6 +15,8 @@ const (
 	// work and should likely work well for quad-core systems
 	ListTaskWorkers = 4
 )
+
+const maxLimit = 1_000_000
 
 // ensure PaginatingKapaClient is a KapaClient
 var _ KapaClient = &PaginatingKapaClient{}
@@ -66,7 +67,7 @@ func (p *PaginatingKapaClient) ListTasks(opts *client.ListTasksOptions) ([]clien
 		pos := -1
 		limit := opts.Limit
 		if limit <= 0 {
-			limit = math.MaxInt
+			limit = maxLimit
 		}
 	processTasksBatches:
 		for tasks := range taskChan {
@@ -124,12 +125,12 @@ func (p *PaginatingKapaClient) fetchFromKapacitor(optChan chan client.ListTasksO
 func (p *PaginatingKapaClient) generateKapacitorOptions(optChan chan client.ListTasksOptions, opts client.ListTasksOptions, done chan struct{}) {
 	toFetchCount := opts.Limit
 	if toFetchCount <= 0 {
-		toFetchCount = math.MaxInt
+		toFetchCount = maxLimit
 	}
 	// fetch all data when pattern is set, chronograf is herein filters by task name
 	// whereas kapacitor filters by task ID that is hidden to chronograf users
 	if opts.Pattern != "" {
-		toFetchCount = math.MaxInt
+		toFetchCount = maxLimit
 		opts.Pattern = ""
 		opts.Offset = 0
 	}
