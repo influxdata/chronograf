@@ -7,11 +7,13 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/bouk/httprouter"
 	"github.com/influxdata/chronograf"
 	kapa "github.com/influxdata/chronograf/kapacitor"
+	"github.com/influxdata/kapacitor/client/v1"
 )
 
 type postKapacitorRequest struct {
@@ -730,6 +732,16 @@ func (s *Service) KapacitorRulesGet(w http.ResponseWriter, r *http.Request) {
 		Error(w, http.StatusUnprocessableEntity, err.Error(), s.Logger)
 		return
 	}
+	// parse parameters
+	params := r.URL.Query()
+	opts := client.ListTasksOptions{}
+	if _limit, err := strconv.ParseInt(params.Get("limit"), 0, 0); err != nil {
+		opts.Limit = int(_limit)
+	}
+	if _offset, err := strconv.ParseInt(params.Get("limit"), 0, 0); err != nil {
+		opts.Offset = int(_offset)
+	}
+	opts.Pattern = params.Get("pattern")
 
 	srcID, err := paramID("id", r)
 	if err != nil {
@@ -745,7 +757,7 @@ func (s *Service) KapacitorRulesGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c := kapa.NewClient(srv.URL, srv.Username, srv.Password, srv.InsecureSkipVerify)
-	tasks, err := c.All(ctx)
+	tasks, err := c.List(ctx, &opts)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, err.Error(), s.Logger)
 		return

@@ -279,13 +279,16 @@ func (c *Client) status(ctx context.Context, href string) (client.TaskStatus, er
 
 // All returns all tasks in kapacitor
 func (c *Client) All(ctx context.Context) (map[string]*Task, error) {
+	return c.List(ctx, &client.ListTasksOptions{})
+}
+
+// List kapacitor tasks according to options supplied
+func (c *Client) List(ctx context.Context, opts *client.ListTasksOptions) (map[string]*Task, error) {
 	kapa, err := c.kapaClient(c.URL, c.Username, c.Password, c.InsecureSkipVerify)
 	if err != nil {
 		return nil, err
 	}
 
-	// Only get the status, id and link section back
-	opts := &client.ListTasksOptions{}
 	tasks, err := kapa.ListTasks(opts)
 	if err != nil {
 		return nil, err
