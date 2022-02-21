@@ -159,7 +159,7 @@ const Contents = ({
 
 const FluxTasksPage = ({source: src}: {source: Source}) => {
   return (
-    <KapacitorScopedPage source={src} title="Flux Tasks">
+    <KapacitorScopedPage source={src} title="Manage Flux Tasks">
       {(kapacitor: Kapacitor, source: Source) => (
         <Contents kapacitor={kapacitor} source={source} />
       )}
