@@ -323,7 +323,6 @@ func (c *Client) Get(ctx context.Context, id string) (*Task, error) {
 	if err != nil {
 		return nil, chronograf.ErrAlertNotFound
 	}
-	fmt.Println("!!!", task.ID, task.TemplateID)
 
 	return NewTask(&task), nil
 }
