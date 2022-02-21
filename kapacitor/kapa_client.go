@@ -12,11 +12,6 @@ const (
 	// tasks from Kapacitor. This constant was chosen after some benchmarking
 	// work and should likely work well for quad-core systems
 	ListTaskWorkers = 4
-
-	// TaskGatherers is the number of workers collating responses from
-	// ListTaskWorkers. There can only be one without additional synchronization
-	// around the output buffer from ListTasks
-	TaskGatherers = 1
 )
 
 // ensure PaginatingKapaClient is a KapaClient
@@ -39,6 +34,11 @@ func (p *PaginatingKapaClient) ListTasks(opts *client.ListTasksOptions) ([]clien
 	done := make(chan struct{})
 
 	var once sync.Once
+	readFinished := func() {
+		once.Do(func() {
+			close(done)
+		})
+	}
 
 	go p.generateKapacitorOptions(optChan, *opts, done)
 
@@ -46,11 +46,14 @@ func (p *PaginatingKapaClient) ListTasks(opts *client.ListTasksOptions) ([]clien
 
 	wg.Add(ListTaskWorkers)
 	for i := 0; i < ListTaskWorkers; i++ {
-		go p.fetchFromKapacitor(optChan, &wg, &once, taskChan, done)
+		go func() {
+			p.fetchFromKapacitor(optChan, taskChan, readFinished)
+			wg.Done()
+		}()
 	}
 
 	var gatherWg sync.WaitGroup
-	gatherWg.Add(TaskGatherers)
+	gatherWg.Add(1)
 	go func() {
 		for task := range taskChan {
 			allTasks = append(allTasks, task...)
@@ -68,8 +71,7 @@ func (p *PaginatingKapaClient) ListTasks(opts *client.ListTasksOptions) ([]clien
 // fetchFromKapacitor fetches a set of results from a kapacitor by reading a
 // set of options from the provided optChan. Fetched tasks are pushed onto the
 // provided taskChan
-func (p *PaginatingKapaClient) fetchFromKapacitor(optChan chan client.ListTasksOptions, wg *sync.WaitGroup, closer *sync.Once, taskChan chan []client.Task, done chan struct{}) {
-	defer wg.Done()
+func (p *PaginatingKapaClient) fetchFromKapacitor(optChan chan client.ListTasksOptions, taskChan chan []client.Task, readFinished func()) {
 	for opt := range optChan {
 		resp, err := p.KapaClient.ListTasks(&opt)
 		if err != nil {
@@ -78,9 +80,7 @@ func (p *PaginatingKapaClient) fetchFromKapacitor(optChan chan client.ListTasksO
 
 		// break and stop all workers if we're done
 		if len(resp) == 0 {
-			closer.Do(func() {
-				close(done)
-			})
+			readFinished()
 			return
 		}
 
