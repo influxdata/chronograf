@@ -112,5 +112,15 @@ func Test_Kapacitor_PaginatingKapaClient(t *testing.T) {
 			t.Error("PaginatingKapaClient: Expected to find no matching task but found: ", len(tasks))
 		}
 	})
+	t.Run("zero offset required with pattern specified", func(t *testing.T) {
+		opts := &client.ListTasksOptions{
+			Pattern: " ",
+			Offset:  1,
+		}
+		_, err := pkap.ListTasks(opts)
+		if err == nil {
+			t.Error("PaginatingKapaClient: Error expected but no error returned")
+		}
+	})
 
 }

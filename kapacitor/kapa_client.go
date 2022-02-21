@@ -1,6 +1,7 @@
 package kapacitor
 
 import (
+	"errors"
 	"math"
 	"regexp"
 	"strings"
@@ -29,6 +30,9 @@ type PaginatingKapaClient struct {
 // ListTasks lists all available tasks from Kapacitor, navigating pagination as
 // it fetches them
 func (p *PaginatingKapaClient) ListTasks(opts *client.ListTasksOptions) ([]client.Task, error) {
+	if opts.Pattern != "" && opts.Offset > 0 {
+		return nil, errors.New("offset paramater must be 0 when pattern parameter is supplied")
+	}
 	allTasks := make([]client.Task, 0, p.FetchRate)
 
 	optChan := make(chan client.ListTasksOptions)
