@@ -93,7 +93,7 @@ func (p *PaginatingKapaClient) fetchFromKapacitor(optChan chan client.ListTasksO
 // Limit and Offset parameters, and inserts them into the provided optChan
 func (p *PaginatingKapaClient) generateKapacitorOptions(optChan chan client.ListTasksOptions, opts client.ListTasksOptions, done chan struct{}) {
 	toFetchCount := opts.Limit
-	if toFetchCount <= 0 {
+	if toFetchCount <= 0 && opts.Pattern != "" {
 		toFetchCount = math.MaxInt
 	}
 
