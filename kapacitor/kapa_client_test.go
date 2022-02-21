@@ -124,3 +124,62 @@ func Test_Kapacitor_PaginatingKapaClient(t *testing.T) {
 	})
 
 }
+
+func Test_Kapacitor_GetAlertRuleName(t *testing.T) {
+	tests := []struct {
+		Task client.Task
+		Name string
+	}{
+		{
+			Task: client.Task{},
+			Name: "",
+		},
+		{
+			Task: client.Task{
+				ID: "abcd",
+			},
+			Name: "abcd",
+		},
+		{
+			Task: client.Task{
+				ID:         "abcd",
+				TICKscript: "var name = 'pavel'\n",
+			},
+			Name: "pavel",
+		},
+		{
+			Task: client.Task{
+				ID:         "abcd",
+				TICKscript: "var name = 'pavel'\n",
+				Vars: client.Vars{
+					"name": {
+						Type:  client.VarInt,
+						Value: 1,
+					},
+				},
+			},
+			Name: "pavel",
+		},
+		{
+			Task: client.Task{
+				ID:         "abcd",
+				TICKscript: "var name = 'pavel'\n",
+				Vars: client.Vars{
+					"name": {
+						Type:  client.VarString,
+						Value: "pepa",
+					},
+				},
+			},
+			Name: "pepa",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			retVal := kapacitor.GetAlertRuleName(&test.Task)
+			if retVal != test.Name {
+				t.Error("Expected: ", test.Name, " Received:", retVal)
+			}
+		})
+	}
+}
