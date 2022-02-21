@@ -2,6 +2,8 @@ package kapacitor
 
 import (
 	"math"
+	"regexp"
+	"strings"
 	"sync"
 
 	client "github.com/influxdata/kapacitor/client/v1"
@@ -27,7 +29,7 @@ type PaginatingKapaClient struct {
 // ListTasks lists all available tasks from Kapacitor, navigating pagination as
 // it fetches them
 func (p *PaginatingKapaClient) ListTasks(opts *client.ListTasksOptions) ([]client.Task, error) {
-	allTasks := []client.Task{}
+	allTasks := make([]client.Task, 0, p.FetchRate)
 
 	optChan := make(chan client.ListTasksOptions)
 	taskChan := make(chan []client.Task, ListTaskWorkers)
@@ -55,8 +57,32 @@ func (p *PaginatingKapaClient) ListTasks(opts *client.ListTasksOptions) ([]clien
 	var gatherWg sync.WaitGroup
 	gatherWg.Add(1)
 	go func() {
-		for task := range taskChan {
-			allTasks = append(allTasks, task...)
+		// pos and limit are position within filtered results
+		// that are used with pattern searching
+		pos := -1
+		limit := opts.Limit
+		if limit <= 0 {
+			limit = math.MaxInt
+		}
+	processTasksBatches:
+		for tasks := range taskChan {
+			if opts.Pattern != "" {
+				for _, task := range tasks {
+					if strings.Contains(GetAlertRuleName(&task), opts.Pattern) {
+						pos++
+						if pos < opts.Offset {
+							continue
+						}
+						allTasks = append(allTasks, task)
+						if len(allTasks) == limit {
+							readFinished()
+							break processTasksBatches
+						}
+					}
+				}
+				continue
+			}
+			allTasks = append(allTasks, tasks...)
 		}
 		gatherWg.Done()
 	}()
@@ -93,8 +119,15 @@ func (p *PaginatingKapaClient) fetchFromKapacitor(optChan chan client.ListTasksO
 // Limit and Offset parameters, and inserts them into the provided optChan
 func (p *PaginatingKapaClient) generateKapacitorOptions(optChan chan client.ListTasksOptions, opts client.ListTasksOptions, done chan struct{}) {
 	toFetchCount := opts.Limit
-	if toFetchCount <= 0 && opts.Pattern != "" {
+	if toFetchCount <= 0 {
 		toFetchCount = math.MaxInt
+	}
+	// fetch all data when pattern is set, chronograf is herein filters by task name
+	// whereas kapacitor filters by task ID that is hidden to chronograf users
+	if opts.Pattern != "" {
+		toFetchCount = math.MaxInt
+		opts.Pattern = ""
+		opts.Offset = 0
 	}
 
 	nextLimit := func() int {
@@ -108,7 +141,7 @@ func (p *PaginatingKapaClient) generateKapacitorOptions(optChan chan client.List
 	}
 
 	opts.Limit = nextLimit()
-	opts.Pattern = "" // ignore pattern, these are used to filter by task ID, chronograf is however interrested in task name
+	opts.Pattern = ""
 
 generateOpts:
 	for {
@@ -126,4 +159,23 @@ generateOpts:
 		opts.Limit = nextLimit()
 	}
 	close(optChan)
+}
+
+var reTaskName = regexp.MustCompile(`[\r\n]*var[ \t]+name[ \t]+=[ \t]+'([^\n]+)'[ \r\t]*\n`)
+
+// GetAlertRuleName returns chronograf rule name out of kapacitor task.
+// Chronograf UI always preffer alert rule names.
+func GetAlertRuleName(task *client.Task) string {
+	// #5403 override name when defined in a variable
+	if nameVar, exists := task.Vars["name"]; exists {
+		if val, isString := nameVar.Value.(string); isString && val != "" {
+			return val
+		}
+	}
+	// try to parse Name from a line such as: `var name = 'Rule Name'
+	if matches := reTaskName.FindStringSubmatch(task.TICKscript); matches != nil {
+		return strings.ReplaceAll(strings.ReplaceAll(matches[1], "\\'", "'"), "\\\\", "\\")
+	}
+
+	return task.ID
 }

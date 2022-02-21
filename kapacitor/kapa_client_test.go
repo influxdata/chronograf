@@ -1,6 +1,7 @@
 package kapacitor_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/influxdata/chronograf/kapacitor"
@@ -17,7 +18,9 @@ func Test_Kapacitor_PaginatingKapaClient(t *testing.T) {
 			// create all the tasks
 			allTasks := []client.Task{}
 			for i := 0; i < lenAllTasks; i++ {
-				allTasks = append(allTasks, client.Task{})
+				allTasks = append(allTasks, client.Task{
+					ID: "id" + fmt.Sprintf("%3d", i),
+				})
 			}
 			begin := opts.Offset
 			end := opts.Offset + opts.Limit
@@ -39,23 +42,75 @@ func Test_Kapacitor_PaginatingKapaClient(t *testing.T) {
 		FetchRate:  50,
 	}
 
-	opts := &client.ListTasksOptions{
-		Limit:  100,
-		Offset: 0,
-	}
+	t.Run("100 tasks returned when calling with limit", func(t *testing.T) {
+		opts := &client.ListTasksOptions{
+			Limit:  100,
+			Offset: 0,
+		}
+		// ensure 100 elems returned when calling mockClient directly
+		tasks, _ := pkap.ListTasks(opts)
 
-	// ensure 100 elems returned when calling mockClient directly
-	tasks, _ := pkap.ListTasks(opts)
+		if len(tasks) != 100 {
+			t.Error("Expected calling KapaClient's ListTasks to return", opts.Limit, "items. Received:", len(tasks))
+		}
+	})
 
-	if len(tasks) != 100 {
-		t.Error("Expected calling KapaClient's ListTasks to return", opts.Limit, "items. Received:", len(tasks))
-	}
+	t.Run("all tasks with 0 Limit", func(t *testing.T) {
+		opts := &client.ListTasksOptions{
+			Limit:  0,
+			Offset: 0,
+		}
+		tasks, _ := pkap.ListTasks(opts)
+		if len(tasks) != lenAllTasks {
+			t.Error("PaginatingKapaClient: Expected to find", lenAllTasks, "tasks but found", len(tasks))
+		}
+		opts.Offset = 100
+		tasks, _ = pkap.ListTasks(opts)
+		if len(tasks) != lenAllTasks-100 {
+			t.Error("PaginatingKapaClient: Expected to find", lenAllTasks-100, "tasks but found", len(tasks))
+		}
+	})
 
-	// ensure PaginatingKapaClient returns _all_ tasks with 0 value for Limit and Offset
-	allOpts := &client.ListTasksOptions{}
-	allTasks, _ := pkap.ListTasks(allOpts)
+	t.Run("tasks matching pattern", func(t *testing.T) {
+		opts := &client.ListTasksOptions{
+			Pattern: " ",
+		}
+		tasks, _ := pkap.ListTasks(opts)
+		if len(tasks) != 100 {
+			t.Error("PaginatingKapaClient: Expected to find 100 tasks but found", len(tasks))
+		}
+		opts = &client.ListTasksOptions{
+			Pattern: " ",
+			Limit:   20,
+		}
+		tasks, _ = pkap.ListTasks(opts)
+		if len(tasks) != 20 {
+			t.Error("PaginatingKapaClient: Expected to find 100 tasks but found", len(tasks))
+		}
 
-	if len(allTasks) != lenAllTasks {
-		t.Error("PaginatingKapaClient: Expected to find", lenAllTasks, "tasks but found", len(allTasks))
-	}
+		opts = &client.ListTasksOptions{
+			Pattern: "id22",
+			Limit:   10,
+		}
+		tasks, _ = pkap.ListTasks(opts)
+		if len(tasks) != 7 {
+			t.Error("PaginatingKapaClient: Expected to find 7 matching task but found: ", len(tasks))
+		}
+		opts = &client.ListTasksOptions{
+			Pattern: "id22",
+			Limit:   1,
+		}
+		tasks, _ = pkap.ListTasks(opts)
+		if len(tasks) != 1 {
+			t.Error("PaginatingKapaClient: Expected to find 1 matching task but found: ", len(tasks))
+		}
+		opts = &client.ListTasksOptions{
+			Pattern: "id227",
+		}
+		tasks, _ = pkap.ListTasks(opts)
+		if len(tasks) != 0 {
+			t.Error("PaginatingKapaClient: Expected to find no matching task but found: ", len(tasks))
+		}
+	})
+
 }
