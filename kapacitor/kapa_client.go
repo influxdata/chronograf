@@ -1,6 +1,7 @@
 package kapacitor
 
 import (
+	"math"
 	"sync"
 
 	client "github.com/influxdata/kapacitor/client/v1"
@@ -31,11 +32,6 @@ type PaginatingKapaClient struct {
 // ListTasks lists all available tasks from Kapacitor, navigating pagination as
 // it fetches them
 func (p *PaginatingKapaClient) ListTasks(opts *client.ListTasksOptions) ([]client.Task, error) {
-	// only trigger auto-pagination with Offset=0 and Limit=0
-	if opts.Limit != 0 || opts.Offset != 0 {
-		return p.KapaClient.ListTasks(opts)
-	}
-
 	allTasks := []client.Task{}
 
 	optChan := make(chan client.ListTasksOptions)
@@ -96,18 +92,37 @@ func (p *PaginatingKapaClient) fetchFromKapacitor(optChan chan client.ListTasksO
 // generateKapacitorOptions creates ListTasksOptions with incrementally greater
 // Limit and Offset parameters, and inserts them into the provided optChan
 func (p *PaginatingKapaClient) generateKapacitorOptions(optChan chan client.ListTasksOptions, opts client.ListTasksOptions, done chan struct{}) {
-	// ensure Limit and Offset start from known quantities
-	opts.Limit = p.FetchRate
-	opts.Offset = 0
+	toFetchCount := opts.Limit
+	if toFetchCount <= 0 {
+		toFetchCount = math.MaxInt
+	}
 
+	nextLimit := func() int {
+		if p.FetchRate < toFetchCount {
+			toFetchCount -= p.FetchRate
+			return p.FetchRate
+		}
+		retVal := toFetchCount
+		toFetchCount = 0
+		return retVal
+	}
+
+	opts.Limit = nextLimit()
+
+generateOpts:
 	for {
 		select {
 		case <-done:
-			close(optChan)
-			return
+			break generateOpts
 		case optChan <- opts:
 			// nop
 		}
-		opts.Offset = p.FetchRate + opts.Offset
+		if toFetchCount <= 0 {
+			// no more data to read from options
+			break generateOpts
+		}
+		opts.Offset = opts.Offset + p.FetchRate
+		opts.Limit = nextLimit()
 	}
+	close(optChan)
 }
