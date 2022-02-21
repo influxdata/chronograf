@@ -108,6 +108,7 @@ func (p *PaginatingKapaClient) generateKapacitorOptions(optChan chan client.List
 	}
 
 	opts.Limit = nextLimit()
+	opts.Pattern = "" // ignore pattern, these are used to filter by task ID, chronograf is however interrested in task name
 
 generateOpts:
 	for {
