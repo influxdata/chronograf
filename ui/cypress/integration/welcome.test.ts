@@ -1,39 +1,35 @@
-describe('welcome test', () => {
-  beforeEach(cy.setupConnection)
+describe('Welcome Page', () => {
+  beforeEach(() => {
+    cy.cutConnections()
+    cy.visit('/')
+  })
   
+  it('set up InfluxDB connection', () => {
+    cy.get('button').contains('Get Started').click()
+    cy.get('[id="Connection URL"]').clear().type(Cypress.env('url'))
+    cy.get('[id="Connection Name"]').clear().type(Cypress.env('connectionName'))
+    cy.get('[id="Username"]').clear().type(Cypress.env('username'))
+    cy.get('[id="Password"]').clear().type(Cypress.env('password'))
 
-  it('HostList', () => {
-    cy.clickNav(2, 'Host List')
-    cy.clickNav(1, 'Status')
-  })
+    cy.get('.wizard-button-bar').within(() => {
+      cy.get('button').contains('Add Connection').click()
+    })
 
-  it('Explore', () => {
-    cy.clickNav(3, 'Explore')
-    cy.clickNav(1, 'Status')
-  })
+    cy.get('button').contains('Skip').click()
+    cy.get('button').contains('Skip').click()
+    cy.get('button').contains('View All Connections').click()
 
-  it('Dashboards', () => {
-    cy.clickNav(4, 'Dashboards')
-    cy.clickNav(1, 'Status')
-  })
+    cy.request(
+      'GET',
+      '/chronograf/v1/sources'
+    )
+    .then(response => {
+      const connections = response.body.sources
 
-  it('Manage Tasks', () => {
-    cy.clickNav(5, 'Manage Tasks')
-    cy.clickNav(1, 'Status')
-  })
-
-  it('Log Viewer', () => {
-    cy.clickNav(6, 'Log Viewer')
-    cy.clickNav(1, 'Status')
-  })
-
-  it('InfluxDB Admin', () => {
-    cy.clickNav(7, 'InfluxDB Admin')
-    cy.clickNav(1, 'Status')
-  })
-
-  it('Configuration', () => {
-    cy.clickNav(8, 'Configuration')
-    cy.clickNav(1, 'Status')
+      // Select element with source
+      cy.get('.panel-body > table > tbody')
+        .should('contain.text', connections[0].name)
+        .and('contain.text', connections[0].url)
+    })
   })
 })
