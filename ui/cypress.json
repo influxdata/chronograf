@@ -3,6 +3,10 @@
   "baseUrl": "http://localhost:8888",
   "video": false,
   "env": {
-    "ALLOW_SCREENSHOT": true
+    "ALLOW_SCREENSHOT": true,
+    "url": "http://localhost:8086",
+    "username": "admin",
+    "password": "admin",
+    "connectionName": "E1M1"
   }
 }
