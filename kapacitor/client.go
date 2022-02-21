@@ -72,6 +72,11 @@ var reTaskName = regexp.MustCompile(`[\r\n]*var[ \t]+name[ \t]+=[ \t]+'([^\n]+)'
 
 // NewTask creates a task from a kapacitor client task
 func NewTask(task *client.Task) *Task {
+	return NewTaskWithParsing(task, true)
+}
+
+// NewTask creates a task from a kapacitor client task with optional parsing of alert rule
+func NewTaskWithParsing(task *client.Task, parse bool) *Task {
 	dbrps := make([]chronograf.DBRP, len(task.DBRPs))
 	for i := range task.DBRPs {
 		dbrps[i].DB = task.DBRPs[i].Database
@@ -80,7 +85,7 @@ func NewTask(task *client.Task) *Task {
 
 	script := chronograf.TICKScript(task.TICKscript)
 	var rule chronograf.AlertRule = chronograf.AlertRule{Query: nil}
-	if task.TemplateID == "" {
+	if parse && task.TemplateID == "" {
 		// try to parse chronograf rule, tasks created from template cannot be chronograf rules
 		if parsedRule, err := Reverse(script); err == nil {
 			rule = parsedRule
@@ -279,11 +284,11 @@ func (c *Client) status(ctx context.Context, href string) (client.TaskStatus, er
 
 // All returns all tasks in kapacitor
 func (c *Client) All(ctx context.Context) (map[string]*Task, error) {
-	return c.List(ctx, &client.ListTasksOptions{})
+	return c.List(ctx, &client.ListTasksOptions{}, true)
 }
 
 // List kapacitor tasks according to options supplied
-func (c *Client) List(ctx context.Context, opts *client.ListTasksOptions) (map[string]*Task, error) {
+func (c *Client) List(ctx context.Context, opts *client.ListTasksOptions, parseRules bool) (map[string]*Task, error) {
 	kapa, err := c.kapaClient(c.URL, c.Username, c.Password, c.InsecureSkipVerify)
 	if err != nil {
 		return nil, err
@@ -296,7 +301,7 @@ func (c *Client) List(ctx context.Context, opts *client.ListTasksOptions) (map[s
 
 	all := map[string]*Task{}
 	for _, task := range tasks {
-		all[task.ID] = NewTask(&task)
+		all[task.ID] = NewTaskWithParsing(&task, parseRules)
 	}
 	return all, nil
 }

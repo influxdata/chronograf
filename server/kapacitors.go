@@ -735,10 +735,10 @@ func (s *Service) KapacitorRulesGet(w http.ResponseWriter, r *http.Request) {
 	// parse parameters
 	params := r.URL.Query()
 	opts := client.ListTasksOptions{}
-	if _limit, err := strconv.ParseInt(params.Get("limit"), 0, 0); err != nil {
+	if _limit, err := strconv.ParseInt(params.Get("limit"), 0, 0); err == nil {
 		opts.Limit = int(_limit)
 	}
-	if _offset, err := strconv.ParseInt(params.Get("limit"), 0, 0); err != nil {
+	if _offset, err := strconv.ParseInt(params.Get("offset"), 0, 0); err == nil {
 		opts.Offset = int(_offset)
 	}
 	opts.Pattern = params.Get("pattern")
@@ -757,7 +757,7 @@ func (s *Service) KapacitorRulesGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c := kapa.NewClient(srv.URL, srv.Username, srv.Password, srv.InsecureSkipVerify)
-	tasks, err := c.List(ctx, &opts)
+	tasks, err := c.List(ctx, &opts, params.Get("parse") != "0")
 	if err != nil {
 		Error(w, http.StatusInternalServerError, err.Error(), s.Logger)
 		return
