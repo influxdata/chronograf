@@ -117,7 +117,7 @@ const Contents = ({
             onDelete={(rule: AlertRule) => {
               deleteRule(rule)
                 .then(() => {
-                  setAllList(allList.filter(x => x.id === rule.id))
+                  setAllList(allList.filter(x => x.id !== rule.id))
                   dispatch(notify(notifyAlertRuleDeleted(rule.name)))
                 })
                 .catch(() => {
