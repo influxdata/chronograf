@@ -68,7 +68,7 @@ describe('Kapacitor.Containers.TickscriptPage', () => {
 
         const {wrapper} = setup({
           kapacitorActions: actions,
-          router: {push},
+          router: {push, location: {search: ''}},
           params: {ruleID: 'new'},
         })
 
