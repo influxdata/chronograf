@@ -40,6 +40,7 @@ interface ErrorActions {
 
 interface Router {
   push: (path: string) => void
+  location: {search: string; query: Record<string, string>}
 }
 
 interface KapacitorActions {
@@ -262,10 +263,9 @@ export class TickscriptPage extends PureComponent<Props, State> {
       } else {
         this.setState({unsavedChanges: false, consoleMessage: ''})
       }
-
       router.push(
         // prettier-ignore
-        `/sources/${sourceID}/kapacitors/${kapacitor.id}/tickscripts/${response.id}`
+        `/sources/${sourceID}/kapacitors/${kapacitor.id}/tickscripts/${response.id}${router.location.search}`
       )
     } catch (error) {
       console.error(error)
@@ -278,7 +278,9 @@ export class TickscriptPage extends PureComponent<Props, State> {
       source: {id: sourceID},
       router,
     } = this.props
-
+    if (router.location.query?.l === 't') {
+      return router.push(`/sources/${sourceID}/tickscripts`)
+    }
     return router.push(`/sources/${sourceID}/alert-rules`)
   }
 
