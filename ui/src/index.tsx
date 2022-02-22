@@ -35,6 +35,7 @@ import {
   KapacitorRulePage,
   KapacitorRulesPage,
   TickscriptPage,
+  TickscriptsPage,
 } from 'src/kapacitor'
 import {AdminChronografPage, AdminInfluxDBPage} from 'src/admin'
 import {ManageSources, OnboardingWizard} from 'src/sources'
@@ -190,6 +191,7 @@ class Root extends PureComponent<Record<string, never>, State> {
                 <Route path="alerts" component={AlertsApp} />
                 <Route path="alert-rules" component={KapacitorRulesPage} />
                 <Route path="flux-tasks" component={FluxTasksPage} />
+                <Route path="tickscripts" component={TickscriptsPage} />
                 <Route
                   path="kapacitors/:kid/alert-rules/:ruleID" // ruleID can be "new"
                   component={KapacitorRulePage}
