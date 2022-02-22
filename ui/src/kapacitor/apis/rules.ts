@@ -60,7 +60,7 @@ function addUnderscoreType(alertArray: any[]): void {
 export async function getRules(
   kapacitor: Kapacitor,
   opts?: {params?: Record<string, string>; signal?: AbortSignal}
-): Promise<{data: AlertRule[]}> {
+): Promise<{data: {rules: AlertRule[]}}> {
   const response = await AJAX({
     method: 'GET',
     url: kapacitor.links.rules,
