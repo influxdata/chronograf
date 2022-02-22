@@ -13,6 +13,7 @@ interface FluxTasksTableProps {
   kapacitorLink: string
   onChangeTaskStatus: (task: FluxTask) => void
   onDelete: (task: FluxTask) => void
+  editLinkSuffix?: string
 }
 
 interface FluxTaskRowProps {
@@ -63,6 +64,7 @@ const FluxTasksTable: FC<FluxTasksTableProps> = ({
   kapacitorLink,
   onDelete,
   onChangeTaskStatus,
+  editLinkSuffix = '',
 }) => {
   if (!tasks) {
     return null
@@ -85,7 +87,7 @@ const FluxTasksTable: FC<FluxTasksTableProps> = ({
           return (
             <FluxTaskRow
               key={task.id}
-              viewLink={`${kapacitorLink}/fluxtasks/${task.id}`}
+              viewLink={`${kapacitorLink}/fluxtasks/${task.id}${editLinkSuffix}`}
               task={task}
               onDelete={onDelete}
               onChangeTaskStatus={onChangeTaskStatus}

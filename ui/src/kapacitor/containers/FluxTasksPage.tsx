@@ -24,9 +24,11 @@ import {isCancellationError} from 'src/types/promises'
 const Contents = ({
   kapacitor,
   source,
+  filter: filterInit = '',
 }: {
   kapacitor: Kapacitor
   source: Source
+  filter?: string
 }) => {
   const [loading, setLoading] = useState(true)
   const [reloadRequired, setReloadRequired] = useState(0)
@@ -62,7 +64,7 @@ const Contents = ({
     fetchData()
     return () => ac.abort()
   }, [kapacitor, reloadRequired])
-  const [nameFilter, setNameFilter] = useState('')
+  const [nameFilter, setNameFilter] = useState(filterInit)
   const filter = useDebounce(nameFilter)
   const list = useMemo(() => {
     if (allList && allList.length && filter) {
@@ -122,6 +124,7 @@ const Contents = ({
           <FluxTasksTable
             kapacitorLink={`/sources/${source.id}/kapacitors/${kapacitor.id}`}
             tasks={list}
+            editLinkSuffix={`?filter=${encodeURIComponent(filter)}`}
             onDelete={(task: FluxTask) => {
               deleteFluxTask(kapacitor, task)
                 .then(() => {
@@ -157,11 +160,26 @@ const Contents = ({
   )
 }
 
-const FluxTasksPage = ({source: src}: {source: Source}) => {
+interface Props {
+  source: Source
+  router: {
+    location: {
+      query?: Record<string, string>
+    }
+  }
+}
+const FluxTasksPage = ({
+  source: src,
+  router: {
+    location: {
+      query: {filter},
+    },
+  },
+}: Props) => {
   return (
     <KapacitorScopedPage source={src} title="Manage Flux Tasks">
       {(kapacitor: Kapacitor, source: Source) => (
-        <Contents kapacitor={kapacitor} source={source} />
+        <Contents kapacitor={kapacitor} source={source} filter={filter} />
       )}
     </KapacitorScopedPage>
   )
