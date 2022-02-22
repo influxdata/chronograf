@@ -26,6 +26,7 @@ export interface Kapacitor {
     self?: string
     proxy?: string
     ping?: string
+    rules?: string
   }
 }
 
@@ -57,6 +58,7 @@ export interface AlertRule {
   'last-enabled'?: string
   'template-id'?: string
   vars?: Record<string, {type: string; value: unknown}>
+  links?: Record<string, string>
 }
 
 export interface Task {
