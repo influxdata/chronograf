@@ -16,7 +16,7 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import PageSpinner from 'src/shared/components/PageSpinner'
 
 import {Source, Kapacitor, FluxTask, LogItem} from 'src/types'
-import {getFluxTask, getFluxTaskLogs} from '../apis'
+import {getFluxTask, getFluxTaskLogs} from '../apis/fluxTasks'
 import LogsTableRow from '../components/LogsTableRow'
 import {useDispatch} from 'react-redux'
 import {notify} from 'src/shared/actions/notifications'
@@ -25,6 +25,7 @@ import {
   notifyCopyToClipboardSuccess,
 } from 'src/shared/copy/notifications'
 import {updateFluxTaskStatus} from '../actions/view'
+import errorMessage from '../utils/errorMessage'
 
 interface Params {
   taskID: string
@@ -41,18 +42,6 @@ interface Props {
 
 const noop = () => undefined
 const numLogsToRender = 200
-function errorMessage(e: any): unknown {
-  if (!e) {
-    return e
-  }
-  if (e.message) {
-    return e.message
-  }
-  if (e.statusText) {
-    return e.statusText
-  }
-  return e
-}
 
 const LogsTable: FC<{task: FluxTask; kapacitor: Kapacitor}> = ({
   task,
@@ -300,9 +289,9 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
           </Radio>
           <button
             className="btn btn-default btn-sm"
-            title="Return to Tasks"
+            title="Return to Flux Tasks"
             onClick={() => {
-              router.push(`/sources/${source.id}/alert-rules`)
+              router.push(`/sources/${source.id}/flux-tasks`)
             }}
           >
             Exit
