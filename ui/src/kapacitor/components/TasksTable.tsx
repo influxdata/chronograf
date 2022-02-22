@@ -13,6 +13,7 @@ interface TasksTableProps {
   kapacitorLink: string
   onChangeRuleStatus: (rule: AlertRule) => void
   onDelete: (rule: AlertRule) => void
+  editLinkSuffix?: string
 }
 
 interface TaskRowProps {
@@ -27,6 +28,7 @@ const TasksTable: FunctionComponent<TasksTableProps> = ({
   kapacitorLink,
   onDelete,
   onChangeRuleStatus,
+  editLinkSuffix,
 }) => (
   <table className="table v-center table-highlight">
     <thead>
@@ -45,7 +47,9 @@ const TasksTable: FunctionComponent<TasksTableProps> = ({
           <TaskRow
             key={task.id}
             task={task}
-            editLink={`${kapacitorLink}/tickscripts/${task.id}`}
+            editLink={`${kapacitorLink}/tickscripts/${task.id}${
+              editLinkSuffix ?? ''
+            }`}
             onDelete={onDelete}
             onChangeRuleStatus={onChangeRuleStatus}
           />
