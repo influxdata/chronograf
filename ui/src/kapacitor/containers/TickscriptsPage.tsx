@@ -21,9 +21,11 @@ import {Link} from 'react-router'
 const Contents = ({
   kapacitor,
   source,
+  filter: filterInit = '',
 }: {
   kapacitor: Kapacitor
   source: Source
+  filter?: string
 }) => {
   const [loading, setLoading] = useState(true)
   const [reloadRequired, setReloadRequired] = useState(0)
@@ -57,7 +59,7 @@ const Contents = ({
     fetchData()
     return () => ac.abort()
   }, [kapacitor, reloadRequired])
-  const [nameFilter, setNameFilter] = useState('')
+  const [nameFilter, setNameFilter] = useState(filterInit)
   const filter = useDebounce(nameFilter)
   const list = useMemo(() => {
     if (allList && allList.length && filter) {
@@ -99,7 +101,9 @@ const Contents = ({
           onClick={() => setReloadRequired(reloadRequired + 1)}
         />
         <Link
-          to={`${kapacitorLink}/tickscripts/new?l=t`}
+          to={`${kapacitorLink}/tickscripts/new?l=t&filter=${encodeURIComponent(
+            filter
+          )}`}
           className="btn btn-sm btn-success"
           style={{marginLeft: '4px'}}
         >
@@ -113,7 +117,7 @@ const Contents = ({
           <TasksTable
             kapacitorLink={kapacitorLink}
             tasks={list}
-            editLinkSuffix="?l=t"
+            editLinkSuffix={`?l=t&filter=${encodeURIComponent(filter)}`}
             onDelete={(rule: AlertRule) => {
               deleteRule(rule)
                 .then(() => {
@@ -149,11 +153,27 @@ const Contents = ({
   )
 }
 
-const TickscriptsPage = ({source: src}: {source: Source}) => {
+interface Props {
+  source: Source
+  router: {
+    location: {
+      query?: Record<string, string>
+    }
+  }
+}
+
+const TickscriptsPage = ({
+  source: src,
+  router: {
+    location: {
+      query: {filter},
+    },
+  },
+}: Props) => {
   return (
     <KapacitorScopedPage source={src} title="Manage TICKscripts">
       {(kapacitor: Kapacitor, source: Source) => (
-        <Contents kapacitor={kapacitor} source={source} />
+        <Contents kapacitor={kapacitor} source={source} filter={filter} />
       )}
     </KapacitorScopedPage>
   )
