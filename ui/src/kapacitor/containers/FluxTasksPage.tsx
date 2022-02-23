@@ -124,7 +124,6 @@ const Contents = ({
           <FluxTasksTable
             kapacitorLink={`/sources/${source.id}/kapacitors/${kapacitor.id}`}
             tasks={list}
-            editLinkSuffix={`?filter=${encodeURIComponent(filter)}`}
             onDelete={(task: FluxTask) => {
               deleteFluxTask(kapacitor, task)
                 .then(() => {
