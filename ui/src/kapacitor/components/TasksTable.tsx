@@ -1,6 +1,6 @@
-import React, {MouseEvent, PureComponent} from 'react'
+import React, {MouseEvent, PureComponent, useMemo, useState} from 'react'
 import {Link} from 'react-router'
-import {sortBy} from 'lodash'
+import {sortBy, take} from 'lodash'
 
 import {AlertRule} from 'src/types'
 
@@ -24,6 +24,8 @@ interface TaskRowProps {
   onViewRule?: (ruleId: string) => void
 }
 
+const PAGE_SIZE = 100
+
 const TasksTable = ({
   tasks,
   kapacitorLink,
@@ -31,7 +33,11 @@ const TasksTable = ({
   onChangeRuleStatus,
   onViewRule,
 }: TasksTableProps) => {
-  const tableData = sortBy(tasks, t => t.name.toLowerCase())
+  const [limit, setLimit] = useState(PAGE_SIZE)
+  const allData = useMemo(() => sortBy(tasks, t => t.name.toLowerCase()), [
+    tasks,
+  ])
+  const tableData = useMemo(() => take(allData, limit), [allData, limit])
   return (
     <table className="table v-center table-highlight">
       <thead>
@@ -57,6 +63,18 @@ const TasksTable = ({
             />
           )
         })}
+        {allData.length > limit ? (
+          <tr>
+            <td colSpan={4}>
+              <button
+                className="btn btn-sm btn-default btn-block"
+                onClick={() => setLimit(limit + 100)}
+              >
+                {`Show next ${PAGE_SIZE} tasks`}
+              </button>
+            </td>
+          </tr>
+        ) : undefined}
       </tbody>
     </table>
   )
