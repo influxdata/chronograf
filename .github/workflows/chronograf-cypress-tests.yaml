@@ -35,7 +35,7 @@ jobs:
 
       - name: Create Enterprise Test Resources
         run: |
-          kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.15.1/cert-manager.yaml
+          kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.5.4/cert-manager.yaml
           sleep 30 # wait for CertManager
           kubectl apply -f .github/workflows/resources/test-reources.yaml
           kubectl create secret generic influxdb-license --from-literal=INFLUXDB_ENTERPRISE_LICENSE_KEY=${INFLUXDB_ENTERPRISE_LICENSE_KEY}
