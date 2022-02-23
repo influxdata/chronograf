@@ -78,6 +78,7 @@ const Contents = ({
     )
   }
   const kapacitorLink = `/sources/${source.id}/kapacitors/${kapacitor.id}`
+  const detailLinkSuffix = `?l=t&filter=${encodeURIComponent(filter)}`
   return (
     <div className="panel">
       <div className="panel-heading" style={{gap: '5px'}}>
@@ -101,9 +102,7 @@ const Contents = ({
           onClick={() => setReloadRequired(reloadRequired + 1)}
         />
         <Link
-          to={`${kapacitorLink}/tickscripts/new?l=t&filter=${encodeURIComponent(
-            filter
-          )}`}
+          to={`${kapacitorLink}/tickscripts/new${detailLinkSuffix}`}
           className="btn btn-sm btn-success"
           style={{marginLeft: '4px'}}
         >
@@ -117,7 +116,7 @@ const Contents = ({
           <TasksTable
             kapacitorLink={kapacitorLink}
             tasks={list}
-            editLinkSuffix={`?l=t&filter=${encodeURIComponent(filter)}`}
+            editLinkSuffix={detailLinkSuffix}
             onDelete={(rule: AlertRule) => {
               deleteRule(rule)
                 .then(() => {
