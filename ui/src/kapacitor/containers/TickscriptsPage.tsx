@@ -18,6 +18,9 @@ import {isCancellationError} from 'src/types/promises'
 import TasksTable from '../components/TasksTable'
 import {Link} from 'react-router'
 
+// max size of a limited fetch
+const LIMITED_FETCH_SIZE = 100
+
 const Contents = ({
   kapacitor,
   source,
@@ -42,12 +45,26 @@ const Contents = ({
     }
     return allList
   }, [allList, filter])
+  // optimization: limit fetch if no filter is specified
+  const loadAllData = useRef(false)
+  const limitedFetch = useMemo(() => {
+    if (loadAllData.current) {
+      return false
+    }
+    if (filter) {
+      loadAllData.current = true
+      return false
+    }
+    return true
+  }, [filter, reloadRequired])
+
   useEffect(() => {
     setLoading(true)
     const ac = new AbortController()
     const fetchData = async () => {
       const params: Record<string, string> = {
         parse: '0',
+        ...(limitedFetch ? {limit: String(LIMITED_FETCH_SIZE)} : undefined),
       }
       try {
         const {
@@ -71,7 +88,7 @@ const Contents = ({
     }
     fetchData()
     return () => ac.abort()
-  }, [kapacitor, reloadRequired])
+  }, [kapacitor, reloadRequired, limitedFetch])
 
   if (error) {
     return (
@@ -166,13 +183,39 @@ const Contents = ({
         {loading ? (
           <PageSpinner />
         ) : (
-          <TasksTable
-            kapacitorLink={kapacitorLink}
-            tasks={list}
-            onViewRule={onViewRule}
-            onDelete={onDelete}
-            onChangeRuleStatus={onChangeRuleStatus}
-          />
+          <>
+            {limitedFetch && list.length === LIMITED_FETCH_SIZE ? (
+              <div
+                style={{
+                  display: 'inline-flex',
+                  justifyContent: 'center',
+                  color: '#FFB94A',
+                  width: '100%',
+                }}
+              >
+                <span>
+                  {`${LIMITED_FETCH_SIZE} kapacitor items are shown. Adjust the filter or `}
+                  <a
+                    href="#"
+                    onClick={() => {
+                      loadAllData.current = true
+                      setReloadRequired(reloadRequired + 1)
+                    }}
+                  >
+                    Load All
+                  </a>
+                  {' to show them all.'}
+                </span>
+              </div>
+            ) : undefined}
+            <TasksTable
+              kapacitorLink={kapacitorLink}
+              tasks={list}
+              onViewRule={onViewRule}
+              onDelete={onDelete}
+              onChangeRuleStatus={onChangeRuleStatus}
+            />
+          </>
         )}
       </div>
     </div>
