@@ -1,6 +1,6 @@
-import React, {MouseEvent, PureComponent, FunctionComponent} from 'react'
+import React, {MouseEvent, PureComponent} from 'react'
 import {Link} from 'react-router'
-import _ from 'lodash'
+import {sortBy} from 'lodash'
 
 import {AlertRule} from 'src/types'
 
@@ -24,40 +24,43 @@ interface TaskRowProps {
   onViewRule?: (ruleId: string) => void
 }
 
-const TasksTable: FunctionComponent<TasksTableProps> = ({
+const TasksTable = ({
   tasks,
   kapacitorLink,
   onDelete,
   onChangeRuleStatus,
   onViewRule,
-}) => (
-  <table className="table v-center table-highlight">
-    <thead>
-      <tr>
-        <th style={{minWidth: colName}}>Name</th>
-        <th style={{width: colType}}>Type</th>
-        <th style={{width: colEnabled}} className="text-center">
-          Task Enabled
-        </th>
-        <th style={{width: colActions}} />
-      </tr>
-    </thead>
-    <tbody>
-      {_.sortBy(tasks, t => t.name.toLowerCase()).map(task => {
-        return (
-          <TaskRow
-            key={task.id}
-            task={task}
-            editLink={`${kapacitorLink}/tickscripts/${task.id}`}
-            onViewRule={onViewRule}
-            onDelete={onDelete}
-            onChangeRuleStatus={onChangeRuleStatus}
-          />
-        )
-      })}
-    </tbody>
-  </table>
-)
+}: TasksTableProps) => {
+  const tableData = sortBy(tasks, t => t.name.toLowerCase())
+  return (
+    <table className="table v-center table-highlight">
+      <thead>
+        <tr>
+          <th style={{minWidth: colName}}>Name</th>
+          <th style={{width: colType}}>Type</th>
+          <th style={{width: colEnabled}} className="text-center">
+            Task Enabled
+          </th>
+          <th style={{width: colActions}} />
+        </tr>
+      </thead>
+      <tbody>
+        {tableData.map(task => {
+          return (
+            <TaskRow
+              key={task.id}
+              task={task}
+              editLink={`${kapacitorLink}/tickscripts/${task.id}`}
+              onViewRule={onViewRule}
+              onDelete={onDelete}
+              onChangeRuleStatus={onChangeRuleStatus}
+            />
+          )
+        })}
+      </tbody>
+    </table>
+  )
+}
 
 export class TaskRow extends PureComponent<TaskRowProps> {
   public render() {

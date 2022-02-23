@@ -34,14 +34,25 @@ const Contents = ({
   const [error, setError] = useState(undefined)
   const [allList, setAllList] = useState<AlertRule[]>([])
   const dispatch = useDispatch()
+  const [nameFilter, setNameFilter] = useState(filterInit)
+  const filter = useDebounce(nameFilter)
+  const list = useMemo(() => {
+    if (allList && allList.length && filter) {
+      return allList.filter(x => x.name.includes(filter))
+    }
+    return allList
+  }, [allList, filter])
   useEffect(() => {
     setLoading(true)
     const ac = new AbortController()
     const fetchData = async () => {
+      const params: Record<string, string> = {
+        parse: '0',
+      }
       try {
         const {
           data: {rules},
-        } = await getRules(kapacitor, {signal: ac.signal, params: {parse: '0'}})
+        } = await getRules(kapacitor, {signal: ac.signal, params})
         setAllList(rules)
       } catch (e) {
         if (!isCancellationError(e)) {
@@ -61,14 +72,6 @@ const Contents = ({
     fetchData()
     return () => ac.abort()
   }, [kapacitor, reloadRequired])
-  const [nameFilter, setNameFilter] = useState(filterInit)
-  const filter = useDebounce(nameFilter)
-  const list = useMemo(() => {
-    if (allList && allList.length && filter) {
-      return allList.filter(x => x.name.includes(filter))
-    }
-    return allList
-  }, [allList, filter])
 
   if (error) {
     return (
@@ -83,7 +86,6 @@ const Contents = ({
     () => `/sources/${source.id}/kapacitors/${kapacitor.id}`,
     [source, kapacitor]
   )
-
   // memoize table handlers in order to avoid re-rendering of table rows
   const onDelete = useMemo(
     () => (rule: AlertRule) => {
