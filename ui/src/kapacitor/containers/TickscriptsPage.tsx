@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react'
+import React, {useEffect, useMemo, useRef, useState} from 'react'
 import {AlertRule, Kapacitor, Source} from 'src/types'
 import KapacitorScopedPage from './KapacitorScopedPage'
 import {useDispatch} from 'react-redux'
@@ -22,9 +22,11 @@ const Contents = ({
   kapacitor,
   source,
   filter: filterInit = '',
+  router,
 }: {
   kapacitor: Kapacitor
   source: Source
+  router: Router
   filter?: string
 }) => {
   const [loading, setLoading] = useState(true)
@@ -77,13 +79,60 @@ const Contents = ({
       </div>
     )
   }
-  const kapacitorLink = `/sources/${source.id}/kapacitors/${kapacitor.id}`
-  const detailLinkSuffix = `?l=t&filter=${encodeURIComponent(filter)}`
+  const kapacitorLink = useMemo(
+    () => `/sources/${source.id}/kapacitors/${kapacitor.id}`,
+    [source, kapacitor]
+  )
+
+  // memoize table handlers in order to avoid re-rendering of table rows
+  const onDelete = useMemo(
+    () => (rule: AlertRule) => {
+      deleteRule(rule)
+        .then(() => {
+          setAllList(allList.filter(x => x.id !== rule.id))
+          dispatch(notify(notifyAlertRuleDeleted(rule.name)))
+        })
+        .catch(() => {
+          dispatch(notify(notifyAlertRuleDeleteFailed(rule.name)))
+        })
+    },
+    [allList, dispatch]
+  )
+  const onChangeRuleStatus = useMemo(
+    () => (rule: AlertRule) => {
+      const status = rule.status === 'enabled' ? 'disabled' : 'enabled'
+      updateRuleStatus(rule, status)
+        .then(() => {
+          setAllList(
+            allList.map(x => (x.id === rule.id ? {...rule, status} : x))
+          )
+          dispatch(notify(notifyAlertRuleStatusUpdated(rule.name, status)))
+        })
+        .catch(() => {
+          dispatch(notify(notifyAlertRuleStatusUpdateFailed(rule.name, status)))
+          return false
+        })
+    },
+    [allList, dispatch]
+  )
+  const filterRef = useRef<HTMLInputElement>()
+  const onViewRule = useMemo(
+    () => (id: string) => {
+      const params = new URLSearchParams({
+        l: 't', // inform view page to return back herein
+        filter: filterRef.current.value,
+      })
+      router.push(`${kapacitorLink}/tickscripts/${id}?${params}`)
+    },
+    [dispatch, kapacitorLink]
+  )
+
   return (
     <div className="panel">
       <div className="panel-heading" style={{gap: '5px'}}>
         <div className="search-widget" style={{flexGrow: 1}}>
           <input
+            ref={filterRef}
             type="text"
             className="form-control input-sm"
             placeholder="Filter by name"
@@ -102,7 +151,9 @@ const Contents = ({
           onClick={() => setReloadRequired(reloadRequired + 1)}
         />
         <Link
-          to={`${kapacitorLink}/tickscripts/new${detailLinkSuffix}`}
+          to={`${kapacitorLink}/tickscripts/new?l=t&filter=${encodeURIComponent(
+            filter
+          )}`}
           className="btn btn-sm btn-success"
           style={{marginLeft: '4px'}}
         >
@@ -116,35 +167,9 @@ const Contents = ({
           <TasksTable
             kapacitorLink={kapacitorLink}
             tasks={list}
-            editLinkSuffix={detailLinkSuffix}
-            onDelete={(rule: AlertRule) => {
-              deleteRule(rule)
-                .then(() => {
-                  setAllList(allList.filter(x => x.id !== rule.id))
-                  dispatch(notify(notifyAlertRuleDeleted(rule.name)))
-                })
-                .catch(() => {
-                  dispatch(notify(notifyAlertRuleDeleteFailed(rule.name)))
-                })
-            }}
-            onChangeRuleStatus={(rule: AlertRule) => {
-              const status = rule.status === 'enabled' ? 'disabled' : 'enabled'
-              updateRuleStatus(rule, status)
-                .then(() => {
-                  setAllList(
-                    allList.map(x => (x.id === rule.id ? {...rule, status} : x))
-                  )
-                  dispatch(
-                    notify(notifyAlertRuleStatusUpdated(rule.name, status))
-                  )
-                })
-                .catch(() => {
-                  dispatch(
-                    notify(notifyAlertRuleStatusUpdateFailed(rule.name, status))
-                  )
-                  return false
-                })
-            }}
+            onViewRule={onViewRule}
+            onDelete={onDelete}
+            onChangeRuleStatus={onChangeRuleStatus}
           />
         )}
       </div>
@@ -152,27 +177,28 @@ const Contents = ({
   )
 }
 
+interface Router {
+  location: {
+    query?: Record<string, string>
+  }
+  push: (location: string) => void
+}
 interface Props {
   source: Source
-  router: {
-    location: {
-      query?: Record<string, string>
-    }
-  }
+  router: Router
 }
 
-const TickscriptsPage = ({
-  source: src,
-  router: {
-    location: {
-      query: {filter},
-    },
-  },
-}: Props) => {
+const TickscriptsPage = ({source: src, router}: Props) => {
+  const filter = router.location.query?.filter
   return (
     <KapacitorScopedPage source={src} title="Manage TICKscripts">
       {(kapacitor: Kapacitor, source: Source) => (
-        <Contents kapacitor={kapacitor} source={source} filter={filter} />
+        <Contents
+          kapacitor={kapacitor}
+          source={source}
+          filter={filter}
+          router={router}
+        />
       )}
     </KapacitorScopedPage>
   )

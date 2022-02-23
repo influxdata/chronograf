@@ -1,4 +1,4 @@
-import React, {PureComponent, FunctionComponent} from 'react'
+import React, {MouseEvent, PureComponent, FunctionComponent} from 'react'
 import {Link} from 'react-router'
 import _ from 'lodash'
 
@@ -13,7 +13,7 @@ interface TasksTableProps {
   kapacitorLink: string
   onChangeRuleStatus: (rule: AlertRule) => void
   onDelete: (rule: AlertRule) => void
-  editLinkSuffix?: string
+  onViewRule?: (ruleId: string) => void
 }
 
 interface TaskRowProps {
@@ -21,6 +21,7 @@ interface TaskRowProps {
   editLink: string
   onChangeRuleStatus: (rule: AlertRule) => void
   onDelete: (rule: AlertRule) => void
+  onViewRule?: (ruleId: string) => void
 }
 
 const TasksTable: FunctionComponent<TasksTableProps> = ({
@@ -28,7 +29,7 @@ const TasksTable: FunctionComponent<TasksTableProps> = ({
   kapacitorLink,
   onDelete,
   onChangeRuleStatus,
-  editLinkSuffix,
+  onViewRule,
 }) => (
   <table className="table v-center table-highlight">
     <thead>
@@ -47,9 +48,8 @@ const TasksTable: FunctionComponent<TasksTableProps> = ({
           <TaskRow
             key={task.id}
             task={task}
-            editLink={`${kapacitorLink}/tickscripts/${task.id}${
-              editLinkSuffix ?? ''
-            }`}
+            editLink={`${kapacitorLink}/tickscripts/${task.id}`}
+            onViewRule={onViewRule}
             onDelete={onDelete}
             onChangeRuleStatus={onChangeRuleStatus}
           />
@@ -62,7 +62,6 @@ const TasksTable: FunctionComponent<TasksTableProps> = ({
 export class TaskRow extends PureComponent<TaskRowProps> {
   public render() {
     const {task, editLink} = this.props
-
     return (
       <tr key={task.id}>
         <td style={{minWidth: colName}}>
@@ -70,6 +69,8 @@ export class TaskRow extends PureComponent<TaskRowProps> {
             style={{color: task['template-id'] ? 'gray' : undefined}}
             className="link-success"
             to={editLink}
+            data-task-id={task.id}
+            onClick={this.handleViewRule}
           >
             {task.name}
           </Link>
@@ -112,6 +113,18 @@ export class TaskRow extends PureComponent<TaskRowProps> {
     const {onChangeRuleStatus, task} = this.props
 
     onChangeRuleStatus(task)
+  }
+
+  private handleViewRule = (e: MouseEvent) => {
+    const {onViewRule} = this.props
+    if (onViewRule) {
+      e.preventDefault()
+      // casting to unknown is a workaround to wrong global typings
+      onViewRule(
+        ((e.target as unknown) as any).attributes.getNamedItem('data-task-id')
+          .value
+      )
+    }
   }
 }
 
