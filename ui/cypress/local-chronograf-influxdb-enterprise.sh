@@ -64,6 +64,7 @@ main() {
         install_kind_release
         "${KIND}" create cluster --wait 60s --loglevel=debug --config "${KIND_CONFIG}" --kubeconfig "${KUBE_CONFIG}"
         export KUBECONFIG="${KUBE_CONFIG}"
+        kubectl -n kube-system rollout restart deployment coredns
         deploy_influxdb_ent
         if [[ "${NO_BUILD}" == 0 ]]; then
             build_chronograf
