@@ -171,34 +171,34 @@ describe('dashboards', () => {
 //     cy.getByTestID('btn-accept').click()   
 //     cy.get('.template-control--container').contains('iHopeThisNameDoesNotExist')
     
-    cy.getByTestID('add-template-variable').click()
-    cy.getByTestID('variable-name-type', {timeout: 2000})
-      .type('{selectAll}{backspace}iHopeThisNameDoesNotExist',{delay:400})
+//    cy.getByTestID('add-template-variable').click()
+//    cy.getByTestID('variable-name-type', {timeout: 2000})
+//      .type('{selectAll}{backspace}iHopeThisNameDoesNotExist',{delay:400})
 
 
-    cy.getByTestID('btn-accept').should('be.disabled')
-    cy.getByTestID('btn-cancel').click()
+//    cy.getByTestID('btn-accept').should('be.disabled')
+//    cy.getByTestID('btn-cancel').click()
 
 
-    //deletes existing variable
-    cy.getByTestID('edit')
-      .last()
-      .click()
-    cy.getByTitle('Confirm').click()
-    cy.getByTestID('confirm-btn').click()
-    cy.wait(500)
-    cy.getByTestID('edit').then($a => {
-      cy.wrap($a)
-      .first()
-      .click({ force: true })})
-    cy.getByTitle('Confirm').click()
-    cy.getByTestID('confirm-btn').click()
+//    deletes existing variable
+//    cy.getByTestID('edit')
+//      .last()
+//      .click()
+//    cy.getByTitle('Confirm').click()
+//    cy.getByTestID('confirm-btn').click()
+//    cy.wait(500)
+//    cy.getByTestID('edit').then($a => {
+//      cy.wrap($a)
+//      .first()
+//      .click({ force: true })})
+//    cy.getByTitle('Confirm').click()
+//    cy.getByTestID('confirm-btn').click()
 
-    cy.get('.template-control--dropdown').should('not.exist')
-    cy.get('[data-test="empty-state"]').should('exist')
+//    cy.get('.template-control--dropdown').should('not.exist')
+//    cy.get('[data-test="empty-state"]').should('exist')
 
-    cy.clickNav(4, 'Dashboards')
-    cy.getByTitle('Confirm').click({multiple: true, force:true}).then(()=>
-    cy.getByTestID('confirm-btn').click({multiple: true, force:true}))
-  })
+//    cy.clickNav(4, 'Dashboards')
+//    cy.getByTitle('Confirm').click({multiple: true, force:true}).then(()=>
+//    cy.getByTestID('confirm-btn').click({multiple: true, force:true}))
+//  })
 })
