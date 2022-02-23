@@ -44,12 +44,20 @@ build_chronograf() {
 }
 
 deploy_influxdb_ent() {
-    kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.5.4/cert-manager.yaml
-    sleep 30 # wait for CertManager
-    kubectl apply -f "${RWD}/.github/workflows/resources/test-reources.yaml"
-    kubectl create secret generic influxdb-license --from-literal=INFLUXDB_ENTERPRISE_LICENSE_KEY="${LICENSE_KEY}"
+#    kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.5.4/cert-manager.yaml
+    helm repo add jetstack https://charts.jetstack.io
     helm repo add influxdata https://helm.influxdata.com/
     helm repo update
+    helm upgrade --wait --install \
+        cert-manager jetstack/cert-manager \
+        --namespace cert-manager \
+        --create-namespace \
+        --version v1.5.4 \
+        --set prometheus.enabled=false \
+        --set webhook.timeoutSeconds=30 \
+        --set installCRDs=true
+    kubectl apply -f "${RWD}/.github/workflows/resources/test-reources.yaml"
+    kubectl create secret generic influxdb-license --from-literal=INFLUXDB_ENTERPRISE_LICENSE_KEY="${LICENSE_KEY}"
     helm upgrade --wait --install influxdb influxdata/influxdb-enterprise --namespace default --set-string envFromSecret=influxdb-license --set-string data.service.type=NodePort
     kubectl patch svc influxdb-influxdb-enterprise-data --type=json -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":30086}]'
     sleep 5
