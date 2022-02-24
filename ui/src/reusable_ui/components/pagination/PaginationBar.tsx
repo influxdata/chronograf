@@ -46,7 +46,7 @@ export default function PaginationBar({
     <div style={{display: 'inline-flex', alignItems: 'baseline', gap: '10px'}}>
       <button
         className="btn btn-sm btn-default"
-        disabled={page === maxPage}
+        disabled={page === 0}
         onClick={() => onChange(Math.max(0, page - 1), pageSize)}
         title="Previous Page"
       >
