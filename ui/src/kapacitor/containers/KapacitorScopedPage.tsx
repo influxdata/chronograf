@@ -29,7 +29,7 @@ interface Props {
   notify: typeof mdtp.notify
   setActiveKapacitor: typeof mdtp.setActiveKapacitor
 
-  // owen props
+  // own props
   title: string
   source: Source
   tooltip?: string
