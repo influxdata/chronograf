@@ -1,5 +1,5 @@
 // Libraries
-import React, {PureComponent} from 'react'
+import React, {MouseEvent, PureComponent} from 'react'
 import {connect} from 'react-redux'
 
 // APIs
@@ -33,11 +33,16 @@ interface Props {
   title: string
   source: Source
   tooltip?: string
-  children: (kapacitor: Kapacitor, source: Source) => JSX.Element
+  children: (
+    kapacitor: Kapacitor,
+    source: Source,
+    scrollToTop: (scrollTop: number) => void
+  ) => JSX.Element
 }
 
 interface State {
   loading: RemoteDataState
+  scrollTop: number
   kapacitors?: Kapacitor[]
   kapacitor?: Kapacitor
   error?: Error
@@ -49,6 +54,7 @@ export class KapacitorScopedPage extends PureComponent<Props, State> {
     super(props)
     this.state = {
       loading: RemoteDataState.NotStarted,
+      scrollTop: 0,
     }
   }
 
@@ -71,7 +77,7 @@ export class KapacitorScopedPage extends PureComponent<Props, State> {
 
   public render() {
     const {tooltip, title, source, children} = this.props
-    const {loading, kapacitor, kapacitors} = this.state
+    const {loading, kapacitor, kapacitors, scrollTop} = this.state
     return (
       <Page className={kapacitor ? '' : 'empty-tasks-page'}>
         <Page.Header>
@@ -101,10 +107,13 @@ export class KapacitorScopedPage extends PureComponent<Props, State> {
             ) : undefined}
           </Page.Header.Right>
         </Page.Header>
-        <Page.Contents>
+        <Page.Contents
+          setScrollTop={this.handleScrollbarScroll}
+          scrollTop={scrollTop}
+        >
           <Spinner loading={loading}>
             {kapacitor ? (
-              children(kapacitor, source)
+              children(kapacitor, source, this.scrollToTop)
             ) : (
               <NoKapacitorError source={source} />
             )}
@@ -124,6 +133,15 @@ export class KapacitorScopedPage extends PureComponent<Props, State> {
     pingKapacitor(toKapacitor).catch(() => {
       this.props.notify(notifyKapacitorConnectionFailed())
     })
+  }
+  private handleScrollbarScroll = (e: MouseEvent<HTMLElement>): void => {
+    e.stopPropagation()
+    e.preventDefault()
+    const target = e.currentTarget
+    this.setState({scrollTop: target.scrollTop})
+  }
+  private scrollToTop = (scrollTop: number) => {
+    this.setState({scrollTop})
   }
 }
 

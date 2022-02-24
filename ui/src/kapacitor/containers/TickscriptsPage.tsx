@@ -28,11 +28,13 @@ const Contents = ({
   source,
   filter: filterInit = '',
   router,
+  setScrollTop,
 }: {
   kapacitor: Kapacitor
   source: Source
   router: Router
   filter?: string
+  setScrollTop: (scrollTop: number) => void
 }) => {
   const [loading, setLoading] = useState(true)
   const [reloadRequired, setReloadRequired] = useState(0)
@@ -232,7 +234,10 @@ const Contents = ({
                   page={page}
                   total={list.length}
                   pageSize={PAGE_SIZE}
-                  onChange={p => setPage(p)}
+                  onChange={p => {
+                    setScrollTop(0)
+                    setPage(p)
+                  }}
                 />
               ) : undefined}
             </TasksTable>
@@ -258,12 +263,17 @@ const TickscriptsPage = ({source: src, router}: Props) => {
   const filter = router.location.query?.filter
   return (
     <KapacitorScopedPage source={src} title="Manage TICKscripts">
-      {(kapacitor: Kapacitor, source: Source) => (
+      {(
+        kapacitor: Kapacitor,
+        source: Source,
+        setScrollTop: (scrollTop: number) => void
+      ) => (
         <Contents
           kapacitor={kapacitor}
           source={source}
           filter={filter}
           router={router}
+          setScrollTop={setScrollTop}
         />
       )}
     </KapacitorScopedPage>
