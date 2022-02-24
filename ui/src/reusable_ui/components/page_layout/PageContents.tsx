@@ -1,5 +1,5 @@
 // Libraries
-import React, {Component} from 'react'
+import React, {MouseEvent, Component} from 'react'
 import classnames from 'classnames'
 
 // Components
@@ -12,7 +12,7 @@ interface Props {
   fullWidth?: boolean
   scrollable?: boolean
   inPresentationMode?: boolean
-  setScrollTop?: () => void
+  setScrollTop?: (e: MouseEvent<HTMLElement>) => void
   className?: string
 }
 
