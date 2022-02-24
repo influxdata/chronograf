@@ -13,13 +13,15 @@ import {
   notifyAlertRuleStatusUpdateFailed,
 } from 'src/shared/copy/notifications'
 import useDebounce from '../../utils/useDebounce'
-import {Button, ButtonShape, IconFont} from 'src/reusable_ui'
+import {Button, ButtonShape, IconFont, PaginationBar} from 'src/reusable_ui'
 import {isCancellationError} from 'src/types/promises'
 import TasksTable from '../components/TasksTable'
 import {Link} from 'react-router'
+import {sortBy} from 'lodash'
 
 // max size of a limited fetch
 const LIMITED_FETCH_SIZE = 100
+const PAGE_SIZE = LIMITED_FETCH_SIZE
 
 const Contents = ({
   kapacitor,
@@ -57,6 +59,14 @@ const Contents = ({
     }
     return true
   }, [filter, reloadRequired])
+  const [page, setPage] = useState(0)
+  const listPage = useMemo(() => {
+    if (list.length <= PAGE_SIZE) {
+      return list
+    }
+    const start = Math.max(page * PAGE_SIZE, 0)
+    return list.slice(start, Math.min(start + PAGE_SIZE, list.length))
+  }, [page, list])
 
   useEffect(() => {
     setLoading(true)
@@ -70,7 +80,8 @@ const Contents = ({
         const {
           data: {rules},
         } = await getRules(kapacitor, {signal: ac.signal, params})
-        setAllList(rules)
+        const sorted = sortBy(rules, t => t.name.toLowerCase())
+        setAllList(sorted)
       } catch (e) {
         if (!isCancellationError(e)) {
           console.error(e)
@@ -210,11 +221,21 @@ const Contents = ({
             ) : undefined}
             <TasksTable
               kapacitorLink={kapacitorLink}
-              tasks={list}
+              tasks={listPage}
+              sorted={true}
               onViewRule={onViewRule}
               onDelete={onDelete}
               onChangeRuleStatus={onChangeRuleStatus}
-            />
+            >
+              {listPage !== list ? (
+                <PaginationBar
+                  page={page}
+                  total={list.length}
+                  pageSize={PAGE_SIZE}
+                  onChange={p => setPage(p)}
+                />
+              ) : undefined}
+            </TasksTable>
           </>
         )}
       </div>
