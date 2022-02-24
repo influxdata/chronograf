@@ -4,9 +4,10 @@
   "video": false,
   "env": {
     "ALLOW_SCREENSHOT": true,
-    "url": "http://localhost:8086",
+    "url": "https://localhost:8086",
     "username": "admin",
     "password": "admin",
-    "connectionName": "E1M1"
+    "connectionName": "E1M1",
+    "insecureSkipVerify": true
   }
 }

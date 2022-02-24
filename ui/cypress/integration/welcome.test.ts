@@ -10,6 +10,7 @@ describe('Welcome Page', () => {
     cy.get('[id="Connection Name"]').clear().type(Cypress.env('connectionName'))
     cy.get('[id="Username"]').clear().type(Cypress.env('username'))
     cy.get('[id="Password"]').clear().type(Cypress.env('password'))
+    cy.get('.wizard-checkbox--label').contains('Unsafe SSL').click()
 
     cy.get('.wizard-button-bar').within(() => {
       cy.get('button').contains('Add Connection').click()

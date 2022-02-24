@@ -28,3 +28,5 @@ canned/apps_gen.go
 npm-debug.log
 yarn-error.log
 ui/.vs/slnx.sqlite
+out.log
+ui/cypress/kube-config

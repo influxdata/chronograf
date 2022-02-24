@@ -48,6 +48,7 @@ export const createConnection = (url: string = Cypress.env('url')) => {
           username: Cypress.env('username'),
           password: Cypress.env('password'),
           name: Cypress.env('connectionName'),
+          insecureSkipVerify: Cypress.env('insecureSkipVerify')
         }
       })
       .then(() => {
@@ -126,7 +127,8 @@ function wrapDashboards(): Cypress.Chainable {
     })
 }
 
-Cypress.Commands.add('setupConnection', setupConnection)
 Cypress.Commands.add('getByTestID', getByTestID)
-Cypress.Commands.add('getByTitle', getByTitle)
-Cypress.Commands.add('writeManualData', writeManualData)
+Cypress.Commands.add('createConnection', createConnection)
+Cypress.Commands.add('cutConnections', cutConnections)
+Cypress.Commands.add('createDashboard', createDashboard)
+Cypress.Commands.add('deleteDashboards', deleteDashboards)
