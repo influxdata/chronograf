@@ -13,6 +13,7 @@ import Panel, {PanelType} from './components/panel/Panel'
 import Radio from './components/radio_buttons/RadioButtons'
 import SlideToggle from './components/slide_toggle/SlideToggle'
 import Spinner from './components/spinners/Spinner'
+import PaginationBar from './components/pagination/PaginationBar'
 
 // Import Types
 import {
@@ -55,4 +56,5 @@ export {
   IconFont,
   Columns,
   Spinner,
+  PaginationBar,
 }
