@@ -33,7 +33,7 @@ export const getByTestID = (
     Cypress.Loggable & Cypress.Timeoutable & Cypress.Withinable & Cypress.Shadow
   >
 ): Cypress.Chainable => {
-  return cy.get(`[data-testid="${dataTest}"]`, options)
+  return cy.get(`[data-test="${dataTest}"]`, options)
 }
 
 // Change enviromental values in cypress.json
@@ -126,7 +126,6 @@ function wrapDashboards(): Cypress.Chainable {
     })
 }
 
-Cypress.Commands.add('clickNav', clickNav)
 Cypress.Commands.add('setupConnection', setupConnection)
 Cypress.Commands.add('getByTestID', getByTestID)
 Cypress.Commands.add('getByTitle', getByTitle)
