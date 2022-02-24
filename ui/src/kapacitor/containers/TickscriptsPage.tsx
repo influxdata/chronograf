@@ -194,7 +194,7 @@ const Contents = ({
                 }}
               >
                 <span>
-                  {`${LIMITED_FETCH_SIZE} kapacitor items are shown. Adjust the filter or `}
+                  {`${LIMITED_FETCH_SIZE} kapacitor tasks are shown, which are then sorted by name. Input a filter or `}
                   <a
                     href="#"
                     onClick={() => {
@@ -204,7 +204,7 @@ const Contents = ({
                   >
                     Load All
                   </a>
-                  {' to show them all.'}
+                  {' to show the first 100 tasks sorted by name.'}
                 </span>
               </div>
             ) : undefined}
