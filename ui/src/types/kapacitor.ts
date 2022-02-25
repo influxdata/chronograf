@@ -70,6 +70,7 @@ export interface Task {
   type: string
   templateID?: string
   vars?: Record<string, {type: string; value: unknown}>
+  query?: QueryConfig
 }
 
 export type TaskStatusType = 'active' | 'inactive'
