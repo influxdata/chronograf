@@ -162,7 +162,7 @@ class KapacitorRule extends Component<Props, State> {
   }
 
   private handleCreate = (pathname?: string) => {
-    const {notify, queryConfigs, rule, source, router, kapacitor} = this.props
+    const {notify, queryConfigs, rule, kapacitor} = this.props
 
     const newRule = Object.assign({}, rule, {
       query: queryConfigs[rule.queryID],
@@ -172,7 +172,7 @@ class KapacitorRule extends Component<Props, State> {
 
     createRule(kapacitor, newRule)
       .then(() => {
-        router.push(pathname || `/sources/${source.id}/alert-rules`)
+        this.exitPage(pathname)
         notify(notifyAlertRuleCreated(newRule.name))
       })
       .catch(e => {
@@ -181,14 +181,14 @@ class KapacitorRule extends Component<Props, State> {
   }
 
   private handleEdit = (pathname?: string) => {
-    const {notify, queryConfigs, rule, router, source} = this.props
+    const {notify, queryConfigs, rule} = this.props
     const updatedRule = Object.assign({}, rule, {
       query: queryConfigs[rule.queryID],
     })
     this.applyRuleWorkarounds(updatedRule)
     editRule(updatedRule)
       .then(() => {
-        router.push(pathname || `/sources/${source.id}/alert-rules`)
+        this.exitPage(pathname)
         notify(notifyAlertRuleUpdated(rule.name))
       })
       .catch(e => {
@@ -196,6 +196,20 @@ class KapacitorRule extends Component<Props, State> {
           notifyAlertRuleUpdateFailed(rule.name, e?.data?.message || String(e))
         )
       })
+  }
+
+  private exitPage(pathname?: string) {
+    const {source, router} = this.props
+    if (pathname) {
+      return router.push(pathname)
+    }
+    const location = (router as any).location
+    if (location?.query?.l === 't') {
+      return router.push(
+        `/sources/${source.id}/tickscripts${location?.search || ''}`
+      )
+    }
+    router.push(pathname || `/sources/${source.id}/alert-rules`)
   }
 
   private handleSave = () => {
