@@ -19,6 +19,7 @@ const setup = (override?) => {
     onToggleLogsVisibility: () => {},
     onSave: () => {},
     onExit: () => {},
+    onOpenBuilderUI: () => {},
     areLogsVisible: false,
     areLogsEnabled: false,
     task: {

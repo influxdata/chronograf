@@ -151,6 +151,7 @@ export class TickscriptPage extends PureComponent<Props, State> {
         type,
         'template-id': templateID,
         vars,
+        query,
       } = this.props.rules.find(r => r.id === ruleID)
 
       this.setState({
@@ -163,6 +164,7 @@ export class TickscriptPage extends PureComponent<Props, State> {
           id,
           templateID,
           vars,
+          query,
         },
       })
     }
@@ -197,6 +199,7 @@ export class TickscriptPage extends PureComponent<Props, State> {
         logs={logs}
         onSave={this.handleSave}
         onExit={this.handleExit}
+        onOpenBuilderUI={this.handleOpenBuilderUI}
         unsavedChanges={unsavedChanges}
         areLogsVisible={areLogsVisible}
         areLogsEnabled={areLogsEnabled}
@@ -271,6 +274,19 @@ export class TickscriptPage extends PureComponent<Props, State> {
       console.error(error)
       throw error
     }
+  }
+
+  private handleOpenBuilderUI = () => {
+    const {
+      params: {ruleID},
+      source: {id: sourceID},
+      router,
+    } = this.props
+    const {kapacitor} = this.state
+    router.push(
+      // prettier-ignore
+      `/sources/${sourceID}/kapacitors/${kapacitor.id}/alert-rules/${ruleID}${router.location.search}`
+    )
   }
 
   private handleExit = () => {
