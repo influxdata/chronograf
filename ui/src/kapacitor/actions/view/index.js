@@ -12,7 +12,6 @@ import {
 import {
   updateFluxTaskStatus as updateFluxTaskStatusAPI,
   deleteFluxTask as deleteFluxTaskAPI,
-  getFluxTasks,
 } from 'src/kapacitor/apis/fluxTasks'
 
 import {errorThrown} from 'shared/actions/errors'
@@ -111,19 +110,6 @@ export const fetchRules = kapacitor => async dispatch => {
     dispatch({type: 'LOAD_RULES', payload: {rules}})
   } catch (error) {
     dispatch(errorThrown(error))
-  }
-}
-
-export const fetchFluxTasks = kapacitor => async dispatch => {
-  try {
-    const tasks = await getFluxTasks(kapacitor)
-    dispatch({type: 'LOAD_FLUX_TASKS', payload: {tasks}})
-  } catch (error) {
-    dispatch({type: 'LOAD_FLUX_TASKS', payload: {tasks: null}})
-    // dispatch an error unless flux tasks are disabled/not supported
-    if (error.status !== 404) {
-      dispatch(errorThrown(error))
-    }
   }
 }
 
