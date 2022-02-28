@@ -183,9 +183,19 @@ export async function getAJAX<T = any>(url: string): Promise<{data: T}> {
       'response:',
       data
     )
-    return Promise.reject(
-      new Error(response.statusText || `error ${response.status}`)
-    )
+    let errorMessage = response.statusText || `error ${response.status}`
+    // try to parse error message from JSON payload
+    if (response.headers.get('content-type').includes('application/json')) {
+      try {
+        const {message} = JSON.parse(data)
+        if (message) {
+          errorMessage = message
+        }
+      } catch (e) {
+        // ignore silently, unrecognized error message
+      }
+    }
+    return Promise.reject(new Error(errorMessage))
   } catch (e) {
     console.error('failed to GET url:', url, 'error:', e)
     return Promise.reject(e)
