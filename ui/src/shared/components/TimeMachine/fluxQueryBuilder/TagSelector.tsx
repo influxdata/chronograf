@@ -1,4 +1,4 @@
-import React, {ChangeEvent, Dispatch, useEffect, useMemo} from 'react'
+import React, {ChangeEvent, Dispatch, useEffect, useMemo, useState} from 'react'
 import {connect} from 'react-redux'
 import BuilderCard from './BuilderCard'
 import DefaultDebouncer from 'src/shared/utils/debouncer'
@@ -19,7 +19,15 @@ import {
   selectTagKeyThunk,
   selectTagValuesThunk,
 } from './actions/thunks'
-import {changeKeysSearchTerm, changeValuesSearchTerm} from './actions/tags'
+import {
+  changeKeysSearchTerm,
+  changeValuesSearchTerm,
+  increaseKeysLimit,
+  increaseValuesLimit,
+} from './actions/tags'
+import {ButtonShape, ComponentSize, IconFont} from 'src/reusable_ui/types'
+import {Button} from 'src/reusable_ui'
+import LoadingSpinner from 'src/reusable_ui/components/spinners/LoadingSpinner'
 
 const SEARCH_DEBOUNCE_MS = 400
 
@@ -61,13 +69,16 @@ const TagSelectorBody = (props: Props) => {
     aggregateFunctionType,
     keys,
     keysStatus,
+    keysTruncated,
     tagKey: key,
     onSelectKey,
     valuesSearchTerm,
     onChangeValuesSearchTerm,
+    onIncreaseValuesLimit,
     onSearchValues,
     keysSearchTerm,
     onChangeKeysSearchTerm,
+    onIncreaseKeysLimit,
     onSearchKeys,
     tagValues: selectedValues,
   } = props
@@ -99,6 +110,14 @@ const TagSelectorBody = (props: Props) => {
     onChangeKeysSearchTerm(term)
     debouncer.call(() => onSearchKeys(), SEARCH_DEBOUNCE_MS)
   }
+  function onLoadMoreKeys() {
+    onIncreaseKeysLimit()
+    debouncer.call(() => onSearchKeys(), SEARCH_DEBOUNCE_MS)
+  }
+  function onLoadMoreValues() {
+    onIncreaseValuesLimit()
+    debouncer.call(() => onSearchValues(), SEARCH_DEBOUNCE_MS)
+  }
 
   const placeholderText =
     aggregateFunctionType === 'group'
@@ -125,6 +144,15 @@ const TagSelectorBody = (props: Props) => {
               buttonSize="btn-sm"
               className="dropdown-stretch"
               status={keysStatus}
+              addNew={
+                aggregateFunctionType === 'filter' && keysTruncated
+                  ? {
+                      text: 'Load More',
+                      stopPropagation: true,
+                      handler: onLoadMoreKeys,
+                    }
+                  : undefined
+              }
             />
             {selectedValues.length ? (
               <div
@@ -150,12 +178,12 @@ const TagSelectorBody = (props: Props) => {
           />
         ) : undefined}
       </BuilderCard.Menu>
-      <TagSelectorValues {...props} />
+      <TagSelectorValues {...props} onLoadMoreValues={onLoadMoreValues} />
     </>
   )
 }
 
-const TagSelectorValues = (props: Props) => {
+const TagSelectorValues = (props: Props & {onLoadMoreValues: () => void}) => {
   const {
     aggregateFunctionType,
     keysStatus,
@@ -163,8 +191,10 @@ const TagSelectorValues = (props: Props) => {
     tagIndex,
     values,
     valuesStatus,
+    valuesTruncated,
     tagValues: selectedValues,
     onSelectValues,
+    onLoadMoreValues,
   } = props
   if (aggregateFunctionType === 'filter') {
     if (keysStatus === RemoteDataState.NotStarted) {
@@ -183,7 +213,11 @@ const TagSelectorValues = (props: Props) => {
       )
     }
   }
+  const [loadFinished, setLoadFinished] = useState(false)
   if (valuesStatus === RemoteDataState.Error) {
+    if (loadFinished) {
+      setLoadFinished(false)
+    }
     return (
       <BuilderCard.Empty>
         {`Failed to load tag values for ${key}`}
@@ -191,25 +225,33 @@ const TagSelectorValues = (props: Props) => {
     )
   }
   if (valuesStatus === RemoteDataState.NotStarted) {
+    if (loadFinished) {
+      setLoadFinished(false)
+    }
     return (
       <BuilderCard.Empty>
         <WaitingText text="Waiting for tag values" />
       </BuilderCard.Empty>
     )
   }
-  if (valuesStatus === RemoteDataState.Loading) {
+  if (!loadFinished && valuesStatus === RemoteDataState.Loading) {
     return (
       <BuilderCard.Empty>
         <WaitingText text="Loading tag values" />
       </BuilderCard.Empty>
     )
   }
-  if (valuesStatus === RemoteDataState.Done && !values.length) {
-    return (
-      <BuilderCard.Empty>
-        No values found <small>in the current time range</small>
-      </BuilderCard.Empty>
-    )
+  if (valuesStatus === RemoteDataState.Done) {
+    if (!loadFinished) {
+      setLoadFinished(true)
+    }
+    if (!values.length) {
+      return (
+        <BuilderCard.Empty>
+          No values found <small>in the current time range</small>
+        </BuilderCard.Empty>
+      )
+    }
   }
   return (
     <BuilderCard.Body>
@@ -236,6 +278,24 @@ const TagSelectorValues = (props: Props) => {
             </div>
           )
         })}
+        {valuesTruncated && aggregateFunctionType === 'filter' ? (
+          <div className="flux-query-builder--list-item" key={`__truncated`}>
+            {valuesStatus !== RemoteDataState.Loading ? (
+              <Button
+                text="Load More Values"
+                onClick={e => {
+                  e.stopPropagation()
+                  onLoadMoreValues()
+                }}
+                size={ComponentSize.ExtraSmall}
+                shape={ButtonShape.StretchToFit}
+                icon={IconFont.Plus}
+              />
+            ) : (
+              <LoadingSpinner />
+            )}
+          </div>
+        ) : undefined}
       </div>
     </BuilderCard.Body>
   )
@@ -261,11 +321,17 @@ const mdtp = (dispatch: Dispatch<any>, {source, timeRange, tagIndex}) => {
     onChangeKeysSearchTerm: (term: string) => {
       dispatch(changeKeysSearchTerm(tagIndex, term))
     },
+    onIncreaseKeysLimit: () => {
+      dispatch(increaseKeysLimit(tagIndex))
+    },
     onSearchKeys: () => {
       dispatch(searchTagKeysThunk(source, timeRange, tagIndex))
     },
     onChangeValuesSearchTerm: (term: string) => {
       dispatch(changeValuesSearchTerm(tagIndex, term))
+    },
+    onIncreaseValuesLimit: () => {
+      dispatch(increaseValuesLimit(tagIndex))
     },
     onSearchValues: () => {
       dispatch(searchTagValuesThunk(source, timeRange, tagIndex))

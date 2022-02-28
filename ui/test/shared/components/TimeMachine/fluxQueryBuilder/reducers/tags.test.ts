@@ -19,8 +19,11 @@ import {
   searchValues,
   setKeysStatus,
   setValuesStatus,
+  increaseKeysLimit,
+  increaseValuesLimit,
 } from 'src/shared/components/TimeMachine/fluxQueryBuilder/actions/tags'
 import {BuilderAggregateFunctionType, RemoteDataState} from 'src/types'
+import {FQB_RESULTS_LIMIT} from 'src/shared/components/TimeMachine/fluxQueryBuilder/apis/fluxQueries'
 
 describe('fluxQueryBuilder/reducers/tags', () => {
   it('has empty initial state', () => {
@@ -84,6 +87,26 @@ describe('fluxQueryBuilder/reducers/tags', () => {
     expect(Object.is(state, reducedState)).toBe(false)
     expect(Object.is(state[1], reducedState[1])).toBe(false)
   })
+  it('should handle increaseKeysLimit', () => {
+    const state = [initialSelectorState(0), initialSelectorState(1)]
+    const reducedState = reducer(state, increaseKeysLimit(1))
+    expect(reducedState).toEqual([
+      state[0],
+      {...state[1], keysLimit: state[1].keysLimit + FQB_RESULTS_LIMIT},
+    ])
+    expect(Object.is(state, reducedState)).toBe(false)
+    expect(Object.is(state[1], reducedState[1])).toBe(false)
+  })
+  it('should handle increaseValuesLimit', () => {
+    const state = [initialSelectorState(0), initialSelectorState(1)]
+    const reducedState = reducer(state, increaseValuesLimit(1))
+    expect(reducedState).toEqual([
+      state[0],
+      {...state[1], valuesLimit: state[1].valuesLimit + FQB_RESULTS_LIMIT},
+    ])
+    expect(Object.is(state, reducedState)).toBe(false)
+    expect(Object.is(state[1], reducedState[1])).toBe(false)
+  })
   it('should handle selectKey', () => {
     const newVal = 'newK'
     const state = [initialSelectorState(0), initialSelectorState(1)]
@@ -101,26 +124,40 @@ describe('fluxQueryBuilder/reducers/tags', () => {
     expect(Object.is(state[1], reducedState[1])).toBe(false)
   })
   it('should handle setKeys', () => {
-    const newVal = ['newK']
-    const state = [initialSelectorState(0), initialSelectorState(1)]
-    const reducedState = reducer(state, setKeys(1, newVal))
-    expect(reducedState).toEqual([
-      state[0],
-      {...state[1], keys: newVal, keysStatus: RemoteDataState.Done},
-    ])
-    expect(Object.is(state, reducedState)).toBe(false)
-    expect(Object.is(state[1], reducedState[1])).toBe(false)
+    ;[true, false].forEach(truncated => {
+      const newVal = ['newK']
+      const state = [initialSelectorState(0), initialSelectorState(1)]
+      const reducedState = reducer(state, setKeys(1, newVal, truncated))
+      expect(reducedState).toEqual([
+        state[0],
+        {
+          ...state[1],
+          keys: newVal,
+          keysTruncated: truncated,
+          keysStatus: RemoteDataState.Done,
+        },
+      ])
+      expect(Object.is(state, reducedState)).toBe(false)
+      expect(Object.is(state[1], reducedState[1])).toBe(false)
+    })
   })
   it('should handle setValues', () => {
-    const newVal = ['newV']
-    const state = [initialSelectorState(0), initialSelectorState(1)]
-    const reducedState = reducer(state, setValues(1, newVal))
-    expect(reducedState).toEqual([
-      state[0],
-      {...state[1], values: newVal, valuesStatus: RemoteDataState.Done},
-    ])
-    expect(Object.is(state, reducedState)).toBe(false)
-    expect(Object.is(state[1], reducedState[1])).toBe(false)
+    ;[true, false].forEach(truncated => {
+      const newVal = ['newV']
+      const state = [initialSelectorState(0), initialSelectorState(1)]
+      const reducedState = reducer(state, setValues(1, newVal, truncated))
+      expect(reducedState).toEqual([
+        state[0],
+        {
+          ...state[1],
+          values: newVal,
+          valuesTruncated: truncated,
+          valuesStatus: RemoteDataState.Done,
+        },
+      ])
+      expect(Object.is(state, reducedState)).toBe(false)
+      expect(Object.is(state[1], reducedState[1])).toBe(false)
+    })
   })
   it('should ignore searchKeys', () => {
     const state = [initialSelectorState(0), initialSelectorState(1)]

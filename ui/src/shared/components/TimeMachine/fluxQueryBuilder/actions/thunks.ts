@@ -62,15 +62,19 @@ export const loadTagSelectorThunk = (
     if (tagState.aggregateFunctionType === 'filter') {
       const searchTerm = tagState.keysSearchTerm
       dispatch(tagActions.setKeysStatus(tagIndex, RemoteDataState.Loading))
-      const keys = await queryBuilderFetcher.findKeys(tagIndex, {
-        source,
-        bucket: selectedBucket,
-        searchTerm,
-        timeRange,
-        tagsSelections: tags
-          .slice(0, tagIndex)
-          .filter(x => x.aggregateFunctionType === 'filter'),
-      })
+      const {result: keys, truncated} = await queryBuilderFetcher.findKeys(
+        tagIndex,
+        {
+          source,
+          bucket: selectedBucket,
+          searchTerm,
+          timeRange,
+          tagsSelections: tags
+            .slice(0, tagIndex)
+            .filter(x => x.aggregateFunctionType === 'filter'),
+          limit: tagState.keysLimit,
+        }
+      )
 
       const {tagKey: key} = tagState
 
@@ -95,7 +99,7 @@ export const loadTagSelectorThunk = (
         keys.unshift(key)
       }
 
-      dispatch(tagActions.setKeys(tagIndex, keys))
+      dispatch(tagActions.setKeys(tagIndex, keys, truncated))
     }
     dispatch(loadTagSelectorValuesThunk(source, timeRange, tagIndex))
   } catch (e) {
@@ -136,12 +140,13 @@ const loadTagSelectorValuesThunk = (
 
   try {
     let values: string[]
+    let valuesTruncated = false
     const originalSelected = tagState.tagValues || []
     let selectedValues = originalSelected
     if (tagState.aggregateFunctionType === 'filter') {
       dispatch(tagActions.setValuesStatus(tagIndex, RemoteDataState.Loading))
       if (tagState.tagKey) {
-        values = await queryBuilderFetcher.findValues(tagIndex, {
+        const data = await queryBuilderFetcher.findValues(tagIndex, {
           source,
           bucket: selectedBucket,
           tagsSelections: tags
@@ -150,7 +155,10 @@ const loadTagSelectorValuesThunk = (
           key: tagState.tagKey,
           searchTerm: tagState.valuesSearchTerm,
           timeRange,
+          limit: tagState.valuesLimit,
         })
+        values = data.result
+        valuesTruncated = data.truncated
         for (const selectedValue of tagState.tagValues) {
           // Even if the selected values didn't come back in the results, let them
           // be selected anyway
@@ -175,7 +183,7 @@ const loadTagSelectorValuesThunk = (
       selectedValues = tagState.tagValues.filter(x => values.includes(x))
     }
 
-    dispatch(tagActions.setValues(tagIndex, values))
+    dispatch(tagActions.setValues(tagIndex, values, valuesTruncated))
     if (selectedValues !== originalSelected) {
       dispatch(tagActions.selectValues(tagIndex, selectedValues))
     }
@@ -205,7 +213,7 @@ export const loadBucketsThunk = (
   dispatch(bucketActions.setBucketsStatus(RemoteDataState.Loading))
 
   try {
-    const allBuckets = await queryBuilderFetcher.findBuckets(source)
+    const {result: allBuckets} = await queryBuilderFetcher.findBuckets(source)
 
     const systemBuckets = allBuckets.filter(b => b.startsWith('_'))
     const userBuckets = allBuckets.filter(b => !b.startsWith('_'))

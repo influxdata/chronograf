@@ -24,10 +24,14 @@ export interface TagSelectorState extends BuilderTagsType {
   keysStatus: RemoteDataState
   keys: string[]
   keysSearchTerm: string
+  keysTruncated: boolean
+  keysLimit: number
 
   valuesSearchTerm: string
   valuesStatus?: RemoteDataState
   values: string[]
+  valuesTruncated: boolean
+  valuesLimit: number
 }
 
 export interface BuilderTagsType {
