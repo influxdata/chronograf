@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {AlertRule, Kapacitor, Source} from 'src/types'
 import KapacitorScopedPage from './KapacitorScopedPage'
 import {useDispatch} from 'react-redux'
@@ -112,13 +112,10 @@ const Contents = ({
       </div>
     )
   }
-  const kapacitorLink = useMemo(
-    () => `/sources/${source.id}/kapacitors/${kapacitor.id}`,
-    [source, kapacitor]
-  )
+  const kapacitorLink = `/sources/${source.id}/kapacitors/${kapacitor.id}`
   // memoize table handlers in order to avoid re-rendering of table rows
-  const onDelete = useMemo(
-    () => (rule: AlertRule) => {
+  const onDelete = useCallback(
+    (rule: AlertRule) => {
       deleteRule(rule)
         .then(() => {
           setAllList(allList.filter(x => x.id !== rule.id))
@@ -130,8 +127,8 @@ const Contents = ({
     },
     [allList, dispatch]
   )
-  const onChangeRuleStatus = useMemo(
-    () => (rule: AlertRule) => {
+  const onChangeRuleStatus = useCallback(
+    (rule: AlertRule) => {
       const status = rule.status === 'enabled' ? 'disabled' : 'enabled'
       updateRuleStatus(rule, status)
         .then(() => {
@@ -148,8 +145,8 @@ const Contents = ({
     [allList, dispatch]
   )
   const filterRef = useRef<HTMLInputElement>()
-  const onViewRule = useMemo(
-    () => (id: string) => {
+  const onViewRule = useCallback(
+    (id: string) => {
       const params = new URLSearchParams({
         l: 't', // inform view page to return back herein
         filter: filterRef.current.value,
