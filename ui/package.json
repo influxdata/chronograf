@@ -126,7 +126,7 @@
     "react-markdown": "^6.0.2",
     "react-onclickoutside": "^6.10.0",
     "react-redux": "^7.2.2",
-    "react-resize-detector": "^2.3.0",
+    "react-resize-detector": "^7.0.0",
     "react-router": "^3.0.2",
     "react-router-redux": "^4.0.8",
     "react-tooltip": "^3.2.1",
