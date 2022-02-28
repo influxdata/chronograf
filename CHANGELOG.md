@@ -8,6 +8,7 @@
 1. [#5868](https://github.com/influxdata/chronograf/pull/5868): Move Flux Tasks to own page.
 1. [#5869](https://github.com/influxdata/chronograf/pull/5869): Optimize Alert Rules API.
 1. [#5871](https://github.com/influxdata/chronograf/pull/5871): Add TICKscipts page.
+1. [#5872](https://github.com/influxdata/chronograf/pull/5872): Open Alert Rule Builder from a TICKscript page.
 
 ### Bug Fixes
 
