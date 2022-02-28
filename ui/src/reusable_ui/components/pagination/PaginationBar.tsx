@@ -51,6 +51,7 @@ export default function PaginationBar({
         className="btn btn-sm btn-default"
         disabled={page === 0}
         onClick={() => onChange(Math.max(0, page - 1), pageSize)}
+        style={{minWidth: '70px'}}
         title="Previous Page"
       >
         <span className="icon caret-left" /> Prev
@@ -76,6 +77,7 @@ export default function PaginationBar({
         className="btn btn-sm btn-default"
         disabled={page === maxPage}
         onClick={() => onChange(Math.min(page + 1, maxPage), pageSize)}
+        style={{minWidth: '70px'}}
         title="Next Page"
       >
         Next <span className="icon caret-right" />
