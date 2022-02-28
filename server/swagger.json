@@ -1476,6 +1476,27 @@
             "type": "string",
             "description": "ID of the kapacitor backend.",
             "required": true
+          },
+          {
+            "name": "pattern",
+            "in": "query",
+            "type": "string",
+            "description": "filter results to contain the specified value in the task name",
+            "required": false
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "number",
+            "description": "limits results length, 0 to return unlimited results",
+            "required": false
+          },
+          {
+            "name": "parse",
+            "in": "query",
+            "type": "string",
+            "description": "can be '0' to skip parsing of TICKscript",
+            "required": false
           }
         ],
         "responses": {

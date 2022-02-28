@@ -30,6 +30,7 @@ import {LogsPage} from 'src/logs'
 import AlertsApp from 'src/alerts'
 import {
   FluxTaskPage,
+  FluxTasksPage,
   KapacitorPage,
   KapacitorRulePage,
   KapacitorRulesPage,
@@ -188,6 +189,7 @@ class Root extends PureComponent<Record<string, never>, State> {
                 />
                 <Route path="alerts" component={AlertsApp} />
                 <Route path="alert-rules" component={KapacitorRulesPage} />
+                <Route path="flux-tasks" component={FluxTasksPage} />
                 <Route
                   path="kapacitors/:kid/alert-rules/:ruleID" // ruleID can be "new"
                   component={KapacitorRulePage}

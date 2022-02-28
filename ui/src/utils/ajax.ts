@@ -137,9 +137,9 @@ async function AJAX<T = any>(
   if (fetchResponse.status === 204) {
     data = ''
   } else {
-    const isText = (fetchResponse.headers.get('content-type') || '').includes(
-      'text/'
-    )
+    const isText = (
+      fetchResponse.headers.get('content-type') || 'text/'
+    ).includes('text/')
     data = isText ? await fetchResponse.text() : await fetchResponse.json()
   }
   const headers = {}

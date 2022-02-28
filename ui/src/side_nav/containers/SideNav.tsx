@@ -99,7 +99,14 @@ class SideNav extends PureComponent<Props> {
           <NavHeader link={`${sourcePrefix}/dashboards`} title="Dashboards" />
         </NavBlock>
         <NavBlock
-          highlightWhen={['alerts', 'alert-rules', 'tickscript']}
+          highlightWhen={[
+            'alerts',
+            'alert-rules',
+            'tickscript',
+            'tickscripts',
+            'flux-tasks',
+            'fluxtasks',
+          ]}
           icon="alerts"
           link={`${sourcePrefix}/alert-rules`}
           location={location}
@@ -107,6 +114,9 @@ class SideNav extends PureComponent<Props> {
           <NavHeader link={`${sourcePrefix}/alert-rules`} title="Alerting" />
           <NavListItem link={`${sourcePrefix}/alert-rules`}>
             Manage Tasks
+          </NavListItem>
+          <NavListItem link={`${sourcePrefix}/flux-tasks`}>
+            Flux Tasks
           </NavListItem>
           <NavListItem link={`${sourcePrefix}/alerts`}>
             Alert History
@@ -160,6 +170,7 @@ class SideNav extends PureComponent<Props> {
         </Authorized>
         <NavBlock
           highlightWhen={['manage-sources', 'kapacitors']}
+          highlightUnless={['alert-rules', 'tickscripts', 'fluxtasks']}
           icon="wrench"
           link={`${sourcePrefix}/manage-sources`}
           location={location}

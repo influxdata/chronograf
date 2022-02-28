@@ -1,4 +1,4 @@
-import ActiveKapacitorFromSources from 'src/kapacitor/utils/ActiveKapacitorFromSources'
+import activeKapacitorFromSources from 'src/kapacitor/utils/activeKapacitorFromSources'
 import {source, kapacitor} from 'mocks/dummy'
 
 describe('ActiveKapacitorFromSources', () => {
@@ -25,7 +25,7 @@ describe('ActiveKapacitorFromSources', () => {
       kapacitors: [expectedKap, createKapacitor({name: 'bar', active: false})],
     })
 
-    const actualKap = ActiveKapacitorFromSources(activeSource, sources)
+    const actualKap = activeKapacitorFromSources(activeSource, sources)
 
     expect(actualKap).toBe(expectedKap)
   })
@@ -41,7 +41,7 @@ describe('ActiveKapacitorFromSources', () => {
       ],
     })
 
-    const actualKap = ActiveKapacitorFromSources(activeSource, sources)
+    const actualKap = activeKapacitorFromSources(activeSource, sources)
 
     expect(actualKap).toBe(expectedKap)
   })

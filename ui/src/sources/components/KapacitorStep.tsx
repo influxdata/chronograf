@@ -10,7 +10,7 @@ import KapacitorDropdown from 'src/sources/components/KapacitorDropdown'
 import KapacitorForm from 'src/sources/components/KapacitorForm'
 
 // Utils
-import ActiveKapacitorFromSources from 'src/kapacitor/utils/ActiveKapacitorFromSources'
+import activeKapacitorFromSources from 'src/kapacitor/utils/activeKapacitorFromSources'
 
 // Actions
 import {notify as notifyAction} from 'src/shared/actions/notifications'
@@ -76,7 +76,7 @@ class KapacitorStep extends Component<Props, State> {
     super(props)
 
     const activeKapacitor =
-      ActiveKapacitorFromSources(props.source, props.sources) || props.kapacitor
+      activeKapacitorFromSources(props.source, props.sources) || props.kapacitor
 
     let kapacitor = syncHostnames(props.source, DEFAULT_KAPACITOR)
 
@@ -183,7 +183,7 @@ class KapacitorStep extends Component<Props, State> {
     const {source, sources} = this.props
     const {kapacitor} = this.state
 
-    const activeKapacitor = ActiveKapacitorFromSources(source, sources)
+    const activeKapacitor = activeKapacitorFromSources(source, sources)
     return !_.isEqual(activeKapacitor, kapacitor)
   }
 
