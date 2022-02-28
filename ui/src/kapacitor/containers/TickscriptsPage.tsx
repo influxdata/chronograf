@@ -206,7 +206,7 @@ const Contents = ({
                 }}
               >
                 <span>
-                  {`${LIMITED_FETCH_SIZE} kapacitor tasks are shown, which are then sorted by name. Input a filter or `}
+                  {`${LIMITED_FETCH_SIZE} kapacitor tasks are shown. Input a filter or `}
                   <a
                     href="#"
                     onClick={() => {
