@@ -18,6 +18,7 @@ import {isCancellationError} from 'src/types/promises'
 import TasksTable from '../components/TasksTable'
 import {Link} from 'react-router'
 import {sortBy} from 'lodash'
+import {useResizeDetector} from 'react-resize-detector'
 
 // max size of a limited fetch
 const LIMITED_FETCH_SIZE = 100
@@ -36,6 +37,7 @@ const Contents = ({
   filter?: string
   setScrollTop: (scrollTop: number) => void
 }) => {
+  const {width, ref} = useResizeDetector()
   const [loading, setLoading] = useState(true)
   const [reloadRequired, setReloadRequired] = useState(0)
   const [error, setError] = useState(undefined)
@@ -189,7 +191,7 @@ const Contents = ({
           <span className="icon plus" /> Write TICKscript
         </Link>
       </div>
-      <div className="panel-body">
+      <div className="panel-body" ref={ref}>
         {loading ? (
           <PageSpinner />
         ) : (
@@ -235,6 +237,7 @@ const Contents = ({
                     setScrollTop(0)
                     setPage(p)
                   }}
+                  width={width}
                 />
               ) : undefined}
             </TasksTable>

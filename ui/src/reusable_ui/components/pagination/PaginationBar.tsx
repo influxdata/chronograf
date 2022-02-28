@@ -8,6 +8,7 @@ interface Props {
   onChange: (page: number, pageSize: number) => void
   pageSize?: number
   diameter?: number
+  width?: number
 }
 
 export default function PaginationBar({
@@ -15,8 +16,17 @@ export default function PaginationBar({
   page,
   pageSize = 100,
   onChange,
-  diameter = 4,
+  diameter,
+  width,
 }: Props) {
+  if (!diameter) {
+    if (!width) {
+      diameter = 4
+    } else {
+      diameter = Math.trunc(Math.max(0, width - 350) / 80) * 2
+    }
+  }
+
   const maxPage = Math.trunc((total - 1) / pageSize)
   const radius = Math.trunc(diameter / 2)
   if (page < 0) {
@@ -27,7 +37,7 @@ export default function PaginationBar({
   }
   let startPage = Math.max(0, page - radius)
   let endPage = Math.min(page + radius, maxPage)
-  // try to show at least 1+BUTTONS_DIAMETER page buttons
+  // try to show at least 1+diameter page buttons
   if (endPage - startPage < diameter) {
     startPage = Math.max(startPage - (diameter - endPage + startPage), 0)
   }
