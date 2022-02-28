@@ -15,6 +15,7 @@
 
 1. [#5851](https://github.com/influxdata/chronograf/pull/5851): Remove fixed-table-2 to resolve CVE-2022-0235.
 1. [#5866](https://github.com/influxdata/chronograf/pull/5866): Replace axios by fetch.
+1. [#5873](https://github.com/influxdata/chronograf/pull/5873): Upgrade react-resize-detector.
 
 ## v1.9.3 [2022-01-25]
 
