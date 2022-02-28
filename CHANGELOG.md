@@ -11,6 +11,7 @@
 ### Bug Fixes
 
 1. [#5862](https://github.com/influxdata/chronograf/pull/5862): Respect BASE_PATH when serving API docs.
+1. [#5874](https://github.com/influxdata/chronograf/pull/5874): Propagate InfluxQL errors to UI.
 
 ### Other
 
