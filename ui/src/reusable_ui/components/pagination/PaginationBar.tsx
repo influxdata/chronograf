@@ -7,6 +7,7 @@ interface Props {
   page: number
   onChange: (page: number, pageSize: number) => void
   pageSize?: number
+  diameter?: number
 }
 
 export default function PaginationBar({
@@ -14,22 +15,24 @@ export default function PaginationBar({
   page,
   pageSize = 100,
   onChange,
+  diameter = 4,
 }: Props) {
   const maxPage = Math.trunc((total - 1) / pageSize)
+  const radius = Math.trunc(diameter / 2)
   if (page < 0) {
     page = 0
   }
   if (page > maxPage) {
     page = maxPage
   }
-  let startPage = Math.max(0, page - 2)
-  let endPage = Math.min(page + 2, maxPage)
-  // try to show at least 5 page buttons
-  if (endPage - startPage < 4) {
-    startPage = Math.max(startPage - (4 - endPage + startPage), 0)
+  let startPage = Math.max(0, page - radius)
+  let endPage = Math.min(page + radius, maxPage)
+  // try to show at least 1+BUTTONS_DIAMETER page buttons
+  if (endPage - startPage < diameter) {
+    startPage = Math.max(startPage - (diameter - endPage + startPage), 0)
   }
-  if (endPage - startPage < 4) {
-    endPage = Math.min(endPage + (4 - endPage + startPage), maxPage)
+  if (endPage - startPage < diameter) {
+    endPage = Math.min(endPage + (diameter - endPage + startPage), maxPage)
   }
   const buttons: JSX.Element[] = new Array<JSX.Element>(endPage - startPage + 1)
   for (let i = startPage; i <= endPage; i++) {
