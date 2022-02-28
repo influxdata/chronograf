@@ -32,7 +32,19 @@ const proxy = async (msg: ProxyMsg): Promise<{data: any}> => {
       'response:',
       data
     )
-    Promise.reject(response.statusText || `error ${response.status}`)
+    let errorMessage = response.statusText || `error ${response.status}`
+    // try to parse error message from JSON payload
+    if (response.headers.get('content-type').includes('application/json')) {
+      try {
+        const {message} = JSON.parse(data)
+        if (message) {
+          errorMessage = message
+        }
+      } catch (e) {
+        // ignore silently, unrecognized error message
+      }
+    }
+    return Promise.reject(errorMessage)
   } catch (e) {
     console.error('failed to POST url:', url, 'body:', body, 'error:', e)
     return Promise.reject(e.message ? e.message : String(e))
