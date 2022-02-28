@@ -228,7 +228,7 @@ class Dygraph extends Component<Props, State> {
           style={this.dygraphStyle}
         >
           <ReactResizeDetector
-            resizableElementId={`graph-ref-${cellID}`}
+            targetRef={this.graphRef}
             handleWidth={true}
             handleHeight={true}
             onResize={this.resize}
