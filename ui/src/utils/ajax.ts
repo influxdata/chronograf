@@ -183,7 +183,9 @@ export async function getAJAX<T = any>(url: string): Promise<{data: T}> {
       'response:',
       data
     )
-    Promise.reject(new Error(response.statusText || `error ${response.status}`))
+    return Promise.reject(
+      new Error(response.statusText || `error ${response.status}`)
+    )
   } catch (e) {
     console.error('failed to GET url:', url, 'error:', e)
     return Promise.reject(e)
