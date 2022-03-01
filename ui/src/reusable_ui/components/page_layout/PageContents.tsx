@@ -1,5 +1,5 @@
 // Libraries
-import React, {Component} from 'react'
+import React, {MouseEvent, Component} from 'react'
 import classnames from 'classnames'
 
 // Components
@@ -12,7 +12,9 @@ interface Props {
   fullWidth?: boolean
   scrollable?: boolean
   inPresentationMode?: boolean
-  setScrollTop?: () => void
+  setScrollTop?: (e: MouseEvent<HTMLElement>) => void
+  scrollTop?: number
+  scrollLeft?: number
   className?: string
 }
 
@@ -25,11 +27,16 @@ class PageContents extends Component<Props> {
   }
 
   public render() {
-    const {scrollable, setScrollTop} = this.props
+    const {scrollable, setScrollTop, scrollTop, scrollLeft} = this.props
 
     if (scrollable) {
       return (
-        <FancyScrollbar className={this.className} setScrollTop={setScrollTop}>
+        <FancyScrollbar
+          className={this.className}
+          setScrollTop={setScrollTop}
+          scrollTop={scrollTop}
+          scrollLeft={scrollLeft}
+        >
           {this.children}
         </FancyScrollbar>
       )

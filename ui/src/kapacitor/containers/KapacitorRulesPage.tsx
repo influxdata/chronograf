@@ -28,7 +28,6 @@ import {
   RemoteDataState,
   Notification,
   NotificationFunc,
-  FluxTask,
 } from 'src/types'
 
 // Decorators
@@ -47,7 +46,6 @@ interface Props {
   fetchKapacitors: sourcesActions.FetchKapacitorsAsync
   setActiveKapacitor: sourcesActions.SetActiveKapacitorAsync
   rules: AlertRule[]
-  fluxTasks: FluxTask[]
 }
 
 interface State {
@@ -101,7 +99,7 @@ export class KapacitorRulesPage extends PureComponent<Props, State> {
 
   private get rules(): JSX.Element {
     const kapacitor = this.kapacitor
-    const {source, rules, fluxTasks} = this.props
+    const {source, rules} = this.props
 
     if (!kapacitor) {
       return <NoKapacitorError source={source} />
@@ -112,7 +110,6 @@ export class KapacitorRulesPage extends PureComponent<Props, State> {
         rules={rules}
         source={source}
         kapacitor={kapacitor}
-        fluxTasks={fluxTasks}
         onDelete={this.handleDeleteRule}
         onChangeRuleStatus={this.handleRuleStatus}
       />

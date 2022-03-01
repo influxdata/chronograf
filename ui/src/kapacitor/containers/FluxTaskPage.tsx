@@ -37,6 +37,7 @@ interface Props {
   params: Params
   router: {
     push: (path: string) => void
+    location: {search: string}
   }
 }
 
@@ -291,7 +292,9 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
             className="btn btn-default btn-sm"
             title="Return to Flux Tasks"
             onClick={() => {
-              router.push(`/sources/${source.id}/flux-tasks`)
+              router.push(
+                `/sources/${source.id}/flux-tasks${router.location.search}`
+              )
             }}
           >
             Exit

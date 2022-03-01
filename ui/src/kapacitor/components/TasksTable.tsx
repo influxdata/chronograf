@@ -1,6 +1,6 @@
-import React, {PureComponent, FunctionComponent} from 'react'
+import React, {MouseEvent, PureComponent, useMemo} from 'react'
 import {Link} from 'react-router'
-import _ from 'lodash'
+import {sortBy} from 'lodash'
 
 import {AlertRule} from 'src/types'
 
@@ -13,6 +13,9 @@ interface TasksTableProps {
   kapacitorLink: string
   onChangeRuleStatus: (rule: AlertRule) => void
   onDelete: (rule: AlertRule) => void
+  onViewRule?: (ruleId: string) => void
+  children?: JSX.Element
+  sorted?: boolean
 }
 
 interface TaskRowProps {
@@ -20,45 +23,60 @@ interface TaskRowProps {
   editLink: string
   onChangeRuleStatus: (rule: AlertRule) => void
   onDelete: (rule: AlertRule) => void
+  onViewRule?: (ruleId: string) => void
 }
 
-const TasksTable: FunctionComponent<TasksTableProps> = ({
+const TasksTable = ({
   tasks,
   kapacitorLink,
   onDelete,
   onChangeRuleStatus,
-}) => (
-  <table className="table v-center table-highlight">
-    <thead>
-      <tr>
-        <th style={{minWidth: colName}}>Name</th>
-        <th style={{width: colType}}>Type</th>
-        <th style={{width: colEnabled}} className="text-center">
-          Task Enabled
-        </th>
-        <th style={{width: colActions}} />
-      </tr>
-    </thead>
-    <tbody>
-      {_.sortBy(tasks, t => t.name.toLowerCase()).map(task => {
-        return (
-          <TaskRow
-            key={task.id}
-            task={task}
-            editLink={`${kapacitorLink}/tickscripts/${task.id}`}
-            onDelete={onDelete}
-            onChangeRuleStatus={onChangeRuleStatus}
-          />
-        )
-      })}
-    </tbody>
-  </table>
-)
+  onViewRule,
+  children,
+  sorted,
+}: TasksTableProps) => {
+  const tableData = useMemo(
+    () => (sorted ? tasks : sortBy(tasks, t => t.name.toLowerCase())),
+    [tasks, sorted]
+  )
+  return (
+    <table className="table v-center table-highlight">
+      <thead>
+        <tr>
+          <th style={{minWidth: colName}}>Name</th>
+          <th style={{width: colType}}>Type</th>
+          <th style={{width: colEnabled}} className="text-center">
+            Task Enabled
+          </th>
+          <th style={{width: colActions}} />
+        </tr>
+      </thead>
+      <tbody>
+        {tableData.map(task => {
+          return (
+            <TaskRow
+              key={task.id}
+              task={task}
+              editLink={`${kapacitorLink}/tickscripts/${task.id}`}
+              onViewRule={onViewRule}
+              onDelete={onDelete}
+              onChangeRuleStatus={onChangeRuleStatus}
+            />
+          )
+        })}
+        {children ? (
+          <tr>
+            <td colSpan={4}>{children}</td>
+          </tr>
+        ) : undefined}
+      </tbody>
+    </table>
+  )
+}
 
 export class TaskRow extends PureComponent<TaskRowProps> {
   public render() {
     const {task, editLink} = this.props
-
     return (
       <tr key={task.id}>
         <td style={{minWidth: colName}}>
@@ -66,6 +84,8 @@ export class TaskRow extends PureComponent<TaskRowProps> {
             style={{color: task['template-id'] ? 'gray' : undefined}}
             className="link-success"
             to={editLink}
+            data-task-id={task.id}
+            onClick={this.handleViewRule}
           >
             {task.name}
           </Link>
@@ -108,6 +128,18 @@ export class TaskRow extends PureComponent<TaskRowProps> {
     const {onChangeRuleStatus, task} = this.props
 
     onChangeRuleStatus(task)
+  }
+
+  private handleViewRule = (e: MouseEvent) => {
+    const {onViewRule} = this.props
+    if (onViewRule) {
+      e.preventDefault()
+      // casting to unknown is a workaround to wrong global typings
+      onViewRule(
+        ((e.target as unknown) as any).attributes.getNamedItem('data-task-id')
+          .value
+      )
+    }
   }
 }
 
