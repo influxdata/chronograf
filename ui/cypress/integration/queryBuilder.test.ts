@@ -31,7 +31,7 @@ describe('query builder', () => {
     cy.get('button').contains('Query Builder').click()
   })
 
-  it.only('create a query, change its aggregation function and fill missing values', () => {
+  it('create a query, change its aggregation function and fill missing values', () => {
     let clusterID: string
     let queryTemplate: string
 
