@@ -30,3 +30,4 @@ yarn-error.log
 ui/.vs/slnx.sqlite
 out.log
 ui/cypress/kube-config
+ui/cypress/.local-chronograf-influxdb-enterprise.sh.swp
