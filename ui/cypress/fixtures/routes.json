@@ -1,6 +1,6 @@
 {
-    "dashboards": "/dashboards",
-    "hosts": "/hosts",
-    "explorer": "/data-explorer",
-    "config": "/manage-sources"
+  "dashboards": "/dashboards",
+  "hosts": "/hosts",
+  "explorer": "/data-explorer",
+  "config": "/manage-sources"
 }

@@ -13,7 +13,7 @@
 //         if($el.text() == 'InfluxTest2'){
 //           $el.click()}
 //       })
-    
+
 //     cy.get('[data-test=source-button-selector] > .radio-buttons')
 //       .contains('Flux')
 //       .click({force: true})
@@ -50,7 +50,7 @@
 //     cy.get('[data-test=threesizer-header-controls] > .button-default').click('left')
 //     cy.get('.form--wrapper > :nth-child(1) > .dropdown > [data-test=wizard-bucket-selected]')
 //       .click()
-  
+
 //     cy.get('[data-test="dropdown--item"]')
 //       .filter(':contains("my-bucket")')
 //       .click()
@@ -73,7 +73,7 @@
 //   cy.getByTestID('set-conection-panel-body').contains('InfluxTest2 (Default)')
 //   })
 
-//   it('add data to explore', () => { 
+//   it('add data to explore', () => {
 //     cy.clickNav(3, 'Explore')
 //     cy.get('[data-test=source-button-selector] > .dropdown > [data-test=wizard-bucket-selected]')
 //       .click()
@@ -84,7 +84,7 @@
 //           $el.click()
 //         }
 //       })
-  
+
 //     cy.getByTitle('Flux').click()
 //     cy.writeManualData('new_data', 'value=2')
 //     cy.writeManualData('new_data', 'value=2.5')
@@ -94,17 +94,17 @@
 //     cy.writeManualData('new_data', 'value=2.5')
 //     cy.writeManualData('new_data', 'value=5.8')
 //     cy.writeManualData('new_data', 'value=3.7')
-      
+
 //     cy.clickNav(4, 'Dashboards')
 //     cy.getByTitle('Create Dashboard').click()
 //     cy.getByTestID('rename-dashboard')
 //     // .clear()
 //       .type('explorer_test{enter}')
 //     cy.getByTestID('add-data-btn').click()
-  
+
 //     cy.get('[data-test=source-button-selector] > .dropdown > [data-test=wizard-bucket-selected]')
 //       .click()
-    
+
 //       // selecting dynamic dropdown item
 //     cy.get('[data-test="dropdown--item"]')
 //       .each(($el, index, $list) => {
@@ -112,11 +112,11 @@
 //           $el.click()
 //         }
 //       })
-    
+
 //     cy.getByTitle('Flux').click()
 //     cy.getByTitle('Script Wizard')
 //   })
-  
+
 //   it('create data queries in data explore',() =>{
 //     cy.visit('/')
 //     cy.clickNav(4, 'Dashboards')
@@ -125,22 +125,22 @@
 //       .click()
 //       .type('explorer_test{enter}')
 //     cy.getByTestID('add-data-btn').click()
-  
+
 //     cy.get('[data-test=source-button-selector] > .dropdown > [data-test=wizard-bucket-selected]')
 //         .click()
-    
+
 //     // selecting dynamic dropdown item
 //     cy.get('[data-test="dropdown--item"]')
 //         .each(($el, index, $list) => {
 //           if($el.text() == 'InfluxTest2'){
 //             $el.click()}})
-    
+
 //     cy.getByTitle('Flux').click()
-  
+
 //     cy.getByTitle('Script Wizard').click()
 //     cy.get('.form--wrapper > :nth-child(1) > .dropdown > [data-test=wizard-bucket-selected]')
 //       .click()
-    
+
 //     cy.getByTestID('dropdown--item')
 //       .filter(':contains("my-bucket")')
 //       .click()
@@ -148,32 +148,32 @@
 //       .click()
 //       .filter(':contains("new_data")').click()
 //     cy.get('.form--submit > .button').click()
-  
+
 //     cy.getByTestID('rename-graph')
 //       .click()
 //       .clear()
 //       .type('Stacked line', {delay:100})
-  
+
 //     cy. getByTitle('Visualization').click()
 //     cy.get('#StepPlot').click()
 //     cy.getByTestID('line-colours').click()
 //     cy.get('.color-dropdown--menu > .fancy-scroll--container > .fancy-scroll--view > :nth-child(5)')
 //       .click()
-      
+
 //     cy.get('#SingleStat').click()
 //     cy.getByTestID('graph-container')
 //       .wait(500)
-  
+
 //     cy.get('.color-dropdown > .btn').click()
 //     cy.getByTestID('base-colour')
 //       .each(($el: { text: () => string; click: () => void }, index: any, $list: any) => {
 //         if($el.text() == 'Thunder'){
 //           $el.click()}})
-  
+
 //     cy.get(':nth-child(1) > .form-control').type('Amos ')
 //     // edit graph
 //     cy.getByTitle('Save').click()
-          
+
 //     cy.clickNav(4, 'Dashboards')
 //     cy.getByTitle('Confirm').click({multiple :true, force: true})
 //     cy.getByTestID('confirm-btn').click({multiple: true, force:true})
@@ -193,7 +193,6 @@
 //     cy.getByTitle('Flux').click()
 //     cy.writeManualData('testing_value', 'value=0')
 
-    
 //     cy.get('[data-test=source-button-selector] > .dropdown > [data-test=wizard-bucket-selected]')
 //       .click()
 
@@ -205,13 +204,13 @@
 
 //     cy.get('[data-test=source-button-selector] > .dropdown > [data-test=wizard-bucket-selected]')
 //     .click()
-  
+
 //     // selecting dynamic dropdown item
 //     cy.get('[data-test="dropdown--item"]')
 //       .each(($el, index, $list) => {
 //         if($el.text() == 'InfluxTest2'){
 //           $el.click()}})
-  
+
 //     cy.getByTitle('Flux').click()
 
 //     cy.getByTitle('Script Wizard').click()
@@ -259,7 +258,6 @@
 //     cy.getByTitle('Flux').click()
 //     cy.writeManualData('testing_value', 'value=0')
 
-    
 //     cy.get('[data-test=source-button-selector] > .dropdown > [data-test=wizard-bucket-selected]')
 //       .click()
 
@@ -271,13 +269,13 @@
 
 //     cy.get('[data-test=source-button-selector] > .dropdown > [data-test=wizard-bucket-selected]')
 //     .click()
-  
+
 //     // selecting dynamic dropdown item
 //     cy.get('[data-test="dropdown--item"]')
 //       .each(($el, index, $list) => {
 //         if($el.text() == 'InfluxTest2'){
 //           $el.click()}})
-  
+
 //     cy.getByTitle('Flux').click()
 
 //     cy.getByTitle('Script Wizard').click()

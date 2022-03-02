@@ -16,8 +16,7 @@ declare global {
       cutConnections: typeof cutConnections
       createConnection: typeof createConnection
       createDashboard: typeof createDashboard
-      deleteDashboards: typeof deleteDashboards     
+      deleteDashboards: typeof deleteDashboards
     }
   }
 }
-

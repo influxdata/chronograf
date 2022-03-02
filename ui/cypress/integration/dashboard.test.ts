@@ -3,11 +3,10 @@ describe('dashboards', () => {
     cy.deleteDashboards()
     cy.cutConnections()
     cy.createConnection()
-    cy.get('@connections').then((connections) => {
+    cy.get('@connections').then(connections => {
       cy.fixture('routes').then(({dashboards}) => {
-          cy.visit(`/sources/${connections[0].id}${dashboards}`)
+        cy.visit(`/sources/${connections[0].id}${dashboards}`)
       })
-
     })
   })
 
@@ -19,14 +18,14 @@ describe('dashboards', () => {
 
     // rename the dashboard
     cy.get('.rename-dashboard')
-      .should('have.text', 'Name This Dashboard')    
+      .should('have.text', 'Name This Dashboard')
       .type(`${newName}{enter}`)
       .should('have.text', newName)
 
     // delete the dashboard
-    cy.get('@connections').then((connections) => {
+    cy.get('@connections').then(connections => {
       cy.fixture('routes').then(({dashboards}) => {
-          cy.visit(`/sources/${connections[0].id}${dashboards}`)
+        cy.visit(`/sources/${connections[0].id}${dashboards}`)
       })
     })
 
@@ -34,7 +33,6 @@ describe('dashboards', () => {
     cy.get('.panel-body > table > tbody')
       .should('exist')
       .within(() => {
-
         // delete button
         cy.get('.confirm-button--confirmation').click({force: true})
       })
@@ -45,7 +43,7 @@ describe('dashboards', () => {
 // TODO: has to be rewritten and sorted into multiple files as it does much more than the test description says (creates flux Query)
 // describe('variables', () => {
 //   beforeEach(cy.setupConnection)
-  
+
 //   it('create dashboard', () => {
 //     cy.visit('/')
 //     cy.clickNav(4, 'Dashboards')
@@ -53,7 +51,7 @@ describe('dashboards', () => {
 //       .click()
 //     cy.getByTestID('rename-dashboard')
 //       .type('testing_dashboard{enter}')
-    
+
 //     cy.clickNav(3, 'Explore')
 //     cy.get('[data-test=source-button-selector] > .dropdown > .dropdown--button')
 //       .click()
@@ -71,7 +69,7 @@ describe('dashboards', () => {
 //     cy.get('[data-test=threesizer-header-controls] > .button-default').click('left')
 //     cy.get('.form--wrapper > :nth-child(1) > .dropdown > [data-test=wizard-bucket-selected]')
 //     .click()
-  
+
 //     cy.get('[data-test="dropdown--item"]')
 //     .filter(':contains("my-bucket")')
 //     .click()
@@ -83,16 +81,16 @@ describe('dashboards', () => {
 //     cy.get('[data-test="send-to-dashboard-btn"]').click()
 //     cy.get('.form--wrapper > :nth-child(1) > .dropdown > [data-test=wizard-bucket-selected]')
 //       .click()
-    
+
 //     //selecting dynamic dropdown
 //     cy.get('[data-test="dropdown--item"]').contains('testing_dashboard').then(()=>
 //         cy.get('[data-test="dropdown--item"]')
 //           .each(($el, index, $list) => {
 //             if($el.text() == 'testing_dashboard'){
 //               $el.click()}
-//             } 
+//             }
 //           ))
-    
+
 //     cy.get('.form--wrapper > :nth-child(1) > .dropdown > [data-test=wizard-bucket-selected]')
 //     .click()
 //     cy.get('.form--wrapper > :nth-child(1) > .dropdown > [data-test=wizard-bucket-selected]')
@@ -114,7 +112,7 @@ describe('dashboards', () => {
 //           cy.wrap($b)
 //           cy.getByTitle('Create Dashboard').click()
 //         })
-        
+
 //       }
 //       else{
 //         cy.getByTitle('Confirm')
@@ -136,13 +134,13 @@ describe('dashboards', () => {
 //         if($el.text() == 'InfluxTest2'){
 //           $el.click()}
 //         })
-    
+
 //     cy.get(':nth-child(3) > [data-test=dropdown-toggle] > .btn > .dropdown-selected')
 //       .filter(':visible')
 //       .click()
 
 //     cy.get('[data-test=dropdown-ul] > .fancy-scroll--container > .fancy-scroll--view > :nth-child(8) > a').click()
-    
+
 //     cy.wait(2000)
 //     cy.getByTestID('variable-name-type', {timeout: 2000})
 //       .clear()
@@ -164,21 +162,19 @@ describe('dashboards', () => {
 //       .each(($el, index, $list) => {
 //         if($el.text() == 'Flux Query'){
 //           $el.click()}
-//         })   
+//         })
 //     cy.getByTestID('variable-name-type', {timeout: 2000})
 //       .type('{selectAll}{backspace}iHopeThisNameDoesNotExist22' , {delay:600})
 
-//     cy.getByTestID('btn-accept').click()   
+//     cy.getByTestID('btn-accept').click()
 //     cy.get('.template-control--container').contains('iHopeThisNameDoesNotExist')
-    
+
 //    cy.getByTestID('add-template-variable').click()
 //    cy.getByTestID('variable-name-type', {timeout: 2000})
 //      .type('{selectAll}{backspace}iHopeThisNameDoesNotExist',{delay:400})
 
-
 //    cy.getByTestID('btn-accept').should('be.disabled')
 //    cy.getByTestID('btn-cancel').click()
-
 
 //    deletes existing variable
 //    cy.getByTestID('edit')

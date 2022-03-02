@@ -3,7 +3,7 @@ describe('Welcome Page', () => {
     cy.cutConnections()
     cy.visit('/')
   })
-  
+
   it('set up InfluxDB connection', () => {
     cy.get('button').contains('Get Started').click()
     cy.get('[id="Connection URL"]').clear().type(Cypress.env('url'))
@@ -20,11 +20,7 @@ describe('Welcome Page', () => {
     cy.get('button').contains('Skip').click()
     cy.get('button').contains('View All Connections').click()
 
-    cy.request(
-      'GET',
-      '/chronograf/v1/sources'
-    )
-    .then(response => {
+    cy.request('GET', '/chronograf/v1/sources').then(response => {
       const connections = response.body.sources
 
       // Select element with source
