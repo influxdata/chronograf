@@ -31,7 +31,7 @@ describe('query builder', () => {
     cy.get('button').contains('Query Builder').click()
   })
 
-  it('create a query, change its aggregation function and fill missing values', () => {
+  it.only('create a query, change its aggregation function and fill missing values', () => {
     let clusterID: string
     let queryTemplate: string
 
@@ -88,6 +88,12 @@ describe('query builder', () => {
 
     cy.get('[data-testid="aggregation-selector"]').within(() => {
       cy.get('[data-testid="builder-card--body"]').within(() => {
+        cy.get('.dropdown-selected').click()
+        cy.get('.dropdown-menu').within(() => {
+          cy.getByTestID('dropdown-item').contains('custom').click({force: true})
+        })
+        cy.get('input').type('13s{enter}')
+        cy.get('.dropdown-selected').should('contain.text', '13s')
         cy.get('.slide-toggle').click().should('have.class', 'active')
       })
 
@@ -133,7 +139,7 @@ describe('query builder', () => {
           '  |> filter(fn: (r) => r["_measurement"] == "database")' +
           `  |> filter(fn: (r) => r["clusterID"] == "${clusterID}")` +
           '  |> group(columns: ["_time"])' +
-          '  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: true)' +
+          '  |> aggregateWindow(every: 13s, fn: max, createEmpty: true)' +
           '  |> yield(name: "max")'
 
         checkQuery(queryTemplate)
