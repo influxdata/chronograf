@@ -60,6 +60,12 @@ deploy_influxdb_ent() {
     kubectl create secret generic influxdb-license --from-literal=INFLUXDB_ENTERPRISE_LICENSE_KEY="${LICENSE_KEY}"
     helm upgrade --wait --install influxdb influxdata/influxdb-enterprise --namespace default --set-string envFromSecret=influxdb-license --set-string data.service.type=NodePort
     kubectl patch svc influxdb-influxdb-enterprise-data --type=json -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":30086}]'
+    kubectl get configmap/influxdb-influxdb-enterprise-data -o  yaml > influxdb-influxdb-enterprise-data-patch
+    sed -in 's|\[http\]|[http]\\nflux-enabled = true|' influxdb-influxdb-enterprise-data-patch
+    docker cp influxdb-influxdb-enterprise-data-patch kind-control-plane:/
+    kubectl patch configmap influxdb-influxdb-enterprise-data --patch-file influxdb-influxdb-enterprise-data-patch
+    docker restart kind-control-plane
+    rm influxdb-influxdb-enterprise-data-patch influxdb-influxdb-enterprise-data-patchn
     sleep 5
     echo -e "InfluxDB data node status: $(curl -Isk "https://localhost:8086/ping" | head -n 1)"
 }
