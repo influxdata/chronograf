@@ -45,7 +45,8 @@ jobs:
           kubectl patch svc influxdb-influxdb-enterprise-data --type=json -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":30086}]'
           kubectl get configmap/influxdb-influxdb-enterprise-data -o  yaml > influxdb-influxdb-enterprise-data-patch
           sed -in 's|\[http\]|[http]\\nflux-enabled = true|' influxdb-influxdb-enterprise-data-patch
-          kubectl patch configmap influxdb-influxdb-enterprise-data --patch-file influxdb-influxdb-enterprise-data-patch
+          kubectl patch configmap influxdb-influxdb-enterprise-data --patch-file influxdb-influxdb-enterprise-data-patch       
+          kubectl exec influxdb-influxdb-enterprise-data-0 -c influxdb-enterprise /sbin/killall5   
         env:
           INFLUXDB_ENTERPRISE_LICENSE_KEY: "${{ secrets.INFLUXDB_ENTERPRISE_LICENSE_KEY }}"
 
