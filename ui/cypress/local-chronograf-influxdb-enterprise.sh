@@ -64,8 +64,7 @@ deploy_influxdb_ent() {
     sed -in 's|\[http\]|[http]\\nflux-enabled = true|' influxdb-influxdb-enterprise-data-patch
     docker cp influxdb-influxdb-enterprise-data-patch kind-control-plane:/
     kubectl patch configmap influxdb-influxdb-enterprise-data --patch-file influxdb-influxdb-enterprise-data-patch
-    kubectl delete pod influxdb-influxdb-enterprise-data-0
-    kubectl apply -f "${RWD}/.github/workflows/resources/test-reources.yaml"
+    kubectl exec influxdb-influxdb-enterprise-data-0 -c influxdb-enterprise /sbin/killall5
     sleep 5
     echo -e "InfluxDB data node status: $(curl -Isk "https://localhost:8086/ping" | head -n 1)"
 }
