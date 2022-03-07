@@ -28,6 +28,7 @@ interface Props {
   onChangeName: (name: string) => void
   isNewTickscript: boolean
   unsavedChanges: boolean
+  onOpenBuilderUI: () => void
 }
 
 @ErrorHandling
@@ -48,6 +49,7 @@ class Tickscript extends PureComponent<Props> {
       areLogsVisible,
       areLogsEnabled,
       onToggleLogsVisibility,
+      onOpenBuilderUI,
     } = this.props
     return (
       <Page className="tickscript-editor-page">
@@ -55,6 +57,7 @@ class Tickscript extends PureComponent<Props> {
           task={task}
           onSave={onSave}
           onExit={onExit}
+          onOpenBuilderUI={onOpenBuilderUI}
           unsavedChanges={unsavedChanges}
           areLogsVisible={areLogsVisible}
           areLogsEnabled={areLogsEnabled}

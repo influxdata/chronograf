@@ -3,7 +3,8 @@ import React, {Component} from 'react'
 import {Page} from 'src/reusable_ui'
 import LogsToggle from 'src/kapacitor/components/LogsToggle'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
-import TickscriptSave, {Task} from 'src/kapacitor/components/TickscriptSave'
+import TickscriptSave from 'src/kapacitor/components/TickscriptSave'
+import {Task} from 'src/types'
 
 interface Props {
   task: Task
@@ -14,6 +15,7 @@ interface Props {
   onSave: () => void
   onExit: () => void
   onToggleLogsVisibility: (visibility: boolean) => void
+  onOpenBuilderUI: () => void
 }
 
 class TickscriptHeader extends Component<Props> {
@@ -26,6 +28,7 @@ class TickscriptHeader extends Component<Props> {
       areLogsEnabled,
       areLogsVisible,
       onToggleLogsVisibility,
+      onOpenBuilderUI,
     } = this.props
 
     return (
@@ -34,6 +37,25 @@ class TickscriptHeader extends Component<Props> {
           <Page.Title title="TICKscript Editor" />
         </Page.Header.Left>
         <Page.Header.Right showSourceIndicator={true}>
+          {!!task.query && !task.templateID ? (
+            <button
+              className="btn btn-sm btn-primary"
+              title="Open TICKscript in Alert Rule Builder"
+              onClick={onOpenBuilderUI}
+            >
+              Alert Rule Builder
+            </button>
+          ) : undefined}
+          {isNewTickscript ? (
+            <button
+              className="btn btn-sm btn-default"
+              title="Use Alert Rule Builder to create a new TICKscript"
+              onClick={onOpenBuilderUI}
+            >
+              Alert Rule Builder
+            </button>
+          ) : undefined}
+
           <LogsToggle
             areLogsEnabled={areLogsEnabled}
             areLogsVisible={areLogsVisible}
