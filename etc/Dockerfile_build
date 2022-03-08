@@ -20,7 +20,7 @@ RUN pip3 install boto requests python-jose --upgrade
 RUN gem install fpm
 
 # Install node
-ENV NODE_VERSION v14.15.0
+ENV NODE_VERSION v16.14.0
 RUN wget -q https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-linux-x64.tar.gz; \
    mkdir /usr/local/node; \
    tar -xvf node-${NODE_VERSION}-linux-x64.tar.gz -C /usr/local/node --strip-components=1; \
