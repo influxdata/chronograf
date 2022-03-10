@@ -2421,7 +2421,7 @@ export const AST_TESTS: Array<[string, string, number, any]> = [
     AST_9,
   ],
   [
-    'basic absolure number query',
+    'basic absolute number query',
     'from(bucket: "b") |> range(start: 0, end: 10)',
     10000,
     AST_10,
