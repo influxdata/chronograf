@@ -64,6 +64,7 @@ type RangeCallPropertyValue =
   | MinusUnaryExpression<DurationLiteral>
   | DurationLiteral
   | DateTimeLiteral
+  | IntegerLiteral
   | Identifier
   | DurationBinaryExpression
   | MemberExpression
@@ -97,6 +98,11 @@ type DurationUnit =
 
 interface DateTimeLiteral {
   type: 'DateTimeLiteral'
+  value: string
+}
+
+interface IntegerLiteral {
+  type: 'IntegerLiteral'
   value: string
 }
 
@@ -162,6 +168,8 @@ function propertyTime(
       return now + durationDuration(value)
     case 'DateTimeLiteral':
       return Date.parse(value.value)
+    case 'IntegerLiteral':
+      return new Date(+value.value * 1000).getTime()
     case 'Identifier':
       return propertyTime(ast, resolveDeclaration(ast, value.name), now)
     case 'MemberExpression':
