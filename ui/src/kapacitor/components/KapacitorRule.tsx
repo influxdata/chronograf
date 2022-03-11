@@ -209,7 +209,7 @@ class KapacitorRule extends Component<Props, State> {
         `/sources/${source.id}/tickscripts${location?.search || ''}`
       )
     }
-    router.push(pathname || `/sources/${source.id}/alert-rules`)
+    router.push(`/sources/${source.id}/alert-rules`)
   }
 
   private handleSave = () => {
