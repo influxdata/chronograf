@@ -40,7 +40,9 @@ function renderType(type: BuilderAggregateFunctionType) {
 }
 
 type Callbacks = ReturnType<typeof mdtp>
-type Props = TagSelectorState & Callbacks & TimeMachineQueryProps
+type Props = TagSelectorState &
+  Callbacks &
+  TimeMachineQueryProps & {timeRangeText: string}
 
 const TagSelector = (props: Props) => {
   const {
@@ -92,6 +94,7 @@ const TagSelectorBody = (props: Props) => {
     onIncreaseKeysLimit,
     onSearchKeys,
     tagValues: selectedValues,
+    timeRangeText,
   } = props
   if (aggregateFunctionType === 'filter') {
     if (keysStatus === RemoteDataState.Error) {
@@ -108,7 +111,7 @@ const TagSelectorBody = (props: Props) => {
           No tag keys found{' '}
           <small>
             in the current{' '}
-            <a href="#" onClick={hightlightDropdown}>
+            <a href="#" onClick={hightlightDropdown} title={timeRangeText}>
               time range
             </a>
           </small>
@@ -212,6 +215,7 @@ const TagSelectorValues = (props: Props & {onLoadMoreValues: () => void}) => {
     tagValues: selectedValues,
     onSelectValues,
     onLoadMoreValues,
+    timeRangeText,
   } = props
   if (aggregateFunctionType === 'filter') {
     if (keysStatus === RemoteDataState.NotStarted) {
@@ -268,7 +272,7 @@ const TagSelectorValues = (props: Props & {onLoadMoreValues: () => void}) => {
           No values found{' '}
           <small>
             in the current{' '}
-            <a href="#" onClick={hightlightDropdown}>
+            <a href="#" onClick={hightlightDropdown} title={timeRangeText}>
               time range
             </a>
           </small>
@@ -302,7 +306,7 @@ const TagSelectorValues = (props: Props & {onLoadMoreValues: () => void}) => {
           )
         })}
         {valuesTruncated && aggregateFunctionType === 'filter' ? (
-          <div className="flux-query-builder--list-item" key={`__truncated`}>
+          <div className="flux-query-builder--list-item" key="__truncated">
             {valuesStatus !== RemoteDataState.Loading ? (
               <Button
                 text="Load More Values"
@@ -319,6 +323,14 @@ const TagSelectorValues = (props: Props & {onLoadMoreValues: () => void}) => {
             )}
           </div>
         ) : undefined}
+        <div className="flux-query-builder--list-item" key="__infomsg">
+          <small style={{textAlign: 'center', width: '100%'}}>
+            keys/values depend on{' '}
+            <a href="#" onClick={hightlightDropdown} title={timeRangeText}>
+              time range
+            </a>
+          </small>
+        </div>
       </div>
     </BuilderCard.Body>
   )
