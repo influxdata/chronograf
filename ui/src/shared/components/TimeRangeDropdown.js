@@ -13,6 +13,27 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import TimeRangeLabel from './TimeRangeLabel'
 const emptyTime = {lower: '', upper: ''}
 
+let timeoutHandle
+export function hightlightDropdown(e) {
+  if (e && e.preventDefault) {
+    e.preventDefault()
+  }
+  const el1 = document.getElementsByClassName('time-range-dropdown')[0]
+  if (el1) {
+    el1.classList.add('highlight')
+    if (timeoutHandle) {
+      clearTimeout(timeoutHandle)
+    }
+    timeoutHandle = setTimeout(() => {
+      const el2 = document.getElementsByClassName('time-range-dropdown')[0]
+      if (el2) {
+        el2.classList.remove('highlight')
+      }
+      timeoutHandle = undefined
+    }, 1000)
+  }
+}
+
 class TimeRangeDropdown extends Component {
   constructor(props) {
     super(props)
