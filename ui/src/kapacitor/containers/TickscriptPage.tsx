@@ -294,12 +294,9 @@ export class TickscriptPage extends PureComponent<Props, State> {
       source: {id: sourceID},
       router,
     } = this.props
-    if (router.location.query?.l === 't') {
-      return router.push(
-        `/sources/${sourceID}/tickscripts${router.location.search}`
-      )
-    }
-    return router.push(`/sources/${sourceID}/alert-rules`)
+    return router.push(
+      `/sources/${sourceID}/tickscripts${router.location.search}`
+    )
   }
 
   private handleChangeScript = (tickscript: string) => {
