@@ -297,20 +297,16 @@ $rd-cell-size: 30px;
   }
 }
 @keyframes TimeRangeHighlight {
-  0% {
-    padding-left: 0px;
-    padding-right: 0px;
-    border-width: 0px 9px;
-    border-color: red;
-    border-style: solid;
+  25% {
+    transform: scale(1.2);
+  }
+  50% {
+    transform: scale(0.9);
+  }
+  75% {
+    transform: scale(1.2);
   }
   100% {
-    padding-left: 9px;
-    padding-right: 9px;
-    border-width: 0px 0px;
-    border-color: red;
-    border-style: solid;
-    transform: scale(1.2);
   }
 }
 .time-range-dropdown {
@@ -319,7 +315,12 @@ $rd-cell-size: 30px;
 
   &.highlight .dropdown-toggle {
     pointer-events: none;
-    animation: TimeRangeHighlight 1s ease-out infinite;
+    padding-left: 6px;
+    padding-right: 6px;
+    border-width: 3px;
+    border-color: $c-banana;
+    border-style: solid;
+    animation: TimeRangeHighlight 1s linear 1;
   }
 }
 
