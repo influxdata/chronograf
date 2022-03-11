@@ -28,6 +28,7 @@ import {
 import {ButtonShape, ComponentSize, IconFont} from 'src/reusable_ui/types'
 import {Button} from 'src/reusable_ui'
 import LoadingSpinner from 'src/reusable_ui/components/spinners/LoadingSpinner'
+import {hightlightDropdown} from '../../TimeRangeDropdown'
 
 const SEARCH_DEBOUNCE_MS = 400
 
@@ -104,7 +105,13 @@ const TagSelectorBody = (props: Props) => {
     ) {
       return (
         <BuilderCard.Empty testID="empty-tag-keys">
-          No tag keys found <small>in the current time range</small>
+          No tag keys found{' '}
+          <small>
+            in the current{' '}
+            <a href="#" onClick={hightlightDropdown}>
+              time range
+            </a>
+          </small>
         </BuilderCard.Empty>
       )
     }
@@ -258,7 +265,13 @@ const TagSelectorValues = (props: Props & {onLoadMoreValues: () => void}) => {
     if (!values.length) {
       return (
         <BuilderCard.Empty>
-          No values found <small>in the current time range</small>
+          No values found{' '}
+          <small>
+            in the current{' '}
+            <a href="#" onClick={hightlightDropdown}>
+              time range
+            </a>
+          </small>
         </BuilderCard.Empty>
       )
     }
