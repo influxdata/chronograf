@@ -113,7 +113,7 @@ class SideNav extends PureComponent<Props> {
         >
           <NavHeader link={`${sourcePrefix}/alert-rules`} title="Alerting" />
           <NavListItem link={`${sourcePrefix}/alert-rules`}>
-            Manage Tasks
+            Alert Rules
           </NavListItem>
           <NavListItem link={`${sourcePrefix}/tickscripts`}>
             TICKscripts
