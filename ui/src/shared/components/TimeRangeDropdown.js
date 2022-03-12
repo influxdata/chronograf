@@ -20,8 +20,9 @@ export function hightlightDropdown(e) {
   }
   const el1 = document.getElementsByClassName('time-range-dropdown')[0]
   if (el1) {
-    el1.classList.add('highlight')
-    if (timeoutHandle) {
+    if (!timeoutHandle) {
+      el1.classList.add('highlight')
+    } else {
       clearTimeout(timeoutHandle)
     }
     timeoutHandle = setTimeout(() => {
