@@ -49,9 +49,9 @@ class FluxEditor extends PureComponent<Props> {
               <p>
                 New to Flux? Give the{' '}
                 <Button
-                  text={'Query Builder'}
+                  text={'Script Builder'}
                   color={ComponentColor.Primary}
-                  titleText={'Open Flux Query Builder'}
+                  titleText={'Open Flux Script Builder'}
                   size={ComponentSize.Large}
                   onClick={onShowWizard}
                 />{' '}

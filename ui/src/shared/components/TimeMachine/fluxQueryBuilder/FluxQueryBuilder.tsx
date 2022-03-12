@@ -84,8 +84,8 @@ const FluxQueryBuilder = ({
             <Button
               size={ComponentSize.ExtraSmall}
               onClick={onShowEditor}
-              text="Query Editor"
-              titleText="Switch to Flux Query Editor"
+              text="Script Editor"
+              titleText="Switch to Flux Script Editor"
             />
             <Button
               shape={ButtonShape.Square}

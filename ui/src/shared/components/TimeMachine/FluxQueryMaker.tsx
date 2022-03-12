@@ -117,7 +117,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
           headerButtons: [
             <Button
               key={0}
-              text={'Query Builder'}
+              text={'Script Builder'}
               onClick={this.handleShowWizard}
               size={ComponentSize.ExtraSmall}
             />,
