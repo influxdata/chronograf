@@ -83,13 +83,10 @@ export const loadTagSelectorThunk = (
 
         if (tagIndex === 0 && keys.includes('_measurement')) {
           defaultKey = '_measurement'
+        } else if (keys.includes('_field')) {
+          defaultKey = '_field'
         } else {
           defaultKey = keys[0]
-          // auto-select _field as the last option, older InfluxDB v1
-          // will returns tags values with preceeding _field tag selector
-          if (defaultKey === '_field' && keys.length > 1) {
-            defaultKey = keys[1]
-          }
         }
 
         dispatch(tagActions.selectKey(tagIndex, defaultKey))

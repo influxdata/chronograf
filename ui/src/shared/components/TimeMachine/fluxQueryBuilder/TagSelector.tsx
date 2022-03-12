@@ -64,6 +64,16 @@ const TagSelector = (props: Props) => {
   )
 }
 
+function tagSearchPlaceholder(key: string): string {
+  if (key === '_measurement') {
+    return 'Search measurements'
+  }
+  if (key === '_field') {
+    return 'Search fields'
+  }
+  return `Search ${key} tag values`
+}
+
 const TagSelectorBody = (props: Props) => {
   const {
     aggregateFunctionType,
@@ -122,7 +132,7 @@ const TagSelectorBody = (props: Props) => {
   const placeholderText =
     aggregateFunctionType === 'group'
       ? 'Search group column values'
-      : `Search ${key} tag values`
+      : tagSearchPlaceholder(key)
   return (
     <>
       <BuilderCard.Menu testID={`tag-selector--container`}>
