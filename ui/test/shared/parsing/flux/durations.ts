@@ -2281,6 +2281,89 @@ const AST_9 = {
   ],
 }
 
+const AST_10 = {
+  type: 'Program',
+  body: [
+    {
+      type: 'ExpressionStatement',
+      expression: {
+        type: 'PipeExpression',
+        argument: {
+          type: 'CallExpression',
+          callee: {
+            type: 'Identifier',
+            name: 'from',
+          },
+          arguments: [
+            {
+              type: 'ObjectExpression',
+              properties: [
+                {
+                  type: 'Property',
+                  key: {
+                    type: 'Identifier',
+                    location: {
+                      start: {line: 1, column: 6},
+                      end: {line: 1, column: 12},
+                      source: 'bucket',
+                    },
+                    name: 'bucket',
+                  },
+                  value: {
+                    type: 'StringLiteral',
+                    location: {
+                      start: {line: 1, column: 14},
+                      end: {line: 1, column: 17},
+                      source: '"b"',
+                    },
+                    value: 'b',
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        call: {
+          type: 'CallExpression',
+          callee: {
+            type: 'Identifier',
+            name: 'range',
+          },
+          arguments: [
+            {
+              type: 'ObjectExpression',
+              properties: [
+                {
+                  type: 'Property',
+                  key: {
+                    type: 'Identifier',
+                    name: 'start',
+                  },
+                  value: {
+                    type: 'IntegerLiteral',
+                    value: '0',
+                  },
+                },
+                {
+                  type: 'Property',
+                  key: {
+                    type: 'Identifier',
+                    name: 'stop',
+                  },
+                  value: {
+                    type: 'IntegerLiteral',
+                    value: '10',
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      },
+    },
+  ],
+}
+
 export const AST_TESTS: Array<[string, string, number, any]> = [
   [
     'basic relative query',
@@ -2336,5 +2419,11 @@ export const AST_TESTS: Array<[string, string, number, any]> = [
     new Date('2021-09-20T14:50:00.000Z').getTime() -
       new Date('2020-09-20T14:50:00.000Z').getTime(),
     AST_9,
+  ],
+  [
+    'basic absolute number query',
+    'from(bucket: "b") |> range(start: 0, end: 10)',
+    10000,
+    AST_10,
   ],
 ]
