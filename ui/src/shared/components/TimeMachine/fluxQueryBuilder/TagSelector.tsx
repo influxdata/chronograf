@@ -323,7 +323,11 @@ const TagSelectorValues = (props: Props & {onLoadMoreValues: () => void}) => {
             )}
           </div>
         ) : undefined}
-        <div className="flux-query-builder--list-item" key="__infomsg">
+        <div
+          className="flux-query-builder--list-item"
+          key="__infomsg"
+          style={{cursor: 'default'}}
+        >
           <small style={{textAlign: 'center', width: '100%'}}>
             keys/values depend on{' '}
             <a href="#" onClick={hightlightDropdown} title={timeRangeText}>
