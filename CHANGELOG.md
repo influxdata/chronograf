@@ -2,9 +2,9 @@
 
 ### Features
 
-1. [#5852](https://github.com/influxdata/chronograf/pull/5852): Add Flux Query Builder.
+1. [#5852](https://github.com/influxdata/chronograf/pull/5852): Add Flux Script Builder.
 1. [#5858](https://github.com/influxdata/chronograf/pull/5858): Use time range in flux Schema Explorer.
-1. [#5861](https://github.com/influxdata/chronograf/pull/5861): Allow to load truncated data in Flux Query Builder.
+1. [#5861](https://github.com/influxdata/chronograf/pull/5861): Allow to load truncated data in Flux Script Builder.
 1. [#5868](https://github.com/influxdata/chronograf/pull/5868): Move Flux Tasks to own page.
 1. [#5869](https://github.com/influxdata/chronograf/pull/5869): Optimize Alert Rules API.
 1. [#5871](https://github.com/influxdata/chronograf/pull/5871): Add TICKscipts page.
