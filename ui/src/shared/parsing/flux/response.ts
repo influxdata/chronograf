@@ -59,10 +59,6 @@ export const parseTables = (responseChunk: string): FluxTable[] => {
   const tableColIndex = headerRow.findIndex(h => h === 'table')
   const timeColIndex = headerRow.findIndex(h => h === '_time')
 
-  if (!timeColIndex) {
-    throw new Error('Could not find time Column')
-  }
-
   // Group rows by their table id
   const tablesData: Array<Array<Array<string | number>>> = Object.values(
     _.groupBy(nonAnnotationData.slice(1), row => row[tableColIndex])
@@ -100,8 +96,10 @@ export const parseTables = (responseChunk: string): FluxTable[] => {
       {}
     )
 
-    for (const row of tableData) {
-      row[timeColIndex] = new Date(row[timeColIndex]).valueOf()
+    if (timeColIndex >= 0) {
+      for (const row of tableData) {
+        row[timeColIndex] = new Date(row[timeColIndex]).valueOf()
+      }
     }
 
     const data: Array<Array<string | number>> = [headerRow, ...tableData]
