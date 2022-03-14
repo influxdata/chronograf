@@ -66,7 +66,9 @@ export const parseTables = (responseChunk: string): FluxTable[] => {
 
   const groupRow = annotationData.find(row => row[0] === '#group')
   const defaultsRow = annotationData.find(row => row[0] === '#default')
-  const dataTypeRow = annotationData.find(row => row[0] === '#datatype')
+  const dataTypeRow: string[] = annotationData.find(
+    row => row[0] === '#datatype'
+  )
 
   // groupRow = ['#group', 'false', 'true', 'true', 'false']
   const groupKeyIndices = groupRow.reduce((acc, value, i) => {
@@ -96,9 +98,22 @@ export const parseTables = (responseChunk: string): FluxTable[] => {
       {}
     )
 
-    if (timeColIndex >= 0) {
-      for (const row of tableData) {
+    const numberColumns = (dataTypeRow || []).reduce((acc, val, i) => {
+      if (val === 'long' || val === 'unsignedLong' || val === 'double') {
+        acc.push(i)
+      }
+      return acc
+    }, [] as number[])
+    for (const row of tableData) {
+      if (timeColIndex >= 0) {
         row[timeColIndex] = new Date(row[timeColIndex]).valueOf()
+      }
+      if (numberColumns.length) {
+        numberColumns.forEach(colIndex => {
+          if (row[colIndex] !== '') {
+            row[colIndex] = parseFloat(row[colIndex] as string)
+          }
+        })
       }
     }
 
