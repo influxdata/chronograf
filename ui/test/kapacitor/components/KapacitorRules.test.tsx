@@ -17,9 +17,6 @@ describe('Kapacitor.Containers.KapacitorRules', () => {
     loading: false,
     onDelete: () => {},
     onChangeRuleStatus: () => {},
-    fluxTasks: null,
-    onChangeFluxTaskStatus: () => undefined,
-    onDeleteFluxTask: () => undefined,
   }
 
   describe('rendering', () => {
@@ -29,24 +26,17 @@ describe('Kapacitor.Containers.KapacitorRules', () => {
       expect(wrapper.exists()).toBe(true)
     })
 
-    it('renders KapacitorRulesTable', () => {
+    it('renders KapacitorRulesTable without', () => {
       const wrapper = shallow(<KapacitorRules {...props} />)
 
       const kapacitorRulesTable = wrapper.find(KapacitorRulesTable)
       expect(kapacitorRulesTable.length).toEqual(1)
 
       const tasksTable = wrapper.find(TasksTable)
-      expect(tasksTable.length).toEqual(1)
+      expect(tasksTable.length).toEqual(0)
     })
 
-    it('renders TasksTable', () => {
-      const wrapper = shallow(<KapacitorRules {...props} />)
-
-      const tasksTable = wrapper.find(TasksTable)
-      expect(tasksTable.length).toEqual(1)
-    })
-
-    describe('rows in KapacitorRulesTable and TasksTable', () => {
+    describe('rows in KapacitorRulesTable', () => {
       const findRows = (root, reactTable) =>
         root
           .find(reactTable)
@@ -84,58 +74,22 @@ describe('Kapacitor.Containers.KapacitorRules', () => {
 
       let wrapper
       let rulesRows
-      let tasksRows
 
       beforeEach(() => {
         wrapper = shallow(<KapacitorRules {...props} />)
         rulesRows = findRows(wrapper, KapacitorRulesTable)
-        tasksRows = findRows(wrapper, TasksTable)
       })
 
-      it('renders every rule/task checkbox with unique html id', () => {
-        const allCheckboxIDs = rulesRows
-          .map(r => r.row.checkbox.id)
-          .concat(tasksRows.map(r => r.row.checkbox.id))
+      it('renders every rule checkbox with unique html id', () => {
+        const allCheckboxIDs = rulesRows.map(r => r.row.checkbox.id)
 
         expect(containsAnyDuplicate(allCheckboxIDs)).toEqual(false)
       })
 
-      it('renders each rule/task table row label with unique "for" attribute', () => {
-        const allCheckboxLabelFors = rulesRows
-          .map(r => r.row.label.htmlFor)
-          .concat(tasksRows.map(r => r.row.label.htmlFor))
+      it('renders each rule table row label with unique "for" attribute', () => {
+        const allCheckboxLabelFors = rulesRows.map(r => r.row.label.htmlFor)
 
         expect(containsAnyDuplicate(allCheckboxLabelFors)).toEqual(false)
-      })
-
-      it('renders one corresponding task row for each rule row', () => {
-        expect(rulesRows.length).toBeLessThanOrEqual(tasksRows.length)
-
-        rulesRows.forEach(ruleRow => {
-          expect(
-            tasksRows.filter(taskRow => taskRow.rule.id === ruleRow.rule.id)
-              .length
-          ).toEqual(1)
-        })
-      })
-
-      it('renders corresponding rule/task rows with the same enabled status', () => {
-        const correspondingRows = []
-
-        rulesRows.forEach(ruleRow => {
-          const taskRow = tasksRows
-            .filter(t => t.rule.id === ruleRow.rule.id)
-            .pop()
-          if (taskRow) {
-            correspondingRows.push({ruleRow, taskRow})
-          }
-        })
-
-        correspondingRows.forEach(({ruleRow, taskRow}) => {
-          expect(ruleRow.row.checkbox.checked).toEqual(
-            taskRow.row.checkbox.checked
-          )
-        })
       })
     })
   })

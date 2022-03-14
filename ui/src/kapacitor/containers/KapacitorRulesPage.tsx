@@ -176,10 +176,10 @@ export class KapacitorRulesPage extends PureComponent<Props, State> {
     const kapacitor = this.kapacitor
 
     if (!kapacitor) {
-      return 'Manage Tasks'
+      return 'Manage Alert Rules'
     }
 
-    return `Manage Tasks on`
+    return `Manage Alert Rules on`
   }
 
   private get className(): string {
