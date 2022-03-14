@@ -10,6 +10,8 @@
 1. [#5871](https://github.com/influxdata/chronograf/pull/5871): Add TICKscipts page.
 1. [#5872](https://github.com/influxdata/chronograf/pull/5872): Open Alert Rule Builder from a TICKscript page.
 1. [#5879](https://github.com/influxdata/chronograf/pull/5879): Remove Manage Tasks page, add Alert Rules page.
+1. [#5881](https://github.com/influxdata/chronograf/pull/5881): Highlight that Script Builder keys/values depend on the selected time range.
+
 
 ### Bug Fixes
 

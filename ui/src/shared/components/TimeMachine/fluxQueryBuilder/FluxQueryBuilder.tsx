@@ -25,8 +25,9 @@ import {
 import {QueryBuilderState, TimeMachineQueryProps} from './types'
 import {addTagSelectorThunk} from './actions/thunks'
 import timeRangeWindowPeriod from './util/timeRangeWindowPeriod'
-import {RemoteDataState} from 'src/types'
+import {RemoteDataState, TimeZones} from 'src/types'
 import {buildQuery} from './util/generateFlux'
+import {timeRangeLabel} from '../../TimeRangeLabel'
 
 interface OwnProps extends TimeMachineQueryProps {
   onSubmit: (script: string) => void
@@ -42,14 +43,19 @@ const FluxQueryBuilder = ({
   tags,
   isRunnable,
   builderState,
+  timeZone,
   notify,
   onSubmit,
   onShowEditor,
   onAddTagSelector,
 }: Props) => {
-  const defaultPeriod = useMemo(() => timeRangeWindowPeriod(timeRange), [
-    timeRange,
-  ])
+  const [defaultPeriod, timeRangeText] = useMemo(
+    () => [
+      timeRangeWindowPeriod(timeRange),
+      timeRangeLabel({timeRange, timeZone}),
+    ],
+    [timeRange, timeZone]
+  )
 
   return (
     <div className="flux-query-builder" data-testid="flux-query-builder">
@@ -64,6 +70,7 @@ const FluxQueryBuilder = ({
               <TagSelector
                 source={source}
                 timeRange={timeRange}
+                timeRangeText={timeRangeText}
                 key={tag.tagIndex}
                 tagIndex={tag.tagIndex}
               />
@@ -150,9 +157,11 @@ const FluxQueryBuilder = ({
 }
 const mstp = (state: any) => {
   const fluxQueryBuilder = state?.fluxQueryBuilder as QueryBuilderState
+  const timeZone = state?.app?.persisted?.timeZone as TimeZones
   return {
     builderState: fluxQueryBuilder,
     tags: fluxQueryBuilder.tags,
+    timeZone,
     isRunnable:
       fluxQueryBuilder.buckets.status === RemoteDataState.Done &&
       !!fluxQueryBuilder.buckets.selectedBucket,

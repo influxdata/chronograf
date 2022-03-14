@@ -75,9 +75,7 @@
 .custom-time--shortcut {
   white-space: nowrap;
   padding: 6px 16px;
-  transition:
-    color 0.25s ease,
-    background-color 0.25s ease;
+  transition: color 0.25s ease, background-color 0.25s ease;
   color: $g11-sidewalk;
   font-weight: 500;
 
@@ -138,14 +136,14 @@ $rd-cell-size: 30px;
   left: 0;
   &:after {
     left: calc(50% - 1px);
-    content: "\e901";
+    content: '\e901';
   }
 }
 .rd-next {
   left: calc(100% - #{$custom-time-arrow});
   &:after {
     left: calc(50% + 1px);
-    content: "\e903";
+    content: '\e903';
   }
 }
 .rd-month-label {
@@ -298,10 +296,34 @@ $rd-cell-size: 30px;
     background-color: $g6-smoke;
   }
 }
-/* Custom positioning for dashboard use */
-.time-range-dropdown {
-  position: relative;
+@keyframes TimeRangeHighlight {
+  25% {
+    transform: scale(1.2);
+  }
+  50% {
+    transform: scale(0.9);
+  }
+  75% {
+    transform: scale(1.2);
+  }
+  100% {
+  }
 }
+.time-range-dropdown {
+  /* Custom positioning for dashboard use */
+  position: relative;
+
+  &.highlight .dropdown-toggle {
+    pointer-events: none;
+    padding-left: 6px;
+    padding-right: 6px;
+    border-width: 3px;
+    border-color: $c-banana;
+    border-style: solid;
+    animation: TimeRangeHighlight 1s linear 1;
+  }
+}
+
 .custom-time--overlay {
   position: absolute;
   top: 0;

@@ -19,7 +19,10 @@ interface PassedProps {
 }
 type Props = PassedProps & ReturnType<typeof mstp>
 
-const TimeRangeLabel = ({timeRange: {upper, lower}, timeZone}: Props) => {
+export function timeRangeLabel({
+  timeRange: {upper, lower},
+  timeZone,
+}: Props): string {
   if (upper && lower) {
     if (upper === 'now()') {
       return `${format(lower, timeZone)} - Now`
@@ -30,8 +33,13 @@ const TimeRangeLabel = ({timeRange: {upper, lower}, timeZone}: Props) => {
   const selected = timeRanges.find(range => range.lower === lower)
   return selected ? selected.inputValue : 'Custom'
 }
+const TimeRangeLabel = (props: Props) => {
+  return timeRangeLabel(props)
+}
 
 const mstp = (state: any) => ({
-  timeZone: _.get(state, ['app', 'persisted', 'timeZone']) as TimeZones,
+  timeZone: _.get(state, ['app', 'persisted', 'timeZone']) as
+    | TimeZones
+    | undefined,
 })
 export default connect(mstp)(TimeRangeLabel)
