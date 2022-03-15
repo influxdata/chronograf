@@ -96,7 +96,10 @@ export default function rules(state = {}, action) {
 
     case 'UPDATE_RULE_ALERT_NODES': {
       const {ruleID, alerts} = action.payload
-      const alertNodesByType = {}
+      const alertNodesByType = {
+        noRecoveries: state[ruleID].alertNodes.noRecoveries,
+        stateChangesOnly: state[ruleID].alertNodes.stateChangesOnly,
+      }
       _.forEach(alerts, h => {
         if (h.enabled) {
           if (h.type === 'post') {
