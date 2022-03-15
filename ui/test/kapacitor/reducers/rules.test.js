@@ -12,6 +12,8 @@ import {
   updateRuleName,
   deleteRuleSuccess,
   updateRuleStatusSuccess,
+  updateNoRecoveries,
+  updateStateChangesOnly,
 } from 'src/kapacitor/actions/view'
 
 describe('Kapacitor.Reducers.rules', () => {
@@ -103,7 +105,10 @@ describe('Kapacitor.Reducers.rules', () => {
       [ruleID]: {
         id: ruleID,
         queryID: 988,
-        alertNodes: {},
+        alertNodes: {
+          stateChangesOnly: false,
+          noRecoveries: true,
+        },
       },
     }
     const updatedSlack = {
@@ -123,7 +128,9 @@ describe('Kapacitor.Reducers.rules', () => {
       initialState,
       updateAlertNodes(ruleID, [updatedSlack])
     )
-    expect(newState[ruleID].alertNodes.slack[0]).toEqual(expectedSlack)
+    const expectedState = JSON.parse(JSON.stringify(initialState))
+    expectedState[ruleID].alertNodes.slack = [expectedSlack]
+    expect(newState).toEqual(expectedState)
   })
 
   it('can update the name', () => {
@@ -192,5 +199,42 @@ describe('Kapacitor.Reducers.rules', () => {
       updateRuleStatusSuccess(ruleID, status)
     )
     expect(newState[ruleID].status).toBe(status)
+  })
+
+  it('can set noRecoveries', () => {
+    const ruleID = 1
+
+    const initialState = {
+      [ruleID]: {
+        id: ruleID,
+        queryID: 988,
+        alertNodes: {
+          noRecoveries: false,
+        },
+      },
+    }
+
+    const newState = reducer(initialState, updateNoRecoveries(ruleID, true))
+    expect(newState[ruleID].alertNodes.noRecoveries).toBe(true)
+  })
+
+  it('can set stateChangesOnly', () => {
+    const ruleID = 1
+
+    const initialState = {
+      [ruleID]: {
+        id: ruleID,
+        queryID: 988,
+        alertNodes: {
+          stateChangesOnly: true,
+        },
+      },
+    }
+
+    const newState = reducer(
+      initialState,
+      updateStateChangesOnly(ruleID, false)
+    )
+    expect(newState[ruleID].alertNodes.stateChangesOnly).toBe(false)
   })
 })

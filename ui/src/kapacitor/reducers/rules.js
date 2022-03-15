@@ -16,7 +16,7 @@ export default function rules(state = {}, action) {
           trigger: 'threshold',
           values: defaultRuleConfigs.threshold,
           message: '',
-          alertNodes: {},
+          alertNodes: {stateChangesOnly: true},
           every: null,
           name: 'Untitled Rule',
         },
@@ -76,9 +76,30 @@ export default function rules(state = {}, action) {
       })
     }
 
+    case 'UPDATE_RULE_NORECOVERIES': {
+      const {ruleID, noRecoveries} = action.payload
+      return Object.assign({}, state, {
+        [ruleID]: Object.assign({}, state[ruleID], {
+          alertNodes: {...state[ruleID].alertNodes, noRecoveries},
+        }),
+      })
+    }
+
+    case 'UPDATE_RULE_STATECHANGESONLY': {
+      const {ruleID, stateChangesOnly} = action.payload
+      return Object.assign({}, state, {
+        [ruleID]: Object.assign({}, state[ruleID], {
+          alertNodes: {...state[ruleID].alertNodes, stateChangesOnly},
+        }),
+      })
+    }
+
     case 'UPDATE_RULE_ALERT_NODES': {
       const {ruleID, alerts} = action.payload
-      const alertNodesByType = {}
+      const alertNodesByType = {
+        noRecoveries: state[ruleID].alertNodes.noRecoveries,
+        stateChangesOnly: state[ruleID].alertNodes.stateChangesOnly,
+      }
       _.forEach(alerts, h => {
         if (h.enabled) {
           if (h.type === 'post') {

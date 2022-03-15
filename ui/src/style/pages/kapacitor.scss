@@ -436,7 +436,6 @@ $rule-builder--radius-lg: 5px;
 .endpoint-tabs {
   width: 150px;
   background-color: $rule-builder--section-border;
-  border-bottom-left-radius: $rule-builder--radius-lg;
   display: flex;
   flex-direction: column;
   margin: 0;
@@ -527,7 +526,6 @@ $rule-builder--radius-lg: 5px;
 .endpoint-tab-contents {
   flex: 1 0 0;
   background-color: $rule-builder--section-bg;
-  border-bottom-right-radius: $rule-builder--radius-lg;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -584,6 +582,15 @@ $rule-builder--radius-lg: 5px;
 }
 .endpoint-tab--parameters h4 .btn {
   margin-left: 6px;
+}
+
+/*
+ Alert Options
+  -----------------------------------------------------------------------------
+*/
+.rule-alert-options .form-control-static {
+  margin-left: 6px;
+  margin-right: 6px;
 }
 
 /*

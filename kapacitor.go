@@ -5,6 +5,7 @@ import "encoding/json"
 // AlertNodes defines all possible kapacitor interactions with an alert.
 type AlertNodes struct {
 	IsStateChangesOnly bool          `json:"stateChangesOnly"` // IsStateChangesOnly will only send alerts on state changes.
+	IsNoRecoveries     bool          `json:"noRecoveries"`     // IsNoRecoveries will not send alerts when returning to OK state from other states.
 	UseFlapping        bool          `json:"useFlapping"`      // UseFlapping enables flapping detection. Flapping occurs when a service or host changes state too frequently, resulting in a storm of problem and recovery notification
 	Posts              []*Post       `json:"post"`             // HTTPPost  will post the JSON alert data to the specified URLs.
 	TCPs               []*TCP        `json:"tcp"`              // TCP  will send the JSON alert data to the specified endpoint via TCP.

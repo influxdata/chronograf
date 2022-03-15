@@ -19,6 +19,8 @@ interface HandlerWithText extends Handler {
 interface RuleActions {
   updateAlertNodes: (id: string, handlersOnThisAlert: Handler[]) => void
   updateMessage: (id: string, e: MouseEvent<HTMLInputElement>) => void
+  updateNoRecoveries: (id: string, noRecoveries: boolean) => void
+  updateStateChangesOnly: (id: string, stateChangesOnly: boolean) => void
   updateDetails: () => void
 }
 
@@ -161,9 +163,48 @@ class RuleHandlers extends PureComponent<Props, State> {
               />
             </div>
           ) : null}
+          {mappedHandlersOnThisAlert.length ? (
+            <div className="rule-section--row rule-section--border-top rule-section--row-last rule-alert-options">
+              <p>Alert Options:</p>
+              <div className="form-control-static">
+                <input
+                  name="noRecoveries"
+                  id="noRecoveries"
+                  type="checkbox"
+                  defaultChecked={rule.alertNodes.noRecoveries}
+                  onClick={this.handleNoRecoveries}
+                />
+                <label htmlFor="noRecoveries">
+                  Don't send alert on condition recovery
+                </label>
+              </div>
+              <div className="form-control-static">
+                <input
+                  name="stateChangesOnly"
+                  id="stateChangesOnly"
+                  type="checkbox"
+                  defaultChecked={rule.alertNodes.stateChangesOnly}
+                  onClick={this.handleStateChangesOnly}
+                />
+                <label htmlFor="stateChangesOnly">
+                  Send alert only when condition state changes
+                </label>
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     )
+  }
+
+  private handleNoRecoveries = e => {
+    const {ruleActions, rule} = this.props
+    ruleActions.updateNoRecoveries(rule.id, e.target.checked)
+  }
+
+  private handleStateChangesOnly = e => {
+    const {ruleActions, rule} = this.props
+    ruleActions.updateStateChangesOnly(rule.id, e.target.checked)
   }
 
   private handleChooseHandler = (ep: HandlerWithText): (() => void) => () => {
