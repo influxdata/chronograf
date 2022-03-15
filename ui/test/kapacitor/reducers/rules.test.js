@@ -105,7 +105,10 @@ describe('Kapacitor.Reducers.rules', () => {
       [ruleID]: {
         id: ruleID,
         queryID: 988,
-        alertNodes: {},
+        alertNodes: {
+          stateChangesOnly: false,
+          noRecoveries: true,
+        },
       },
     }
     const updatedSlack = {
@@ -125,7 +128,9 @@ describe('Kapacitor.Reducers.rules', () => {
       initialState,
       updateAlertNodes(ruleID, [updatedSlack])
     )
-    expect(newState[ruleID].alertNodes.slack[0]).toEqual(expectedSlack)
+    const expectedState = JSON.parse(JSON.stringify(initialState))
+    expectedState[ruleID].alertNodes.slack = [expectedSlack]
+    expect(newState).toEqual(expectedState)
   })
 
   it('can update the name', () => {
