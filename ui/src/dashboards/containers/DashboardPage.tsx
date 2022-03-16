@@ -59,10 +59,18 @@ import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import * as TempVarsModels from 'src/types/tempVars'
 import {NewDefaultCell} from 'src/types/dashboards'
-import {NotificationAction, TimeZones, RefreshRate} from 'src/types'
+import {
+  NotificationAction,
+  TimeZones,
+  RefreshRate,
+  Me,
+  Links as CommonLinks,
+} from 'src/types'
 import {AnnotationsDisplaySetting} from 'src/types/annotations'
 import {Links} from 'src/types/flux'
 import {createTimeRangeTemplates} from 'src/shared/utils/templates'
+import UserNavBlock from 'src/side_nav/components/UserNavBlock'
+import {READER_ROLE} from 'src/auth/Authorized'
 
 interface OwnProps extends ManualRefreshProps, WithRouterProps {
   source: SourcesModels.Source
@@ -119,6 +127,9 @@ type ReduxDispatchProps = ResolveThunks<{
   updateTemplateQueryParams: typeof dashboardActions.updateTemplateQueryParams
   updateQueryParams: typeof dashboardActions.updateQueryParams
   updateTimeRangeQueryParams: typeof dashboardActions.updateTimeRangeQueryParams
+  logoutLink?: string
+  me: Me
+  links: CommonLinks
 }>
 
 type Props = OwnProps & ReduxStateProps & ReduxDispatchProps
@@ -270,6 +281,9 @@ class DashboardPage extends Component<Props, State> {
       showTemplateVariableControlBar,
       handleClickPresentationButton,
       toggleTemplateVariableControlBar,
+      me,
+      logoutLink,
+      links,
     } = this.props
 
     const {dashboardTime, upperDashboardTime} = createTimeRangeTemplates(
@@ -335,7 +349,16 @@ class DashboardPage extends Component<Props, State> {
           onToggleShowTempVarControls={toggleTemplateVariableControlBar}
           onToggleShowAnnotationControls={this.toggleAnnotationControls}
           handleClickPresentationButton={handleClickPresentationButton}
-        />
+        >
+          {isUsingAuth && me.role === READER_ROLE ? (
+            <UserNavBlock
+              logoutLink={logoutLink}
+              links={links}
+              me={me}
+              header={true}
+            />
+          ) : undefined}
+        </DashboardHeader>
         {!inPresentationMode && showTemplateVariableControlBar && (
           <TemplateControlBar
             templates={dashboard && dashboard.templates}
@@ -600,7 +623,7 @@ const mstp = (state: any, {params: {dashboardID}}) => {
     annotations: {displaySetting},
     dashboardUI: {dashboards, cellQueryStatuses, zoomedTimeRange},
     sources,
-    auth: {me, isUsingAuth},
+    auth: {me, isUsingAuth, logoutLink},
     cellEditorOverlay: {timeRange: editorTimeRange},
   } = state
 
@@ -628,7 +651,10 @@ const mstp = (state: any, {params: {dashboardID}}) => {
     editorTimeRange,
     showTemplateVariableControlBar,
     annotationsDisplaySetting: displaySetting,
-  } as ReduxStateProps
+    logoutLink,
+    me,
+    links,
+  }
 }
 
 const mdtp = {

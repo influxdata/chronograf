@@ -54,6 +54,7 @@ interface Props {
   onRenameDashboard: (name: string) => Promise<void>
   dashboardLinks: DashboardsModels.DashboardSwitcherLinks
   isHidden: boolean
+  children?: JSX.Element
 }
 
 @ErrorHandling
@@ -105,6 +106,7 @@ class DashboardHeader extends Component<Props, State> {
       onSetTimeZone,
       onManualRefresh,
       handleChooseAutoRefresh,
+      children,
     } = this.props
     const {selected} = this.state
 
@@ -134,6 +136,7 @@ class DashboardHeader extends Component<Props, State> {
             shape={ButtonShape.Square}
             titleText="Enter Full-Screen Presentation Mode"
           />
+          {children}
         </Page.Header.Right>
       </Page.Header>
     )
