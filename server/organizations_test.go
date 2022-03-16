@@ -299,7 +299,7 @@ func TestService_UpdateOrganization(t *testing.T) {
 			wantBody:        `{"code":422,"message":"No fields to update"}`,
 		},
 		{
-			name: "Update Organization default role",
+			name: "Update Organization default role to viewer",
 			args: args{
 				w: httptest.NewRecorder(),
 				r: httptest.NewRequest(
@@ -330,6 +330,39 @@ func TestService_UpdateOrganization(t *testing.T) {
 			wantStatus:      http.StatusOK,
 			wantContentType: "application/json",
 			wantBody:        `{"links":{"self":"/chronograf/v1/organizations/1337"},"id":"1337","name":"The Good Place","defaultRole":"viewer"}`,
+		},
+		{
+			name: "Update Organization default role to reader",
+			args: args{
+				w: httptest.NewRecorder(),
+				r: httptest.NewRequest(
+					"GET",
+					"http://any.url", // can be any valid URL as we are bypassing mux
+					nil,
+				),
+				org: &organizationRequest{
+					DefaultRole: roles.ReaderRoleName,
+				},
+			},
+			fields: fields{
+				Logger: log.New(log.DebugLevel),
+				OrganizationsStore: &mocks.OrganizationsStore{
+					UpdateF: func(ctx context.Context, o *chronograf.Organization) error {
+						return nil
+					},
+					GetF: func(ctx context.Context, q chronograf.OrganizationQuery) (*chronograf.Organization, error) {
+						return &chronograf.Organization{
+							ID:          "1337",
+							Name:        "The Good Place",
+							DefaultRole: roles.MemberRoleName,
+						}, nil
+					},
+				},
+			},
+			id:              "1337",
+			wantStatus:      http.StatusOK,
+			wantContentType: "application/json",
+			wantBody:        `{"links":{"self":"/chronograf/v1/organizations/1337"},"id":"1337","name":"The Good Place","defaultRole":"reader"}`,
 		},
 		{
 			name: "Update Organization - invalid update",
