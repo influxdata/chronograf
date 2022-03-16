@@ -3,7 +3,11 @@ import React, {PureComponent} from 'react'
 import {withRouter, Link, WithRouterProps} from 'react-router'
 import {connect} from 'react-redux'
 
-import Authorized, {ADMIN_ROLE} from 'src/auth/Authorized'
+import Authorized, {
+  ADMIN_ROLE,
+  isUserAuthorized,
+  VIEWER_ROLE,
+} from 'src/auth/Authorized'
 
 import UserNavBlock from 'src/side_nav/components/UserNavBlock'
 
@@ -53,6 +57,11 @@ class SideNav extends PureComponent<Props> {
 
     const defaultSource = sources.find(s => s.default)
     const id = sourceID || _.get(defaultSource, 'id', 0)
+
+    if (isUsingAuth && !isUserAuthorized(me.role, VIEWER_ROLE)) {
+      // sidenav is available at least for VIEWER_ROLE
+      return null
+    }
 
     const sourcePrefix = `/sources/${id}`
     const dataExplorerLink = `${sourcePrefix}/chronograf/data-explorer`
