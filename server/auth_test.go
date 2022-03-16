@@ -194,6 +194,62 @@ func TestAuthorizedUser(t *testing.T) {
 			hasServerContext:       false,
 		},
 		{
+			name: "User with reader role is member authorized",
+			fields: fields{
+				UsersStore: &mocks.UsersStore{
+					GetF: func(ctx context.Context, q chronograf.UserQuery) (*chronograf.User, error) {
+						if q.Name == nil || q.Provider == nil || q.Scheme == nil {
+							return nil, fmt.Errorf("Invalid user query: missing Name, Provider, and/or Scheme")
+						}
+						return &chronograf.User{
+							ID:       1337,
+							Name:     "billysteve",
+							Provider: "google",
+							Scheme:   "oauth2",
+							Roles: []chronograf.Role{
+								{
+									Name:         roles.ReaderRoleName,
+									Organization: "1337",
+								},
+							},
+						}, nil
+					},
+				},
+				OrganizationsStore: &mocks.OrganizationsStore{
+					DefaultOrganizationF: func(ctx context.Context) (*chronograf.Organization, error) {
+						return &chronograf.Organization{
+							ID: "0",
+						}, nil
+					},
+					GetF: func(ctx context.Context, q chronograf.OrganizationQuery) (*chronograf.Organization, error) {
+						if q.ID == nil {
+							return nil, fmt.Errorf("Invalid organization query: missing ID")
+						}
+						return &chronograf.Organization{
+							ID:   "1337",
+							Name: "The ShillBillThrilliettas",
+						}, nil
+					},
+				},
+				Logger: clog.New(clog.DebugLevel),
+			},
+			args: args{
+				principal: &oauth2.Principal{
+					Subject:      "billysteve",
+					Issuer:       "google",
+					Organization: "1337",
+				},
+				scheme:  "oauth2",
+				role:    "member",
+				useAuth: true,
+			},
+			authorized:             true,
+			hasOrganizationContext: true,
+			hasSuperAdminContext:   false,
+			hasRoleContext:         true,
+			hasServerContext:       false,
+		},
+		{
 			name: "User with viewer role is member authorized",
 			fields: fields{
 				UsersStore: &mocks.UsersStore{

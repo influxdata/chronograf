@@ -43,10 +43,10 @@ func (r *organizationRequest) ValidDefaultRole() error {
 	}
 
 	switch r.DefaultRole {
-	case roles.MemberRoleName, roles.ViewerRoleName, roles.EditorRoleName, roles.AdminRoleName:
+	case roles.MemberRoleName, roles.ReaderRoleName, roles.ViewerRoleName, roles.EditorRoleName, roles.AdminRoleName:
 		return nil
 	default:
-		return fmt.Errorf("default role must be member, viewer, editor, or admin")
+		return fmt.Errorf("default role must be member, reader, viewer, editor, or admin")
 	}
 }
 
