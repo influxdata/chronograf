@@ -27,22 +27,25 @@ interface Props {
   links: Links
   logoutLink: string
   meChangeOrg: (meLink: string, orgID: OrgID) => Promise<void>
+  header?: boolean
 }
 
 @ErrorHandling
 class UserNavBlock extends PureComponent<Props> {
   public render() {
-    const {logoutLink, me, links, meChangeOrg} = this.props
-
+    const {logoutLink, me, links, meChangeOrg, header} = this.props
+    const extraModifier = header ? 'header' : 'sidenav'
     return (
-      <div className="sidebar--item">
+      <div className={`sidebar--item sidebar--${extraModifier}`}>
         <div className="sidebar--square">
           <div className="sidebar--icon icon user-outline" />
           {this.isSuperAdmin && (
             <span className="sidebar--icon sidebar--icon__superadmin icon crown2" />
           )}
         </div>
-        <div className="sidebar-menu sidebar-menu--user-nav">
+        <div
+          className={`sidebar-menu sidebar-menu--user-nav sidebar-menu--${extraModifier}`}
+        >
           {!!this.customLinks && (
             <div className="sidebar-menu--section sidebar-menu--section__custom-links">
               Custom Links
