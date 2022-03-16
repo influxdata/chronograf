@@ -220,10 +220,9 @@ func TestService_UpdateOrganization(t *testing.T) {
 		Logger             chronograf.Logger
 	}
 	type args struct {
-		w      *httptest.ResponseRecorder
-		r      *http.Request
-		org    *organizationRequest
-		setPtr bool
+		w   *httptest.ResponseRecorder
+		r   *http.Request
+		org *organizationRequest
 	}
 	tests := []struct {
 		name            string
@@ -296,7 +295,7 @@ func TestService_UpdateOrganization(t *testing.T) {
 			id:              "1337",
 			wantStatus:      http.StatusUnprocessableEntity,
 			wantContentType: "application/json",
-			wantBody:        `{"code":422,"message":"No fields to update"}`,
+			wantBody:        `{"code":422,"message":"no fields to update"}`,
 		},
 		{
 			name: "Update Organization default role to viewer",
@@ -389,7 +388,7 @@ func TestService_UpdateOrganization(t *testing.T) {
 			id:              "1337",
 			wantStatus:      http.StatusUnprocessableEntity,
 			wantContentType: "application/json",
-			wantBody:        `{"code":422,"message":"No fields to update"}`,
+			wantBody:        `{"code":422,"message":"no fields to update"}`,
 		},
 		{
 			name: "Update Organization - invalid role",
