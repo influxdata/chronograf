@@ -385,7 +385,7 @@ func TestService_UpdateOrganization(t *testing.T) {
 			id:              "1337",
 			wantStatus:      http.StatusUnprocessableEntity,
 			wantContentType: "application/json",
-			wantBody:        `{"code":422,"message":"default role must be member, viewer, editor, or admin"}`,
+			wantBody:        `{"code":422,"message":"default role must be member, reader, viewer, editor, or admin"}`,
 		},
 	}
 

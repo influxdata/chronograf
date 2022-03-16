@@ -59,10 +59,10 @@ func (r *userRequest) ValidRoles() error {
 			}
 			orgs[r.Organization] = true
 			switch r.Name {
-			case roles.MemberRoleName, roles.ViewerRoleName, roles.EditorRoleName, roles.AdminRoleName, roles.WildcardRoleName:
+			case roles.MemberRoleName, roles.ReaderRoleName, roles.ViewerRoleName, roles.EditorRoleName, roles.AdminRoleName, roles.WildcardRoleName:
 				continue
 			default:
-				return fmt.Errorf("Unknown role %s. Valid roles are 'member', 'viewer', 'editor', 'admin', and '*'", r.Name)
+				return fmt.Errorf("Unknown role %s. Valid roles are 'member', 'reader', 'viewer', 'editor', 'admin', and '*'", r.Name)
 			}
 		}
 	}
