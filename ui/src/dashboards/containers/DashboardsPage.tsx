@@ -31,9 +31,11 @@ import {
   notifyDashboardExportFailed,
 } from 'src/shared/copy/notifications'
 
-import {Source, Dashboard, RemoteDataState} from 'src/types'
+import {Source, Dashboard, RemoteDataState, Links, Me} from 'src/types'
 import {Notification} from 'src/types/notifications'
 import {DashboardFile, Cell} from 'src/types/dashboards'
+import UserNavBlock from 'src/side_nav/components/UserNavBlock'
+import {READER_ROLE} from 'src/auth/Authorized'
 
 export interface Props extends WithRouterProps {
   source: Source
@@ -48,6 +50,10 @@ export interface Props extends WithRouterProps {
   retainRangesDashTimeV1: (dashboardIDs: number[]) => void
   retainDashRefresh: (dashboardIDs: number[]) => void
   dashboards: Dashboard[]
+  isUsingAuth: boolean
+  logoutLink?: string
+  links?: Links
+  me: Me
 }
 
 interface State {
@@ -81,7 +87,16 @@ export class DashboardsPage extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {dashboards, notify, sources, source} = this.props
+    const {
+      dashboards,
+      notify,
+      sources,
+      source,
+      isUsingAuth,
+      me,
+      logoutLink,
+      links,
+    } = this.props
     const {dashboardsStatus} = this.state
     const dashboardLink = `/sources/${this.props.source.id}`
 
@@ -91,7 +106,17 @@ export class DashboardsPage extends PureComponent<Props, State> {
           <Page.Header.Left>
             <Page.Title title="Dashboards" />
           </Page.Header.Left>
-          <Page.Header.Right showSourceIndicator={true} />
+          <Page.Header.Right showSourceIndicator={true}>
+            {isUsingAuth && me.role === READER_ROLE ? (
+              <UserNavBlock
+                logoutLink={logoutLink}
+                links={links}
+                me={me}
+                sourcePrefix={`/sources/${source?.id}`}
+                header={true}
+              />
+            ) : undefined}
+          </Page.Header.Right>
         </Page.Header>
         <Page.Contents>
           <DashboardsContents
@@ -187,10 +212,16 @@ export class DashboardsPage extends PureComponent<Props, State> {
 const mapStateToProps = ({
   dashboardUI: {dashboards, dashboard},
   sources,
+  auth: {isUsingAuth, logoutLink, me},
+  links,
 }): Partial<Props> => ({
   dashboards,
   dashboard,
   sources,
+  isUsingAuth,
+  logoutLink,
+  me,
+  links,
 })
 
 const mapDispatchToProps = {
