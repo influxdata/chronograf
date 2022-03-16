@@ -1702,7 +1702,7 @@ func TestUserRequest_ValidCreate(t *testing.T) {
 				},
 			},
 			wantErr: true,
-			err:     fmt.Errorf("Unknown role BilliettaSpecialRole. Valid roles are 'member', 'viewer', 'editor', 'admin', and '*'"),
+			err:     fmt.Errorf("Unknown role BilliettaSpecialRole. Valid roles are 'member', 'reader', 'viewer', 'editor', 'admin', and '*'"),
 		},
 		{
 			name: "Invalid roles - missing organization",
@@ -1792,7 +1792,7 @@ func TestUserRequest_ValidUpdate(t *testing.T) {
 				},
 			},
 			wantErr: true,
-			err:     fmt.Errorf("Unknown role BillietaSpecialOrg. Valid roles are 'member', 'viewer', 'editor', 'admin', and '*'"),
+			err:     fmt.Errorf("Unknown role BillietaSpecialOrg. Valid roles are 'member', 'reader', 'viewer', 'editor', 'admin', and '*'"),
 		},
 		{
 			name: "Valid – roles empty",
@@ -1824,7 +1824,7 @@ func TestUserRequest_ValidUpdate(t *testing.T) {
 				},
 			},
 			wantErr: true,
-			err:     fmt.Errorf("Unknown role BillietaSpecialOrg. Valid roles are 'member', 'viewer', 'editor', 'admin', and '*'"),
+			err:     fmt.Errorf("Unknown role BillietaSpecialOrg. Valid roles are 'member', 'reader', 'viewer', 'editor', 'admin', and '*'"),
 		},
 		{
 			name: "Invalid - duplicate organization",
