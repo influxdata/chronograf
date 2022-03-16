@@ -4,6 +4,7 @@ import {connect} from 'react-redux'
 import {withRouter} from 'react-router'
 
 export const MEMBER_ROLE = 'member'
+export const READER_ROLE = 'reader'
 export const VIEWER_ROLE = 'viewer'
 export const EDITOR_ROLE = 'editor'
 export const ADMIN_ROLE = 'admin'
