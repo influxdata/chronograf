@@ -12,6 +12,14 @@ export const SUPERADMIN_ROLE = 'superadmin'
 
 export const isUserAuthorized = (meRole, requiredRole) => {
   switch (requiredRole) {
+    case READER_ROLE:
+      return (
+        meRole === READER_ROLE ||
+        meRole === VIEWER_ROLE ||
+        meRole === EDITOR_ROLE ||
+        meRole === ADMIN_ROLE ||
+        meRole === SUPERADMIN_ROLE
+      )
     case VIEWER_ROLE:
       return (
         meRole === VIEWER_ROLE ||
