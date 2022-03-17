@@ -35,7 +35,7 @@ import {Source, Dashboard, RemoteDataState, Links, Me} from 'src/types'
 import {Notification} from 'src/types/notifications'
 import {DashboardFile, Cell} from 'src/types/dashboards'
 import UserNavBlock from 'src/side_nav/components/UserNavBlock'
-import {READER_ROLE} from 'src/auth/Authorized'
+import {READER_ROLE} from 'src/auth/roles'
 
 export interface Props extends WithRouterProps {
   source: Source

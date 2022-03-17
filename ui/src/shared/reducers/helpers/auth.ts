@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-import {SUPERADMIN_ROLE, MEMBER_ROLE} from 'src/auth/Authorized'
+import {SUPERADMIN_ROLE, MEMBER_ROLE} from 'src/auth/roles'
 import {Me} from 'src/types/auth'
 
 export const getMeRole = (me: Me): string => {
