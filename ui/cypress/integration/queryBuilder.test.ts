@@ -28,11 +28,10 @@ describe('query builder', () => {
       cy.get('button').contains('Flux').click().should('have.class', 'active')
     })
 
-    cy.get('button').contains('Query Builder').click()
+    cy.get('button').contains('Script Builder').click()
   })
 
   it('create a query, change its aggregation function and fill missing values', () => {
-    let clusterID: string
     let queryTemplate: string
 
     cy.get('[data-testid="bucket-selector"]').within(() => {
@@ -48,17 +47,14 @@ describe('query builder', () => {
     cy.get('[data-testid="builder-card"]')
       .eq(1)
       .within(() => {
-        cy.get('.flux-query-builder--list-item')
+        cy.get('#flxts1_numSeries')
           .should('exist')
           .click({force: true})
-          .then(value => {
-            clusterID = value.text()
-          })
       })
 
     const checkQuery = (queryTemplate: string): void => {
       cy.get('.flux-query-builder--actions')
-        .contains('Query Editor')
+        .contains('Script Editor')
         .click({force: true})
       cy.get('.flux-script-wizard--bg-hint')
         .should('not.exist')
@@ -68,7 +64,7 @@ describe('query builder', () => {
           )
         })
 
-      cy.get('button').contains('Query Builder').click({force: true})
+      cy.get('button').contains('Script Builder').click({force: true})
     }
 
     cy.get('.flux-query-builder--actions')
@@ -79,7 +75,7 @@ describe('query builder', () => {
           'from(bucket: "_internal/monitor")' +
           '  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)' +
           '  |> filter(fn: (r) => r["_measurement"] == "database")' +
-          `  |> filter(fn: (r) => r["clusterID"] == "${clusterID}")` +
+          `  |> filter(fn: (r) => r["_field"] == "numSeries")` +
           '  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)' +
           '  |> yield(name: "mean")'
 
@@ -137,7 +133,7 @@ describe('query builder', () => {
           'from(bucket: "_internal/monitor")' +
           '  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)' +
           '  |> filter(fn: (r) => r["_measurement"] == "database")' +
-          `  |> filter(fn: (r) => r["clusterID"] == "${clusterID}")` +
+          `  |> filter(fn: (r) => r["_field"] == "numSeries")` +
           '  |> group(columns: ["_time"])' +
           '  |> aggregateWindow(every: 13s, fn: max, createEmpty: true)' +
           '  |> yield(name: "max")'
@@ -162,18 +158,22 @@ describe('query builder', () => {
       cy.get('.flux-query-builder--list-item')
         .contains('database')
         .click({force: true})
+
       cy.get('.flux-tag-selector--count').should('have.text', 1)
       cy.get('.flux-query-builder--list-item')
         .contains('cluster')
         .click({force: true})
+
       cy.get('.flux-tag-selector--count').should('have.text', 2)
       cy.get('.flux-query-builder--list-item')
         .contains('database')
         .click({force: true})
+
       cy.get('.flux-tag-selector--count').should('have.text', 1)
       cy.get('.flux-query-builder--list-item')
         .contains('cluster')
         .click({force: true})
+        
       cy.get('.flux-tag-selector--count').should('not.exist')
     })
   })
