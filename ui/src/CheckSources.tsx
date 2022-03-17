@@ -14,7 +14,7 @@ import {
   READER_ROLE,
   EDITOR_ROLE,
   ADMIN_ROLE,
-} from 'src/auth/Authorized'
+} from 'src/auth/roles'
 
 import {getSourceHealth} from 'src/sources/apis'
 import {getSourcesAsync} from 'src/shared/actions/sources'

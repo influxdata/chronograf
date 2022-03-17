@@ -34,7 +34,7 @@ import {
   SOURCE_TYPE_INFLUX_V2,
   SOURCE_TYPE_INFLUX_V1,
 } from 'src/shared/constants'
-import {SUPERADMIN_ROLE} from 'src/auth/Authorized'
+import {SUPERADMIN_ROLE} from 'src/auth/roles'
 
 // Types
 import {Source, Me} from 'src/types'

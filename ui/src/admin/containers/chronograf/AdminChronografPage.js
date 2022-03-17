@@ -10,11 +10,7 @@ import AllUsersPage from 'src/admin/containers/chronograf/AllUsersPage'
 import OrganizationsPage from 'src/admin/containers/chronograf/OrganizationsPage'
 import ProvidersPage from 'src/admin/containers/ProvidersPage'
 
-import {
-  isUserAuthorized,
-  ADMIN_ROLE,
-  SUPERADMIN_ROLE,
-} from 'src/auth/Authorized'
+import {isUserAuthorized, ADMIN_ROLE, SUPERADMIN_ROLE} from 'src/auth/roles'
 
 const sections = me => [
   {
