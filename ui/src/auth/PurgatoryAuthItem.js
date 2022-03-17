@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import {isUserAuthorized, READER_ROLE} from 'src/auth/Authorized'
+import {isUserAuthorized, READER_ROLE} from 'src/auth/roles'
 
 const PurgatoryAuthItem = ({roleAndOrg, onClickLogin, superAdmin}) => (
   <div

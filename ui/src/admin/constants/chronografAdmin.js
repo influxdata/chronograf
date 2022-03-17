@@ -4,7 +4,7 @@ import {
   EDITOR_ROLE,
   READER_ROLE,
   ADMIN_ROLE,
-} from 'src/auth/Authorized'
+} from 'src/auth/roles'
 
 export const USER_ROLES = [
   {name: MEMBER_ROLE},
