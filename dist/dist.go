@@ -1,10 +1,11 @@
 package dist
 
-//go:generate go-bindata -o dist_gen.go -ignore 'map|go' -pkg dist ../ui/build/...
+//go:generate go-bindata -o dist_gen.go -ignore 'map|go' -pkg dist ../ui/build/... ../ui/package.json
 
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 
 	assetfs "github.com/elazarl/go-bindata-assetfs"
@@ -97,4 +98,16 @@ func (b *BindataAssets) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Prefix:    b.Prefix,
 	}
 	http.FileServer(dir).ServeHTTP(w, r)
+}
+
+var re = regexp.MustCompile(`"version"\s*:\s*"(.*)"`)
+
+// GetVersion returns version of the packed assets
+func GetVersion() string {
+	if data, err := Asset("../ui/package.json"); err == nil {
+		if matches := re.FindStringSubmatch(string(data)); matches != nil {
+			return matches[1]
+		}
+	}
+	return ""
 }

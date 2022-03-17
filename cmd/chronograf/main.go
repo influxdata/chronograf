@@ -6,15 +6,28 @@ import (
 	"os"
 
 	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/dist"
 	"github.com/influxdata/chronograf/server"
 	flags "github.com/jessevdk/go-flags"
 )
 
 // Build flags
 var (
-	version = "1.8.0"
-	commit  = ""
+	version     = ""
+	commit      = ""
+	fullVersion = ""
 )
+
+func init() {
+	if version == "" {
+		// read version from bindata files
+		version = dist.GetVersion()
+	}
+	fullVersion = version
+	if commit != "" {
+		fullVersion = fmt.Sprintf("%s (git: %s)", version, commit)
+	}
+}
 
 func main() {
 	srv := server.Server{
@@ -39,7 +52,7 @@ func main() {
 	}
 
 	if srv.ShowVersion {
-		fmt.Printf("Chronograf %s (git: %s)\n", version, commit)
+		fmt.Printf("Chronograf %s\n", fullVersion)
 		os.Exit(0)
 	}
 
