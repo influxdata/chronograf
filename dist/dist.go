@@ -102,7 +102,7 @@ func (b *BindataAssets) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 var re = regexp.MustCompile(`"version"\s*:\s*"(.*)"`)
 
-// GetVersion returns version of the assets
+// GetVersion returns version of the packed assets
 func GetVersion() string {
 	if data, err := Asset("../ui/package.json"); err == nil {
 		if matches := re.FindStringSubmatch(string(data)); matches != nil {
