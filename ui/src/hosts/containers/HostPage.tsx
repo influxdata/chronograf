@@ -25,9 +25,10 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
 import {getCells} from 'src/hosts/utils/getCells'
 
-import {Source, Layout, TimeRange} from 'src/types'
+import {Source, Layout, TimeRange, TimeZones} from 'src/types'
 import {Location} from 'history'
 import {DashboardSwitcherLinks} from 'src/types/dashboards'
+import {setTimeZone} from 'src/shared/actions/app'
 
 interface Props {
   source: Source
@@ -41,6 +42,8 @@ interface Props {
   onManualRefresh: () => void
   handleChooseTimeRange: typeof setAutoRefresh
   handleClickPresentationButton: typeof delayEnablePresentationMode
+  timeZone: TimeZones
+  onSetTimeZone: typeof setTimeZone
 }
 
 interface State {
@@ -119,6 +122,8 @@ class HostPage extends PureComponent<Props, State> {
       inPresentationMode,
       handleClickPresentationButton,
       source,
+      timeZone,
+      onSetTimeZone,
     } = this.props
     const {timeRange, hostLinks, layouts} = this.state
 
@@ -137,6 +142,8 @@ class HostPage extends PureComponent<Props, State> {
           handleChooseTimeRange={this.handleChooseTimeRange}
           handleClickPresentationButton={handleClickPresentationButton}
           dashboardLinks={hostLinks}
+          timeZone={timeZone}
+          onSetTimeZone={onSetTimeZone}
         />
         <FancyScrollbar
           className={classnames({
@@ -206,16 +213,18 @@ class HostPage extends PureComponent<Props, State> {
 const mstp = ({
   app: {
     ephemeral: {inPresentationMode},
-    persisted: {autoRefresh},
+    persisted: {autoRefresh, timeZone},
   },
 }) => ({
   inPresentationMode,
   autoRefresh,
+  timeZone,
 })
 
 const mdtp = {
   handleChooseTimeRange: setAutoRefresh,
   handleClickPresentationButton: delayEnablePresentationMode,
+  onSetTimeZone: setTimeZone,
 }
 
 export default connect(mstp, mdtp)(ManualRefresh(ErrorHandling(HostPage)))

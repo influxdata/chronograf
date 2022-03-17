@@ -19,6 +19,8 @@
 1. [#5862](https://github.com/influxdata/chronograf/pull/5862): Respect BASE_PATH when serving API docs.
 1. [#5874](https://github.com/influxdata/chronograf/pull/5874): Propagate InfluxQL errors to UI.
 1. [#5878](https://github.com/influxdata/chronograf/pull/5878): Rename Flux Query to Flux Script.
+1. [#5885](https://github.com/influxdata/chronograf/pull/5885): Repair time zone selector on Host page.
+
 
 ### Other
 
