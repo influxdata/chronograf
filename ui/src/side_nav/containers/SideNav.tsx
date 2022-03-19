@@ -108,15 +108,15 @@ class SideNav extends PureComponent<Props> {
             'fluxtasks',
           ]}
           icon="alerts"
-          link={`${sourcePrefix}/tickscripts`}
+          link={`${sourcePrefix}/alert-rules`}
           location={location}
         >
           <NavHeader link={`${sourcePrefix}/tickscripts`} title="Alerting" />
-          <NavListItem link={`${sourcePrefix}/tickscripts`}>
-            TICKscripts
-          </NavListItem>
           <NavListItem link={`${sourcePrefix}/alert-rules`}>
             Alert Rules
+          </NavListItem>
+          <NavListItem link={`${sourcePrefix}/tickscripts`}>
+            TICKscripts
           </NavListItem>
           <NavListItem link={`${sourcePrefix}/flux-tasks`}>
             Flux Tasks
