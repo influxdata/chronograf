@@ -22,6 +22,7 @@
 1. [#5885](https://github.com/influxdata/chronograf/pull/5885): Repair time zone selector on Host page.
 1. [#5886](https://github.com/influxdata/chronograf/pull/5886): Report correct chronograf version.
 1. [#5888](https://github.com/influxdata/chronograf/pull/5888): Show failure reason on Queries page.
+1. [#5892](https://github.com/influxdata/chronograf/pull/5892): Reorder Alerting side menu.
 
 ### Other
 
