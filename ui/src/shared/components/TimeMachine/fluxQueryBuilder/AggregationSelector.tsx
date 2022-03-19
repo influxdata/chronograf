@@ -2,7 +2,6 @@ import React from 'react'
 
 import {connect} from 'react-redux'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
-import {fluxWizardError} from 'src/shared/copy/notifications'
 
 import {ComponentSize, SlideToggle} from 'src/reusable_ui'
 import ReactTooltip from 'react-tooltip'
@@ -122,16 +121,7 @@ const AggregationSelector = (props: Props & {children?: JSX.Element}) => {
               const newSelected = active
                 ? selectedFunctions.filter(x => x !== fn)
                 : [fn, ...selectedFunctions]
-              // at least one function must be selected
-              if (newSelected.length) {
-                setSelectedFunctions(newSelected)
-              } else {
-                props.notify(
-                  fluxWizardError(
-                    'You must have at least one aggregation function selected'
-                  )
-                )
-              }
+              setSelectedFunctions(newSelected)
             }
 
             const id = `flx-agrselect${fn}`
