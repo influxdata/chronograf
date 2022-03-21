@@ -2,6 +2,8 @@ name: "chronograf/cypress"
 
 on:
   pull_request:
+  schedule:
+    - cron: '30 5 * * 1-5'
 
 jobs:
   e2e:
