@@ -1,12 +1,7 @@
 name: "chronograf/cypress"
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - 'test-cypress'
-      - 'master'
-      - 'qa-cypress'
+  pull_request:
 
 jobs:
   e2e:
@@ -36,11 +31,19 @@ jobs:
 
       - name: Create Enterprise Test Resources
         run: |
-          kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.5.4/cert-manager.yaml
-          sleep 30 # wait for CertManager
+          helm repo add jetstack https://charts.jetstack.io
+          helm repo add influxdata https://helm.influxdata.com/
+          helm repo update
+          helm upgrade --wait --install \
+              cert-manager jetstack/cert-manager \
+              --namespace cert-manager \
+              --create-namespace \
+              --version v1.5.4 \
+              --set prometheus.enabled=false \
+              --set webhook.timeoutSeconds=30 \
+              --set installCRDs=true
           kubectl apply -f .github/workflows/resources/test-reources.yaml
           kubectl create secret generic influxdb-license --from-literal=INFLUXDB_ENTERPRISE_LICENSE_KEY=${INFLUXDB_ENTERPRISE_LICENSE_KEY}
-          helm repo add influxdata https://helm.influxdata.com/
           helm upgrade --install influxdb influxdata/influxdb-enterprise --namespace default --set-string envFromSecret=influxdb-license --set-string data.service.type=NodePort
           kubectl patch svc influxdb-influxdb-enterprise-data --type=json -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":30086}]'
         env:
@@ -57,12 +60,12 @@ jobs:
         run: |
           echo "InfluxDB data node status: $(curl -Isk "https://localhost:8086/ping" | head -n 1)"
           echo "Chronograf status: $(curl -Isk "http://localhost:8888" | head -n 1)"
-          cat out.log || exit 0
+          cat out.log || true
 
       - name: Cypress
         uses: addnab/docker-run-action@v3
         with:
-          image: cypress/included:8.7.0
+          image: cypress/included:9.5.2
           options: -i -v ${{ github.workspace }}/ui:/ui -w /ui --add-host=host.docker.internal:host-gateway
           shell: sh
           run: |
@@ -74,6 +77,6 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: logs
-          path: ui/*.log
+          path: "*.log"
           retention-days: 5
 
