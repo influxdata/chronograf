@@ -9,7 +9,6 @@ import FancyScrollbar from '../../FancyScrollbar'
 import {
   Button,
   ButtonShape,
-  ComponentColor,
   ComponentSize,
   ComponentStatus,
   IconFont,
@@ -18,7 +17,6 @@ import AggregationSelector from './AggregationSelector'
 import TagSelector from './TagSelector'
 import {notify as notifyActionCreator} from 'src/shared/actions/notifications'
 import {
-  fluxWizardError,
   notifyCopyToClipboardFailed,
   notifyCopyToClipboardSuccess,
 } from 'src/shared/copy/notifications'
@@ -28,11 +26,12 @@ import timeRangeWindowPeriod from './util/timeRangeWindowPeriod'
 import {RemoteDataState, TimeZones} from 'src/types'
 import {buildQuery} from './util/generateFlux'
 import {timeRangeLabel} from '../../TimeRangeLabel'
+import FluxQueryBuilderSubmit from './FluxQueryBuilderSubmit'
 
 interface OwnProps extends TimeMachineQueryProps {
   onSubmit: (script: string) => void
   onShowEditor: () => void
-  isRunnable: boolean
+  script: string
 }
 
 type Props = OwnProps & typeof mdtp & ReturnType<typeof mstp>
@@ -48,6 +47,7 @@ const FluxQueryBuilder = ({
   onSubmit,
   onShowEditor,
   onAddTagSelector,
+  script: editorScript,
 }: Props) => {
   const [defaultPeriod, timeRangeText] = useMemo(
     () => [
@@ -97,7 +97,7 @@ const FluxQueryBuilder = ({
             <Button
               shape={ButtonShape.Square}
               size={ComponentSize.ExtraSmall}
-              titleText="Copy builder query to clipboard"
+              titleText="Copy builder script to clipboard"
               icon={IconFont.Duplicate}
               status={
                 isRunnable ? ComponentStatus.Default : ComponentStatus.Disabled
@@ -115,12 +115,12 @@ const FluxQueryBuilder = ({
                   success
                     ? notifyCopyToClipboardSuccess(
                         null,
-                        'Query builder flux script has been copied to clipboard.',
+                        'Builder script has been copied to clipboard.',
                         ''
                       )
                     : notifyCopyToClipboardFailed(
                         null,
-                        'Query builder flux script was not copied to clipboard.',
+                        'Builder script was not copied to clipboard.',
                         ''
                       )
                 )
@@ -128,26 +128,12 @@ const FluxQueryBuilder = ({
                 e.preventDefault()
               }}
             />
-            <Button
-              size={ComponentSize.ExtraSmall}
-              color={ComponentColor.Primary}
-              onClick={() => {
-                try {
-                  const script = buildQuery(builderState)
-                  onSubmit(script)
-                } catch (ex) {
-                  console.error(ex)
-                  notify(
-                    fluxWizardError(
-                      'Unable to build flux script: ' + ex.message
-                    )
-                  )
-                }
-              }}
-              status={
-                isRunnable ? ComponentStatus.Default : ComponentStatus.Disabled
-              }
-              text="Submit"
+            <FluxQueryBuilderSubmit
+              isRunnable={isRunnable}
+              builderState={builderState}
+              editorScript={editorScript}
+              notify={notify}
+              onSubmit={onSubmit}
             />
           </div>
         </AggregationSelector>

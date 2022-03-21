@@ -172,6 +172,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
 
     return (
       <FluxQueryBuilder
+        script={draftScript}
         source={source}
         timeRange={timeRange}
         onSubmit={this.handleSubmitBuilderScript}
