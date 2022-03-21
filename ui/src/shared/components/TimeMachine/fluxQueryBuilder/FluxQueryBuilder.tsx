@@ -1,5 +1,5 @@
 // Libraries
-import React, {useMemo} from 'react'
+import React, {useCallback, useMemo} from 'react'
 import {connect} from 'react-redux'
 import copyToClipboard from 'copy-to-clipboard'
 
@@ -9,7 +9,6 @@ import FancyScrollbar from '../../FancyScrollbar'
 import {
   Button,
   ButtonShape,
-  ComponentColor,
   ComponentSize,
   ComponentStatus,
   IconFont,
@@ -28,6 +27,7 @@ import timeRangeWindowPeriod from './util/timeRangeWindowPeriod'
 import {RemoteDataState, TimeZones} from 'src/types'
 import {buildQuery} from './util/generateFlux'
 import {timeRangeLabel} from '../../TimeRangeLabel'
+import FluxQueryBuilderSubmit from './FluxQueryBuilderSubmit'
 
 interface OwnProps extends TimeMachineQueryProps {
   onSubmit: (script: string) => void
@@ -65,6 +65,15 @@ const FluxQueryBuilder = ({
     const builtScript = buildQuery(builderState)
     return editorScript !== builtScript
   }, [editorScript])
+  const submitAction = useCallback(() => {
+    try {
+      const script = buildQuery(builderState)
+      onSubmit(script)
+    } catch (ex) {
+      console.error(ex)
+      notify(fluxWizardError('Unable to build flux script: ' + ex.message))
+    }
+  }, [builderState, notify])
 
   return (
     <div className="flux-query-builder" data-testid="flux-query-builder">
@@ -137,28 +146,10 @@ const FluxQueryBuilder = ({
                 e.preventDefault()
               }}
             />
-            <Button
-              size={ComponentSize.ExtraSmall}
-              color={
-                isCustomScript ? ComponentColor.Warning : ComponentColor.Primary
-              }
-              onClick={() => {
-                try {
-                  const script = buildQuery(builderState)
-                  onSubmit(script)
-                } catch (ex) {
-                  console.error(ex)
-                  notify(
-                    fluxWizardError(
-                      'Unable to build flux script: ' + ex.message
-                    )
-                  )
-                }
-              }}
-              status={
-                isRunnable ? ComponentStatus.Default : ComponentStatus.Disabled
-              }
-              text="Submit"
+            <FluxQueryBuilderSubmit
+              isCustomScript={isCustomScript}
+              isRunnable={isRunnable}
+              submitAction={submitAction}
             />
           </div>
         </AggregationSelector>
