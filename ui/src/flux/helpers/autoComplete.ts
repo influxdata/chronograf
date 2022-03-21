@@ -64,6 +64,21 @@ export const EXCLUDED_KEYS = new Set([
   ' ',
 ])
 
+const V_OBJECT_SUGGESTIONS = [
+  {
+    text: 'timeRangeStart',
+    displayText: 'timeRangeStart',
+  },
+  {
+    text: 'timeRangeStop',
+    displayText: 'timeRangeStop',
+  },
+  {
+    text: 'windowPeriod',
+    displayText: 'windowPeriod',
+  },
+]
+
 export const getSuggestions = (
   editor: CMEditor,
   allSuggestions: Suggestion[]
@@ -101,6 +116,13 @@ export const getSuggestionsHelper = (
       cursorPosition,
       allSuggestions
     )
+  }
+  if (shouldCompleteVObject(currentLineText, cursorPosition)) {
+    return {
+      start: cursorPosition,
+      end: cursorPosition,
+      suggestions: V_OBJECT_SUGGESTIONS,
+    }
   }
 
   return {
@@ -167,6 +189,16 @@ const shouldCompleteParam = (currentLineText, cursorPosition) => {
   }
 
   return false
+}
+
+const shouldCompleteVObject = (currentLineText, cursorPosition) => {
+  // check whether "[ :]v." preceeds current position
+  const char1 = currentLineText[cursorPosition - 3]
+  return (
+    (char1 === ' ' || char1 === ':') &&
+    currentLineText[cursorPosition - 2] === 'v' &&
+    currentLineText[cursorPosition - 1] === '.'
+  )
 }
 
 export const getParamSuggestions = (

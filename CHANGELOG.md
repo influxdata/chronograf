@@ -14,6 +14,7 @@
 
 1. [#5856](https://github.com/influxdata/chronograf/pull/5856): Add alert rule options to not send alert on state recovery and send regardless of state change.
 1. [#5893](https://github.com/influxdata/chronograf/pull/5893): Make aggregation function selection optional.
+1. [#5894](https://github.com/influxdata/chronograf/pull/5894): Autocomplete builtin `v` object in Flux editor.
 
 ### Bug Fixes
 
