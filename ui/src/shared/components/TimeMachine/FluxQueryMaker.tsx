@@ -90,6 +90,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
       fluxProportions,
       onSetFluxProportions,
       timeRange,
+      script,
     } = this.props
     if (!this.state.isWizardActive) {
       const {suggestions, draftScriptStatus} = this.state
@@ -172,6 +173,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
 
     return (
       <FluxQueryBuilder
+        script={script}
         source={source}
         timeRange={timeRange}
         onSubmit={this.handleSubmitBuilderScript}

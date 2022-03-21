@@ -32,7 +32,7 @@ import {timeRangeLabel} from '../../TimeRangeLabel'
 interface OwnProps extends TimeMachineQueryProps {
   onSubmit: (script: string) => void
   onShowEditor: () => void
-  isRunnable: boolean
+  script: string
 }
 
 type Props = OwnProps & typeof mdtp & ReturnType<typeof mstp>
@@ -48,6 +48,7 @@ const FluxQueryBuilder = ({
   onSubmit,
   onShowEditor,
   onAddTagSelector,
+  script: editorScript,
 }: Props) => {
   const [defaultPeriod, timeRangeText] = useMemo(
     () => [
@@ -56,6 +57,14 @@ const FluxQueryBuilder = ({
     ],
     [timeRange, timeZone]
   )
+  // isCustomScript detects if the supplied script contains user changes
+  const isCustomScript = useMemo(() => {
+    if (!editorScript) {
+      return false
+    }
+    const builtScript = buildQuery(builderState)
+    return editorScript !== builtScript
+  }, [editorScript])
 
   return (
     <div className="flux-query-builder" data-testid="flux-query-builder">
@@ -130,7 +139,9 @@ const FluxQueryBuilder = ({
             />
             <Button
               size={ComponentSize.ExtraSmall}
-              color={ComponentColor.Primary}
+              color={
+                isCustomScript ? ComponentColor.Warning : ComponentColor.Primary
+              }
               onClick={() => {
                 try {
                   const script = buildQuery(builderState)
