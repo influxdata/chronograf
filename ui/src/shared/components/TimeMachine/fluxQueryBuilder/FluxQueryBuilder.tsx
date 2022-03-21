@@ -97,7 +97,7 @@ const FluxQueryBuilder = ({
             <Button
               shape={ButtonShape.Square}
               size={ComponentSize.ExtraSmall}
-              titleText="Copy builder query to clipboard"
+              titleText="Copy builder script to clipboard"
               icon={IconFont.Duplicate}
               status={
                 isRunnable ? ComponentStatus.Default : ComponentStatus.Disabled
@@ -115,12 +115,12 @@ const FluxQueryBuilder = ({
                   success
                     ? notifyCopyToClipboardSuccess(
                         null,
-                        'Query builder flux script has been copied to clipboard.',
+                        'Builder script has been copied to clipboard.',
                         ''
                       )
                     : notifyCopyToClipboardFailed(
                         null,
-                        'Query builder flux script was not copied to clipboard.',
+                        'Builder script was not copied to clipboard.',
                         ''
                       )
                 )
