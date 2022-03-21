@@ -1,5 +1,5 @@
 // Libraries
-import React, {useCallback, useMemo} from 'react'
+import React, {useMemo} from 'react'
 import {connect} from 'react-redux'
 import copyToClipboard from 'copy-to-clipboard'
 
@@ -17,7 +17,6 @@ import AggregationSelector from './AggregationSelector'
 import TagSelector from './TagSelector'
 import {notify as notifyActionCreator} from 'src/shared/actions/notifications'
 import {
-  fluxWizardError,
   notifyCopyToClipboardFailed,
   notifyCopyToClipboardSuccess,
 } from 'src/shared/copy/notifications'
@@ -57,23 +56,6 @@ const FluxQueryBuilder = ({
     ],
     [timeRange, timeZone]
   )
-  // isCustomScript detects if the supplied script contains user changes
-  const isCustomScript = useMemo(() => {
-    if (!editorScript) {
-      return false
-    }
-    const builtScript = buildQuery(builderState)
-    return editorScript !== builtScript
-  }, [editorScript])
-  const submitAction = useCallback(() => {
-    try {
-      const script = buildQuery(builderState)
-      onSubmit(script)
-    } catch (ex) {
-      console.error(ex)
-      notify(fluxWizardError('Unable to build flux script: ' + ex.message))
-    }
-  }, [builderState, notify])
 
   return (
     <div className="flux-query-builder" data-testid="flux-query-builder">
@@ -147,9 +129,11 @@ const FluxQueryBuilder = ({
               }}
             />
             <FluxQueryBuilderSubmit
-              isCustomScript={isCustomScript}
               isRunnable={isRunnable}
-              submitAction={submitAction}
+              builderState={builderState}
+              editorScript={editorScript}
+              notify={notify}
+              onSubmit={onSubmit}
             />
           </div>
         </AggregationSelector>

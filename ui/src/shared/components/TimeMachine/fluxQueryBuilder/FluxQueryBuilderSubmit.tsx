@@ -1,43 +1,96 @@
 // Libraries
-import React, {useRef, useState} from 'react'
+import React, {useMemo, useRef, useState} from 'react'
 import {
   Button,
   ComponentColor,
   ComponentSize,
   ComponentStatus,
 } from 'src/reusable_ui'
+import {fluxWizardError} from 'src/shared/copy/notifications'
+import {PublishNotificationActionCreator} from 'src/types/actions/notifications'
 import {ClickOutside} from '../../ClickOutside'
+import {QueryBuilderState} from './types'
+import {buildQuery} from './util/generateFlux'
 
 interface Props {
-  isCustomScript: boolean
   isRunnable: boolean
-  submitAction: () => void
+  onSubmit: (s: string) => void
+  editorScript: string
+  builderState: QueryBuilderState
+  notify: PublishNotificationActionCreator
 }
+const EMPTY_FN = () => {}
 
 const FluxQueryBuilderSubmit = ({
-  isCustomScript,
+  builderState,
   isRunnable,
-  submitAction,
+  editorScript,
+  onSubmit,
+  notify,
 }: Props) => {
+  if (!isRunnable) {
+    return (
+      <Button
+        size={ComponentSize.ExtraSmall}
+        color={ComponentColor.Primary}
+        onClick={EMPTY_FN}
+        status={ComponentStatus.Disabled}
+        text="Submit"
+        customClass="fqb--submit"
+      />
+    )
+  }
+
   const [showConfirm, setShowConfirm] = useState(false)
   const buttonRef = useRef<HTMLDivElement>()
-  if (isCustomScript && isRunnable) {
-    // TODO require confirmation when isCustomScript
-    // Submitting the query builder will discard any changes you have made
-    // using Flux. This cannot be recovered.
-    return (
-      <div ref={buttonRef}>
+  const lastConfirmedBuilderState = useMemo(() => {
+    return builderState
+  }, [editorScript])
+
+  return (
+    <div ref={buttonRef}>
+      {!showConfirm ? (
         <Button
           size={ComponentSize.ExtraSmall}
           color={ComponentColor.Primary}
-          onClick={() => setShowConfirm(true)}
-          status={
-            isRunnable ? ComponentStatus.Default : ComponentStatus.Disabled
-          }
+          onClick={() => {
+            try {
+              const script = buildQuery(builderState)
+              const lastScript = buildQuery(lastConfirmedBuilderState)
+              // submit directly if editor is empty, the generated query is the same as the editor query
+              // or if the builder was used to generate the new script
+              if (
+                !editorScript ||
+                script === editorScript ||
+                editorScript === lastScript
+              ) {
+                onSubmit(script)
+              } else {
+                setShowConfirm(true)
+              }
+            } catch (ex) {
+              console.error(ex)
+              notify(
+                fluxWizardError('Unable to build flux script: ' + ex.message)
+              )
+            }
+          }}
+          status={ComponentStatus.Default}
           text="Submit"
           customClass="fqb--submit"
         />
-        {showConfirm ? (
+      ) : (
+        <>
+          <Button
+            size={ComponentSize.ExtraSmall}
+            color={ComponentColor.Primary}
+            onClick={EMPTY_FN}
+            status={
+              isRunnable ? ComponentStatus.Default : ComponentStatus.Disabled
+            }
+            text="Submit"
+            customClass="fqb--submit"
+          />
           <div
             className="fqb--confirm-popup"
             style={{
@@ -47,36 +100,36 @@ const FluxQueryBuilderSubmit = ({
             }}
           >
             <span>
-              Submitting the query builder will overwrite the editor script and
-              can thus discard any changes you have made using Flux. This cannot
-              be recovered.
+              Submitting the Script Builder will overwrite the existing Flux
+              script, any changes you have made using Flux will be discarded.
+              This cannot be recovered.
             </span>
             <ClickOutside onClickOutside={() => setShowConfirm(false)}>
               <Button
                 size={ComponentSize.ExtraSmall}
                 color={ComponentColor.Danger}
                 onClick={() => {
-                  setShowConfirm(false)
-                  submitAction()
+                  try {
+                    const script = buildQuery(builderState)
+                    setShowConfirm(false)
+                    onSubmit(script)
+                  } catch (ex) {
+                    console.error(ex)
+                    notify(
+                      fluxWizardError(
+                        'Unable to build flux script: ' + ex.message
+                      )
+                    )
+                  }
                 }}
                 status={ComponentStatus.Default}
                 text="OK"
               />
             </ClickOutside>
           </div>
-        ) : null}
-      </div>
-    )
-  }
-  return (
-    <Button
-      size={ComponentSize.ExtraSmall}
-      color={ComponentColor.Primary}
-      onClick={submitAction}
-      status={isRunnable ? ComponentStatus.Default : ComponentStatus.Disabled}
-      text="Submit"
-      customClass="fqb--submit"
-    />
+        </>
+      )}
+    </div>
   )
 }
 
