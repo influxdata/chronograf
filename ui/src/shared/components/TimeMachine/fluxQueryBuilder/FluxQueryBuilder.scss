@@ -228,7 +228,7 @@ button.flux-query-builder--add-card-button {
   display: flex;
   z-index: 5000;
 
-  span {
+  .fqb--confirm-label {
     margin: 0 8px
   }
   > button {
@@ -236,4 +236,17 @@ button.flux-query-builder--add-card-button {
     background: #bf3d5e;
     background-image: linear-gradient(45deg, rgb(191, 61, 94) 0%, rgb(249, 95, 83) 100%)
   }
+}
+.fqb--confirm-caret {
+  content: "";
+  width: 0;
+  height: 0;
+  position: fixed;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid #ff8564;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  margin-top: -12px;
+  margin-left: -3px;
+  z-index: 9999;
 }

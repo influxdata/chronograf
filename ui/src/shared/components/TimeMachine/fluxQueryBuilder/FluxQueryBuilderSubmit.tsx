@@ -99,7 +99,7 @@ const FluxQueryBuilderSubmit = ({
               }px`,
             }}
           >
-            <span>
+            <span className="fqb--confirm-label">
               Submitting the Script Builder will overwrite the existing Flux
               script, any changes you have made using Flux will be discarded.
               This cannot be recovered.
@@ -127,6 +127,16 @@ const FluxQueryBuilderSubmit = ({
               />
             </ClickOutside>
           </div>
+          <span
+            className="fqb--confirm-caret"
+            style={{
+              left: `${
+                buttonRef.current.getBoundingClientRect().left +
+                buttonRef.current.getBoundingClientRect().width / 2
+              }px`,
+              top: `${buttonRef.current.getBoundingClientRect().bottom}px`,
+            }}
+          />
         </>
       )}
     </div>
