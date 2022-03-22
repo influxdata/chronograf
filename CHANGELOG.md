@@ -1,4 +1,12 @@
-## v1.9.4
+## v1.10
+
+### Features
+
+### Bug Fixes
+
+### Other
+
+## v1.9.4 [2022-03-22]
 
 ### Features
 
@@ -11,7 +19,6 @@
 1. [#5872](https://github.com/influxdata/chronograf/pull/5872): Open Alert Rule Builder from a TICKscript page.
 1. [#5879](https://github.com/influxdata/chronograf/pull/5879): Remove Manage Tasks page, add Alert Rules page.
 1. [#5881](https://github.com/influxdata/chronograf/pull/5881): Highlight that Script Builder keys/values depend on the selected time range.
-
 1. [#5856](https://github.com/influxdata/chronograf/pull/5856): Add alert rule options to not send alert on state recovery and send regardless of state change.
 1. [#5893](https://github.com/influxdata/chronograf/pull/5893): Make aggregation function selection optional.
 1. [#5894](https://github.com/influxdata/chronograf/pull/5894): Autocomplete builtin `v` object in Flux editor.
