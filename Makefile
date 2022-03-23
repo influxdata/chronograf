@@ -100,7 +100,22 @@ gen: internal.pb.go
 internal.pb.go: kv/internal/internal.proto
 	GO111MODULE=on go generate -x ./kv/internal
 
-test: jstest gotest gotestrace lint-ci
+test: gochecktidy gocheckfmt jstest gotest gotestrace lint-ci
+
+gochecktidy:
+	go mod tidy
+	if ! git --no-pager diff --exit-code -- go.mod go.sum; then\
+		echo modules are not tidy, please run 'go mod tidy';\
+		exit 1;\
+	fi
+
+gocheckfmt:
+	NOFMTFILES=`go fmt './...'` ; \
+	if [ ! -z "$$NOFMTFILES" ] ; then\
+		echo Unformatted files: $$NOFMTFILES ;\
+		echo Run \`go fmt ./...\` to fix it;\
+		exit 1;\
+	fi
 
 gotest:
 	GO111MODULE=on go test -timeout 10s ./...
