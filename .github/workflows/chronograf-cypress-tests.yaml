@@ -44,16 +44,20 @@ jobs:
               --set prometheus.enabled=false \
               --set webhook.timeoutSeconds=30 \
               --set installCRDs=true
-          kubectl apply -f .github/workflows/resources/test-reources.yaml
+          kubectl apply -f .github/workflows/resources/test-resources.yaml
           kubectl create secret generic influxdb-license --from-literal=INFLUXDB_ENTERPRISE_LICENSE_KEY=${INFLUXDB_ENTERPRISE_LICENSE_KEY}
           helm upgrade --install influxdb influxdata/influxdb-enterprise --namespace default --set-string envFromSecret=influxdb-license --set-string data.service.type=NodePort
           kubectl patch svc influxdb-influxdb-enterprise-data --type=json -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":30086}]'
         env:
           INFLUXDB_ENTERPRISE_LICENSE_KEY: "${{ secrets.INFLUXDB_ENTERPRISE_LICENSE_KEY }}"
 
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.15.0'
+      - run: npm install --global yarn
+
       - name: Chronograf
         run: |
-          npm install --global yarn
           make
           RUNNER_TRACKING_ID="" && (nohup ./chronograf > out.log 2>&1 &)
           sleep 10
@@ -67,18 +71,21 @@ jobs:
       - name: Cypress
         uses: addnab/docker-run-action@v3
         with:
-          image: cypress/included:9.5.2
-          options: -i -v ${{ github.workspace }}/ui:/ui -w /ui --add-host=host.docker.internal:host-gateway
+          image: cypress/browsers:node16.14.0-slim-chrome99-ff97
+          options: -i -v ${{ github.workspace }}:/chronograf -w /chronograf/ui --add-host=host.docker.internal:host-gateway
           shell: sh
           run: |
-            yarn install
-            npx browserslist@latest --update-db
-            cypress run --browser chrome --config baseUrl=http://host.docker.internal:8888
+            apt update
+            apt install -y build-essential
+            yarn install --frozen-lockfile
+            yarn run cypress run --browser chrome --config baseUrl=http://host.docker.internal:8888 --reporter junit --reporter-options 'mochaFile=cypress/results/results-[hash].xml'
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
+        if: success() || failure()
         with:
-          name: logs
-          path: "*.log"
-          retention-days: 5
+            name: results
+            path: |
+              out.log
+              ui/cypress/results/results-*.xml
 

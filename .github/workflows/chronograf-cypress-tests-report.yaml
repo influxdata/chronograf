@@ -1,0 +1,16 @@
+name: 'chronograf/cypress/report'
+on:
+  workflow_run:
+    workflows: ['chronograf/cypress']
+    types:
+      - completed
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: dorny/test-reporter@v1
+        with:
+          artifact: test-results
+          name: Cypress Tests
+          path: "*.xml"
+          reporter: java-junit
