@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     apt-transport-https \
