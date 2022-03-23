@@ -2069,7 +2069,7 @@ trigger
 				Trigger: "threshold",
 				AlertNodes: chronograf.AlertNodes{
 					IsStateChangesOnly: true,
-					IsNoRecoveries: true,
+					IsNoRecoveries:     true,
 					Slack: []*chronograf.Slack{
 						{},
 					},
