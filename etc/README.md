@@ -1,15 +1,31 @@
-## Builds
+# Builds
 
 Builds are run from a docker build image that is configured with the node and go we support.
 Our circle.yml uses this docker container to build, test and create release packages.
 
-### Updating new node/go versions
-After updating the Dockerfile_build run
+## Updating new node/go versions
 
-`docker build -t quay.io/influxdb/builder:chronograf-$(date "+%Y%m%d") -f Dockerfile_build .`
+Versions can be updated in `Dockerfile_build`. A new docker must be then built, published and used in CI.
 
-and push to quay with:
-`docker push quay.io/influxdb/builder:chronograf-$(date "+%Y%m%d")`
+### Step 1: Build New Docker Image and Save It to Quay
 
-### Update circle
-Update DOCKER_TAG in .circleci/config.yml to the new container.
+Having logged to quay.io with push permissions run:
+
+```sh
+cd $CHRONOGRAF_REPOSITORY_ROOT
+./etc/scripts/docker/build.sh
+```
+
+### OPTIONAL Step 2: Check the build image
+
+Run the image with:
+
+```sh
+export DOCKER_TAG="chronograf-$(date +%Y%m%d)"
+./etc/scripts/docker/run.sh
+```
+
+### Step 3: Update script and CircleCI
+
+1. Modify default tag in `etc/docker/run.sh`, replace with new one.
+2. Change DOCKER_TAG in `.circleci/config.yml`.
