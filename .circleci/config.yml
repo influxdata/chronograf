@@ -11,12 +11,6 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - e2e:
-          requires:
-            - build
-          filters:
-            tags:
-              only: /.*/
       - deploy-nightly:
           requires:
             - build
@@ -64,48 +58,6 @@ jobs:
           root: /home/circleci
           paths:
             - project
-
-  #### cypress e2e tests
-  e2e:
-    docker:
-      - image: cimg/go:1.17.1-browsers
-      - image: influxdb:2.0
-        environment:
-          INFLUXD_HTTP_BIND_ADDRESS: :9999
-          DOCKER_INFLUXDB_INIT_MODE: setup
-          DOCKER_INFLUXDB_INIT_USERNAME: my-user
-          DOCKER_INFLUXDB_INIT_PASSWORD: my-password
-          DOCKER_INFLUXDB_INIT_ORG: my-org
-          DOCKER_INFLUXDB_INIT_BUCKET: my-bucket
-          DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: my-token
-    environment:
-      GOCACHE: /tmp/go-cache
-    steps:
-      - browser-tools/install-chrome
-      - checkout
-      - restore_cache:
-          name: Restore Yarn Cache
-          keys:
-            - yarn-deps-lock-{{ checksum "yarn.lock" }}
-      - run: sudo apt-get update && sudo apt-get install netcat-openbsd
-      - run:
-          command: make
-      - run:
-          command: ./chronograf
-          background: true
-      - run:
-          command: make e2e
-      - store_test_results:
-          path: ui/cypress-jsunit-results.xml
-      - store_artifacts:
-          path: ui/cypress/videos
-          destination: videos
-      - store_artifacts:
-          path: ui/cypress/screenshots
-          destination: screenshots
-      - store_artifacts:
-          path: ui/cypress/snapshots
-          destination: snapshots
 
   deploy-nightly:
     environment:

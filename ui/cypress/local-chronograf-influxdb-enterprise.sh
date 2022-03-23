@@ -20,9 +20,9 @@ KUBE_CONFIG="${CWD}/kube-config"
 
 # cleanup on exit (useful for running locally)
 cleanup() {
-    "${KIND}" delete cluster || true
-    [[ -f ${CHRONO_PID} ]] && kill "$(cat ${CHRONO_PID})" && rm -rf "${CHRONO_PID}"
-    rm -rf "${BIN_DIR}" "${KUBE_CONFIG}" "${LOG}"
+    "${KIND}" delete cluster >/dev/null 2>&1 || true
+    [[ -f ${CHRONO_PID} ]] && kill "$(cat ${CHRONO_PID})"
+    rm -rf "${CHRONO_PID}" "${BIN_DIR}" "${KUBE_CONFIG}" "${LOG}" >/dev/null 2>&1
 }
 
 # util to install a released kind version into ${BIN_DIR}
@@ -56,7 +56,7 @@ deploy_influxdb_ent() {
         --set prometheus.enabled=false \
         --set webhook.timeoutSeconds=30 \
         --set installCRDs=true
-    kubectl apply -f "${RWD}/.github/workflows/resources/test-reources.yaml"
+    kubectl apply -f "${RWD}/.github/workflows/resources/test-resources.yaml"
     kubectl create secret generic influxdb-license --from-literal=INFLUXDB_ENTERPRISE_LICENSE_KEY="${LICENSE_KEY}"
     helm upgrade --wait --install influxdb influxdata/influxdb-enterprise --namespace default --set-string envFromSecret=influxdb-license --set-string data.service.type=NodePort
     kubectl patch svc influxdb-influxdb-enterprise-data --type=json -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":30086}]'
