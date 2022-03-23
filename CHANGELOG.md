@@ -9,6 +9,7 @@
 1. [#5875](https://github.com/influxdata/chronograf/pull/5875): Upgrade to node 16 LTS.
 1. [#5896](https://github.com/influxdata/chronograf/pull/5896): Add cypress tests with github workflows.
 1. [#5898](https://github.com/influxdata/chronograf/pull/5898): Upgrade javascript dependencies.
+1. [#5754](https://github.com/influxdata/chronograf/pull/5754): Upgrade golang to 1.18.
 
 ## v1.9.4 [2022-03-22]
 
