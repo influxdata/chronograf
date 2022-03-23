@@ -59,15 +59,7 @@ To add a dependency via Yarn, for example, run `yarn add <dependency>` from with
 
 ## Installing Go
 
-Chronograf requires Go 1.16 or higher.
-
-## Installing & Using Dep
-
-You'll need to install Dep to manage the backend (Go) dependencies.
-
-* [Install Dep](https://github.com/golang/dep)
-
-To add a dependency via Dep, for example, run `dep ensure -add <dependency>` from within the `/chronograf` directory. _Note that as of this writing, `dep ensure` will modify many extraneous vendor files, so you'll need to run `dep prune` to clean this up before committing your changes. Apparently, the next version of `dep` will take care of this step for you._
+Chronograf requires Go 1.18 or higher.
 
 ## Revision Control Systems
 
