@@ -5,8 +5,6 @@ Our circle.yml uses this docker container to build, test and create release pack
 
 ## Updating new node/go versions
 
-Prereqs -- have python3.
-
 ### Step 1: Build New Docker Image and Save It to Quay
 
 Having logged to quay.io with push permissions run:
