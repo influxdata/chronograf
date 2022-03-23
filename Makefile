@@ -105,7 +105,7 @@ test: gochecktidy gocheckfmt jstest gotest gotestrace lint-ci
 gochecktidy:
 	go mod tidy
 	if ! git --no-pager diff --exit-code -- go.mod go.sum; then\
-		echo modules are not tidy, please run \`go mod tidy\` ! ;\
+		echo Modules are not tidy, please run \`go mod tidy\` ! ;\
 		exit 1;\
 	fi
 
