@@ -186,7 +186,7 @@ docker pull chronograf:latest
   1.5.x+ to create and store alerts.
 
 1. [Install Go 1.16](https://golang.org/doc/install)
-1. [Install Node (version 14 LTS)](https://nodejs.org/en/about/releases/)
+1. [Install Node (version 16 LTS)](https://nodejs.org/en/about/releases/)
 1. [Install yarn](https://yarnpkg.com/docs/install)
 1. [Setup your GOPATH](https://golang.org/doc/code.html#GOPATH)
 1. Build the Chronograf package:
