@@ -105,7 +105,7 @@ test: gochecktidy gocheckfmt jstest gotest gotestrace lint-ci
 gochecktidy:
 	go mod tidy
 	if ! git --no-pager diff --exit-code -- go.mod go.sum; then\
-		echo modules are not tidy, please run 'go mod tidy';\
+		echo modules are not tidy, please run \`go mod tidy\` ! ;\
 		exit 1;\
 	fi
 
@@ -113,7 +113,7 @@ gocheckfmt:
 	NOFMTFILES=`go fmt './...'` ; \
 	if [ ! -z "$$NOFMTFILES" ] ; then\
 		echo Unformatted files: $$NOFMTFILES ;\
-		echo Run \`go fmt ./...\` to fix it;\
+		echo Run \`go fmt ./...\` to fix it ! ;\
 		exit 1;\
 	fi
 
