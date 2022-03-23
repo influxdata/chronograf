@@ -6,6 +6,7 @@ Our circle.yml uses this docker container to build, test and create release pack
 ## Updating new node/go versions
 
 Versions can be updated in `Dockerfile_build`. A new docker must be then built, published and used in CI.
+
 ### Step 1: Build New Docker Image and Save It to Quay
 
 Having logged to quay.io with push permissions run:
