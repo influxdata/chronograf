@@ -5,6 +5,7 @@ Our circle.yml uses this docker container to build, test and create release pack
 
 ## Updating new node/go versions
 
+Versions can be updated in `Dockerfile_build`. A new docker must be then built, published and used in CI.
 ### Step 1: Build New Docker Image and Save It to Quay
 
 Having logged to quay.io with push permissions run:
@@ -23,7 +24,7 @@ export DOCKER_TAG="chronograf-$(date +%Y%m%d)"
 ./etc/scripts/docker/run.sh
 ```
 
-### Step 3: Update script and circle
+### Step 3: Update script and CircleCI
 
-1. Check default tag in `etc/docker/run.sh`, replace with new one.
-2. Check DOCKER_TAG in .circleci/config.yml to the new container.
+1. Modify default tag in `etc/docker/run.sh`, replace with new one.
+2. Change DOCKER_TAG in `.circleci/config.yml`.
