@@ -355,5 +355,13 @@
     "@typescript-eslint/type-annotation-spacing": "off",
     "@typescript-eslint/unbound-method": "off",
     "@typescript-eslint/unified-signatures": "error"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["*.js"],
+      "rules": {
+        "@typescript-eslint/no-unsafe-argument": "off"
+      }
+    }
+  ]
 }
