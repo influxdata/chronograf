@@ -1,4 +1,4 @@
-export type TimeSeriesValue = string | number | null
+export type TimeSeriesValue = string | number | boolean | null
 
 export interface TimeSeriesSeries {
   name?: string
