@@ -13,11 +13,8 @@ describe('parseHandlersFromRule', () => {
   it('returns empty things if rule is new and config is empty', () => {
     const input1 = emptyRule
     const input2 = emptyConfigResponse
-    const {
-      handlersOnThisAlert,
-      selectedHandler,
-      handlersOfKind,
-    } = parseHandlersFromRule(input1, input2)
+    const {handlersOnThisAlert, selectedHandler, handlersOfKind} =
+      parseHandlersFromRule(input1, input2)
 
     expect(handlersOnThisAlert).toEqual([])
     expect(selectedHandler).toEqual(null)
@@ -27,11 +24,8 @@ describe('parseHandlersFromRule', () => {
   it('returns values if rule and config are not empty', () => {
     const input1 = rule
     const input2 = handlersFromConfig
-    const {
-      handlersOnThisAlert,
-      selectedHandler,
-      handlersOfKind,
-    } = parseHandlersFromRule(input1, input2)
+    const {handlersOnThisAlert, selectedHandler, handlersOfKind} =
+      parseHandlersFromRule(input1, input2)
 
     expect(handlersOnThisAlert).toEqual(handlersOnThisAlertExpected)
     expect(selectedHandler).toEqual(selectedHandlerExpected)
