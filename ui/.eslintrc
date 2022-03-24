@@ -324,6 +324,7 @@
         "hoist": "all"
       }
     ],
+    "@typescript-eslint/no-unsafe-argument": "off",
     "@typescript-eslint/no-unsafe-assignment": "off",
     "@typescript-eslint/no-unsafe-call": "off",
     "@typescript-eslint/no-unsafe-member-access": "off",
@@ -361,6 +362,12 @@
       "files": ["*.js"],
       "rules": {
         "@typescript-eslint/no-unsafe-argument": "off"
+      }
+    },
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {
+        "babel/no-invalid-this": "off"
       }
     }
   ]
