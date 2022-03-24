@@ -94,7 +94,7 @@ const updateMaxWidths = (
         colValue = toFixed(col, decimalPlaces)
       }
 
-      const columnLabel = topRow[c]
+      const columnLabel = topRow[c] as string
       const isTimeColumn =
         columnLabel === DEFAULT_INFLUXQL_TIME_FIELD.internalName ||
         columnLabel === DEFAULT_FLUX_TIME_FIELD.internalName

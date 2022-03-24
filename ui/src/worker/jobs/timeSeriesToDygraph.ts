@@ -37,7 +37,10 @@ export const timeSeriesToDygraphWork = (
 
   const timeSeries = fastMap<TimeSeries, DygraphValue[]>(
     sortedTimeSeries,
-    ({time, values}) => [new Date(time), ...values]
+    ({time, values}) => [
+      new Date(time as string),
+      ...(values as Array<string | number | null>),
+    ]
   )
 
   const dygraphSeries = fastReduce<Label, DygraphSeries>(

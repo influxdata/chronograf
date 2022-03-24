@@ -7,7 +7,7 @@ import {
   computeFieldOptions,
 } from 'src/dashboards/utils/tableGraph'
 
-import {InfluxQLQueryType} from 'src/types/series'
+import {InfluxQLQueryType, TimeSeriesServerResponse} from 'src/types/series'
 import {DataType} from 'src/shared/constants'
 
 import {DEFAULT_SORT_DIRECTION} from 'src/shared/constants/tableGraph'
@@ -432,7 +432,7 @@ it('parses a two-column meta query with same first column values', () => {
 })
 
 it('parses meta query with multiple columns with one series', () => {
-  const metaQueryResponse = [
+  const metaQueryResponse: TimeSeriesServerResponse[] = [
     {
       response: {
         results: [
@@ -452,7 +452,6 @@ it('parses meta query with multiple columns with one series', () => {
             ],
           },
         ],
-        uuid: '2f0e3400-d240-11e8-8c53-9748e5c2a80a',
       },
     },
   ]
