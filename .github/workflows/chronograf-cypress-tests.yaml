@@ -20,6 +20,12 @@ jobs:
         with:
           go-version: '1.16.4'
 
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.15.0'
+      - run: if [ ! -x "$(command -v yarn)" ]; then npm install -g yarn; fi
+      - run: yarn node --version
+
       - name: Setup Helm
         uses: azure/setup-helm@v1
         with:
@@ -50,11 +56,6 @@ jobs:
           kubectl patch svc influxdb-influxdb-enterprise-data --type=json -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":30086}]'
         env:
           INFLUXDB_ENTERPRISE_LICENSE_KEY: "${{ secrets.INFLUXDB_ENTERPRISE_LICENSE_KEY }}"
-
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14.15.0'
-      - run: npm install --global yarn
 
       - name: Chronograf
         run: |

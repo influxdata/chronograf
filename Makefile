@@ -136,7 +136,6 @@ clean:
 	cd ui && rm -rf node_modules
 	rm -f dist/dist_gen.go canned/bin_gen.go protoboards/bin_gen.go server/swagger_gen.go
 	@rm -f .godep .jsdep .jssrc .bindata
-	./ui/cypress/local-chronograf-influxdb-enterprise.sh 0 1
 
 ctags:
 	ctags -R --languages="Go" --exclude=.git --exclude=ui .
