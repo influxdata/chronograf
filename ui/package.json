@@ -85,7 +85,7 @@
     "jest-runner-eslint": "^0.10.0",
     "node-sass": "^7.0.0",
     "parcel": "1.12.3",
-    "prettier": "^2.2.1",
+    "prettier": "2.2.1",
     "sass": "^1.26.3",
     "ts-jest": "^26.5.3",
     "tslib": "^1.9.0",
