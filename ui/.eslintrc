@@ -7,7 +7,7 @@
     "eslint-plugin-react",
     "react",
     "prettier",
-    "babel",
+    "@babel",
     "jest"
   ],
   "settings": {
@@ -247,7 +247,7 @@
     "react/sort-comp": 0,
     "jest/no-disabled-tests": "warn",
     "jest/no-focused-tests": "error",
-    "babel/no-invalid-this": 1,
+    "@babel/no-invalid-this": 1,
     "@typescript-eslint/adjacent-overload-signatures": "error",
     "@typescript-eslint/array-type": [
       "error",
@@ -367,7 +367,7 @@
     {
       "files": ["*.ts", "*.tsx"],
       "rules": {
-        "babel/no-invalid-this": "off"
+        "@babel/no-invalid-this": "off"
       }
     }
   ]
