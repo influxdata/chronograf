@@ -39,8 +39,12 @@ export const timeSeriesToTableGraphWork = (
   raw: TimeSeriesServerResponse[]
 ): TimeSeriesToTableGraphReturnType => {
   const isTable = true
-  const {sortedLabels, sortedTimeSeries, queryType, metaQuerySeries} =
-    groupByTimeSeriesTransform(raw, isTable)
+  const {
+    sortedLabels,
+    sortedTimeSeries,
+    queryType,
+    metaQuerySeries,
+  } = groupByTimeSeriesTransform(raw, isTable)
 
   if (queryType === InfluxQLQueryType.MetaQuery) {
     return {data: metaQuerySeries, sortedLabels, influxQLQueryType: queryType}
