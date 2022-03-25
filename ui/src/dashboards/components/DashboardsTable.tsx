@@ -153,6 +153,7 @@ class DashboardsTable extends PureComponent<Props> {
           <button
             className="btn btn-sm btn-primary"
             onClick={onCreateDashboard}
+            data-test="create-dashboard"
           >
             <span className="icon plus" /> Create Dashboard
           </button>

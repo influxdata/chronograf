@@ -97,6 +97,7 @@ export default class ColorDropdown extends Component<Props, State> {
               }
               key={i}
               onClick={this.handleColorClick(color)}
+              data-test="base-colour"
             >
               <span
                 className="color-dropdown--swatch"

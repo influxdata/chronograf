@@ -10,7 +10,7 @@ COMMIT ?= $(shell git rev-parse --short=8 HEAD)
 YARN := $(shell command -v yarn 2> /dev/null)
 
 SOURCES := $(shell find . -name '*.go' ! -name '*_gen.go' -not -path "./vendor/*" )
-UISOURCES := $(shell find ui -type f -not \( -path ui/build/\* -o -path ui/node_modules/\* -prune \) )
+UISOURCES := $(shell find ui -type f -not \( -path ui/build/\* -o -path ui/node_modules/\* -o -path ui/cypress/\* -prune \) )
 
 unexport LDFLAGS
 ifdef VERSION
@@ -123,6 +123,12 @@ run: ${BINARY}
 run-dev: chronogiraffe
 	mkdir -p ui/build
 	./chronograf -d --log-level=debug
+
+e2e-prepare:
+	./ui/cypress/local-chronograf-influxdb-enterprise.sh
+
+e2e:
+	cd ui && yarn test:e2e
 
 clean:
 	if [ -f ${BINARY} ] ; then rm ${BINARY} ; fi
