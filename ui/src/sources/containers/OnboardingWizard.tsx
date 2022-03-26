@@ -98,7 +98,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
             <SourceStep
               ref={c => (this.sourceStepRef = c)}
               setError={this.handleSetSourceError}
-              source={source}
+              source={source as Source}
               onBoarding={true}
               me={me}
               isUsingAuth={isUsingAuth}
@@ -114,7 +114,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
             previousLabel="Go Back"
           >
             <DashboardStep
-              source={source}
+              source={source as Source}
               countSelected={this.countSelected}
               dashboardsCreated={dashboardsCreated}
               ref={c => (this.dashboardStepRef = c)}
@@ -131,9 +131,9 @@ class OnboardingWizard extends PureComponent<Props, State> {
             previousLabel="Go Back"
           >
             <KapacitorStep
-              ref={c => (this.kapacitorStepRef = c)}
+              ref={(c: any) => (this.kapacitorStepRef = c)}
               setError={this.handleSetKapacitorError}
-              source={source}
+              source={source as Source}
               onBoarding={true}
             />
           </WizardStep>

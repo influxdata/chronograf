@@ -38,7 +38,7 @@ interface Props {
   setError: (b: boolean) => void
   sources: Source[]
   onBoarding?: boolean
-  kapacitor: Kapacitor
+  kapacitor?: Kapacitor
   deleteKapacitor: sourcesActions.DeleteKapacitor
   setActiveKapacitor: sourcesActions.SetActiveKapacitor
   fetchKapacitors: sourcesActions.FetchKapacitorsAsync
