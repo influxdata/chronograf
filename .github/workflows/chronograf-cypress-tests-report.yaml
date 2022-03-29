@@ -11,7 +11,7 @@ jobs:
       - uses: dorny/test-reporter@v1
         if: success() || failure()
         with:
-          artifact: test-results
+          artifact: results
           name: Cypress Tests
-          path: "*.xml"
+          path: "ui/cypress/results/results-*.xml"
           reporter: java-junit
