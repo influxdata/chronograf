@@ -94,20 +94,6 @@ describe('query builder', () => {
       })
 
       cy.get('.builder-card--contents').within(() => {
-        cy.get('#flx-agrselectmean').click()
-
-        // Temporarily jump outside the builder-card--body element scope to check whether or not notification error message popped up
-        cy.document()
-          .its('body')
-          .within(() => {
-            cy.get('.notification-error')
-              .should('exist')
-              .and(
-                'have.text',
-                'You must have at least one aggregation function selected'
-              )
-          })
-
         cy.get('#flx-agrselectmax').click()
         cy.get('#flx-agrselectmean').click()
       })
