@@ -13,5 +13,5 @@ jobs:
         with:
           artifact: results
           name: Cypress Tests
-          path: "ui/cypress/results/"
+          path: ui/cypress/results/results-*.xml
           reporter: java-junit
