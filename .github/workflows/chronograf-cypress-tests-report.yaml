@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: dorny/test-reporter@v1
+        if: success() || failure()
         with:
           artifact: test-results
           name: Cypress Tests
