@@ -1,4 +1,4 @@
-import {Dispatch} from 'redux'
+import {Dispatch, Action as ReduxAction} from 'redux'
 
 import {getLinks as getLinksAJAX} from 'src/shared/apis/links'
 
@@ -38,9 +38,7 @@ const linksGetFailed = (): LinksGetFailedAction => ({
 })
 
 export const getLinksAsync = () => async (
-  dispatch: Dispatch<
-    LinksGetRequestedAction | LinksGetCompletedAction | LinksGetFailedAction
-  >
+  dispatch: Dispatch<ReduxAction>
 ): Promise<void> => {
   dispatch(linksGetRequested())
   try {
