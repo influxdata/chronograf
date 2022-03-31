@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {connect} from 'react-redux'
+import {connect, ResolveThunks} from 'react-redux'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import * as sourcesActions from 'src/shared/actions/sources'
@@ -14,7 +14,7 @@ import {
   notifySourceDeleteFailed,
 } from 'src/shared/copy/notifications'
 
-import {Source, Notification} from 'src/types'
+import {Source} from 'src/types'
 import {ToggleWizard} from 'src/types/wizard'
 
 interface State {
@@ -24,15 +24,22 @@ interface State {
   showNewKapacitor: boolean
 }
 
-interface Props {
-  source: Source
+interface ReduxStateProps {
   sources: Source[]
-  notify: (n: Notification) => void
-  deleteKapacitor: sourcesActions.DeleteKapacitorAsync
-  fetchKapacitors: sourcesActions.FetchKapacitorsAsync
-  removeAndLoadSources: sourcesActions.RemoveAndLoadSources
-  setActiveKapacitor: sourcesActions.SetActiveKapacitorAsync
 }
+
+type ReduxDispatchProps = ResolveThunks<{
+  notify: typeof notifyAction
+  removeAndLoadSources: typeof sourcesActions.removeAndLoadSources
+  fetchKapacitors: typeof sourcesActions.fetchKapacitorsAsync
+  setActiveKapacitor: typeof sourcesActions.setActiveKapacitorAsync
+  deleteKapacitor: typeof sourcesActions.deleteKapacitorAsync
+}>
+interface OwnProps {
+  source: Source
+}
+
+type Props = OwnProps & ReduxStateProps & ReduxDispatchProps
 
 const VERSION = process.env.npm_package_version
 
@@ -137,9 +144,10 @@ class ManageSources extends PureComponent<Props, State> {
   }
 }
 
-const mstp = ({sources}) => ({
-  sources,
-})
+const mstp = ({sources}) =>
+  ({
+    sources,
+  } as ReduxStateProps)
 
 const mdtp = {
   notify: notifyAction,
