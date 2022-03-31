@@ -1,6 +1,6 @@
 // Libraries
 import React, {MouseEvent, PureComponent} from 'react'
-import {connect} from 'react-redux'
+import {connect, ResolveThunks} from 'react-redux'
 
 // APIs
 import {getKapacitors, pingKapacitor} from 'src/shared/apis'
@@ -23,13 +23,13 @@ import {Source, Kapacitor, RemoteDataState} from 'src/types'
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import NoKapacitorError from 'src/shared/components/NoKapacitorError'
-
-interface Props {
+interface ReduxDispatchProps {
   // connected props
   notify: typeof mdtp.notify
   setActiveKapacitor: typeof mdtp.setActiveKapacitor
+}
 
-  // own props
+interface OwnProps {
   title: string
   source: Source
   tooltip?: string
@@ -40,6 +40,7 @@ interface Props {
   ) => JSX.Element
 }
 
+type Props = OwnProps & ResolveThunks<ReduxDispatchProps>
 interface State {
   loading: RemoteDataState
   scrollTop: number
