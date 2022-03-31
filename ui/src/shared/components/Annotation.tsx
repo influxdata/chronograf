@@ -17,7 +17,6 @@ interface Props {
 const Annotation: FunctionComponent<Props> = ({
   mode,
   dygraph,
-  dWidth,
   xAxisRange,
   annotation,
   staticLegendHeight,
@@ -28,7 +27,6 @@ const Annotation: FunctionComponent<Props> = ({
         mode={mode}
         dygraph={dygraph}
         annotation={annotation}
-        dWidth={dWidth}
         staticLegendHeight={staticLegendHeight}
         xAxisRange={xAxisRange}
       />
@@ -37,7 +35,6 @@ const Annotation: FunctionComponent<Props> = ({
         mode={mode}
         dygraph={dygraph}
         annotation={annotation}
-        dWidth={dWidth}
         staticLegendHeight={staticLegendHeight}
         xAxisRange={xAxisRange}
       />
