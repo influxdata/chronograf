@@ -2,8 +2,8 @@
 import {Source} from 'src/types'
 
 export interface Query {
-  text: string
-  id: string
+  text?: string
+  id?: string
   queryConfig: QueryConfig
   type: string
 }

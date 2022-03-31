@@ -95,7 +95,7 @@ class Layout extends Component<Props, State> {
       templates,
       source,
     } = this.props
-    const {cellFluxData, visType} = this.state
+    const {visType} = this.state
     const showRawFluxData = visType === VisType.Table
 
     return (
@@ -120,9 +120,7 @@ class Layout extends Component<Props, State> {
         source={source}
         cellNote={cell.note}
         cellNoteVisibility={cell.noteVisibility}
-        rawData={cellFluxData}
         showRawFluxData={showRawFluxData}
-        visType={this.visType}
       />
     )
   }

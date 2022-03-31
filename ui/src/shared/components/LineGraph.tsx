@@ -51,7 +51,7 @@ interface Props {
   cellHeight: number
   staticLegend: boolean
   onZoom: () => void
-  handleSetHoverTime: () => void
+  handleSetHoverTime: (t: string) => void
   activeQueryIndex?: number
   onUpdateVisType?: (type: CellType) => Promise<void>
 }
