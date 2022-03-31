@@ -1,21 +1,32 @@
 import React, {PureComponent} from 'react'
 import {withRouter, WithRouterProps} from 'react-router'
-import {connect} from 'react-redux'
+import {connect, HandleThunkActionCreator} from 'react-redux'
 import uuid from 'uuid'
 
 import {updateTagFilterAsync} from 'src/shared/actions/annotations'
 
 import {AnnotationTags, TagFilterType} from 'src/types/annotations'
 
-interface Props extends WithRouterProps {
+interface OwnProps {
   tags: AnnotationTags
-  annotationsIndexURL: string
-  onUpdateTagFilterAsync: typeof updateTagFilterAsync
   params: {
     dashboardID: string
     sourceID: string
   }
 }
+type RouterProps = WithRouterProps<{
+  dashboardID: string
+  sourceID: string
+}>
+
+interface ReduxStateProps {
+  annotationsIndexURL: string
+}
+
+interface ReduxDispatchProps {
+  onUpdateTagFilterAsync: HandleThunkActionCreator<typeof updateTagFilterAsync>
+}
+type Props = OwnProps & RouterProps & ReduxStateProps & ReduxDispatchProps
 
 class AnnotationTagsDropdown extends PureComponent<Props> {
   public render() {
@@ -57,7 +68,7 @@ class AnnotationTagsDropdown extends PureComponent<Props> {
   }
 }
 
-const mstp = (state, ownProps) => {
+const mstp = (state: any, ownProps: any) => {
   const {sourceID} = ownProps.params
   const source = state.sources.find(s => (s.id = sourceID))
 
@@ -67,7 +78,7 @@ const mstp = (state, ownProps) => {
 
   return {
     annotationsIndexURL: source.links.annotations,
-  }
+  } as ReduxStateProps
 }
 
 const mdtp = {
