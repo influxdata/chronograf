@@ -28,6 +28,7 @@ import TimeZoneToggle from 'src/shared/components/time_zones/TimeZoneToggle'
 
 // Constants
 import {AutoRefreshOption} from 'src/shared/components/dropdown_auto_refresh/autoRefreshOptions'
+import {HandleThunkActionCreator} from 'react-redux'
 
 interface State {
   selected: QueriesModels.TimeRange
@@ -43,7 +44,7 @@ interface Props {
   handleChooseTimeRange: (timeRange: QueriesModels.TimeRange) => void
   handleChooseAutoRefresh: (autoRefreshOption: AutoRefreshOption) => void
   onManualRefresh: () => void
-  handleClickPresentationButton: AppActions.DelayEnablePresentationModeDispatcher
+  handleClickPresentationButton: HandleThunkActionCreator<AppActions.DelayEnablePresentationModeDispatcher>
   onAddCell: () => void
   showTempVarControls?: boolean
   onToggleShowTempVarControls?: () => void
