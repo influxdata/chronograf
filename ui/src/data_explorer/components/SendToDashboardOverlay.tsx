@@ -58,7 +58,7 @@ interface PassedProps {
     newCell: Partial<Cell>
   ) => Promise<{success: boolean; dashboard: Dashboard}>
   isStaticLegend: boolean
-  handleGetDashboards: () => Dashboard[]
+  handleGetDashboards: () => Promise<Dashboard[]>
   notify: (message: Notification) => void
   activeQueryIndex: number
 }
