@@ -47,6 +47,7 @@ import {
   RemoteDataState,
   QueryUpdateState,
   QueryType,
+  Status,
 } from 'src/types'
 import {
   TableOptions,
@@ -84,7 +85,7 @@ interface OwnProps {
   manualRefresh: number
   resizerTopHeight: number
   onZoom: () => void
-  editQueryStatus: () => void
+  editQueryStatus?: (queryID: string, status: Status) => void
   onSetResolution: () => void
   grabDataForDownload?: GrabDataForDownloadHandler
   grabFluxData?: (data: string) => void
