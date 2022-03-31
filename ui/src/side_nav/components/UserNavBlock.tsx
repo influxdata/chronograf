@@ -26,7 +26,7 @@ interface Props {
   me: Me
   links: Links
   logoutLink: string
-  meChangeOrg: (meLink: string, orgID: OrgID) => void
+  meChangeOrg: (meLink: string, orgID: OrgID) => Promise<void>
 }
 
 @ErrorHandling

@@ -12,7 +12,7 @@ import {errorThrown} from 'src/shared/actions/errors'
 
 import {notifyUserSwitchedOrgs} from 'src/shared/copy/notifications'
 
-import {Me, Organization} from 'src/types/auth'
+import {Me} from 'src/types/auth'
 
 export type Action =
   | AuthExpiredAction
@@ -148,7 +148,9 @@ export const getMeAsync = ({shouldResetMe = false} = {}) => async (
 // links are still refreshed.
 export const meChangeOrganizationAsync = (
   url: string,
-  organization: Organization
+  organization: {
+    organization: string
+  }
 ) => async (dispatch: Dispatch<ReduxAction>): Promise<void> => {
   dispatch(meChangeOrganizationRequested())
   try {

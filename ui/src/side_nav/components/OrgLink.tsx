@@ -16,7 +16,7 @@ interface Props {
   me: Me
   role: Role
   meLink: string
-  onMeChangeOrg: (meLink: string, orgID: OrgID) => void
+  onMeChangeOrg: (meLink: string, orgID: OrgID) => Promise<void>
 }
 
 @ErrorHandling
