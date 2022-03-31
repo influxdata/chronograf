@@ -1,8 +1,7 @@
 // Libraries
 import React, {PureComponent} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
-import {withRouter, InjectedRouter, WithRouterProps} from 'react-router'
-import {Location} from 'history'
+import {withRouter, WithRouterProps} from 'react-router'
 import qs from 'qs'
 import uuid from 'uuid'
 import _ from 'lodash'
@@ -54,7 +53,6 @@ import {
 import {
   Source,
   Dashboard,
-  QueryConfig,
   QueryStatuses,
   Template,
   TemplateType,
@@ -69,9 +67,6 @@ import {Links} from 'src/types/flux'
 
 interface PassedProps {
   source: Source
-  queryConfigs: QueryConfig[]
-  router?: InjectedRouter
-  location?: Location
 }
 
 interface ConnectedProps {
@@ -110,7 +105,8 @@ interface ReduxDispatchProps {
 type Props = PassedProps &
   ConnectedProps &
   ReduxStateProps &
-  ResolveThunks<ReduxDispatchProps>
+  ResolveThunks<ReduxDispatchProps> &
+  WithRouterProps
 
 interface State {
   isWriteFormVisible: boolean
@@ -413,7 +409,7 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 
   private get selectedDatabase(): string {
-    return _.get(this.props.queryConfigs, ['0', 'database'], null)
+    return null
   }
 
   private toggleSendToDashboard = () => {
@@ -497,6 +493,6 @@ const mdtp = {
   notify: notifyAction,
   updateSourceLink: updateSourceLinkAction,
   onSetTimeZone: setTimeZoneAction,
-}
+} as ReduxDispatchProps
 
-export default connect(mstp, mdtp)(withRouter(ConnectedDataExplorer))
+export default withRouter(connect(mstp, mdtp)(ConnectedDataExplorer))
