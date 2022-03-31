@@ -1,7 +1,7 @@
 /* eslint-disable no-empty */
 // Libraries
 import React, {Component} from 'react'
-import {connect} from 'react-redux'
+import {connect, ResolveThunks} from 'react-redux'
 import _ from 'lodash'
 
 // Components
@@ -32,19 +32,26 @@ import {DEFAULT_KAPACITOR} from 'src/shared/constants'
 import {Kapacitor, Source} from 'src/types'
 import {NextReturn} from 'src/types/wizard'
 
-interface Props {
+interface ReduxStateProps {
+  sources: Source[]
+}
+type ReduxDispatchProps = ResolveThunks<{
   notify: typeof notifyAction
+  setActiveKapacitor: typeof sourcesActions.setActiveKapacitorAsync
+  deleteKapacitor: typeof sourcesActions.deleteKapacitorAsync
+  fetchKapacitors: typeof sourcesActions.fetchKapacitorsAsyncNoNotify
+}>
+
+interface OwnProps {
   source: Source
   setError: (b: boolean) => void
-  sources: Source[]
   onBoarding?: boolean
   kapacitor?: Kapacitor
-  deleteKapacitor: sourcesActions.DeleteKapacitor
-  setActiveKapacitor: sourcesActions.SetActiveKapacitor
-  fetchKapacitors: sourcesActions.FetchKapacitorsAsync
   showNewKapacitor?: boolean
   setKapacitorDraft?: (kapacitor: Kapacitor) => void
 }
+
+type Props = OwnProps & ReduxStateProps & ReduxDispatchProps
 
 interface State {
   kapacitor: Kapacitor
@@ -215,9 +222,10 @@ class KapacitorStep extends Component<Props, State> {
   }
 }
 
-const mstp = ({sources}) => ({
-  sources,
-})
+const mstp = ({sources}) =>
+  ({
+    sources,
+  } as ReduxStateProps)
 
 const mdtp = {
   notify: notifyAction,
