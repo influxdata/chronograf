@@ -1,6 +1,6 @@
 // Libraries
 import React, {useEffect, useMemo} from 'react'
-import {connect} from 'react-redux'
+import {connect, ResolveThunks} from 'react-redux'
 import classnames from 'classnames'
 
 // Components
@@ -12,11 +12,12 @@ import {BucketSelectorState, TimeMachineQueryProps} from './types'
 import {loadBucketsThunk, selectBucketThunk} from './actions/thunks'
 import {setBucketsSearchTerm} from './actions/buckets'
 
-interface Callbacks {
+type Callbacks = ResolveThunks<{
   onFilterBuckets: typeof setBucketsSearchTerm
   onSelectBucket: typeof selectBucketThunk
   onLoadBuckets: typeof loadBucketsThunk
-}
+}>
+
 type Props = TimeMachineQueryProps & BucketSelectorState & Callbacks
 
 const filterBuckets = (buckets: string[], term: string): string[] => {
@@ -114,7 +115,7 @@ const InitializeBucketsSelector = (props: Props) => {
 const mstp = (state: any): BucketSelectorState => {
   return state?.fluxQueryBuilder?.buckets as BucketSelectorState
 }
-const mdtp: Callbacks = {
+const mdtp = {
   onLoadBuckets: loadBucketsThunk,
   onFilterBuckets: setBucketsSearchTerm,
   onSelectBucket: selectBucketThunk,
