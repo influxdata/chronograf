@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-export type DygraphData = number[][]
+export type DygraphData = DygraphValue[][]
 
 export type Data = string | DygraphData | google.visualization.DataTable
 
