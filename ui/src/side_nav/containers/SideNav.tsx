@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import React, {PureComponent} from 'react'
-import {withRouter, Link} from 'react-router'
+import {withRouter, Link, WithRouterProps} from 'react-router'
 import {connect} from 'react-redux'
 
 import Authorized, {ADMIN_ROLE} from 'src/auth/Authorized'
@@ -16,13 +16,10 @@ import {
 import {DEFAULT_HOME_PAGE} from 'src/shared/constants'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import {Params, Location} from 'src/types/sideNav'
 import {Env, Source, Links, Me} from 'src/types'
 
-interface Props {
+interface OwnProps {
   sources: Source[]
-  params: Params
-  location: Location
   isHidden: boolean
   isUsingAuth?: boolean
   logoutLink?: string
@@ -30,6 +27,10 @@ interface Props {
   me: Me
   env: Env
 }
+type RouterProps = WithRouterProps<{
+  sourceID: string
+}>
+type Props = OwnProps & RouterProps
 
 @ErrorHandling
 class SideNav extends PureComponent<Props> {
