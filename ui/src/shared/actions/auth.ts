@@ -1,4 +1,4 @@
-import {Dispatch, Action as ReduxAction} from 'redux'
+import {Dispatch} from 'redux'
 
 import {
   getMe as getMeAJAX,
@@ -151,7 +151,7 @@ export const meChangeOrganizationAsync = (
   organization: {
     organization: string
   }
-) => async (dispatch: Dispatch<ReduxAction>): Promise<void> => {
+) => async (dispatch): Promise<void> => {
   dispatch(meChangeOrganizationRequested())
   try {
     const {data: me, auth, logoutLink} = await updateMeAJAX(url, organization)
@@ -168,7 +168,7 @@ export const meChangeOrganizationAsync = (
 
     // refresh links after every successful meChangeOrganization to refresh
     // /organizations/:id/users link for Admin / Current Org Users page to load
-    dispatch((getLinksAsync() as unknown) as ReduxAction) // casted as a workaround for strict type checking in typescript 4.6.2
+    dispatch(getLinksAsync())
     // TODO: reload sources upon me change org if non-refresh behavior preferred
     // instead of current behavior on both invocations of meChangeOrganization,
     // which is to refresh index via router.push('')
