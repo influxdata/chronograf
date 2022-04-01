@@ -101,12 +101,12 @@ interface ReduxStateProps {
   fluxASTLink: string
 }
 
-interface ReduxDispatchProps {
+type ReduxDispatchProps = ResolveThunks<{
   handleSetHoverTime: typeof setHoverTime
   onNotify: typeof notify
-}
+}>
 
-type Props = OwnProps & ReduxStateProps & ResolveThunks<ReduxDispatchProps>
+type Props = OwnProps & ReduxStateProps & ReduxDispatchProps
 
 class RefreshingGraph extends Component<Props> {
   public static defaultProps: Partial<Props> = {

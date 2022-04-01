@@ -17,15 +17,15 @@ import {Annotation} from 'src/types'
 interface ReduxStateProps {
   editingAnnotation?: Annotation
 }
-interface ReduxDispatchProps {
+type ReduxDispatchProps = ResolveThunks<{
   onSetEditingAnnotation: typeof setEditingAnnotation
   onDeleteAnnotation: typeof deleteAnnotationAsync
   onSaveAnnotation: typeof updateAnnotationAsync
   setTagKeys: typeof setTagKeysAction
   onNotify: typeof notify
-}
+}>
 
-type Props = ReduxStateProps & ResolveThunks<ReduxDispatchProps>
+type Props = ReduxStateProps & ReduxDispatchProps
 class AnnotationEditorContainer extends PureComponent<Props> {
   public render() {
     const {editingAnnotation} = this.props

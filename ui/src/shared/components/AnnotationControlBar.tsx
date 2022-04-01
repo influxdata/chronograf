@@ -29,19 +29,19 @@ interface ReduxStateProps {
   }
   displaySetting: AnnotationsDisplaySetting
 }
-interface ReduxDispatchProps {
+type ReduxDispatchProps = ResolveThunks<{
   onUpdateTagFilter: typeof updateTagFilter
   onUpdateTagFilterAsync: typeof updateTagFilterAsync
   onDeleteTagFilterAsync: typeof deleteTagFilterAsync
   onGetTagKeys: typeof fetchAndSetTagKeys
   onGetTagValues: typeof fetchAndSetTagValues
-}
+}>
 
 interface OwnProps {
   dashboardID: string
   source: Source
 }
-type Props = OwnProps & ReduxStateProps & ResolveThunks<ReduxDispatchProps>
+type Props = OwnProps & ReduxStateProps & ReduxDispatchProps
 
 class AnnotationControlBar extends PureComponent<Props> {
   public render() {

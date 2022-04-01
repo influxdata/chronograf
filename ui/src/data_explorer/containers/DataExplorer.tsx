@@ -90,7 +90,7 @@ interface ReduxStateProps {
   queryStatuses: QueryStatuses
 }
 
-interface ReduxDispatchProps {
+type ReduxDispatchProps = ResolveThunks<{
   handleChooseAutoRefresh: typeof setAutoRefresh
   errorThrownAction: typeof errorThrown
   writeLineProtocol: typeof writeLineProtocolAsync
@@ -101,11 +101,12 @@ interface ReduxDispatchProps {
   notify: typeof notifyAction
   updateSourceLink: typeof updateSourceLinkAction
   onSetTimeZone: typeof setTimeZoneAction
-}
+}>
+
 type Props = PassedProps &
   ConnectedProps &
   ReduxStateProps &
-  ResolveThunks<ReduxDispatchProps> &
+  ReduxDispatchProps &
   WithRouterProps
 
 interface State {
@@ -432,10 +433,7 @@ export class DataExplorer extends PureComponent<Props, State> {
 }
 
 const ConnectedDataExplorer = (
-  props: PassedProps &
-    WithRouterProps &
-    ReduxStateProps &
-    ResolveThunks<ReduxDispatchProps>
+  props: PassedProps & WithRouterProps & ReduxStateProps & ReduxDispatchProps
 ) => {
   return (
     <TimeMachineContextConsumer>
@@ -493,6 +491,6 @@ const mdtp = {
   notify: notifyAction,
   updateSourceLink: updateSourceLinkAction,
   onSetTimeZone: setTimeZoneAction,
-} as ReduxDispatchProps
+}
 
 export default withRouter(connect(mstp, mdtp)(ConnectedDataExplorer))

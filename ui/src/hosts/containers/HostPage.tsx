@@ -45,17 +45,17 @@ interface ReduxStateProps {
   autoRefresh: number
   timeZone: TimeZones
 }
-interface ReduxDispatchProps {
+type ReduxDispatchProps = ResolveThunks<{
   handleChooseTimeRange: typeof setAutoRefresh
   handleClickPresentationButton: typeof delayEnablePresentationMode
   onSetTimeZone: typeof setTimeZone
-}
+}>
 
 type Props = OwnProps &
   RouterProps &
   ManualRefreshProps &
   ReduxStateProps &
-  ResolveThunks<ReduxDispatchProps>
+  ReduxDispatchProps
 
 interface State {
   layouts: Layout[]

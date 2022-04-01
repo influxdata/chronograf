@@ -23,11 +23,11 @@ import {Source, Kapacitor, RemoteDataState} from 'src/types'
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import NoKapacitorError from 'src/shared/components/NoKapacitorError'
-interface ReduxDispatchProps {
+type ReduxDispatchProps = ResolveThunks<{
   // connected props
   notify: typeof mdtp.notify
   setActiveKapacitor: typeof mdtp.setActiveKapacitor
-}
+}>
 
 interface OwnProps {
   title: string
@@ -40,7 +40,7 @@ interface OwnProps {
   ) => JSX.Element
 }
 
-type Props = OwnProps & ResolveThunks<ReduxDispatchProps>
+type Props = OwnProps & ReduxDispatchProps
 interface State {
   loading: RemoteDataState
   scrollTop: number

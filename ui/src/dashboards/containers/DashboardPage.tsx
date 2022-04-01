@@ -92,7 +92,7 @@ interface ReduxStateProps {
   showTemplateVariableControlBar: boolean
   annotationsDisplaySetting: AnnotationsDisplaySetting
 }
-interface ReduxDispatchProps {
+type ReduxDispatchProps = ResolveThunks<{
   toggleTemplateVariableControlBar: typeof appActions.toggleTemplateVariableControlBar
   handleClickPresentationButton: AppActions.DelayEnablePresentationModeDispatcher
   errorThrown: ErrorsActions.ErrorThrownActionCreator
@@ -119,9 +119,9 @@ interface ReduxDispatchProps {
   updateTemplateQueryParams: typeof dashboardActions.updateTemplateQueryParams
   updateQueryParams: typeof dashboardActions.updateQueryParams
   updateTimeRangeQueryParams: typeof dashboardActions.updateTimeRangeQueryParams
-}
+}>
 
-type Props = OwnProps & ReduxStateProps & ResolveThunks<ReduxDispatchProps>
+type Props = OwnProps & ReduxStateProps & ReduxDispatchProps
 interface State {
   scrollTop: number
   windowHeight: number
