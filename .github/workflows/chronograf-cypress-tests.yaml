@@ -22,7 +22,7 @@ jobs:
 
       - uses: actions/setup-node@v2
         with:
-          node-version: '14.15.0'
+          node-version: '16.14.2'
       - run: if [ ! -x "$(command -v yarn)" ]; then npm install -g yarn; fi
       - run: yarn node --version
 
@@ -79,6 +79,7 @@ jobs:
             apt update
             apt install -y build-essential
             yarn install --frozen-lockfile
+            yarn run cypress install
             yarn run cypress run --browser chrome --config baseUrl=http://host.docker.internal:8888 --reporter junit --reporter-options 'mochaFile=cypress/results/results-[hash].xml'
 
       - name: Upload Artifact
