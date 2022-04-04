@@ -103,6 +103,7 @@ internal.pb.go: kv/internal/internal.proto
 test: gochecktidy gocheckfmt jstest gotest gotestrace lint-ci
 
 gochecktidy:
+	go version
 	go mod tidy
 	if ! git --no-pager diff --exit-code -- go.mod go.sum; then\
 		echo Modules are not tidy, please run \`go mod tidy\` ! ;\
