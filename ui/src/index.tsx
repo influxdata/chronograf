@@ -59,6 +59,7 @@ import {HEARTBEAT_INTERVAL} from 'src/shared/constants'
 
 import * as ErrorsModels from 'src/types/errors'
 import {setCustomAutoRefreshOptions} from './shared/components/dropdown_auto_refresh/autoRefreshOptions'
+import Landing from './auth/Landing'
 
 const errorsQueue = []
 
@@ -155,6 +156,7 @@ class Root extends PureComponent<Record<string, never>, State> {
         <TimeMachineContextProvider>
           <Router history={history}>
             <Route path="/" component={UserIsAuthenticated(CheckSources)} />
+            <Route path="/landing" component={UserIsAuthenticated(Landing)} />
             <Route path="/login" component={UserIsNotAuthenticated(Login)} />
             <Route
               path="/purgatory"
