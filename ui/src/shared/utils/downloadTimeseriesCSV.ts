@@ -74,7 +74,7 @@ const timeseriesToCSV = async (
     for (let i = 0; i < tableData.length; i++) {
       // Convert times to a (somewhat) human readable ISO8601 string
       tableData[i][timeIndex] = moment(
-        new Date(tableData[i][timeIndex])
+        new Date(tableData[i][timeIndex] as number | string | Date)
       ).toISOString(isLocal)
     }
   }

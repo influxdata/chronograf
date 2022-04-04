@@ -28,7 +28,7 @@ const WidgetCell: FunctionComponent<Props> = ({cell, source, timeRange}) => {
       )
     }
     case 'news': {
-      return <NewsFeed source={source} />
+      return <NewsFeed />
     }
     case 'guide': {
       return <GettingStarted />

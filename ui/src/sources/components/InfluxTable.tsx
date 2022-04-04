@@ -1,8 +1,6 @@
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 
-import {DeleteKapacitor} from 'src/shared/actions/sources'
-
 import InfluxTableHead from 'src/sources/components/InfluxTableHead'
 import InfluxTableHeader from 'src/sources/components/InfluxTableHeader'
 import InfluxTableRow from 'src/sources/components/InfluxTableRow'
@@ -15,7 +13,7 @@ interface Props {
   source: Source
   sources: Source[]
   isUsingAuth: boolean
-  deleteKapacitor: DeleteKapacitor
+  deleteKapacitor: (kapacitor: Kapacitor) => void
   setActiveKapacitor: (kapacitor: Kapacitor) => void
   onDeleteSource: (source: Source) => void
   toggleWizard: ToggleWizard

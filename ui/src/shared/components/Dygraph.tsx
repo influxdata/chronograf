@@ -1,11 +1,16 @@
 /* eslint-disable no-undef */
 // Libraries
-import React, {Component, CSSProperties, MouseEvent} from 'react'
+import React, {
+  Component,
+  CSSProperties,
+  MouseEvent as ReactMouseEvent,
+} from 'react'
 import {connect} from 'react-redux'
 import {filter, isEqual} from 'lodash'
 import NanoDate from 'nano-date'
 import ReactResizeDetector from 'react-resize-detector'
 import memoizeOne from 'memoize-one'
+import DygraphsDygraph from 'dygraphs'
 
 // Components
 import D from 'src/external/dygraph'
@@ -75,7 +80,7 @@ interface Props {
   timeSeries: DygraphData
   labels: string[]
   options: dygraphs.Options
-  containerStyle: Record<string, unknown>
+  containerStyle: CSSProperties
   dygraphSeries: DygraphSeries
   timeRange: TimeRange
   colors: LineColor[]
@@ -86,8 +91,13 @@ interface Props {
   staticLegend?: boolean
   onZoom?: (timeRange: TimeRange) => void
   mode?: string
-  underlayCallback?: () => void
+  underlayCallback?: (
+    context: CanvasRenderingContext2D,
+    area: dygraphs.Area,
+    dygraph: DygraphsDygraph
+  ) => void
   timeZone: TimeZones
+  children?: JSX.Element | JSX.Element[]
 }
 
 interface State {
@@ -204,7 +214,7 @@ class Dygraph extends Component<Props, State> {
               onMouseEnter={this.handleMouseEnterLegend}
             />
             <Crosshair
-              dygraph={this.dygraph}
+              dygraph={(this.dygraph as unknown) as DygraphsDygraph}
               staticLegendHeight={staticLegendHeight}
             />
           </div>
@@ -373,7 +383,7 @@ class Dygraph extends Component<Props, State> {
 
   private eventToTimestamp = ({
     pageX: pxBetweenMouseAndPage,
-  }: MouseEvent<HTMLDivElement>): string => {
+  }: ReactMouseEvent<HTMLDivElement> | MouseEvent): string => {
     const pxBetweenGraphAndPage = this.graphRef.current.getBoundingClientRect()
       .left
     const graphXCoordinate = pxBetweenMouseAndPage - pxBetweenGraphAndPage
@@ -389,7 +399,9 @@ class Dygraph extends Component<Props, State> {
     this.props.handleSetHoverTime(NULL_HOVER_TIME)
   }
 
-  private handleShowLegend = (e: MouseEvent<HTMLDivElement>): void => {
+  private handleShowLegend = (
+    e: ReactMouseEvent<HTMLDivElement> | MouseEvent
+  ): void => {
     const {isMouseInLegend} = this.state
 
     if (isMouseInLegend) {
@@ -443,7 +455,7 @@ class Dygraph extends Component<Props, State> {
       ...this.props.options,
     }
 
-    return options
+    return options as dygraphs.Options
   }
 
   private haveDygraphOptionsChanged(nextOptions: dygraphs.Options): boolean {

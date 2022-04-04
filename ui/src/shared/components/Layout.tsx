@@ -15,7 +15,7 @@ import {getDeep} from 'src/utils/wrappers'
 import {IS_STATIC_LEGEND} from 'src/shared/constants'
 
 // Types
-import {TimeRange, Cell, Template, Source, QueryType} from 'src/types'
+import {TimeRange, Cell, Template, Source, QueryType, Query} from 'src/types'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
@@ -95,7 +95,7 @@ class Layout extends Component<Props, State> {
       templates,
       source,
     } = this.props
-    const {cellFluxData, visType} = this.state
+    const {visType} = this.state
     const showRawFluxData = visType === VisType.Table
 
     return (
@@ -116,13 +116,11 @@ class Layout extends Component<Props, State> {
         staticLegend={IS_STATIC_LEGEND(cell.legend)}
         grabDataForDownload={this.grabDataForDownload}
         grabFluxData={this.grabFluxData}
-        queries={cell.queries}
+        queries={(cell.queries as unknown) as Query[]}
         source={source}
         cellNote={cell.note}
         cellNoteVisibility={cell.noteVisibility}
-        rawData={cellFluxData}
         showRawFluxData={showRawFluxData}
-        visType={this.visType}
       />
     )
   }
@@ -160,7 +158,9 @@ class Layout extends Component<Props, State> {
         manualRefresh={manualRefresh}
         staticLegend={IS_STATIC_LEGEND(cell.legend)}
         grabDataForDownload={this.grabDataForDownload}
-        queries={buildQueriesForLayouts(cell, timeRange, host)}
+        queries={
+          (buildQueriesForLayouts(cell, timeRange, host) as unknown) as Query[]
+        }
         source={this.getSource(cell, source, sources, source)}
         cellNote={cell.note}
         cellNoteVisibility={cell.noteVisibility}

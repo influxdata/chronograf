@@ -1,11 +1,13 @@
 import React, {PureComponent} from 'react'
-import {connect} from 'react-redux'
+import {connect, ResolveThunks} from 'react-redux'
 import classnames from 'classnames'
 
 import LayoutRenderer from 'src/shared/components/LayoutRenderer'
 import DashboardHeader from 'src/dashboards/components/DashboardHeader'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
-import ManualRefresh from 'src/shared/components/ManualRefresh'
+import ManualRefresh, {
+  ManualRefreshProps,
+} from 'src/shared/components/ManualRefresh'
 import {generateForHosts} from 'src/utils/tempVars'
 
 import {timeRanges} from 'src/shared/data/timeRanges'
@@ -26,25 +28,34 @@ import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
 import {getCells} from 'src/hosts/utils/getCells'
 
 import {Source, Layout, TimeRange, TimeZones} from 'src/types'
-import {Location} from 'history'
 import {DashboardSwitcherLinks} from 'src/types/dashboards'
 import {setTimeZone} from 'src/shared/actions/app'
+import {WithRouterProps} from 'react-router'
 
-interface Props {
+interface OwnProps {
   source: Source
-  params: {
-    hostID: string
-  }
-  location: Location
+}
+
+type RouterProps = WithRouterProps<{
+  hostID: string
+}>
+
+interface ReduxStateProps {
   inPresentationMode: boolean
   autoRefresh: number
-  manualRefresh: number
-  onManualRefresh: () => void
+  timeZone: TimeZones
+}
+type ReduxDispatchProps = ResolveThunks<{
   handleChooseTimeRange: typeof setAutoRefresh
   handleClickPresentationButton: typeof delayEnablePresentationMode
-  timeZone: TimeZones
   onSetTimeZone: typeof setTimeZone
-}
+}>
+
+type Props = OwnProps &
+  RouterProps &
+  ManualRefreshProps &
+  ReduxStateProps &
+  ReduxDispatchProps
 
 interface State {
   layouts: Layout[]
@@ -215,11 +226,12 @@ const mstp = ({
     ephemeral: {inPresentationMode},
     persisted: {autoRefresh, timeZone},
   },
-}) => ({
-  inPresentationMode,
-  autoRefresh,
-  timeZone,
-})
+}) =>
+  ({
+    inPresentationMode,
+    autoRefresh,
+    timeZone,
+  } as ReduxStateProps)
 
 const mdtp = {
   handleChooseTimeRange: setAutoRefresh,

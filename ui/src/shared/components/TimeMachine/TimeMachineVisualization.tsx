@@ -93,8 +93,6 @@ const TimeMachineVisualization: FunctionComponent<Props> = props => {
             fieldOptions={props.fieldOptions}
             timeFormat={props.timeFormat}
             decimalPlaces={props.decimalPlaces}
-            gaugeColors={props.gaugeColors}
-            lineColors={props.lineColors}
             cellNote={props.note}
             cellNoteVisibility={props.noteVisibility}
             onUpdateFieldOptions={props.onUpdateFieldOptions}

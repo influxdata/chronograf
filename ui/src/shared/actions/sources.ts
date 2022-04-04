@@ -120,7 +120,6 @@ export const setActiveKapacitor = (
   },
 })
 
-export type DeleteKapacitor = (kapacitor: Kapacitor) => ActionDeleteKapacitor
 export interface ActionDeleteKapacitor {
   type: 'DELETE_KAPACITOR'
   payload: {

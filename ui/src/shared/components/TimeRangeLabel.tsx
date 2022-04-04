@@ -4,6 +4,7 @@ import {connect} from 'react-redux'
 import {timeRanges} from 'src/shared/data/timeRanges'
 import {TimeRange, TimeZones} from 'src/types'
 import _ from 'lodash'
+import {PureComponent} from 'react'
 
 const dateFormat = 'YYYY-MM-DD HH:mm'
 const format = (t: string, timeZone: string) => {
@@ -17,7 +18,11 @@ const format = (t: string, timeZone: string) => {
 interface PassedProps {
   timeRange: TimeRange
 }
-type Props = PassedProps & ReturnType<typeof mstp>
+
+interface ReduxStateProps {
+  timeZone?: TimeZones
+}
+type Props = PassedProps & ReduxStateProps
 
 export function timeRangeLabel({
   timeRange: {upper, lower},
@@ -33,13 +38,15 @@ export function timeRangeLabel({
   const selected = timeRanges.find(range => range.lower === lower)
   return selected ? selected.inputValue : 'Custom'
 }
-const TimeRangeLabel = (props: Props) => {
-  return timeRangeLabel(props)
+class TimeRangeLabel extends PureComponent<Props> {
+  public render() {
+    return timeRangeLabel(this.props)
+  }
 }
 
-const mstp = (state: any) => ({
-  timeZone: _.get(state, ['app', 'persisted', 'timeZone']) as
-    | TimeZones
-    | undefined,
-})
+const mstp = (state: any) =>
+  ({
+    timeZone: _.get(state, ['app', 'persisted', 'timeZone']),
+  } as ReduxStateProps)
+
 export default connect(mstp)(TimeRangeLabel)

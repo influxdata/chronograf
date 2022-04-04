@@ -1,8 +1,7 @@
 // Libraries
 import React, {PureComponent} from 'react'
-import {connect} from 'react-redux'
-import {withRouter, InjectedRouter, WithRouterProps} from 'react-router'
-import {Location} from 'history'
+import {connect, ResolveThunks} from 'react-redux'
+import {withRouter, WithRouterProps} from 'react-router'
 import qs from 'qs'
 import uuid from 'uuid'
 import _ from 'lodash'
@@ -54,13 +53,10 @@ import {
 import {
   Source,
   Dashboard,
-  QueryConfig,
   QueryStatuses,
   Template,
   TemplateType,
   TemplateValueType,
-  Notification,
-  Cell,
   QueryType,
   CellQuery,
   TimeRange,
@@ -71,38 +67,11 @@ import {Links} from 'src/types/flux'
 
 interface PassedProps {
   source: Source
-  sources: Source[]
-  queryConfigs: QueryConfig[]
-  updateSourceLink: typeof updateSourceLinkAction
-  autoRefresh: number
-  handleChooseAutoRefresh: () => void
-  router?: InjectedRouter
-  location?: Location
-  manualRefresh: number
-  dashboards: Dashboard[]
-  onManualRefresh: () => void
-  errorThrownAction: () => void
-  writeLineProtocol: () => void
-  handleGetDashboards: () => Dashboard[]
-  sendDashboardCell: (
-    dashboard: Dashboard,
-    newCell: Partial<Cell>
-  ) => Promise<{success: boolean; dashboard: Dashboard}>
-  editQueryStatus: typeof editQueryStatusAction
-  resetQueryStatuses: typeof resetQueryStatusesAction
-  queryStatuses: QueryStatuses
-  fluxLinks: Links
-  notify: (message: Notification) => void
-  sourceLink: string
-  onSetTimeZone: typeof setTimeZoneAction
-  timeZone: TimeZones
 }
 
 interface ConnectedProps {
   queryType: QueryType
   queryDrafts: CellQuery[]
-  timeRange: TimeRange
-  timeZone: TimeZones
   draftScript: string
   script: string
   onUpdateQueryDrafts: (queryDrafts: CellQuery[]) => void
@@ -110,7 +79,35 @@ interface ConnectedProps {
   onInitFluxScript: TimeMachineContainer['handleInitFluxScript']
 }
 
-type Props = PassedProps & ConnectedProps
+interface ReduxStateProps {
+  timeZone: TimeZones
+  fluxLinks: Links
+  autoRefresh: number
+  timeRange: TimeRange
+  dashboards: Dashboard[]
+  sources: Source[]
+  sourceLink: string
+  queryStatuses: QueryStatuses
+}
+
+type ReduxDispatchProps = ResolveThunks<{
+  handleChooseAutoRefresh: typeof setAutoRefresh
+  errorThrownAction: typeof errorThrown
+  writeLineProtocol: typeof writeLineProtocolAsync
+  handleGetDashboards: typeof getDashboardsAsync
+  sendDashboardCell: typeof sendDashboardCellAsync
+  editQueryStatus: typeof editQueryStatusAction
+  resetQueryStatuses: typeof resetQueryStatusesAction
+  notify: typeof notifyAction
+  updateSourceLink: typeof updateSourceLinkAction
+  onSetTimeZone: typeof setTimeZoneAction
+}>
+
+type Props = PassedProps &
+  ConnectedProps &
+  ReduxStateProps &
+  ReduxDispatchProps &
+  WithRouterProps
 
 interface State {
   isWriteFormVisible: boolean
@@ -413,7 +410,7 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 
   private get selectedDatabase(): string {
-    return _.get(this.props.queryConfigs, ['0', 'database'], null)
+    return null
   }
 
   private toggleSendToDashboard = () => {
@@ -435,7 +432,9 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 }
 
-const ConnectedDataExplorer = (props: PassedProps & WithRouterProps) => {
+const ConnectedDataExplorer = (
+  props: PassedProps & WithRouterProps & ReduxStateProps & ReduxDispatchProps
+) => {
   return (
     <TimeMachineContextConsumer>
       {(container: TimeMachineContainer) => {
@@ -458,7 +457,7 @@ const ConnectedDataExplorer = (props: PassedProps & WithRouterProps) => {
   )
 }
 
-const mstp = state => {
+const mstp = (state: any) => {
   const {
     app: {
       persisted: {autoRefresh, timeZone},
@@ -478,7 +477,7 @@ const mstp = state => {
     sources,
     queryStatuses,
     sourceLink,
-  }
+  } as ReduxStateProps
 }
 
 const mdtp = {
@@ -494,4 +493,4 @@ const mdtp = {
   onSetTimeZone: setTimeZoneAction,
 }
 
-export default connect(mstp, mdtp)(withRouter(ConnectedDataExplorer))
+export default withRouter(connect(mstp, mdtp)(ConnectedDataExplorer))

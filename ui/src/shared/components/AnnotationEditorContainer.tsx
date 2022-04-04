@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {connect} from 'react-redux'
+import {connect, ResolveThunks} from 'react-redux'
 
 import AnnotationEditor from 'src/shared/components/AnnotationEditor'
 
@@ -14,15 +14,18 @@ import {notifyErrorWithAltText} from 'src/shared/copy/notifications'
 
 import {Annotation} from 'src/types'
 
-interface Props {
+interface ReduxStateProps {
   editingAnnotation?: Annotation
+}
+type ReduxDispatchProps = ResolveThunks<{
   onSetEditingAnnotation: typeof setEditingAnnotation
   onDeleteAnnotation: typeof deleteAnnotationAsync
   onSaveAnnotation: typeof updateAnnotationAsync
   setTagKeys: typeof setTagKeysAction
   onNotify: typeof notify
-}
+}>
 
+type Props = ReduxStateProps & ReduxDispatchProps
 class AnnotationEditorContainer extends PureComponent<Props> {
   public render() {
     const {editingAnnotation} = this.props
@@ -93,7 +96,7 @@ class AnnotationEditorContainer extends PureComponent<Props> {
 const mstp = ({annotations: {annotations, editingAnnotation}}) => {
   return {
     editingAnnotation: annotations[editingAnnotation],
-  }
+  } as ReduxStateProps
 }
 
 const mdtp = {

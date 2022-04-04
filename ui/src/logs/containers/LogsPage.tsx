@@ -2,9 +2,9 @@
 import React, {Component} from 'react'
 import uuid from 'uuid'
 import _ from 'lodash'
-import {connect} from 'react-redux'
+import {connect, ResolveThunks} from 'react-redux'
 import {AutoSizer} from 'react-virtualized'
-import {withRouter, InjectedRouter, WithRouterProps} from 'react-router'
+import {withRouter, WithRouterProps} from 'react-router'
 
 // Components
 import LogsHeader from 'src/logs/components/LogsHeader'
@@ -77,7 +77,7 @@ import {SeverityFormatOptions, SEVERITY_SORTING_ORDER} from 'src/logs/constants'
 
 // Types
 import {Greys} from 'src/reusable_ui/types'
-import {Source, Namespace, NotificationAction} from 'src/types'
+import {Source, Namespace} from 'src/types'
 import {
   HistogramData,
   HistogramColor,
@@ -92,69 +92,74 @@ import {
   TableData,
   TimeRange,
   TimeWindow,
-  TimeMarker,
   TimeBounds,
   SearchStatus,
   FetchLoop,
 } from 'src/types/logs'
 import {RemoteDataState} from 'src/types'
 
-interface Props extends WithRouterProps {
+interface ReduxStateProps {
   sources: Source[]
   currentSource: Source | null
   currentNamespaces: Namespace[]
   currentNamespace: Namespace
-  getSourceAndPopulateNamespaces: (sourceID: string) => void
-  getSources: typeof getSourcesAsync
-  setTimeRangeAsync: (timeRange: TimeRange) => void
-  setTimeBounds: (timeBounds: TimeBounds) => void
-  setTimeWindow: (timeWindow: TimeWindow) => void
-  setTimeMarker: (timeMarker: TimeMarker) => void
-  setNamespaceAsync: (namespace: Namespace) => void
-  setTableRelativeTime: (time: number) => void
-  setTableCustomTime: (time: string) => void
-  addFilter: (filter: Filter) => void
-  removeFilter: (id: string) => void
-  changeFilter: (id: string, operator: string, value: string) => void
-  clearFilters: () => void
-  getConfig: (url: string) => Promise<void>
-  updateConfig: (url: string, config: LogConfig) => Promise<void>
-  notify: NotificationAction
-  router: InjectedRouter
-  newRowsAdded: number
   timeRange: TimeRange
+  newRowsAdded: number
   histogramData: HistogramData
   tableData: TableData
   filters: Filter[]
   queryCount: number
   logConfig: LogConfig
   logConfigLink: string
-  tableInfiniteData: {
-    forward: TableData
-    backward: TableData
-  }
   tableTime: {
     custom: string
     relative: number
   }
-  fetchOlderChunkAsync: typeof fetchOlderChunkAsync
-  fetchNewerChunkAsync: typeof fetchNewerChunkAsync
-  fetchTailAsync: typeof fetchTailAsync
-  fetchNamespaceSyslogStatusAsync: typeof fetchNamespaceSyslogStatusAsync
-  populateNamespacesAsync: typeof populateNamespacesAsync
-  flushTailBuffer: typeof flushTailBuffer
-  clearAllTimeBounds: typeof clearAllTimeBounds
-  setNextTailLowerBound: typeof setNextTailLowerBound
-  setNextNewerLowerBound: typeof setNextNewerLowerBound
-  executeHistogramQueryAsync: typeof executeHistogramQueryAsync
+  tableInfiniteData: {
+    forward: TableData
+    backward: TableData
+  }
   nextOlderUpperBound: number | undefined
   nextNewerLowerBound: number | undefined
   currentTailUpperBound: number | undefined
   nextTailLowerBound: number | undefined
   searchStatus: SearchStatus
-  clearSearchData: (searchStatus: SearchStatus) => void
-  setSearchStatus: (SearchStatus: SearchStatus) => void
 }
+
+const mapDispatchToProps = {
+  getSourceAndPopulateNamespaces: getSourceAndPopulateNamespacesAsync,
+  getSources: getSourcesAsync,
+  setTimeRangeAsync,
+  setTimeBounds,
+  setTimeWindow,
+  setTimeMarker,
+  setNamespaceAsync,
+  executeHistogramQueryAsync,
+  clearSearchData,
+  setSearchStatus,
+  addFilter,
+  removeFilter,
+  changeFilter,
+  clearFilters,
+  fetchOlderChunkAsync,
+  fetchNewerChunkAsync,
+  fetchTailAsync,
+  fetchNamespaceSyslogStatusAsync,
+  flushTailBuffer,
+  clearAllTimeBounds,
+  setNextTailLowerBound,
+  setNextNewerLowerBound,
+  setTableCustomTime: setTableCustomTimeAsync,
+  setTableRelativeTime: setTableRelativeTimeAsync,
+  getConfig: getLogConfigAsync,
+  updateConfig: updateLogConfigAsync,
+  notify: notifyAction,
+  populateNamespacesAsync,
+}
+
+type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
+
+type Props = ReduxStateProps & ReduxDispatchProps & WithRouterProps
 
 interface State {
   searchString: string
@@ -955,7 +960,7 @@ class LogsPage extends Component<Props, State> {
 
     await this.props.setTimeBounds(timeBounds)
 
-    this.props.setTimeRangeAsync(this.props.timeRange)
+    this.props.setTimeRangeAsync(/* this.props.timeRange */)
 
     this.updateTableData(SearchStatus.UpdatingTimeBounds)
   }
@@ -1177,38 +1182,6 @@ const mapStateToProps = ({
   searchStatus,
 })
 
-const mapDispatchToProps = {
-  getSourceAndPopulateNamespaces: getSourceAndPopulateNamespacesAsync,
-  getSources: getSourcesAsync,
-  setTimeRangeAsync,
-  setTimeBounds,
-  setTimeWindow,
-  setTimeMarker,
-  setNamespaceAsync,
-  executeHistogramQueryAsync,
-  clearSearchData,
-  setSearchStatus,
-  addFilter,
-  removeFilter,
-  changeFilter,
-  clearFilters,
-  fetchOlderChunkAsync,
-  fetchNewerChunkAsync,
-  fetchTailAsync,
-  fetchNamespaceSyslogStatusAsync,
-  flushTailBuffer,
-  clearAllTimeBounds,
-  setNextTailLowerBound,
-  setNextNewerLowerBound,
-  setTableCustomTime: setTableCustomTimeAsync,
-  setTableRelativeTime: setTableRelativeTimeAsync,
-  getConfig: getLogConfigAsync,
-  updateConfig: updateLogConfigAsync,
-  notify: notifyAction,
-  populateNamespacesAsync,
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withRouter(LogsPage))
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(LogsPage)
+)

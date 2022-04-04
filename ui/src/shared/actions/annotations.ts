@@ -17,6 +17,7 @@ import {
   AnnotationsDisplaySetting,
 } from 'src/types/annotations'
 import {AnnotationState} from 'src/shared/reducers/annotations'
+import {State} from 'src/dashboards/reducers/dashTimeV1'
 
 export type Action =
   | EditingAnnotationAction
@@ -253,7 +254,7 @@ export const setDisplaySetting = (
 export const addAnnotationAsync = (
   createUrl: string,
   annotation: Annotation
-) => async dispatch => {
+) => async (dispatch: Dispatch<Action>) => {
   dispatch(addAnnotation(annotation))
 
   try {
@@ -272,7 +273,7 @@ export const getAnnotationsAsync = (
   dashboardID: string
 ) => async (
   dispatch: Dispatch<SetAnnotationsAction>,
-  getState
+  getState: () => {annotations: AnnotationState; dashTimeV1: State}
 ): Promise<void> => {
   const {displaySetting} = getState().annotations
 
@@ -294,9 +295,9 @@ export const getAnnotationsAsync = (
   dispatch(setAnnotations(annotations))
 }
 
-export const deleteAnnotationAsync = (
-  annotation: Annotation
-) => async dispatch => {
+export const deleteAnnotationAsync = (annotation: Annotation) => async (
+  dispatch: Dispatch<Action>
+) => {
   try {
     dispatch(deleteAnnotation(annotation))
     await api.deleteAnnotation(annotation)
@@ -306,9 +307,9 @@ export const deleteAnnotationAsync = (
   }
 }
 
-export const updateAnnotationAsync = (
-  annotation: Annotation
-) => async dispatch => {
+export const updateAnnotationAsync = (annotation: Annotation) => async (
+  dispatch: Dispatch<Action>
+) => {
   try {
     await api.updateAnnotation(annotation)
     dispatch(updateAnnotation(annotation))
@@ -321,7 +322,10 @@ export const updateTagFilterAsync = (
   indexURL: string,
   dashboardID: string,
   tagFilter: TagFilter
-) => async (dispatch, getState) => {
+) => async (
+  dispatch: Dispatch<Action>,
+  getState: () => {annotations: AnnotationState; dashTimeV1: State}
+) => {
   const state: AnnotationState = getState().annotations
   const currentTagFilter: TagFilter | null = getDeep(
     state,
@@ -332,7 +336,7 @@ export const updateTagFilterAsync = (
 
   try {
     dispatch(updateTagFilter(dashboardID, tagFilter))
-    await dispatch(getAnnotationsAsync(indexURL, dashboardID))
+    await getAnnotationsAsync(indexURL, dashboardID)(dispatch, getState)
   } catch {
     dispatch(notify(annotationsError('Error saving tag filter')))
 
@@ -348,17 +352,22 @@ export const deleteTagFilterAsync = (
   indexURL: string,
   dashboardID: string,
   tagFilter: TagFilter
-) => async dispatch => {
+) => async (
+  dispatch: Dispatch<Action>,
+  getState: () => {annotations: AnnotationState; dashTimeV1: State}
+) => {
   try {
     dispatch(deleteTagFilter(dashboardID, tagFilter))
-    await dispatch(getAnnotationsAsync(indexURL, dashboardID))
+    await getAnnotationsAsync(indexURL, dashboardID)(dispatch, getState)
   } catch {
     dispatch(updateTagFilter(dashboardID, tagFilter))
     dispatch(notify(annotationsError('Error deleting tag filter')))
   }
 }
 
-export const fetchAndSetTagKeys = (source: string) => async dispatch => {
+export const fetchAndSetTagKeys = (source: string) => async (
+  dispatch: Dispatch<SetTagKeysAction>
+) => {
   const query = 'SHOW TAG KEYS ON chronograf FROM annotations'
   const resp = await proxy({query, source})
   const tagKeys = parseMetaQuery(query, resp.data).filter(
@@ -368,10 +377,9 @@ export const fetchAndSetTagKeys = (source: string) => async dispatch => {
   dispatch(setTagKeys(tagKeys))
 }
 
-export const fetchAndSetTagValues = (
-  source: string,
-  tagKey: string
-) => async dispatch => {
+export const fetchAndSetTagValues = (source: string, tagKey: string) => async (
+  dispatch: Dispatch<SetTagValuesAction>
+) => {
   const query = `SHOW TAG VALUES ON chronograf FROM annotations WITH KEY = "${tagKey}"`
   const resp = await proxy({query, source})
   const tagValues = parseMetaQuery(query, resp.data)

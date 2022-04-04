@@ -1,6 +1,6 @@
 // Libraries
 import React, {Component, MouseEvent} from 'react'
-import {connect} from 'react-redux'
+import {connect, ResolveThunks} from 'react-redux'
 import {withRouter} from 'react-router'
 import _ from 'lodash'
 
@@ -64,39 +64,43 @@ import {AnnotationsDisplaySetting} from 'src/types/annotations'
 import {Links} from 'src/types/flux'
 import {createTimeRangeTemplates} from 'src/shared/utils/templates'
 
-interface Props extends ManualRefreshProps, WithRouterProps {
-  fluxLinks: Links
+interface OwnProps extends ManualRefreshProps, WithRouterProps {
   source: SourcesModels.Source
-  sources: SourcesModels.Source[]
   params: {
     sourceID: string
     dashboardID: string
   }
-  timeZone: TimeZones
-  setTimeZone: typeof appActions.setTimeZone
   location: Location
-  dashboardID: string
+  router: InjectedRouter
+}
+
+interface ReduxStateProps {
+  sources: SourcesModels.Source[]
+  meRole: string
+  timeZone: TimeZones
   dashboard: DashboardsModels.Dashboard
-  dashboards: DashboardsModels.Dashboard[]
-  autoRefresh: number
-  refreshRate: RefreshRate
+  fluxLinks: Links
+  dashboardID: string
   timeRange: QueriesModels.TimeRange
+  refreshRate: RefreshRate
   zoomedTimeRange: QueriesModels.TimeRange
+  autoRefresh: number
+  isUsingAuth: boolean
+  cellQueryStatuses: QueriesModels.QueryStatuses
   inPresentationMode: boolean
+  editorTimeRange: QueriesModels.TimeRange
   showTemplateVariableControlBar: boolean
+  annotationsDisplaySetting: AnnotationsDisplaySetting
+}
+type ReduxDispatchProps = ResolveThunks<{
   toggleTemplateVariableControlBar: typeof appActions.toggleTemplateVariableControlBar
   handleClickPresentationButton: AppActions.DelayEnablePresentationModeDispatcher
-  cellQueryStatuses: QueriesModels.QueryStatuses
   errorThrown: ErrorsActions.ErrorThrownActionCreator
-  meRole: string
-  isUsingAuth: boolean
-  router: InjectedRouter
   notify: NotificationAction
-  annotationsDisplaySetting: AnnotationsDisplaySetting
+  setTimeZone: typeof appActions.setTimeZone
   onGetAnnotationsAsync: typeof getAnnotationsAsync
   handleClearCEO: typeof cellEditorOverlayActions.clearCEO
   handleDismissEditingAnnotation: typeof dismissEditingAnnotation
-  editorTimeRange: QueriesModels.TimeRange
   setDashTimeV1: typeof dashboardActions.setDashTimeV1
   setDashRefresh: typeof dashboardActions.setDashRefresh
   setZoomedTimeRange: typeof dashboardActions.setZoomedTimeRange
@@ -115,8 +119,9 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   updateTemplateQueryParams: typeof dashboardActions.updateTemplateQueryParams
   updateQueryParams: typeof dashboardActions.updateQueryParams
   updateTimeRangeQueryParams: typeof dashboardActions.updateTimeRangeQueryParams
-}
+}>
 
+type Props = OwnProps & ReduxStateProps & ReduxDispatchProps
 interface State {
   scrollTop: number
   windowHeight: number
@@ -585,7 +590,7 @@ class DashboardPage extends Component<Props, State> {
   }
 }
 
-const mstp = (state, {params: {dashboardID}}) => {
+const mstp = (state: any, {params: {dashboardID}}) => {
   const {
     app: {
       ephemeral: {inPresentationMode},
@@ -596,7 +601,7 @@ const mstp = (state, {params: {dashboardID}}) => {
     dashboardUI: {dashboards, cellQueryStatuses, zoomedTimeRange},
     sources,
     auth: {me, isUsingAuth},
-    cellEditorOverlay: {cell, timeRange: editorTimeRange},
+    cellEditorOverlay: {timeRange: editorTimeRange},
   } = state
 
   const meRole = _.get(me, 'role', null)
@@ -605,8 +610,6 @@ const mstp = (state, {params: {dashboardID}}) => {
   const refreshRate = getRefreshRate(state, dashboardID)
 
   const dashboard = dashboards.find(d => d.id === dashboardID)
-
-  const selectedCell = cell
 
   return {
     sources,
@@ -622,11 +625,10 @@ const mstp = (state, {params: {dashboardID}}) => {
     isUsingAuth,
     cellQueryStatuses,
     inPresentationMode,
-    selectedCell,
     editorTimeRange,
     showTemplateVariableControlBar,
     annotationsDisplaySetting: displaySetting,
-  }
+  } as ReduxStateProps
 }
 
 const mdtp = {

@@ -337,7 +337,10 @@ class TableGraph extends PureComponent<Props, State> {
       }
     }
 
-    const firstDiff = this.getTimeDifference(hoverTime, sortedTimeVals[1]) // sortedTimeVals[0] is "time"
+    const firstDiff = this.getTimeDifference(
+      hoverTime,
+      sortedTimeVals[1] as number | string
+    ) // sortedTimeVals[0] is "time"
 
     const hoverTimeFound = fastReduce<
       TimeSeriesValue,
@@ -345,7 +348,10 @@ class TableGraph extends PureComponent<Props, State> {
     >(
       sortedTimeVals,
       (acc, currentTime, index) => {
-        const thisDiff = this.getTimeDifference(hoverTime, currentTime)
+        const thisDiff = this.getTimeDifference(
+          hoverTime,
+          currentTime as string | number
+        )
         if (thisDiff < acc.diff) {
           return {index, diff: thisDiff}
         }
@@ -359,7 +365,7 @@ class TableGraph extends PureComponent<Props, State> {
     return {scrollToRow, scrollToColumn, externalScroll: hoveringOtherCell}
   }
 
-  private getTimeDifference(hoverTime, time: string | number) {
+  private getTimeDifference(hoverTime: string, time: string | number) {
     return Math.abs(parseInt(hoverTime, 10) - parseInt(time as string, 10))
   }
 
@@ -426,7 +432,7 @@ class TableGraph extends PureComponent<Props, State> {
 
     const columnLabel = transformedData[0][index]
 
-    const original = columnWidths[columnLabel]
+    const original = columnWidths[columnLabel as string]
 
     if (original > adjustedWidth) {
       // if the original calculated size of the column is greater than the table size
@@ -462,10 +468,12 @@ class TableGraph extends PureComponent<Props, State> {
 
     if (isTimeData) {
       if (timeZone === TimeZones.UTC) {
-        return moment(cellData).utc().format(timeFormat)
+        return moment(cellData as number | string)
+          .utc()
+          .format(timeFormat)
       }
 
-      return moment(cellData).format(timeFormat)
+      return moment(cellData as number | string).format(timeFormat)
     }
 
     if (_.isString(cellData) && isFieldName) {

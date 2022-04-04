@@ -7,7 +7,7 @@
     "eslint-plugin-react",
     "react",
     "prettier",
-    "babel",
+    "@babel",
     "jest"
   ],
   "settings": {
@@ -247,7 +247,7 @@
     "react/sort-comp": 0,
     "jest/no-disabled-tests": "warn",
     "jest/no-focused-tests": "error",
-    "babel/no-invalid-this": 1,
+    "@babel/no-invalid-this": 1,
     "@typescript-eslint/adjacent-overload-signatures": "error",
     "@typescript-eslint/array-type": [
       "error",
@@ -324,6 +324,7 @@
         "hoist": "all"
       }
     ],
+    "@typescript-eslint/no-unsafe-argument": "off",
     "@typescript-eslint/no-unsafe-assignment": "off",
     "@typescript-eslint/no-unsafe-call": "off",
     "@typescript-eslint/no-unsafe-member-access": "off",
@@ -355,5 +356,19 @@
     "@typescript-eslint/type-annotation-spacing": "off",
     "@typescript-eslint/unbound-method": "off",
     "@typescript-eslint/unified-signatures": "error"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["*.js"],
+      "rules": {
+        "@typescript-eslint/no-unsafe-argument": "off"
+      }
+    },
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {
+        "@babel/no-invalid-this": "off"
+      }
+    }
+  ]
 }

@@ -1,6 +1,6 @@
 // Libraries
 import React, {Component} from 'react'
-import {connect} from 'react-redux'
+import {connect, ResolveThunks} from 'react-redux'
 import _ from 'lodash'
 import {AutoSizer} from 'react-virtualized'
 
@@ -47,6 +47,7 @@ import {
   RemoteDataState,
   QueryUpdateState,
   QueryType,
+  Status,
 } from 'src/types'
 import {
   TableOptions,
@@ -62,7 +63,7 @@ interface TypeAndData {
   data: TimeSeriesServerResponse[] | FluxTable[]
 }
 
-interface Props {
+interface OwnProps {
   axes: Axes
   source: Source
   queries: Query[]
@@ -83,12 +84,9 @@ interface Props {
   autoRefresher: AutoRefresher
   manualRefresh: number
   resizerTopHeight: number
-  fluxASTLink: string
   onZoom: () => void
-  editQueryStatus: () => void
+  editQueryStatus?: (queryID: string, status: Status) => void
   onSetResolution: () => void
-  handleSetHoverTime: () => void
-  onNotify: typeof notify
   grabDataForDownload?: GrabDataForDownloadHandler
   grabFluxData?: (data: string) => void
   cellNote: string
@@ -98,6 +96,17 @@ interface Props {
   onUpdateFieldOptions?: (fieldOptions: FieldOption[]) => void
   onUpdateVisType?: (type: CellType) => Promise<void>
 }
+
+interface ReduxStateProps {
+  fluxASTLink: string
+}
+
+type ReduxDispatchProps = ResolveThunks<{
+  handleSetHoverTime: typeof setHoverTime
+  onNotify: typeof notify
+}>
+
+type Props = OwnProps & ReduxStateProps & ReduxDispatchProps
 
 class RefreshingGraph extends Component<Props> {
   public static defaultProps: Partial<Props> = {
@@ -539,10 +548,10 @@ class RefreshingGraph extends Component<Props> {
   }
 }
 
-const mapStateToProps = ({links, annotations: {mode}}) => ({
-  mode,
-  fluxASTLink: links.flux.ast,
-})
+const mapStateToProps = ({links}) =>
+  ({
+    fluxASTLink: links.flux.ast,
+  } as ReduxStateProps)
 
 const mdtp = {
   handleSetHoverTime: setHoverTime,

@@ -1,8 +1,6 @@
 import React, {PureComponent, ReactElement} from 'react'
 import {withRouter, WithRouterProps} from 'react-router'
 
-import * as actions from 'src/shared/actions/sources'
-
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
 import KapacitorDropdown from 'src/sources/components/KapacitorDropdown'
@@ -18,7 +16,7 @@ interface Props {
   currentSource: Source
   onDeleteSource: (source: Source) => void
   setActiveKapacitor: (kapacitor: Kapacitor) => void
-  deleteKapacitor: actions.DeleteKapacitor
+  deleteKapacitor: (kapacitor: Kapacitor) => void
   toggleWizard: ToggleWizard
 }
 

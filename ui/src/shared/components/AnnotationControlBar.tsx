@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {connect} from 'react-redux'
+import {connect, ResolveThunks} from 'react-redux'
 
 import AddAnnotationToggle from 'src/shared/components/AddAnnotationToggle'
 import AnnotationFilterControl from 'src/shared/components/AnnotationFilterControl'
@@ -21,21 +21,27 @@ import {Source} from 'src/types'
 import {TagFilter, AnnotationsDisplaySetting} from 'src/types/annotations'
 import {AnnotationState} from 'src/shared/reducers/annotations'
 
-interface Props {
-  dashboardID: string
+interface ReduxStateProps {
   tagFilters: TagFilter[]
   tagKeys?: string[]
   tagValues: {
     [tagKey: string]: string[]
   }
   displaySetting: AnnotationsDisplaySetting
-  source: Source
+}
+type ReduxDispatchProps = ResolveThunks<{
   onUpdateTagFilter: typeof updateTagFilter
   onUpdateTagFilterAsync: typeof updateTagFilterAsync
   onDeleteTagFilterAsync: typeof deleteTagFilterAsync
   onGetTagKeys: typeof fetchAndSetTagKeys
   onGetTagValues: typeof fetchAndSetTagValues
+}>
+
+interface OwnProps {
+  dashboardID: string
+  source: Source
 }
+type Props = OwnProps & ReduxStateProps & ReduxDispatchProps
 
 class AnnotationControlBar extends PureComponent<Props> {
   public render() {
@@ -123,7 +129,7 @@ class AnnotationControlBar extends PureComponent<Props> {
 const mstp = (
   state: {annotations: AnnotationState},
   ownProps: {dashboardID: string}
-): Partial<Props> => {
+): ReduxStateProps => {
   const {tagKeys, tagValues, displaySetting} = state.annotations
   const tagFilters = getTagFilters(state, ownProps.dashboardID)
 
