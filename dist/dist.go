@@ -1,6 +1,7 @@
 package dist
 
 //go:generate go-bindata -o dist_gen.go -ignore 'map|go' -pkg dist ../ui/build/... ../ui/package.json
+//go:generate go fmt dist_gen.go
 
 import (
 	"fmt"

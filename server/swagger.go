@@ -1,6 +1,7 @@
 package server
 
 //go:generate go-bindata -o swagger_gen.go -ignore go -nocompress -pkg server .
+//go:generate go fmt swagger_gen.go
 
 import "net/http"
 
