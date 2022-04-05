@@ -8,9 +8,6 @@ import (
 	"github.com/influxdata/chronograf"
 )
 
-// //go:generate go-bindata -o bin_gen.go -ignore README|apps|\.sh|\.go -pkg canned .
-// //go:generate go fmt bin_gen.go
-
 //go:embed *.json
 var content embed.FS
 
