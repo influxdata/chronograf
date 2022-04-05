@@ -1,9 +1,7 @@
 ifeq ($(OS), Windows_NT)
 	VERSION := $(shell git describe --exact-match --tags 2>nil)
-	GOBINDATA := $(shell go-bindata.exe --version 2>nil)
 else
 	VERSION := $(shell git describe --exact-match --tags 2>/dev/null)
-	GOBINDATA := $(shell which go-bindata 2> /dev/null)
 endif
 
 COMMIT ?= $(shell git rev-parse --short=8 HEAD)
@@ -68,11 +66,7 @@ assets: .jssrc .bindata
 dep: .jsdep .godep
 
 .godep:
-ifndef GOBINDATA
-	@echo "Installing go-bindata"
-	go install github.com/kevinburke/go-bindata/...@v3.22.0+incompatible
 	GO111MODULE=on go get
-endif
 	@touch .godep
 
 .jsdep: ./yarn.lock
