@@ -17,7 +17,7 @@ const (
 
 // AssetsOpts configures the asset middleware
 type AssetsOpts struct {
-	// Develop when true serves assets from ui/build directory directly; false will use internal bindata.
+	// Develop when true serves assets from ui/build directory directly; false will use embedded files.
 	Develop bool
 	// Logger will log the asset served
 	Logger chronograf.Logger

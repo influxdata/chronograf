@@ -8,7 +8,7 @@ import (
 //go:embed swagger.json
 var swagger []byte
 
-// Spec servers the swagger.json file from bindata
+// Spec servers the swagger.json embedded file
 func Spec() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
