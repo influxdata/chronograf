@@ -5,19 +5,14 @@ import (
 
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/dist"
+	"github.com/influxdata/chronograf/ui"
 )
 
 const (
-	// Dir is prefix of the assets in the bindata
-	Dir = "../ui/build"
-	// Default is the default item to load if 404
-	Default = "../ui/build/index.html"
 	// DebugDir is the prefix of the assets in development mode
 	DebugDir = "ui/build"
 	// DebugDefault is the default item to load if 404
 	DebugDefault = "ui/build/index.html"
-	// DefaultContentType is the content-type to return for the Default file
-	DefaultContentType = "text/html; charset=utf-8"
 )
 
 // AssetsOpts configures the asset middleware
@@ -37,11 +32,7 @@ func Assets(opts AssetsOpts) http.Handler {
 			Default: DebugDefault,
 		}
 	} else {
-		assets = &dist.BindataAssets{
-			Prefix:             Dir,
-			Default:            Default,
-			DefaultContentType: DefaultContentType,
-		}
+		assets = &ui.BindataAssets{}
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -58,11 +58,8 @@ docker: dep assets docker-${BINARY}
 
 assets: .jssrc .bindata
 
-.bindata: server/swagger.json canned/*.json protoboards/*.json dist/dist_gen.go
+.bindata: server/swagger.json canned/*.json protoboards/*.json $(UISOURCES)
 	@touch .bindata
-
-dist/dist_gen.go: $(UISOURCES)
-	go generate -x ./dist
 
 .jssrc: $(UISOURCES)
 	cd ui && yarn run clean && yarn run build
@@ -142,7 +139,6 @@ clean:
 	cd ui && yarn run clean
 	rm -rf node_modules
 	cd ui && rm -rf node_modules
-	rm -f dist/dist_gen.go
 	@rm -f .godep .jsdep .jssrc .bindata
 
 ctags:
