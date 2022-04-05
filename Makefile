@@ -140,6 +140,7 @@ e2e:
 clean:
 	if [ -f ${BINARY} ] ; then rm ${BINARY} ; fi
 	cd ui && yarn run clean
+	rm -rf node_modules
 	cd ui && rm -rf node_modules
 	rm -f dist/dist_gen.go
 	@rm -f .godep .jsdep .jssrc .bindata
