@@ -13,7 +13,6 @@
 * github.com/golang-jwt/jwt/v4 [MIT](github.com/golang-jwt/jwt/blob/main/LICENSE)
 * github.com/dustin/go-humanize [MIT](https://github.com/dustin/go-humanize/blob/master/LICENSE)
 * github.com/eclipse/paho.mqtt.golang [EPL-1.0](https://github.com/eclipse/paho.mqtt.golang/blob/master/LICENSE)
-* github.com/elazarl/go-bindata-assetfs [BSD-2-Clause](https://github.com/elazarl/go-bindata-assetfs/blob/master/LICENSE)
 * github.com/go-sql-driver/mysql [MPL-2.0](https://github.com/go-sql-driver/mysql/blob/master/LICENSE)
 * github.com/gogo/protobuf [BSD-3-Clause](https://github.com/gogo/protobuf/blob/master/LICENSE)
 * github.com/golang/geo [Apache-2.0](https://github.com/golang/geo/blob/master/LICENSE)
