@@ -112,7 +112,6 @@ export class DashboardsPage extends PureComponent<Props, State> {
                 logoutLink={logoutLink}
                 links={links}
                 me={me}
-                sourcePrefix={`/sources/${source?.id}`}
                 header={true}
               />
             ) : undefined}
