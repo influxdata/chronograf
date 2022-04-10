@@ -117,7 +117,7 @@
     "levelup": "^3.1.1",
     "lodash": "^4.17.13",
     "memoize-one": "^4.0.2",
-    "moment": "^2.13.0",
+    "moment": "^2.29.2",
     "nano-date": "^2.0.1",
     "papaparse": "^5.3.0",
     "prop-types": "^15.6.1",
