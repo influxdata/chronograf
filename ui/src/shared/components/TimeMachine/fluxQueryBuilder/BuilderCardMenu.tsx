@@ -15,7 +15,7 @@ const BuilderCardMenu = (props: Props) => {
   })
 
   return (
-    <div className={classname} data-testid={testID ?? 'builder-card--menu'}>
+    <div className={classname} data-test={testID ?? 'builder-card--menu'}>
       {children}
     </div>
   )

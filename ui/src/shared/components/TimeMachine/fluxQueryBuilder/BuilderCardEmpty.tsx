@@ -12,7 +12,7 @@ const BuilderCardEmpty = (props: Props) => {
   return (
     <div
       className="builder-card--body builder-card--empty"
-      data-testid={testID ?? 'builder-card--empty'}
+      data-test={testID ?? 'builder-card--empty'}
     >
       {children}
     </div>

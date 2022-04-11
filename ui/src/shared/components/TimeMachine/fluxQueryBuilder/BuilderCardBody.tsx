@@ -38,7 +38,7 @@ export default class BuilderCardBody extends PureComponent<Props> {
         <FancyScrollbar
           className="builder-card--body"
           style={scrollbarStyles}
-          data-testid={testID}
+          data-test={testID}
           autoHide={autoHideScrollbars}
         >
           {this.children}
@@ -51,7 +51,7 @@ export default class BuilderCardBody extends PureComponent<Props> {
     })
 
     return (
-      <div className={classname} data-testid={testID} style={style}>
+      <div className={classname} data-test={testID} style={style}>
         {this.children}
       </div>
     )

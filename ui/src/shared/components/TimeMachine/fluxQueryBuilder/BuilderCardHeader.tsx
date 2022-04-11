@@ -18,7 +18,7 @@ const BuilderCardHeader = (props: Props) => {
   })
 
   return (
-    <div className={classname} data-testid={testID ?? 'builder-card--header'}>
+    <div className={classname} data-test={testID ?? 'builder-card--header'}>
       {onDragStart ? (
         <div className="builder-card--draggable" onDragStart={onDragStart}>
           <div className="builder-card--hamburger" />
