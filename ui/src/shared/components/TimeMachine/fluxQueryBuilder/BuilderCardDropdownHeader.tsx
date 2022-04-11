@@ -21,14 +21,14 @@ export default class BuilderCardDropdownHeader extends PureComponent<Props> {
   public render() {
     const {children, options, onSelect, selectedOption, testID} = this.props
     return (
-      <div className="builder-card--header" data-testid={testID}>
+      <div className="builder-card--header" data-test={testID}>
         <Dropdown
           items={options.map(x => ({text: x}))}
           onChoose={({text}) => onSelect(text)}
           selected={selectedOption}
           buttonSize="btn-sm"
           className="dropdown-stretch"
-          data-testid="select-option-dropdown"
+          data-test="select-option-dropdown"
         />
         {children}
         {this.deleteButton}

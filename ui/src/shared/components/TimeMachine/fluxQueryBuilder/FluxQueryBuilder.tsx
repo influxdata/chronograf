@@ -58,7 +58,7 @@ const FluxQueryBuilder = ({
   )
 
   return (
-    <div className="flux-query-builder" data-testid="flux-query-builder">
+    <div className="flux-query-builder" data-test="flux-query-builder">
       <div className="flux-query-builder--cards">
         <FancyScrollbar>
           <div className="builder-card--list">

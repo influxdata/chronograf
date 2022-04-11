@@ -34,7 +34,7 @@ export default class BuilderCard extends PureComponent<Props> {
     const style = {flex: `0 0 ${widthPixels}px`}
 
     return (
-      <div className={classname} data-testid={testID} style={style}>
+      <div className={classname} data-test={testID} style={style}>
         {children}
       </div>
     )

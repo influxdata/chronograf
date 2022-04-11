@@ -34,17 +34,17 @@ describe('query builder', () => {
   it('create a query, change its aggregation function and fill missing values', () => {
     let queryTemplate: string
 
-    cy.get('[data-testid="bucket-selector"]').within(() => {
+    cy.getByTestID('[data-test="bucket-selector"]').within(() => {
       cy.get('.flux-query-builder--list-item').contains('internal').click()
     })
 
-    cy.get('[data-testid="builder-card"]')
+    cy.getByTestID('[data-test="builder-card"]')
       .eq(0)
       .within(() => {
         cy.get('#flxts0_database').should('exist').click({force: true})
       })
 
-    cy.get('[data-testid="builder-card"]')
+    cy.getByTestID('[data-test="builder-card"]')
       .eq(1)
       .within(() => {
         cy.get('#flxts1_numSeries')
@@ -82,8 +82,8 @@ describe('query builder', () => {
         checkQuery(queryTemplate)
       })
 
-    cy.get('[data-testid="aggregation-selector"]').within(() => {
-      cy.get('[data-testid="builder-card--body"]').within(() => {
+    cy.getByTestID('[data-test="aggregation-selector"]').within(() => {
+      cy.getByTestID('[data-test="builder-card--body"]').within(() => {
         cy.get('.dropdown-selected').click()
         cy.get('.dropdown-menu').within(() => {
           cy.getByTestID('dropdown-item').contains('custom').click({force: true})
@@ -99,7 +99,7 @@ describe('query builder', () => {
       })
     })
 
-    cy.get('[data-testid="builder-card"]')
+    cy.getByTestID('[data-test="builder-card"]')
       .eq(2)
       .should('contain.text', 'Filter')
       .within(() => {
@@ -129,17 +129,17 @@ describe('query builder', () => {
   })
 
   it('use filters to search for tags, activate them and keep track of the selected tags counter', () => {
-    cy.get('[data-testid="bucket-selector"]').within(() => {
+    cy.getByTestID('[data-test="bucket-selector"]').within(() => {
       cy.get('.flux-query-builder--list-item').should('have.length', 1)
-      cy.get('[data-testid="builder-card--menu"]').type('Hello World')
+      cy.getByTestID('[data-test="builder-card--menu"]').type('Hello World')
       cy.get('.flux-query-builder--list-item').should('not.exist')
-      cy.get('[data-testid="builder-card--menu"]').clear()
+      cy.getByTestID('[data-test="builder-card--menu"]').clear()
       cy.get('.flux-query-builder--list-item')
         .should('have.length', 1)
         .and('contain.text', 'internal')
     })
 
-    cy.get('[data-testid="builder-card"]').within(() => {
+    cy.getByTestID('[data-test="builder-card"]').within(() => {
       cy.get('.flux-tag-selector--count').should('not.exist')
       cy.get('.flux-query-builder--list-item')
         .contains('database')
