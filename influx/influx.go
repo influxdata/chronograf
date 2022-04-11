@@ -340,7 +340,8 @@ func (c *Client) ping(u *url.URL) (string, string, error) {
 	} else if strings.Contains(version, "relay") {
 		return version, chronograf.InfluxRelay, nil
 	}
-	// older InfluxDB instances might have version 'v1.x.x'
+	// Strip v prefix from version, some older '1.x' versions and also
+	// InfluxDB 2.2.0 return version in format vx.x.x
 	if strings.HasPrefix(version, "v") {
 		version = version[1:]
 	}
