@@ -34,17 +34,17 @@ describe('query builder', () => {
   it('create a query, change its aggregation function and fill missing values', () => {
     let queryTemplate: string
 
-    cy.getByTestID('[data-test="bucket-selector"]').within(() => {
+    cy.getByTestID('bucket-selector').within(() => {
       cy.get('.flux-query-builder--list-item').contains('internal').click()
     })
 
-    cy.getByTestID('[data-test="builder-card"]')
+    cy.getByTestID('builder-card')
       .eq(0)
       .within(() => {
         cy.get('#flxts0_database').should('exist').click({force: true})
       })
 
-    cy.getByTestID('[data-test="builder-card"]')
+    cy.getByTestID('builder-card')
       .eq(1)
       .within(() => {
         cy.get('#flxts1_numSeries')
@@ -82,8 +82,8 @@ describe('query builder', () => {
         checkQuery(queryTemplate)
       })
 
-    cy.getByTestID('[data-test="aggregation-selector"]').within(() => {
-      cy.getByTestID('[data-test="builder-card--body"]').within(() => {
+    cy.getByTestID('aggregation-selector').within(() => {
+      cy.getByTestID('builder-card--body').within(() => {
         cy.get('.dropdown-selected').click()
         cy.get('.dropdown-menu').within(() => {
           cy.getByTestID('dropdown-item').contains('custom').click({force: true})
@@ -99,7 +99,7 @@ describe('query builder', () => {
       })
     })
 
-    cy.getByTestID('[data-test="builder-card"]')
+    cy.getByTestID('builder-card')
       .eq(2)
       .should('contain.text', 'Filter')
       .within(() => {
@@ -129,17 +129,17 @@ describe('query builder', () => {
   })
 
   it('use filters to search for tags, activate them and keep track of the selected tags counter', () => {
-    cy.getByTestID('[data-test="bucket-selector"]').within(() => {
+    cy.getByTestID('bucket-selector').within(() => {
       cy.get('.flux-query-builder--list-item').should('have.length', 1)
-      cy.getByTestID('[data-test="builder-card--menu"]').type('Hello World')
+      cy.getByTestID('builder-card--menu').type('Hello World')
       cy.get('.flux-query-builder--list-item').should('not.exist')
-      cy.getByTestID('[data-test="builder-card--menu"]').clear()
+      cy.getByTestID('builder-card--menu').clear()
       cy.get('.flux-query-builder--list-item')
         .should('have.length', 1)
         .and('contain.text', 'internal')
     })
 
-    cy.getByTestID('[data-test="builder-card"]').within(() => {
+    cy.getByTestID('builder-card').within(() => {
       cy.get('.flux-tag-selector--count').should('not.exist')
       cy.get('.flux-query-builder--list-item')
         .contains('database')
