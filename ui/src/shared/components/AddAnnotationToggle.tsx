@@ -37,12 +37,14 @@ const AddAnnotationToggle: FunctionComponent<Props> = props => {
   let buttonContent = 'Annotate'
   let buttonColor = ComponentColor.Primary
   let buttonIcon = IconFont.AnnotatePlus
+  let buttonDataTest = 'add-annotation--button'
 
   if (isAddingAnnotation) {
     onToggle = onDismissAddingAnnotation
     buttonContent = 'Cancel Annotate'
     buttonColor = ComponentColor.Default
     buttonIcon = IconFont.Remove
+    buttonDataTest = 'cancel-annotation--button'
   } else {
     onToggle = onAddingAnnotation
   }
@@ -53,6 +55,7 @@ const AddAnnotationToggle: FunctionComponent<Props> = props => {
       color={buttonColor}
       text={buttonContent}
       onClick={onToggle}
+      dataTest={buttonDataTest}
     />
   )
 }
