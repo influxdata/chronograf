@@ -28,7 +28,7 @@ const (
 // MuxOpts are the options for the router.  Mostly related to auth.
 type MuxOpts struct {
 	Logger        chronograf.Logger
-	Develop       bool                 // Develop loads assets from filesystem instead of bindata
+	Develop       bool                 // Develop loads assets from filesystem instead of embedded files
 	Basepath      string               // URL path prefix under which all chronograf routes will be mounted
 	UseAuth       bool                 // UseAuth turns on Github OAuth and JWT
 	RedirAuth     string               // RedirAuth specifies which auth to redirect login.

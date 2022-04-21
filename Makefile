@@ -1,9 +1,7 @@
 ifeq ($(OS), Windows_NT)
 	VERSION := $(shell git describe --exact-match --tags 2>nil)
-	GOBINDATA := $(shell go-bindata.exe --version 2>nil)
 else
 	VERSION := $(shell git describe --exact-match --tags 2>/dev/null)
-	GOBINDATA := $(shell which go-bindata 2> /dev/null)
 endif
 
 COMMIT ?= $(shell git rev-parse --short=8 HEAD)
@@ -58,20 +56,8 @@ docker: dep assets docker-${BINARY}
 
 assets: .jssrc .bindata
 
-.bindata: server/swagger_gen.go canned/bin_gen.go protoboards/bin_gen.go dist/dist_gen.go
+.bindata: server/swagger.json canned/*.json protoboards/*.json $(UISOURCES)
 	@touch .bindata
-
-dist/dist_gen.go: $(UISOURCES)
-	go generate -x ./dist
-
-server/swagger_gen.go: server/swagger.json
-	go generate -x ./server
-
-canned/bin_gen.go: canned/*.json
-	go generate -x ./canned
-
-protoboards/bin_gen.go: protoboards/*.json
-	go generate -x ./protoboards
 
 .jssrc: $(UISOURCES)
 	cd ui && yarn run clean && yarn run build
@@ -80,11 +66,7 @@ protoboards/bin_gen.go: protoboards/*.json
 dep: .jsdep .godep
 
 .godep:
-ifndef GOBINDATA
-	@echo "Installing go-bindata"
-	go install github.com/kevinburke/go-bindata/...@v3.22.0+incompatible
 	GO111MODULE=on go get
-endif
 	@touch .godep
 
 .jsdep: ./yarn.lock
@@ -100,7 +82,23 @@ gen: internal.pb.go
 internal.pb.go: kv/internal/internal.proto
 	GO111MODULE=on go generate -x ./kv/internal
 
-test: jstest gotest gotestrace lint-ci
+test: gochecktidy gocheckfmt jstest gotest gotestrace lint-ci
+
+gochecktidy:
+	go version
+	go mod tidy
+	if ! git --no-pager diff --exit-code -- go.mod go.sum; then\
+		echo Modules are not tidy, please run \`go mod tidy\` ! ;\
+		exit 1;\
+	fi
+
+gocheckfmt:
+	NOFMTFILES=`go fmt './...'` ; \
+	if [ ! -z "$$NOFMTFILES" ] ; then\
+		echo Unformatted files: $$NOFMTFILES ;\
+		echo Run \`go fmt ./...\` to fix it ! ;\
+		exit 1;\
+	fi
 
 gotest:
 	GO111MODULE=on go test -timeout 10s ./...
@@ -133,8 +131,8 @@ e2e:
 clean:
 	if [ -f ${BINARY} ] ; then rm ${BINARY} ; fi
 	cd ui && yarn run clean
+	rm -rf node_modules
 	cd ui && rm -rf node_modules
-	rm -f dist/dist_gen.go canned/bin_gen.go protoboards/bin_gen.go server/swagger_gen.go
 	@rm -f .godep .jsdep .jssrc .bindata
 
 ctags:

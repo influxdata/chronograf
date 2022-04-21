@@ -20,7 +20,7 @@ var (
 
 func init() {
 	if version == "" {
-		// read version from bindata files
+		// read version from embedded files
 		version = dist.GetVersion()
 	}
 	fullVersion = version
