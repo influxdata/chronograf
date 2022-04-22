@@ -1,6 +1,7 @@
 describe('Welcome Page', () => {
   beforeEach(() => {
-    cy.cutConnections()
+    cy.OAuthLogin()
+    cy.removeConnections()
     cy.visit('/')
   })
 

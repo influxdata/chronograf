@@ -1,10 +1,10 @@
 describe('query builder', () => {
   beforeEach(() => {
+    cy.OAuthLogin('test')
     cy.deleteDashboards()
-    cy.cutConnections()
+    cy.removeConnections()
     cy.createConnection()
     cy.createDashboard()
-
     cy.get('@connections').then(connections => {
       cy.get('@dashboards').then(dashboards => {
         cy.fixture('routes').then(routes => {

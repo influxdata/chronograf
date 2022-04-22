@@ -1,7 +1,8 @@
 describe('dashboards', () => {
   beforeEach(() => {
+    cy.OAuthLogin
     cy.deleteDashboards()
-    cy.cutConnections()
+    cy.removeConnections()
     cy.createConnection()
     cy.get('@connections').then(connections => {
       cy.fixture('routes').then(({dashboards}) => {
