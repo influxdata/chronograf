@@ -357,7 +357,7 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	router.GET("/chronograf/v1/org_config/logviewer", EnsureViewer(service.OrganizationLogViewerConfig))
 	router.PUT("/chronograf/v1/org_config/logviewer", EnsureEditor(service.ReplaceOrganizationLogViewerConfig))
 
-	router.GET("/chronograf/v1/env", EnsureReader(service.Environment))
+	router.GET("/chronograf/v1/env", EnsureMember(service.Environment))
 
 	// Validates go templates for the js client
 	router.POST("/chronograf/v1/validate_text_templates", EnsureViewer(service.ValidateTextTemplate))
