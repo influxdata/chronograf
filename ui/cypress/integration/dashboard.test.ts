@@ -1,6 +1,6 @@
 describe('dashboards', () => {
   beforeEach(() => {
-    cy.OAuthLogin
+    cy.OAuthLogin('test')
     cy.deleteDashboards()
     cy.removeConnections()
     cy.createConnection()
