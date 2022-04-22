@@ -2,6 +2,8 @@
 
 ### Features
 
+1. [#5904](https://github.com/influxdata/chronograf/pull/5904): Add reader role.
+
 ### Bug Fixes
 
 ### Other
