@@ -168,7 +168,7 @@ class DashboardHeader extends Component<Props, State> {
             icon={IconFont.AddCell}
             onClick={onAddCell}
             titleText="Add a Cell to Dashboard"
-            dataTest='add-cell'
+            dataTest="add-cell"
           />
         </Authorized>
       )

@@ -71,10 +71,7 @@ class SideNav extends PureComponent<Props> {
     const hostPageIsEnabled = !env.hostPageDisabled
 
     return isHidden ? null : (
-      <nav 
-        className="sidebar"
-        data-test="sidebar"
-      >
+      <nav className="sidebar" data-test="sidebar">
         <div
           className={isDefaultPage ? 'sidebar--item active' : 'sidebar--item'}
         >
