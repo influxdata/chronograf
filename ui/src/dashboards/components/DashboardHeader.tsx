@@ -168,6 +168,7 @@ class DashboardHeader extends Component<Props, State> {
             icon={IconFont.AddCell}
             onClick={onAddCell}
             titleText="Add a Cell to Dashboard"
+            dataTest="add-cell"
           />
         </Authorized>
       )
@@ -186,13 +187,17 @@ class DashboardHeader extends Component<Props, State> {
     if (dashboard) {
       let variablesTooltip = 'Show Template Variables Controls'
       let annotationsTooltip = 'Show Annotations Controls'
+      let variablesDataTest = 'show-variables--button'
+      let annotationsDataTest = 'show-annotations--button'
 
       if (showTempVarControls) {
         variablesTooltip = 'Hide Template Variables Controls'
+        variablesDataTest = 'hide-variables--button'
       }
 
       if (showAnnotationControls) {
         annotationsTooltip = 'Hide Annotations Controls'
+        annotationsDataTest = 'hide-annotations--button'
       }
 
       return (
@@ -203,6 +208,7 @@ class DashboardHeader extends Component<Props, State> {
             onClick={onToggleShowTempVarControls}
             active={showTempVarControls}
             titleText={variablesTooltip}
+            dataTest={variablesDataTest}
           />
           <Button
             text="Annotations"
@@ -210,6 +216,7 @@ class DashboardHeader extends Component<Props, State> {
             onClick={onToggleShowAnnotationControls}
             active={showAnnotationControls}
             titleText={annotationsTooltip}
+            dataTest={annotationsDataTest}
           />
         </>
       )
