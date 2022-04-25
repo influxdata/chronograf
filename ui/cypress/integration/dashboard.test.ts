@@ -1,5 +1,6 @@
 describe('Use Dashboards', () => {
   beforeEach(() => {
+    cy.OAuthLogout()
     cy.OAuthLogin('test')
     cy.deleteDashboards()
     cy.removeConnections()
@@ -47,6 +48,7 @@ describe('Use Dashboards', () => {
                      GROUP BY time(:interval:) FILL(null)`
 
     beforeEach(() => {
+        cy.OAuthLogout()
         cy.OAuthLogin('test')
         cy.deleteUser('Reader')
         cy.deleteDashboards()
@@ -56,7 +58,6 @@ describe('Use Dashboards', () => {
         cy.createUser('Reader', 'oauth-mock', 'oauth2')
         cy.OAuthLogout()
         cy.OAuthLogin('Reader')
-        cy.visit('/')
     })
 
     it('use dashboards as user with reader role', () => {
@@ -65,7 +66,7 @@ describe('Use Dashboards', () => {
         cy.getByTestID('create-dashboard-button').should('not.exist')
         cy.get('.form-control').type('Empty')
         cy.getByTestID('dashboard-panel').should('have.text', `Looks like you don’t have any dashboards`)
-         cy.get('.form-control').clear().type('Dashboard')
+        cy.get('.form-control').clear().type('Dashboard')
         cy.getByTestID('Unnamed Dashboard').click()
         cy.get('.dashboard-empty--menu').should('not.exist')
         cy.getByTestID('add-cell').should('not.exist')
