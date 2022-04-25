@@ -65,7 +65,7 @@ jobs:
       - name: Clone OAuth2 Mock Server
         uses: actions/checkout@v3
         with:
-          repository: https://github.com/bonitoo-io/oauth2-server-mock
+          repository: bonitoo-io/oauth2-server-mock
           path: oauth2-server-mock
 
       - name: Run OAuth2 Mock Server
