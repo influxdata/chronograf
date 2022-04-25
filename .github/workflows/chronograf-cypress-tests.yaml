@@ -57,6 +57,19 @@ jobs:
         env:
           INFLUXDB_ENTERPRISE_LICENSE_KEY: "${{ secrets.INFLUXDB_ENTERPRISE_LICENSE_KEY }}"
 
+      - name: Clone OAuth2 Mock Server
+        uses: actions/checkout@v3
+        with:
+          repository: https://github.com/bonitoo-io/oauth2-server-mock
+          path: oauth2-server-mock
+
+      - name: Run OAuth2 Mock Server
+        run: |
+          source ./oauth2-server-mock/env.sh
+          source ./oauth2-server-mock/oauth-for-chronograf.sh
+          yarn --cwd ./oauth2-server-mock
+          RUNNER_TRACKING_ID="" && (nohup yarn --cwd ./oauth2-server-mock start&)
+
       - name: Chronograf
         run: |
           make
