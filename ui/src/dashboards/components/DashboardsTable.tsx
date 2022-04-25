@@ -60,7 +60,10 @@ class DashboardsTable extends PureComponent<Props> {
           {_.sortBy(dashboards, d => d.name.toLowerCase()).map(dashboard => (
             <tr key={dashboard.id}>
               <td>
-                <Link to={`${dashboardLink}/dashboards/${dashboard.id}`}>
+                <Link
+                  to={`${dashboardLink}/dashboards/${dashboard.id}`}
+                  data-test={`${dashboard.name}`}
+                >
                   {dashboard.name}
                 </Link>
               </td>
