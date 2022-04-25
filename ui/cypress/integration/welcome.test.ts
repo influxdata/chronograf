@@ -7,11 +7,11 @@ describe('Welcome Page', () => {
 
   it('set up InfluxDB connection', () => {
     cy.get('button').contains('Get Started').click()
-    cy.get('[id="Connection URL"]').clear().type(Cypress.env('url'))
+    cy.get('[id="Connection URL"]').clear().type(Cypress.env('influxDBURL'))
     cy.get('[id="Connection Name"]').clear().type(Cypress.env('connectionName'))
     cy.get('[id="Username"]').clear().type(Cypress.env('username'))
     cy.get('[id="Password"]').clear().type(Cypress.env('password'))
-    if (Cypress.env('url').startsWith('https')){
+    if (Cypress.env('influxDBURL').startsWith('https')){
       cy.get('.wizard-checkbox--label').contains('Unsafe SSL').click()
     }
 
@@ -19,8 +19,8 @@ describe('Welcome Page', () => {
       cy.get('button').contains('Add Connection').click()
     })
 
-    cy.get('button').contains('Skip').click()
-    cy.get('button').contains('Skip').click()
+    cy.get('.wizard-skip-link').contains('Skip').click()
+    cy.get('.wizard-skip-link').contains('Skip').click()
     cy.get('button').contains('View All Connections').click()
 
     cy.request('GET', '/chronograf/v1/sources').then(response => {
