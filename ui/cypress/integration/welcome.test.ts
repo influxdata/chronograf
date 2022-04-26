@@ -21,8 +21,8 @@ describe('Welcome Page', () => {
       cy.get('button').contains('Add Connection').click()
     })
 
-    cy.get('.wizard-skip-link').contains('Skip').click()
-    cy.get('.wizard-skip-link').contains('Skip').click()
+    cy.getByTestID('skip-button').click()
+    cy.getByTestID('skip-button').click()
     cy.get('button').contains('View All Connections').click()
 
     cy.request('GET', '/chronograf/v1/sources').then(response => {

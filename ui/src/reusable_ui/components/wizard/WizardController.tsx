@@ -180,7 +180,7 @@ class WizardController extends PureComponent<Props, State> {
       <button
         className="btn btn-xs btn-primary btn-link wizard-skip-link"
         onClick={this.jumpToStep(currentStepIndex + 1)}
-        data-test={"skip-button"}
+        data-test={'skip-button'}
       >
         {skipLinkText}
       </button>
@@ -195,7 +195,7 @@ class WizardController extends PureComponent<Props, State> {
         <button
           className="btn btn-xs btn-primary btn-link wizard-skip-link"
           onClick={handleSwitch}
-          data-test={"switch-button"}
+          data-test={'switch-button'}
         >
           {switchLinkText}
         </button>
