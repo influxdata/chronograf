@@ -102,5 +102,6 @@ jobs:
             name: results
             path: |
               out.log
+              ui/cypress/videos/*.mp4
               ui/cypress/results/results-*.xml
 
