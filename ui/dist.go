@@ -83,6 +83,7 @@ func addCacheHeaders(name string, headers http.Header) error {
 	if input, err := buildDir.Open(name); err != nil {
 		return err
 	} else {
+		defer input.Close()
 		if _, err := io.Copy(hash, input); err != nil {
 			return err
 		}
@@ -103,14 +104,14 @@ func (b *BindataAssets) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	openFn := func(name string) (fs.File, error) {
 		// If the named asset exists, then return it directly.
 		file, err := buildDir.Open(name)
+		// If this is at / then we we can return a Directory
+		// that will be be redirected to /index.html by http.fs
+		if name == "/" || name == "." {
+			return file, err
+		}
 		if err != nil {
-			// If this is at / then we just error out so we can return a Directory
-			// This directory will then be redirected by go to the /index.html
-			if name == "/" || name == "." {
-				return nil, err
-			}
-			// If this is anything other than slash, we just return the default
-			// asset.  This default asset will handle the routing.
+			// If this is anything other than root, we have to return the default
+			// asset. This default asset will handle the routing.
 			// Additionally, because we know we are returning the default asset,
 			// we need to set the default asset's content-type.
 			w.Header().Set("Content-Type", DefaultPageContentType)
