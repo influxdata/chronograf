@@ -63,7 +63,7 @@ const AnnotationTooltip: FunctionComponent<Props> = props => {
         <div className="annotation-tooltip--items">
           <div className="annotation-tooltip-text">
             {annotation.text}
-            {isUsingAuth && isUserAuthorized(me, VIEWER_ROLE) ? (
+            {!isUsingAuth || isUserAuthorized(me, VIEWER_ROLE) ? (
               <span
                 className="annotation-tooltip--edit icon pencil"
                 onClick={setEditing}
