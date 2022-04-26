@@ -1,8 +1,14 @@
 describe('Use Dashboards', () => {
+  let query = `SELECT mean("pointsWritten") AS "mean_pointsWritten" 
+  FROM "_internal"."monitor"."localStore" 
+  WHERE time > :dashboardTime: AND time < :upperDashboardTime: 
+  GROUP BY time(:interval:) FILL(null)`
+
   beforeEach(() => {
     cy.OAuthLogout()
     cy.OAuthLogin('test')
     cy.deleteDashboards()
+    cy.createDashboardWithCell(query)
     cy.removeConnections()
     cy.createConnection()
     cy.get('@connections').then(connections => {
@@ -36,37 +42,27 @@ describe('Use Dashboards', () => {
       .should('exist')
       .within(() => {
         // delete button
-        cy.get('.confirm-button--confirmation').click({force: true})
+        cy.get('.confirm-button--confirmation').eq(1).click({force: true})
       })
-      .should('not.exist')
   })
 
   describe('Use Dashboards as reader', () => {
-    let query = `SELECT mean("pointsWritten") AS "mean_pointsWritten" 
-                     FROM "_internal"."monitor"."localStore" 
-                     WHERE time > :dashboardTime: AND time < :upperDashboardTime: 
-                     GROUP BY time(:interval:) FILL(null)`
-
     beforeEach(() => {
-        cy.OAuthLogout()
-        cy.OAuthLogin('test')
-        cy.deleteUser('Reader')
-        cy.deleteDashboards()
-        cy.removeConnections()
-        cy.createConnection()
-        cy.createDashboardWithCell(query)
-        cy.createUser('Reader', 'oauth-mock', 'oauth2')
-        cy.OAuthLogout()
-        cy.OAuthLogin('Reader')
+      cy.OAuthLogout()
+      cy.OAuthLogin('test')
+      cy.deleteUser('Reader')
+      cy.createUser('Reader', 'oauth-mock', 'oauth2')
+      cy.OAuthLogout()
+      cy.OAuthLogin('Reader')
     })
 
-    it('use dashboards as user with reader role', () => {
+    it('ensure that all elements used to edit Chronograf are not visible', () => {
         cy.getByTestID('sidebar').should('not.exist')
         cy.getByTestID('import-dashboard--button').should('not.exist')
         cy.getByTestID('create-dashboard-button').should('not.exist')
-        cy.get('.form-control').type('Empty')
+        cy.getByTestID('dashboard-filter--input').type('Empty')
         cy.getByTestID('dashboard-panel').should('have.text', `Looks like you don’t have any dashboards`)
-        cy.get('.form-control').clear().type('Dashboard')
+        cy.getByTestID('dashboard-filter--input').clear().type('Dashboard')
         cy.getByTestID('Unnamed Dashboard').click()
         cy.get('.dashboard-empty--menu').should('not.exist')
         cy.getByTestID('add-cell').should('not.exist')
