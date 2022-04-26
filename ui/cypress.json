@@ -1,7 +1,8 @@
 {
   "$schema": "https://on.cypress.io/cypress.schema.json",
   "baseUrl": "http://localhost:8888",
-  "video": false,
+  "video": true,
+  "videoCompression": false,
   "env": {
     "ALLOW_SCREENSHOT": true,
     "influxDBURL": "https://localhost:8086",
