@@ -1,13 +1,8 @@
 describe('Use Dashboards', () => {
-  let query = `SELECT mean("pointsWritten") AS "mean_pointsWritten" 
-  FROM "_internal"."monitor"."localStore" 
-  WHERE time > :dashboardTime: AND time < :upperDashboardTime: 
-  GROUP BY time(:interval:) FILL(null)`
 
   beforeEach(() => {
     cy.OAuthLogin('test')
     cy.deleteDashboards()
-    cy.createDashboardWithCell(query)
     cy.removeConnections()
     cy.createConnection()
     cy.get('@connections').then(connections => {
@@ -15,6 +10,7 @@ describe('Use Dashboards', () => {
         cy.visit(`/sources/${connections[0].id}${dashboards}`)
       })
     })
+    cy.createDashboard('Reader Dashboard')
   })
 
   it('create, rename and delete a dashboard', () => {
