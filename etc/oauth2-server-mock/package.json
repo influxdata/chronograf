@@ -1,0 +1,16 @@
+{
+  "name": "oauth2-server-mock",
+  "version": "0.1.0",
+  "description": "Mock OAuth2 server with authorization code grant",
+  "type": "module",
+  "main": "src/index.mjs",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "node src/index.mjs"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.3"
+  }
+}
