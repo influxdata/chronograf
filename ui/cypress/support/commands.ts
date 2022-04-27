@@ -64,6 +64,10 @@ export const OAuthLogout = () => {
   return cy.visit('/oauth/oauth-mock/logout')
 }
 
+export const OAuthLoginAsDiffUser = (name: string) => {
+  changeUserInfo(name)
+  return cy.visit('/oauth/oauth-mock/logout')
+}
 // Change enviromental values in cypress.json
 export const createConnection = (url?: string) => {
   return cy
@@ -241,6 +245,7 @@ Cypress.Commands.add('deleteDashboards', deleteDashboards)
 Cypress.Commands.add('createDashboardWithCell', createDashboardWithCell)
 Cypress.Commands.add('OAuthLogin', OAuthLogin)
 Cypress.Commands.add('OAuthLogout', OAuthLogout)
+Cypress.Commands.add('OAuthLoginAsDiffUser', OAuthLoginAsDiffUser)
 Cypress.Commands.add('createUser', createUser)
 Cypress.Commands.add('deleteUser', deleteUser)
 Cypress.Commands.add('createOrg', createOrg)

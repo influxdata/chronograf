@@ -16,6 +16,7 @@ export GENERIC_API_URL=${OAUTH2_URL}/userinfo
 export GENERIC_SCOPES="whatever"
 export GENERIC_NAME=oauth-mock
 export PUBLIC_URL=http://localhost:8888
+export REDIR_AUTH_LOGIN=oauth-mock
 
 echo Make sure to setup the following environment variables before your start OAuth Mock server
 echo export OAUTH2_HOSTNAME=${OAUTH2_HOSTNAME}

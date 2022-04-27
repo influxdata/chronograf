@@ -9,6 +9,7 @@ import {
   createDashboardWithCell,
   OAuthLogin,
   OAuthLogout,
+  OAuthLoginAsDiffUser,
   createUser,
   deleteUser,
   createOrg,
@@ -26,6 +27,7 @@ declare global {
       createDashboardWithCell: typeof createDashboardWithCell
       OAuthLogin: typeof OAuthLogin
       OAuthLogout: typeof OAuthLogout
+      OAuthLoginAsDiffUser: typeof OAuthLoginAsDiffUser
       createUser: typeof createUser
       deleteUser: typeof deleteUser
       createOrg: typeof createOrg
