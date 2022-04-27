@@ -21,14 +21,15 @@ function storeRedirectPath() {
 }
 
 export function useRedirectPath() {
+  let retVal
   try {
-    const retVal = window.localStorage.getItem(REDIRECT_KEY)
+    retVal = window.localStorage.getItem(REDIRECT_KEY)
     window.localStorage.removeItem(REDIRECT_KEY)
-    return retVal
   } catch (e) {
-    // return no redirect path if locastorage is not available
-    return ''
+    // localStorage is not available, use default
   }
+  // return redirect to localStorage page or root page
+  return retVal || '/'
 }
 
 const Login = ({auth}) => {
