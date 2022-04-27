@@ -5,7 +5,6 @@ describe('Use Dashboards', () => {
   GROUP BY time(:interval:) FILL(null)`
 
   beforeEach(() => {
-    cy.OAuthLogout()
     cy.OAuthLogin('test')
     cy.deleteDashboards()
     cy.createDashboardWithCell(query)
@@ -48,12 +47,9 @@ describe('Use Dashboards', () => {
 
   describe('Use Dashboards as reader', () => {
     beforeEach(() => {
-      cy.OAuthLogout()
-      cy.OAuthLogin('test')
       cy.deleteUser('Reader')
       cy.createUser('Reader', 'oauth-mock', 'oauth2')
-      cy.OAuthLogout()
-      cy.OAuthLogin('Reader')
+      cy.OAuthLoginAsDiffUser('Reader')
     })
 
     it('ensure that all elements used to edit Chronograf are not visible', () => {
