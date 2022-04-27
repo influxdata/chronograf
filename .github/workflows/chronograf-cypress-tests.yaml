@@ -62,7 +62,7 @@ jobs:
           yarn --cwd $(git rev-parse --show-toplevel)/etc/oauth2-server-mock
           RUNNER_TRACKING_ID="" && (nohup yarn --cwd $(git rev-parse --show-toplevel)/etc/oauth2-server-mock start&)
         env:
-          OAUTH2_HOSTNAME: localhost
+          OAUTH2_HOSTNAME: 172.17.0.1
           OAUTH2_PORT: 8087
           OAUTH2_TEST_USER_NAME: Test User
           OAUTH2_TEST_USER_EMAIL: test@oauth2.mock
@@ -84,7 +84,7 @@ jobs:
           --redir-auth-login=oauth-mock > out.log 2>&1 &)
           sleep 10
         env: 
-          OAUTH2_HOSTNAME: localhost
+          OAUTH2_HOSTNAME: 172.17.0.1
           OAUTH2_PORT: 8087
 
 
