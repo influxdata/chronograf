@@ -63,7 +63,6 @@ func AuthorizedToken(auth oauth2.Authenticator, logger chronograf.Logger, next h
 		// Send the principal to the next handler
 		ctx = context.WithValue(ctx, oauth2.PrincipalKey, principal)
 		next.ServeHTTP(w, r.WithContext(ctx))
-		return
 	})
 }
 
@@ -293,7 +292,6 @@ func AuthorizedUser(
 		}
 
 		Error(w, http.StatusForbidden, "User is not authorized", logger)
-		return
 	})
 }
 
@@ -306,7 +304,14 @@ func hasAuthorizedRole(u *chronograf.User, role string) bool {
 	case roles.MemberRoleName:
 		for _, r := range u.Roles {
 			switch r.Name {
-			case roles.MemberRoleName, roles.ViewerRoleName, roles.EditorRoleName, roles.AdminRoleName:
+			case roles.MemberRoleName, roles.ReaderRoleName, roles.ViewerRoleName, roles.EditorRoleName, roles.AdminRoleName:
+				return true
+			}
+		}
+	case roles.ReaderRoleName:
+		for _, r := range u.Roles {
+			switch r.Name {
+			case roles.ReaderRoleName, roles.ViewerRoleName, roles.EditorRoleName, roles.AdminRoleName:
 				return true
 			}
 		}

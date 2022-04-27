@@ -273,7 +273,7 @@ func TestOrganizationsStore_Update(t *testing.T) {
 			addFirst: true,
 		},
 		{
-			name:   "Update organization default role",
+			name:   "Update organization default role to viewer",
 			fields: fields{},
 			args: args{
 				ctx: context.Background(),
@@ -291,7 +291,25 @@ func TestOrganizationsStore_Update(t *testing.T) {
 			addFirst: true,
 		},
 		{
-			name:   "Update organization name and default role",
+			name:   "Update organization default role to reader",
+			fields: fields{},
+			args: args{
+				ctx: context.Background(),
+				initial: &chronograf.Organization{
+					Name: "The Good Place",
+				},
+				updates: &chronograf.Organization{
+					DefaultRole: roles.ReaderRoleName,
+				},
+			},
+			want: &chronograf.Organization{
+				Name:        "The Good Place",
+				DefaultRole: roles.ReaderRoleName,
+			},
+			addFirst: true,
+		},
+		{
+			name:   "Update organization name and default role to viewer",
 			fields: fields{},
 			args: args{
 				ctx: context.Background(),
@@ -307,6 +325,26 @@ func TestOrganizationsStore_Update(t *testing.T) {
 			want: &chronograf.Organization{
 				Name:        "The Bad Place",
 				DefaultRole: roles.ViewerRoleName,
+			},
+			addFirst: true,
+		},
+		{
+			name:   "Update organization name and default role to reader",
+			fields: fields{},
+			args: args{
+				ctx: context.Background(),
+				initial: &chronograf.Organization{
+					Name:        "The Good Place",
+					DefaultRole: roles.AdminRoleName,
+				},
+				updates: &chronograf.Organization{
+					Name:        "The Bad Place",
+					DefaultRole: roles.ReaderRoleName,
+				},
+			},
+			want: &chronograf.Organization{
+				Name:        "The Bad Place",
+				DefaultRole: roles.ReaderRoleName,
 			},
 			addFirst: true,
 		},
@@ -405,7 +443,7 @@ func TestOrganizationsStore_Update(t *testing.T) {
 		}
 
 		if tt.addFirst {
-			tt.args.initial, err = s.Add(tt.args.ctx, tt.args.initial)
+			tt.args.initial, _ = s.Add(tt.args.ctx, tt.args.initial)
 		}
 
 		if tt.args.updates.Name != "" {

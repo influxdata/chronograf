@@ -3,37 +3,16 @@ import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {withRouter} from 'react-router'
 
-export const MEMBER_ROLE = 'member'
-export const VIEWER_ROLE = 'viewer'
-export const EDITOR_ROLE = 'editor'
-export const ADMIN_ROLE = 'admin'
-export const SUPERADMIN_ROLE = 'superadmin'
-
-export const isUserAuthorized = (meRole, requiredRole) => {
-  switch (requiredRole) {
-    case VIEWER_ROLE:
-      return (
-        meRole === VIEWER_ROLE ||
-        meRole === EDITOR_ROLE ||
-        meRole === ADMIN_ROLE ||
-        meRole === SUPERADMIN_ROLE
-      )
-    case EDITOR_ROLE:
-      return (
-        meRole === EDITOR_ROLE ||
-        meRole === ADMIN_ROLE ||
-        meRole === SUPERADMIN_ROLE
-      )
-    case ADMIN_ROLE:
-      return meRole === ADMIN_ROLE || meRole === SUPERADMIN_ROLE
-    case SUPERADMIN_ROLE:
-      return meRole === SUPERADMIN_ROLE
-    // 'member' is the default role and has no authorization for anything currently
-    case MEMBER_ROLE:
-    default:
-      return false
-  }
-}
+import {isUserAuthorized} from './roles'
+export {
+  isUserAuthorized,
+  MEMBER_ROLE,
+  READER_ROLE,
+  VIEWER_ROLE,
+  EDITOR_ROLE,
+  ADMIN_ROLE,
+  SUPERADMIN_ROLE,
+} from './roles'
 
 class Authorized extends Component {
   UNSAFE_componentWillUpdate() {

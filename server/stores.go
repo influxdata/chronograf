@@ -40,7 +40,7 @@ func hasRoleContext(ctx context.Context) (string, bool) {
 		return "", false
 	}
 	switch role {
-	case roles.MemberRoleName, roles.ViewerRoleName, roles.EditorRoleName, roles.AdminRoleName:
+	case roles.MemberRoleName, roles.ReaderRoleName, roles.ViewerRoleName, roles.EditorRoleName, roles.AdminRoleName:
 		return role, true
 	default:
 		return "", false

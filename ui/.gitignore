@@ -9,3 +9,5 @@ log/
 yarn-error.log
 .cache/
 build/
+results/
+screenshots/

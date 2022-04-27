@@ -1,12 +1,15 @@
 package ui
 
 import (
+	"crypto/sha1"
 	"embed"
-	"fmt"
+	"encoding/base64"
+	"io"
 	"io/fs"
 	"net/http"
 	"regexp"
 	"strings"
+	"sync"
 )
 
 const (
@@ -19,6 +22,7 @@ const (
 //go:embed build/*
 var embeddedFS embed.FS
 var buildDir fs.FS
+var fileETags sync.Map
 
 //go:embed package.json
 var packageJson string
@@ -59,22 +63,35 @@ func (b *BindataAssets) Handler() http.Handler {
 }
 
 // addCacheHeaders requests an hour of Cache-Control and sets an ETag based on file size and modtime
-func addCacheHeaders(file fs.File, headers http.Header) error {
-	fi, err := file.Stat()
-	if err == nil {
-		headers.Add("Cache-Control", "public, max-age=3600")
+func addCacheHeaders(name string, headers http.Header) error {
+	headers.Set("Cache-Control", "public, max-age=3600")
+	headers.Set("X-Frame-Options", "SAMEORIGIN")
+	headers.Set("X-XSS-Protection", "1; mode=block")
+	headers.Set("X-Content-Type-Options", "nosniff")
+	headers.Set("Content-Security-Policy", "script-src 'self'; object-src 'self'")
 
-		headers.Add("X-Frame-Options", "SAMEORIGIN")
-		headers.Add("X-XSS-Protection", "1; mode=block")
-		headers.Add("X-Content-Type-Options", "nosniff")
-		headers.Add("Content-Security-Policy", "script-src 'self'; object-src 'self'")
+	// go embed does not include real Stat().ModTime to make ETag computation simple
+	// see https://github.com/golang/go/issues/43223
+	// as a workaround, compute ETag from file contents cand cache it
 
-		hour, minute, second := fi.ModTime().Clock()
-		etag := fmt.Sprintf(`"%d%d%d%d%d"`, fi.Size(), fi.ModTime().Day(), hour, minute, second)
-
+	if etag, found := fileETags.Load(name); found {
+		headers.Set("ETag", etag.(string))
+		return nil
+	}
+	// compute and store SHA1 digest of file contents as an ETag
+	hash := sha1.New()
+	if input, err := buildDir.Open(name); err != nil {
+		return err
+	} else {
+		defer input.Close()
+		if _, err := io.Copy(hash, input); err != nil {
+			return err
+		}
+		etag := base64.StdEncoding.EncodeToString(hash.Sum(nil))
+		fileETags.Store(name, etag)
 		headers.Set("ETag", etag)
 	}
-	return err
+	return nil
 }
 
 // ServeHTTP wraps http.FileServer by returning a default asset if the asset
@@ -87,24 +104,25 @@ func (b *BindataAssets) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	openFn := func(name string) (fs.File, error) {
 		// If the named asset exists, then return it directly.
 		file, err := buildDir.Open(name)
+		// If this is at / then we we can return a Directory
+		// that will be be redirected to /index.html by http.fs
+		if name == "/" || name == "." {
+			return file, err
+		}
 		if err != nil {
-			// If this is at / then we just error out so we can return a Directory
-			// This directory will then be redirected by go to the /index.html
-			if name == "/" || name == "." {
-				return nil, err
-			}
-			// If this is anything other than slash, we just return the default
-			// asset.  This default asset will handle the routing.
+			// If this is anything other than root, we have to return the default
+			// asset. This default asset will handle the routing.
 			// Additionally, because we know we are returning the default asset,
 			// we need to set the default asset's content-type.
 			w.Header().Set("Content-Type", DefaultPageContentType)
-			defaultFile, err := buildDir.Open(DefaultPage)
+			name = DefaultPage
+			defaultFile, err := buildDir.Open(name)
 			if err != nil {
 				return nil, err
 			}
 			file = defaultFile
 		}
-		if err := addCacheHeaders(file, w.Header()); err != nil {
+		if err := addCacheHeaders(name, w.Header()); err != nil {
 			return nil, err
 		}
 		// https://github.com/influxdata/chronograf/issues/5565

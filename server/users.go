@@ -27,10 +27,10 @@ func (r *userRequest) ValidCreate() error {
 		return fmt.Errorf("Name required on Chronograf User request body")
 	}
 	if r.Provider == "" {
-		return fmt.Errorf("Provider required on Chronograf User request body")
+		return fmt.Errorf("provider required on Chronograf User request body")
 	}
 	if r.Scheme == "" {
-		return fmt.Errorf("Scheme required on Chronograf User request body")
+		return fmt.Errorf("scheme required on Chronograf User request body")
 	}
 
 	// TODO: This Scheme value is hard-coded temporarily since we only currently
@@ -42,7 +42,7 @@ func (r *userRequest) ValidCreate() error {
 
 func (r *userRequest) ValidUpdate() error {
 	if r.Roles == nil {
-		return fmt.Errorf("No Roles to update")
+		return fmt.Errorf("no roles to update")
 	}
 	return r.ValidRoles()
 }
@@ -59,10 +59,10 @@ func (r *userRequest) ValidRoles() error {
 			}
 			orgs[r.Organization] = true
 			switch r.Name {
-			case roles.MemberRoleName, roles.ViewerRoleName, roles.EditorRoleName, roles.AdminRoleName, roles.WildcardRoleName:
+			case roles.MemberRoleName, roles.ReaderRoleName, roles.ViewerRoleName, roles.EditorRoleName, roles.AdminRoleName, roles.WildcardRoleName:
 				continue
 			default:
-				return fmt.Errorf("Unknown role %s. Valid roles are 'member', 'viewer', 'editor', 'admin', and '*'", r.Name)
+				return fmt.Errorf("unknown role %s, valid roles are 'member', 'reader', 'viewer', 'editor', 'admin', and '*'", r.Name)
 			}
 		}
 	}
@@ -277,17 +277,17 @@ func (s *Service) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	// But currently, it is not possible to change name, provider, or
 	// scheme via the API.
 	if req.Name != "" && req.Name != u.Name {
-		err := fmt.Errorf("Cannot update Name")
+		err := fmt.Errorf("cannot update Name")
 		invalidData(w, err, s.Logger)
 		return
 	}
 	if req.Provider != "" && req.Provider != u.Provider {
-		err := fmt.Errorf("Cannot update Provider")
+		err := fmt.Errorf("cannot update Provider")
 		invalidData(w, err, s.Logger)
 		return
 	}
 	if req.Scheme != "" && req.Scheme != u.Scheme {
-		err := fmt.Errorf("Cannot update Scheme")
+		err := fmt.Errorf("cannot update Scheme")
 		invalidData(w, err, s.Logger)
 		return
 	}
@@ -302,7 +302,7 @@ func (s *Service) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	// If the user being updated is the user making the request and they are
 	// changing their SuperAdmin status, return an unauthorized error
-	if ctxUser.ID == u.ID && u.SuperAdmin == true && req.SuperAdmin == false {
+	if ctxUser.ID == u.ID && u.SuperAdmin && !req.SuperAdmin {
 		Error(w, http.StatusUnauthorized, "user cannot modify their own SuperAdmin status", s.Logger)
 		return
 	}
@@ -357,7 +357,7 @@ func setSuperAdmin(ctx context.Context, req userRequest, user *chronograf.User) 
 	} else if !isSuperAdmin && (user.SuperAdmin != req.SuperAdmin) {
 		// If req.SuperAdmin has been set, and the request was not made with the SuperAdmin
 		// context, return error
-		return fmt.Errorf("User does not have authorization required to set SuperAdmin status. See https://github.com/influxdata/chronograf/issues/2601 for more information.")
+		return fmt.Errorf("user does not have authorization required to set SuperAdmin status, see https://github.com/influxdata/chronograf/issues/2601 for more information")
 	}
 
 	return nil

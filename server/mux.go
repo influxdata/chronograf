@@ -92,6 +92,15 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 		)
 	}
 	_ = EnsureMember
+	EnsureReader := func(next http.HandlerFunc) http.HandlerFunc {
+		return AuthorizedUser(
+			service.Store,
+			opts.UseAuth,
+			roles.ReaderRoleName,
+			opts.Logger,
+			next,
+		)
+	}
 	EnsureViewer := func(next http.HandlerFunc) http.HandlerFunc {
 		return AuthorizedUser(
 			service.Store,
@@ -174,27 +183,27 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	router.DELETE("/chronograf/v1/mappings/:id", EnsureSuperAdmin(service.RemoveMapping))
 
 	// Sources
-	router.GET("/chronograf/v1/sources", EnsureViewer(service.Sources))
+	router.GET("/chronograf/v1/sources", EnsureReader(service.Sources))
 	router.POST("/chronograf/v1/sources", EnsureEditor(service.NewSource))
 
-	router.GET("/chronograf/v1/sources/:id", EnsureViewer(service.SourcesID))
+	router.GET("/chronograf/v1/sources/:id", EnsureReader(service.SourcesID))
 	router.PATCH("/chronograf/v1/sources/:id", EnsureEditor(service.UpdateSource))
 	router.DELETE("/chronograf/v1/sources/:id", EnsureEditor(service.RemoveSource))
-	router.GET("/chronograf/v1/sources/:id/health", EnsureViewer(service.SourceHealth))
+	router.GET("/chronograf/v1/sources/:id/health", EnsureReader(service.SourceHealth))
 
 	// Flux
-	router.GET("/chronograf/v1/flux", EnsureViewer(service.Flux))
-	router.POST("/chronograf/v1/flux/ast", EnsureViewer(service.FluxAST))
+	router.GET("/chronograf/v1/flux", EnsureReader(service.Flux))
+	router.POST("/chronograf/v1/flux/ast", EnsureReader(service.FluxAST))
 	router.GET("/chronograf/v1/flux/suggestions", EnsureViewer(service.FluxSuggestions))
 	router.GET("/chronograf/v1/flux/suggestions/:name", EnsureViewer(service.FluxSuggestion))
 
 	// Source Proxy to Influx; Has gzip compression around the handler
-	influx := gziphandler.GzipHandler(http.HandlerFunc(EnsureViewer(service.Influx)))
+	influx := gziphandler.GzipHandler(http.HandlerFunc(EnsureReader(service.Influx)))
 	router.Handler("POST", "/chronograf/v1/sources/:id/proxy", influx)
 
 	// Source Proxy to Influx's flux endpoint; compression because the responses from
 	// flux could be large.
-	router.Handler("POST", "/chronograf/v1/sources/:id/proxy/flux", EnsureViewer(service.ProxyFlux))
+	router.Handler("POST", "/chronograf/v1/sources/:id/proxy/flux", EnsureReader(service.ProxyFlux))
 
 	// Write proxies line protocol write requests to InfluxDB
 	router.POST("/chronograf/v1/sources/:id/write", EnsureViewer(service.Write))
@@ -205,12 +214,12 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	//
 	// Admins should ensure that the InfluxDB source as the proper permissions
 	// intended for Chronograf Users with the Viewer Role type.
-	router.POST("/chronograf/v1/sources/:id/queries", EnsureViewer(service.Queries))
+	router.POST("/chronograf/v1/sources/:id/queries", EnsureReader(service.Queries))
 
 	// Annotations are user-defined events associated with this source
-	router.GET("/chronograf/v1/sources/:id/annotations", EnsureViewer(service.Annotations))
+	router.GET("/chronograf/v1/sources/:id/annotations", EnsureReader(service.Annotations))
 	router.POST("/chronograf/v1/sources/:id/annotations", EnsureEditor(service.NewAnnotation))
-	router.GET("/chronograf/v1/sources/:id/annotations/:aid", EnsureViewer(service.Annotation))
+	router.GET("/chronograf/v1/sources/:id/annotations/:aid", EnsureReader(service.Annotation))
 	router.DELETE("/chronograf/v1/sources/:id/annotations/:aid", EnsureEditor(service.RemoveAnnotation))
 	router.PATCH("/chronograf/v1/sources/:id/annotations/:aid", EnsureEditor(service.UpdateAnnotation))
 
@@ -299,18 +308,18 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	router.PATCH("/chronograf/v1/users/:id", EnsureSuperAdmin(rawStoreAccess(service.UpdateUser)))
 
 	// Dashboards
-	router.GET("/chronograf/v1/dashboards", EnsureViewer(service.Dashboards))
+	router.GET("/chronograf/v1/dashboards", EnsureReader(service.Dashboards))
 	router.POST("/chronograf/v1/dashboards", EnsureEditor(service.NewDashboard))
 
-	router.GET("/chronograf/v1/dashboards/:id", EnsureViewer(service.DashboardID))
+	router.GET("/chronograf/v1/dashboards/:id", EnsureReader(service.DashboardID))
 	router.DELETE("/chronograf/v1/dashboards/:id", EnsureEditor(service.RemoveDashboard))
 	router.PUT("/chronograf/v1/dashboards/:id", EnsureEditor(service.ReplaceDashboard))
 	router.PATCH("/chronograf/v1/dashboards/:id", EnsureEditor(service.UpdateDashboard))
 	// Dashboard Cells
-	router.GET("/chronograf/v1/dashboards/:id/cells", EnsureViewer(service.DashboardCells))
+	router.GET("/chronograf/v1/dashboards/:id/cells", EnsureReader(service.DashboardCells))
 	router.POST("/chronograf/v1/dashboards/:id/cells", EnsureEditor(service.NewDashboardCell))
 
-	router.GET("/chronograf/v1/dashboards/:id/cells/:cid", EnsureViewer(service.DashboardCellID))
+	router.GET("/chronograf/v1/dashboards/:id/cells/:cid", EnsureReader(service.DashboardCellID))
 	router.DELETE("/chronograf/v1/dashboards/:id/cells/:cid", EnsureEditor(service.RemoveDashboardCell))
 	router.PUT("/chronograf/v1/dashboards/:id/cells/:cid", EnsureEditor(service.ReplaceDashboardCell))
 
@@ -348,7 +357,7 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	router.GET("/chronograf/v1/org_config/logviewer", EnsureViewer(service.OrganizationLogViewerConfig))
 	router.PUT("/chronograf/v1/org_config/logviewer", EnsureEditor(service.ReplaceOrganizationLogViewerConfig))
 
-	router.GET("/chronograf/v1/env", EnsureViewer(service.Environment))
+	router.GET("/chronograf/v1/env", EnsureMember(service.Environment))
 
 	// Validates go templates for the js client
 	router.POST("/chronograf/v1/validate_text_templates", EnsureViewer(service.ValidateTextTemplate))

@@ -39,6 +39,7 @@ import {
 } from 'src/kapacitor'
 import {AdminChronografPage, AdminInfluxDBPage} from 'src/admin'
 import {ManageSources, OnboardingWizard} from 'src/sources'
+import LandingPage from './auth/LandingPage'
 
 import NotFound from 'src/shared/components/NotFound'
 import PageSpinner from 'src/shared/components/PageSpinner'
@@ -155,6 +156,10 @@ class Root extends PureComponent<Record<string, never>, State> {
         <TimeMachineContextProvider>
           <Router history={history}>
             <Route path="/" component={UserIsAuthenticated(CheckSources)} />
+            <Route
+              path="/landing"
+              component={UserIsAuthenticated(LandingPage)}
+            />
             <Route path="/login" component={UserIsNotAuthenticated(Login)} />
             <Route
               path="/purgatory"

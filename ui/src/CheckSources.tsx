@@ -11,10 +11,10 @@ import PageSpinner from 'src/shared/components/PageSpinner'
 
 import {
   isUserAuthorized,
-  VIEWER_ROLE,
+  READER_ROLE,
   EDITOR_ROLE,
   ADMIN_ROLE,
-} from 'src/auth/Authorized'
+} from 'src/auth/roles'
 
 import {getSourceHealth} from 'src/sources/apis'
 import {getSourcesAsync} from 'src/shared/actions/sources'
@@ -90,7 +90,7 @@ export class CheckSources extends Component<Props, State> {
       router,
       auth: {isUsingAuth, me},
     } = this.props
-    if (!isUsingAuth || isUserAuthorized(me.role, VIEWER_ROLE)) {
+    if (!isUsingAuth || isUserAuthorized(me.role, READER_ROLE)) {
       await this.props.getSources()
       this.setState({isFetching: false})
     } else {
@@ -150,7 +150,7 @@ export class CheckSources extends Component<Props, State> {
       return router.push('/purgatory')
     }
 
-    if (!isFetching && isUsingAuth && !isUserAuthorized(me.role, VIEWER_ROLE)) {
+    if (!isFetching && isUsingAuth && !isUserAuthorized(me.role, READER_ROLE)) {
       // if you're a member, go to purgatory.
       return router.push('/purgatory')
     }
@@ -159,17 +159,25 @@ export class CheckSources extends Component<Props, State> {
     // Do we need to refresh this data more frequently? Does it need to come as frequently as the `me` response?
     if (!isFetching && !source) {
       const rest = location.pathname.match(/\/sources\/\d+?\/(.+)/)
-      const restString = rest === null ? DEFAULT_HOME_PAGE : rest[1]
+      let restString = rest === null ? DEFAULT_HOME_PAGE : rest[1]
 
-      if (isUsingAuth && !isUserAuthorized(me.role, EDITOR_ROLE)) {
-        if (defaultSource) {
-          return router.push(`/sources/${defaultSource.id}/${restString}`)
-        } else if (sources[0]) {
-          return router.push(`/sources/${sources[0].id}/${restString}`)
+      if (isUsingAuth) {
+        if (!isUserAuthorized(me.role, EDITOR_ROLE)) {
+          if (me.role === READER_ROLE) {
+            // reader role can only read dashboards
+            if (!restString.startsWith('dashboards')) {
+              restString = 'dashboards'
+            }
+          }
+          if (defaultSource) {
+            return router.push(`/sources/${defaultSource.id}/${restString}`)
+          } else if (sources[0]) {
+            return router.push(`/sources/${sources[0].id}/${restString}`)
+          }
+          // if you're a viewer and there are no sources, go to purgatory.
+          notify(copy.notifyOrgHasNoSources())
+          return router.push('/purgatory')
         }
-        // if you're a viewer and there are no sources, go to purgatory.
-        notify(copy.notifyOrgHasNoSources())
-        return router.push('/purgatory')
       }
 
       // if you're an editor or not using auth, try for sources or otherwise

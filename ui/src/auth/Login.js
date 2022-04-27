@@ -8,6 +8,29 @@ import SplashPage from 'shared/components/SplashPage'
 import {connect} from 'react-redux'
 
 const VERSION = process.env.npm_package_version
+const REDIRECT_KEY = 'chronoRedirect'
+
+function storeRedirectPath() {
+  try {
+    const url = new URL(window.location.href)
+    const redirect = url.searchParams.get('redirect')
+    window.localStorage.setItem(REDIRECT_KEY, redirect || '')
+  } catch (e) {
+    // will perform default redirect if localStorage is not available
+  }
+}
+
+export function useRedirectPath() {
+  let retVal
+  try {
+    retVal = window.localStorage.getItem(REDIRECT_KEY)
+    window.localStorage.removeItem(REDIRECT_KEY)
+  } catch (e) {
+    // localStorage is not available, use default
+  }
+  // return redirect to localStorage page or root page
+  return retVal || '/'
+}
 
 const Login = ({auth}) => {
   if (
@@ -21,6 +44,7 @@ const Login = ({auth}) => {
   if (auth.isAuthLoading) {
     return <PageSpinner />
   }
+  storeRedirectPath()
 
   return (
     <div>

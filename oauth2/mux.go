@@ -24,16 +24,17 @@ func NewAuthMux(p Provider, a Authenticator, t Tokenizer,
 		codeExchange = simpleTokenExchange
 	}
 	mux := &AuthMux{
-		Provider:     p,
-		Auth:         a,
-		Tokens:       t,
-		SuccessURL:   path.Join(basepath, "/"),
-		FailureURL:   path.Join(basepath, "/login"),
-		Now:          DefaultNowTime,
-		Logger:       l,
-		UseIDToken:   UseIDToken,
-		LoginHint:    LoginHint,
-		CodeExchange: codeExchange,
+		Provider:       p,
+		Auth:           a,
+		Tokens:         t,
+		SuccessURL:     path.Join(basepath, "/landing"),
+		AfterLogoutURL: path.Join(basepath, "/"),
+		FailureURL:     path.Join(basepath, "/login"),
+		Now:            DefaultNowTime,
+		Logger:         l,
+		UseIDToken:     UseIDToken,
+		LoginHint:      LoginHint,
+		CodeExchange:   codeExchange,
 	}
 
 	if client != nil {
@@ -49,17 +50,18 @@ func NewAuthMux(p Provider, a Authenticator, t Tokenizer,
 // Chronograf instance as long as the Authenticator has no external
 // dependencies (e.g. on a Database).
 type AuthMux struct {
-	Provider     Provider          // Provider is the OAuth2 service
-	Auth         Authenticator     // Auth is used to Authorize after successful OAuth2 callback and Expire on Logout
-	Tokens       Tokenizer         // Tokens is used to create and validate OAuth2 "state"
-	Logger       chronograf.Logger // Logger is used to give some more information about the OAuth2 process
-	SuccessURL   string            // SuccessURL is redirect location after successful authorization
-	FailureURL   string            // FailureURL is redirect location after authorization failure
-	Now          func() time.Time  // Now returns the current time (for testing)
-	UseIDToken   bool              // UseIDToken enables OpenID id_token support
-	LoginHint    string            // LoginHint will be included as a parameter during authentication if non-nil
-	client       *http.Client      // client is the http client used in oauth exchange.
-	CodeExchange CodeExchange      // helps with CSRF in exchange of token for authorization code
+	Provider       Provider          // Provider is the OAuth2 service
+	Auth           Authenticator     // Auth is used to Authorize after successful OAuth2 callback and Expire on Logout
+	Tokens         Tokenizer         // Tokens is used to create and validate OAuth2 "state"
+	Logger         chronograf.Logger // Logger is used to give some more information about the OAuth2 process
+	SuccessURL     string            // SuccessURL is redirect location after successful authorization
+	AfterLogoutURL string            // LogoutURL is redirect location after logout
+	FailureURL     string            // FailureURL is redirect location after authorization failure
+	Now            func() time.Time  // Now returns the current time (for testing)
+	UseIDToken     bool              // UseIDToken enables OpenID id_token support
+	LoginHint      string            // LoginHint will be included as a parameter during authentication if non-nil
+	client         *http.Client      // client is the http client used in oauth exchange.
+	CodeExchange   CodeExchange      // helps with CSRF in exchange of token for authorization code
 }
 
 // Login returns a handler that redirects to the providers OAuth login.
@@ -180,6 +182,6 @@ func (j *AuthMux) Callback() http.Handler {
 func (j *AuthMux) Logout() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		j.Auth.Expire(w)
-		http.Redirect(w, r, j.SuccessURL, http.StatusTemporaryRedirect)
+		http.Redirect(w, r, j.AfterLogoutURL, http.StatusTemporaryRedirect)
 	})
 }

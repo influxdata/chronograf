@@ -6,7 +6,8 @@ import classnames from 'classnames'
 import AnnotationTagsDropdown from 'src/shared/components/AnnotationTagsDropdown'
 import {setEditingAnnotation} from 'src/shared/actions/annotations'
 
-import {Annotation} from 'src/types'
+import {Annotation, Me} from 'src/types'
+import {isUserAuthorized, VIEWER_ROLE} from 'src/auth/roles'
 
 interface TimeStampProps {
   time: number
@@ -24,6 +25,8 @@ interface AnnotationState {
 }
 
 interface Props {
+  isUsingAuth: boolean
+  me: Me
   annotation: Annotation
   timestamp: number
   onMouseLeave: (e: MouseEvent<HTMLDivElement>) => void
@@ -38,6 +41,8 @@ const AnnotationTooltip: FunctionComponent<Props> = props => {
     timestamp,
     annotationState: {isDragging, isMouseOver},
     onSetEditingAnnotation,
+    isUsingAuth,
+    me,
   } = props
 
   const tooltipClass = classnames('annotation-tooltip', {
@@ -58,10 +63,12 @@ const AnnotationTooltip: FunctionComponent<Props> = props => {
         <div className="annotation-tooltip--items">
           <div className="annotation-tooltip-text">
             {annotation.text}
-            <span
-              className="annotation-tooltip--edit icon pencil"
-              onClick={setEditing}
-            />
+            {!isUsingAuth || isUserAuthorized(me, VIEWER_ROLE) ? (
+              <span
+                className="annotation-tooltip--edit icon pencil"
+                onClick={setEditing}
+              />
+            ) : null}
           </div>
           <div className="annotation-tooltip--lower">
             <TimeStamp time={timestamp} />
@@ -75,8 +82,12 @@ const AnnotationTooltip: FunctionComponent<Props> = props => {
   )
 }
 
+const mstp = ({auth: {isUsingAuth, me}}) => ({
+  isUsingAuth,
+  me,
+})
 const mdtp = {
   onSetEditingAnnotation: setEditingAnnotation,
 }
 
-export default connect(null, mdtp)(AnnotationTooltip)
+export default connect(mstp, mdtp)(AnnotationTooltip)

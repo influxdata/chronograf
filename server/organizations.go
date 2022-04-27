@@ -27,7 +27,7 @@ func (r *organizationRequest) ValidCreate() error {
 
 func (r *organizationRequest) ValidUpdate() error {
 	if r.Name == "" && r.DefaultRole == "" {
-		return fmt.Errorf("No fields to update")
+		return fmt.Errorf("no fields to update")
 	}
 
 	if r.DefaultRole != "" {
@@ -43,10 +43,10 @@ func (r *organizationRequest) ValidDefaultRole() error {
 	}
 
 	switch r.DefaultRole {
-	case roles.MemberRoleName, roles.ViewerRoleName, roles.EditorRoleName, roles.AdminRoleName:
+	case roles.MemberRoleName, roles.ReaderRoleName, roles.ViewerRoleName, roles.EditorRoleName, roles.AdminRoleName:
 		return nil
 	default:
-		return fmt.Errorf("default role must be member, viewer, editor, or admin")
+		return fmt.Errorf("default role must be member, reader, viewer, editor, or admin")
 	}
 }
 

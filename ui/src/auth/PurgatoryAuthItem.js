@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import {isUserAuthorized, VIEWER_ROLE} from 'src/auth/Authorized'
+import {isUserAuthorized, READER_ROLE} from 'src/auth/roles'
 
 const PurgatoryAuthItem = ({roleAndOrg, onClickLogin, superAdmin}) => (
   <div
@@ -15,7 +15,7 @@ const PurgatoryAuthItem = ({roleAndOrg, onClickLogin, superAdmin}) => (
       <div className="auth--list-org">{roleAndOrg.organization.name}</div>
       <div className="auth--list-role">{roleAndOrg.role}</div>
     </div>
-    {superAdmin || isUserAuthorized(roleAndOrg.role, VIEWER_ROLE) ? (
+    {superAdmin || isUserAuthorized(roleAndOrg.role, READER_ROLE) ? (
       <button
         className="btn btn-sm btn-primary"
         onClick={onClickLogin(roleAndOrg.organization)}
