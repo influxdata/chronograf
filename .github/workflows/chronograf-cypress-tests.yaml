@@ -81,8 +81,7 @@ jobs:
           --generic-token-url="http://${OAUTH2_HOSTNAME}:${OAUTH2_PORT}/oauth/token" \
           --public-url=http://localhost:8888 \
           --token-secret=Q4O1T8FTbErOnmx03mGeVH3pkvKtdKr6HEmzEpNBiVMynZ/qKDdOResI3OMx4Zg9kmIfAI9ihlIV3OV5+VRfZ+iB2knLuGagEmFpG/h51CRcQY58j2NpnxdBewz91E51RRfjDYvqMrISHZCjdeuw0338Xp5UnEg32utr0ThRN0Ucv2isRr4KYJNYuvUXrjKJzjh76394JwY+bzn20L/enR2rLEtJ40ePxwuEvsE0MBUGZy79ecLZPaolQ3lkPE6X3+iV/9suN0BkBNtbQe1sGv4P522jSm24fFhXaFjetQQ/dJGehbWzsBo8uVAWB2RO0+xU2LhHFN0k0LAESD6MWw== \
-          --redir-auth-login=oauth-mock
-          > out.log 2>&1 &)
+          --redir-auth-login=oauth-mock > out.log 2>&1 &)
           sleep 10
 
       - name: Chronograf test url
