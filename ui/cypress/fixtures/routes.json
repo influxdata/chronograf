@@ -2,5 +2,6 @@
   "dashboards": "/dashboards",
   "hosts": "/hosts",
   "explorer": "/data-explorer",
-  "config": "/manage-sources"
+  "config": "/manage-sources",
+  "adminChronograf": "/admin-chronograf"
 }
