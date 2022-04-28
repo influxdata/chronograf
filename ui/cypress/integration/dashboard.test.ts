@@ -1,6 +1,7 @@
 describe('Use Dashboards', () => {
   beforeEach(() => {
     cy.OAuthLogin('test')
+    cy.visit('/login')
     cy.removeConnections()
     cy.createConnection()
     cy.get('@connections').then(connections => {
@@ -44,8 +45,10 @@ describe('Use Dashboards', () => {
     beforeEach(() => {
       cy.deleteUser('Reader')
       cy.createUser('Reader', 'oauth-mock', 'oauth2')
-      cy.OAuthLoginAsDiffUser('Reader')
+      cy.OAuthLogin('Reader')
+      cy.wait(2000)
       cy.OAuthLogout()
+      cy.visit('/login')
     })
 
     it('ensure that all elements used to edit Chronograf are not visible', () => {
