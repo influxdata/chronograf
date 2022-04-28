@@ -56,8 +56,8 @@ const changeUserInfo: Function = (name: string): void => {
 }
 
 export const OAuthLogin = (name: string) => {
-    changeUserInfo(name)
-    return cy.visit('/oauth/oauth-mock/login')
+  changeUserInfo(name)
+  return cy.visit('/oauth/oauth-mock/login')
 }
 
 export const OAuthLogout = () => {
@@ -93,23 +93,26 @@ export const removeConnections = () => {
       cy.request('DELETE', `${connection.links.self}`)
     })
   })
+    .then(() => {
+      wrapConnections()
+    })
 }
 
 export const createDashboard = (name?: string) => {
   return cy
     .fixture('routes').then(({ dashboards }) => {
-    return cy
-      .request({
-        method: 'POST',
-        url: `/chronograf/v1${dashboards}`,
-        body: {
-          name: name ?? 'Default Dashboard',
-        },
-      })
-      .then(() => {
-        wrapDashboards()
-      })
-  })
+      return cy
+        .request({
+          method: 'POST',
+          url: `/chronograf/v1${dashboards}`,
+          body: {
+            name: name ?? 'Default Dashboard',
+          },
+        })
+        .then(() => {
+          wrapDashboards()
+        })
+    })
 }
 
 export const deleteDashboards = () => {
@@ -128,11 +131,11 @@ export const deleteDashboards = () => {
 export const createDashboardWithCell = (
   query?: string,
   dashboardName?: string,
-  cellName?: string, 
-  xPosition?: number, 
-  yPosition?: number, 
-  cellWidth?: number, 
-  cellHeight?: number, 
+  cellName?: string,
+  xPosition?: number,
+  yPosition?: number,
+  cellWidth?: number,
+  cellHeight?: number,
 ) => {
   return cy
     .request({
@@ -161,10 +164,10 @@ export const createDashboardWithCell = (
 }
 
 export const createUser = (
-  userName: string, 
-  provider: string, 
-  scheme: string, 
-  organization?: string, 
+  userName: string,
+  provider: string,
+  scheme: string,
+  organization?: string,
   role?: string
 ) => {
   return cy.request({
