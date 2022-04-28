@@ -65,7 +65,7 @@ export const OAuthLogout = () => {
 }
 
 export const OAuthLoginAsDiffUser = (name: string) => {
-  changeUserInfo(name)
+  setTimeout(changeUserInfo(name), 2000)
   return cy.visit('/oauth/oauth-mock/logout')
 }
 // Change enviromental values in cypress.json
