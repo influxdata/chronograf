@@ -60,7 +60,7 @@ jobs:
       - name: OAuth2 Mock Server
         run: |
           yarn --cwd $(git rev-parse --show-toplevel)/etc/oauth2-server-mock
-          RUNNER_TRACKING_ID="" && (nohup yarn --cwd $(git rev-parse --show-toplevel)/etc/oauth2-server-mock start&)
+          RUNNER_TRACKING_ID="" && (nohup yarn --cwd $(git rev-parse --show-toplevel)/etc/oauth2-server-mock start > oauth2-mock.log 2>&1 &)
         env:
           OAUTH2_HOSTNAME: 172.17.0.1
           OAUTH2_PORT: 8087
@@ -113,6 +113,7 @@ jobs:
         with:
             name: results
             path: |
+              oauth2-mock.log
               out.log
               ui/cypress/videos/*.mp4
               ui/cypress/results/results-*.xml
