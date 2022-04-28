@@ -20,18 +20,15 @@ let CONFIG = {
   },
 };
 
-app.get("/oauth/authorize", (req, res) => {
+app.get("/oauth/authorize", async (req, res) => {
   const state = req.query.state;
   const redirect = req.query.redirect_uri || CONFIG.redirect_uri;
   console.info("GET /oauth/authorize: ", redirect);
-  res.setHeader(
-    "Location",
-    `${redirect}?code=${encodeURIComponent(
-      redirect + new Date().toISOString()
-    )}&state=${encodeURIComponent(state)}`
-  );
-  res.sendStatus(302);
-  res.end();
+  setTimeout(() => {
+    res.setHeader("Location", `${redirect}?code=${encodeURIComponent(redirect + new Date().toISOString())}&state=${encodeURIComponent(state)}`);
+    res.sendStatus(302);
+    res.end();
+  }, 100)
 });
 
 app.post("/oauth/token", (_req, res) => {
