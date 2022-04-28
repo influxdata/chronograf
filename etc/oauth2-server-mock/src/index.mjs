@@ -28,7 +28,7 @@ app.get("/oauth/authorize", async (req, res) => {
     res.setHeader("Location", `${redirect}?code=${encodeURIComponent(redirect + new Date().toISOString())}&state=${encodeURIComponent(state)}`);
     res.sendStatus(302);
     res.end();
-  }, 100)
+  }, 200)
 });
 
 app.post("/oauth/token", (_req, res) => {

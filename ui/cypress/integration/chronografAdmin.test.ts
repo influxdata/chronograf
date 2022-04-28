@@ -1,7 +1,6 @@
 describe('Use Admin tab', () => {
     beforeEach(() => {
         cy.OAuthLogin('test')
-        cy.wait(2000)
         cy.removeConnections()
         cy.createConnection()
         cy.get('@connections').then(connections => {
