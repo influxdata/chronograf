@@ -1,8 +1,9 @@
 describe('Welcome Page', () => {
   beforeEach(() => {
     cy.OAuthLogin('test')
+    cy.wait(2000)
     cy.removeConnections()
-    cy.visit('/')
+    cy.OAuthLogout()
   })
 
   it('set up InfluxDB connection', () => {
@@ -32,13 +33,5 @@ describe('Welcome Page', () => {
         .should('contain.text', connections[0].name)
         .and('contain.text', connections[0].url)
     })
-
-    cy.get('.crown-outline').click()
-    cy.get('.chronograf-admin-table--user').should('exist').and('contain.text', 'test@oauth2.mock')
-        cy.get('.subsection--tab').contains('All Users').click({force: true})
-        cy.get('.chronograf-admin-table--user').should('exist').and('contain.text', 'test@oauth2.mock')
-        cy.get('.chronograf-admin-table--user').within(() => {
-            cy.get('.slide-toggle').should('have.class', 'active').and('have.class', 'disabled')
-        })
   })
 })

@@ -1,8 +1,7 @@
 describe('Use Dashboards', () => {
-
   beforeEach(() => {
     cy.OAuthLogin('test')
-    cy.deleteDashboards()
+    cy.wait(2000)
     cy.removeConnections()
     cy.createConnection()
     cy.get('@connections').then(connections => {
@@ -10,6 +9,7 @@ describe('Use Dashboards', () => {
         cy.visit(`/sources/${connections[0].id}${dashboards}`)
       })
     })
+    cy.deleteDashboards()
     cy.createDashboard('Reader Dashboard')
   })
 
@@ -55,7 +55,7 @@ describe('Use Dashboards', () => {
         cy.getByTestID('dashboard-filter--input').type('Empty')
         cy.getByTestID('dashboard-panel').should('have.text', `Looks like you don’t have any dashboards`)
         cy.getByTestID('dashboard-filter--input').clear().type('Dashboard')
-        cy.getByTestID('Unnamed Dashboard').click()
+        cy.getByTestID('Reader Dashboard').click()
         cy.get('.dashboard-empty--menu').should('not.exist')
         cy.getByTestID('add-cell').should('not.exist')
         cy.getByTestID('show-variables--button').click()
