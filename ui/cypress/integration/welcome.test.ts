@@ -1,6 +1,6 @@
 describe('Welcome Page', () => {
   beforeEach(() => {
-    cy.OAuthLogin('Test')
+    cy.OAuthLogin('test')
     cy.removeConnections()
     cy.OAuthLogout()
     console.log(window.location.hostname)
