@@ -10,6 +10,6 @@
     "password": "admin",
     "connectionName": "E1M1",
     "insecureSkipVerify": true,
-    "oauth2ServerURL": "172.17.0.1"
+    "oauth2ServerURL": "172.17.0.1:8087"
   }
 }
