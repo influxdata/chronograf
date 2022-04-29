@@ -92,7 +92,6 @@ jobs:
         run: |
           echo "InfluxDB data node status: $(curl -Isk "https://localhost:8086/ping" | head -n 1)"
           echo "Chronograf status: $(curl -Isk "http://localhost:8888" | head -n 1)"
-          echo "OAuth2 Server status: $(curl -Isk "http://172.17.0.1:8087" | head -n 1)"
           cat out.log || true
 
       - name: Cypress

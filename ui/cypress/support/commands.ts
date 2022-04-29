@@ -42,7 +42,7 @@ export const getByTestID = (
 // Function sends HTTP POST request to OAuth2 Mock server in order to change user information
 const changeUserInfo: Function = (name: string): void => {
   const xhttp: XMLHttpRequest = new XMLHttpRequest()
-  const url: string = Cypress.env('oauth2ServerURL') + '/config'
+  const url: string = 'http://172.17.0.1:8087/config'
   const body = {
     "userinfo": {
       "name": name,
