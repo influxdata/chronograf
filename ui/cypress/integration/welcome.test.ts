@@ -1,8 +1,9 @@
 describe('Welcome Page', () => {
   beforeEach(() => {
-    cy.OAuthLogin('test')
+    cy.OAuthLogin('Test')
     cy.removeConnections()
     cy.OAuthLogout()
+    console.log(window.location.hostname)
   })
 
   it('set up InfluxDB connection', () => {
