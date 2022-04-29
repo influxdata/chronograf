@@ -1,6 +1,6 @@
 describe('query builder', () => {
   beforeEach(() => {
-    cy.OAuthLogin('test')
+    cy.OAuthLogin('Test')
     cy.deleteDashboards()
     cy.removeConnections()
     cy.createConnection()
