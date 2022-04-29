@@ -16,6 +16,7 @@ jobs:
       OAUTH2_TEST_USER_NAME: test
       OAUTH2_TEST_USER_EMAIL: test@oauth2.mock
       OAUTH2_REDIRECT_URL: http://host.docker.internal:8888/oauth/oauth-mock/callback
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -106,7 +107,7 @@ jobs:
             apt install -y build-essential
             yarn install --frozen-lockfile
             yarn run cypress install
-            yarn run cypress run --browser chrome --config baseUrl=http://host.docker.internal:8888 --reporter junit --reporter-options 'mochaFile=cypress/results/results-[hash].xml' --env oauth2ServerURL=http://$OAUTH2_HOSTNAME:$OAUTH2_PORT
+            yarn run cypress run --env oauth2ServerURL=http://${{ env.OAUTH2_HOSTNAME }}:${{ env.OAUTH2_PORT }} --browser chrome --config baseUrl=http://host.docker.internal:8888 --reporter junit --reporter-options 'mochaFile=cypress/results/results-[hash].xml'
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
