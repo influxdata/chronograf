@@ -3,7 +3,6 @@ describe('Welcome Page', () => {
     cy.OAuthLogin('test')
     cy.removeConnections()
     cy.OAuthLogout()
-    console.log(window.location.hostname)
   })
 
   it('set up InfluxDB connection', () => {
