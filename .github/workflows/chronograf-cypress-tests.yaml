@@ -106,7 +106,7 @@ jobs:
             apt install -y build-essential
             yarn install --frozen-lockfile
             yarn run cypress install
-            CYPRESS_oauth2ServerURL=http://${OAUTH2_HOSTNAME}:${OAUTH2_PORT} yarn run cypress run --browser chrome --config baseUrl=http://host.docker.internal:8888 --reporter junit --reporter-options 'mochaFile=cypress/results/results-[hash].xml'
+            yarn run CYPRESS_oauth2ServerURL=http://${OAUTH2_HOSTNAME}:${OAUTH2_PORT} cypress run --browser chrome --config baseUrl=http://host.docker.internal:8888 --reporter junit --reporter-options 'mochaFile=cypress/results/results-[hash].xml'
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
