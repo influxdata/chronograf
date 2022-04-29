@@ -76,9 +76,9 @@ jobs:
           --generic-client-id=clientID \
           --generic-client-secret=clientSecret \
           --generic-scopes=scopes \
-          --generic-auth-url="http://${OAUTH2_HOSTNAME}:${OAUTH2_PORT}/oauth/authorize" \
-          --generic-api-url="http://${OAUTH2_HOSTNAME}:${OAUTH2_PORT}/userinfo" \
-          --generic-token-url="http://${OAUTH2_HOSTNAME}:${OAUTH2_PORT}/oauth/token" \
+          --generic-auth-url="http://$OAUTH2_HOSTNAME:$OAUTH2_PORT/oauth/authorize" \
+          --generic-api-url="http://$OAUTH2_HOSTNAME:$OAUTH2_PORT/userinfo" \
+          --generic-token-url="http://$OAUTH2_HOSTNAME:$OAUTH2_PORT/oauth/token" \
           --public-url=http://host.docker.internal:8888 \
           --token-secret=Q4O1T8FTbErOnmx03mGeVH3pkvKtdKr6HEmzEpNBiVMynZ/qKDdOResI3OMx4Zg9kmIfAI9ihlIV3OV5+VRfZ+iB2knLuGagEmFpG/h51CRcQY58j2NpnxdBewz91E51RRfjDYvqMrISHZCjdeuw0338Xp5UnEg32utr0ThRN0Ucv2isRr4KYJNYuvUXrjKJzjh76394JwY+bzn20L/enR2rLEtJ40ePxwuEvsE0MBUGZy79ecLZPaolQ3lkPE6X3+iV/9suN0BkBNtbQe1sGv4P522jSm24fFhXaFjetQQ/dJGehbWzsBo8uVAWB2RO0+xU2LhHFN0k0LAESD6MWw== \
           --redir-auth-login=oauth-mock > out.log 2>&1 &)
@@ -101,7 +101,7 @@ jobs:
             apt install -y build-essential
             yarn install --frozen-lockfile
             yarn run cypress install
-            yarn run cypress run --browser chrome --config baseUrl=http://host.docker.internal:8888 --reporter junit --reporter-options 'mochaFile=cypress/results/results-[hash].xml' --env oauth2ServerURL=http://${OAUTH2_HOSTNAME}:${OAUTH2_PORT}
+            yarn run cypress run --browser chrome --config baseUrl=http://host.docker.internal:8888 --reporter junit --reporter-options 'mochaFile=cypress/results/results-[hash].xml' --env oauth2ServerURL=http://$OAUTH2_HOSTNAME:$OAUTH2_PORT
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
