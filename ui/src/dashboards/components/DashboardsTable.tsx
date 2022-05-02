@@ -62,7 +62,9 @@ class DashboardsTable extends PureComponent<Props> {
               <td>
                 <Link
                   to={`${dashboardLink}/dashboards/${dashboard.id}`}
-                  data-test={`${dashboard.name.replace(/\s/g, '-').toLowerCase()}`}
+                  data-test={`${dashboard.name
+                    .replace(/\s/g, '-')
+                    .toLowerCase()}`}
                 >
                   {dashboard.name}
                 </Link>
