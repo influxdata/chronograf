@@ -250,7 +250,11 @@ class SourceStep extends PureComponent<Props, State> {
     this.detectServerType({password})
 
   private detectServerType = async (changedField: Partial<Source>) => {
-    const source = {...this.state.source, ...changedField}
+    const source = {
+      ...this.state.source,
+      ...changedField,
+      insecureSkipVerify: true, // detect InfluxDB type with TLS server verification off
+    }
     const metaserviceURL = new URL(source.metaUrl || DEFAULT_SOURCE.metaUrl)
     const sourceURL = new URL(source.url || DEFAULT_SOURCE.url)
 
