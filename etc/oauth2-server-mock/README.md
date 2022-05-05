@@ -6,10 +6,10 @@ This repository contains a mock [OAuth2](https://oauth.net/2/) Authorization Ser
 
 Prerequisites: [node.js 14](https://nodejs.org/) or newer
 
-Install required dependencies using your favorite package manager (npm,yarn,pnmp):
+Install required dependencies using your favorite package manager yarn:
 
 ```
-npm install
+yarn
 ```
 
 ## Configure
@@ -19,7 +19,7 @@ Modify [./env.sh](./env.sh) and run `source env.sh` to setup initial configurati
 ## Start
 
 ```
-npm run start
+yarn start
 ```
 
 Initial configuration is printed to console as well as the URL where the server is listening for requests.
