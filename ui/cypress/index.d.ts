@@ -13,7 +13,7 @@ import {
   createUser,
   deleteUser,
   createOrg,
-  deleteOrg  
+  deleteOrg,
 } from './support/commands'
 
 declare global {

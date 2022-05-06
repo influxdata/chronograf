@@ -1,4 +1,4 @@
-import { addMatchImageSnapshotCommand } from 'cypress-image-snapshot/command'
+import {addMatchImageSnapshotCommand} from 'cypress-image-snapshot/command'
 
 declare namespace Cypress {
   interface Chainable<Subject> {
@@ -15,7 +15,7 @@ addMatchImageSnapshotCommand({
   customSnapshotsDir: '../ui/cypress/snapshots',
   failureThreshold: 0.75, // threshold for entire image
   failureThresholdType: 'percent', // percent of image or number of pixels
-  customDiffConfig: { threshold: 0.75 }, // threshold for each pixel
+  customDiffConfig: {threshold: 0.75}, // threshold for each pixel
   capture: 'viewport', // capture viewport in screenshot
 })
 
@@ -44,10 +44,10 @@ const changeUserInfo: Function = (name: string): void => {
   const xhttp: XMLHttpRequest = new XMLHttpRequest()
   const url: string = Cypress.env('oauth2ServerURL') + '/config'
   const body = {
-    "userinfo": {
-      "name": name,
-      "email": name + "@oauth2.mock"
-    }
+    userinfo: {
+      name: name,
+      email: name + '@oauth2.mock',
+    },
   }
 
   xhttp.open('POST', url)
@@ -88,37 +88,38 @@ export const createConnection = (url?: string) => {
 }
 
 export const removeConnections = () => {
-  return cy.request('GET', '/chronograf/v1/sources').then(response => {
-    response.body.sources.forEach(connection => {
-      cy.request('DELETE', `${connection.links.self}`)
+  return cy
+    .request('GET', '/chronograf/v1/sources')
+    .then(response => {
+      response.body.sources.forEach(connection => {
+        cy.request('DELETE', `${connection.links.self}`)
+      })
     })
-  })
     .then(() => {
       wrapConnections()
     })
 }
 
 export const createDashboard = (name?: string) => {
-  return cy
-    .fixture('routes').then(({ dashboards }) => {
-      return cy
-        .request({
-          method: 'POST',
-          url: `/chronograf/v1${dashboards}`,
-          body: {
-            name: name ?? 'Default Dashboard',
-          },
-        })
-        .then(() => {
-          wrapDashboards()
-        })
-    })
+  return cy.fixture('routes').then(({dashboards}) => {
+    return cy
+      .request({
+        method: 'POST',
+        url: `/chronograf/v1${dashboards}`,
+        body: {
+          name: name ?? 'Default Dashboard',
+        },
+      })
+      .then(() => {
+        wrapDashboards()
+      })
+  })
 }
 
 export const deleteDashboards = () => {
   return cy
     .request('GET', '/chronograf/v1/dashboards')
-    .then(({ body: response }) => {
+    .then(({body: response}) => {
       response.dashboards.forEach(dashboard => {
         cy.request('DELETE', `${dashboard.links.self}`)
       })
@@ -135,32 +136,31 @@ export const createDashboardWithCell = (
   xPosition?: number,
   yPosition?: number,
   cellWidth?: number,
-  cellHeight?: number,
+  cellHeight?: number
 ) => {
-  return cy
-    .request({
-      method: 'POST',
-      url: `/chronograf/v1/dashboards/`,
-      body: {
-        "cells": [
-          {
-            "x": xPosition ?? 0,
-            "y": yPosition ?? 0,
-            "w": cellWidth ?? 8,
-            "h": cellHeight ?? 4,
-            "name": cellName ?? "Unnamed Cell",
-            "queries": [
-              {
-                "query": query,
-                "db": Cypress.env('connectionName'),
-                "label": "%",
-              }
-            ]
-          }
-        ],
-        name: dashboardName ?? "Unnamed Dashboard"
-      }
-    })
+  return cy.request({
+    method: 'POST',
+    url: `/chronograf/v1/dashboards/`,
+    body: {
+      cells: [
+        {
+          x: xPosition ?? 0,
+          y: yPosition ?? 0,
+          w: cellWidth ?? 8,
+          h: cellHeight ?? 4,
+          name: cellName ?? 'Unnamed Cell',
+          queries: [
+            {
+              query: query,
+              db: Cypress.env('connectionName'),
+              label: '%',
+            },
+          ],
+        },
+      ],
+      name: dashboardName ?? 'Unnamed Dashboard',
+    },
+  })
 }
 
 export const createUser = (
@@ -174,39 +174,40 @@ export const createUser = (
     method: 'POST',
     url: '/chronograf/v1/users',
     body: {
-      "name": userName + "@oauth2.mock",
-      "provider": provider,
-      "roles": [{
-        "name": role ?? "reader",
-        "organization": organization ?? "default"
-      }],
-      "scheme": scheme,
-    }
+      name: userName + '@oauth2.mock',
+      provider: provider,
+      roles: [
+        {
+          name: role ?? 'reader',
+          organization: organization ?? 'default',
+        },
+      ],
+      scheme: scheme,
+    },
   })
 }
 
 export const deleteUser = (name: string) => {
   const userName = name + '@oauth2.mock'
-  return cy
-    .request('GET', '/chronograf/v1/users')
-    .then(({ body: response }) => {
-      response.users.forEach(user => {
-        if (userName == user.name) {
-          cy.request('DELETE', user.links.self)
-        }
-      })
+  return cy.request('GET', '/chronograf/v1/users').then(({body: response}) => {
+    response.users.forEach(user => {
+      if (userName == user.name) {
+        cy.request('DELETE', user.links.self)
+      }
     })
+  })
 }
 
 export const createOrg = (orgName: string, defaultRole: string) => {
-  return cy.request({
-    method: 'POST',
-    url: '/chronograf/v1/organizations',
-    body: {
-      "defaultRole": defaultRole,
-      "name": orgName
-    }
-  })
+  return cy
+    .request({
+      method: 'POST',
+      url: '/chronograf/v1/organizations',
+      body: {
+        defaultRole: defaultRole,
+        name: orgName,
+      },
+    })
     .then(() => {
       wrapOrgs()
     })
@@ -222,22 +223,26 @@ function wrapConnections() {
       method: 'GET',
       url: '/chronograf/v1/sources',
     })
-    .then(({ body: response }) => {
+    .then(({body: response}) => {
       const connections = response.sources
       cy.wrap(connections).as('connections')
     })
 }
 
 function wrapDashboards() {
-  return cy.request('GET', '/chronograf/v1/dashboards').then(({ body: response }) => {
-    cy.wrap(response.dashboards).as('dashboards')
-  })
+  return cy
+    .request('GET', '/chronograf/v1/dashboards')
+    .then(({body: response}) => {
+      cy.wrap(response.dashboards).as('dashboards')
+    })
 }
 
 function wrapOrgs() {
-  return cy.request('GET', '/chronograf/v1/organizations').then(({ body: response }) => {
-    cy.wrap(response.organizations).as('orgs')
-  })
+  return cy
+    .request('GET', '/chronograf/v1/organizations')
+    .then(({body: response}) => {
+      cy.wrap(response.organizations).as('orgs')
+    })
 }
 
 Cypress.Commands.add('getByTestID', getByTestID)

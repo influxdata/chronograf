@@ -47,9 +47,7 @@ describe('query builder', () => {
     cy.getByTestID('builder-card')
       .eq(1)
       .within(() => {
-        cy.get('#flxts1_numSeries')
-          .should('exist')
-          .click({force: true})
+        cy.get('#flxts1_numSeries').should('exist').click({force: true})
       })
 
     const checkQuery = (queryTemplate: string): void => {
@@ -86,7 +84,9 @@ describe('query builder', () => {
       cy.getByTestID('builder-card--body').within(() => {
         cy.get('.dropdown-selected').click()
         cy.get('.dropdown-menu').within(() => {
-          cy.getByTestID('dropdown-item').contains('custom').click({force: true})
+          cy.getByTestID('dropdown-item')
+            .contains('custom')
+            .click({force: true})
         })
         cy.get('input').type('13s{enter}')
         cy.get('.dropdown-selected').should('contain.text', '13s')
@@ -159,7 +159,7 @@ describe('query builder', () => {
       cy.get('.flux-query-builder--list-item')
         .contains('cluster')
         .click({force: true})
-        
+
       cy.get('.flux-tag-selector--count').should('not.exist')
     })
   })
