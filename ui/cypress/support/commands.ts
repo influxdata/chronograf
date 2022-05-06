@@ -40,19 +40,22 @@ export const getByTestID = (
 }
 
 // Function sends HTTP POST request to OAuth2 Mock server in order to change user information
-const changeUserInfo: Function = (name: string): void => {
-  const xhttp: XMLHttpRequest = new XMLHttpRequest()
-  const url: string = Cypress.env('oauth2ServerURL') + '/config'
-  const body = {
+async function changeUserInfo(name: string) {
+  const userData = {
     userinfo: {
       name: name,
       email: name + '@oauth2.mock',
     },
   }
 
-  xhttp.open('POST', url)
-  xhttp.setRequestHeader('Content-Type', 'application/json')
-  xhttp.send(JSON.stringify(body))
+  await fetch(
+    Cypress.env('oauth2ServerURL') + '/config',
+    {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(userData),
+    }
+  )
 }
 
 export const OAuthLogin = (name: string) => {
@@ -160,6 +163,9 @@ export const createDashboardWithCell = (
       ],
       name: dashboardName ?? 'Unnamed Dashboard',
     },
+  })
+  .then(() => {
+    wrapDashboards()
   })
 }
 
