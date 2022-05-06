@@ -25,7 +25,7 @@ interface Props {
   active?: boolean
   tabIndex?: number
   customClass?: string
-  dataTest?: string
+  testId?: string
 }
 
 @ErrorHandling
@@ -39,7 +39,7 @@ class Button extends Component<Props> {
   }
 
   public render() {
-    const {onClick, text, titleText, tabIndex, dataTest} = this.props
+    const {onClick, text, titleText, tabIndex, testId} = this.props
 
     return (
       <button
@@ -48,7 +48,7 @@ class Button extends Component<Props> {
         onClick={onClick}
         title={titleText || text}
         tabIndex={tabIndex ? tabIndex : 0}
-        data-test={dataTest}
+        data-test={testId}
       >
         {this.icon}
         {this.text}

@@ -55,7 +55,7 @@ const AddAnnotationToggle: FunctionComponent<Props> = props => {
       color={buttonColor}
       text={buttonContent}
       onClick={onToggle}
-      dataTest={buttonDataTest}
+      testId={buttonDataTest}
     />
   )
 }

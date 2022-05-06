@@ -168,7 +168,7 @@ class DashboardHeader extends Component<Props, State> {
             icon={IconFont.AddCell}
             onClick={onAddCell}
             titleText="Add a Cell to Dashboard"
-            dataTest="add-cell"
+            testId="add-cell"
           />
         </Authorized>
       )
@@ -208,7 +208,7 @@ class DashboardHeader extends Component<Props, State> {
             onClick={onToggleShowTempVarControls}
             active={showTempVarControls}
             titleText={variablesTooltip}
-            dataTest={variablesDataTest}
+            testId={variablesDataTest}
           />
           <Button
             text="Annotations"
@@ -216,7 +216,7 @@ class DashboardHeader extends Component<Props, State> {
             onClick={onToggleShowAnnotationControls}
             active={showAnnotationControls}
             titleText={annotationsTooltip}
-            dataTest={annotationsDataTest}
+            testId={annotationsDataTest}
           />
         </>
       )
