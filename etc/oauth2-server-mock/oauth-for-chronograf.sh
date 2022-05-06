@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script setup chronograf environment variables to a use this server OAuth2 server.
+# This script setups chronograf environment variables to use this OAuth2 server.
 # Run this script as `source oauth-for-chronograf.sh` before you start chronograf.
 
 . `dirname ${BASH_SOURCE}`/env.sh
@@ -18,7 +18,7 @@ export GENERIC_NAME=oauth-mock
 export PUBLIC_URL=http://localhost:8888
 export REDIR_AUTH_LOGIN=oauth-mock
 
-echo Make sure to setup the following environment variables before your start OAuth Mock server
+echo Make sure to setup the following environment variables before you start OAuth Mock server
 echo export OAUTH2_HOSTNAME=${OAUTH2_HOSTNAME}
 echo export OAUTH2_PORT=${OAUTH2_PORT}
 echo export OAUTH2_REDIRECT_URL=${PUBLIC_URL}/oauth/${GENERIC_NAME}/callback
