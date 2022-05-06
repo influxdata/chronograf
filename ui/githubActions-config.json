@@ -1,0 +1,6 @@
+{
+    "extends": "./cypress.json",
+    "baseUrl": "http://host.docker.internal:8888",
+    "video": true,
+    "videoCompression": 32
+}
