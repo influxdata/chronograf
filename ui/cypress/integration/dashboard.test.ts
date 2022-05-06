@@ -49,20 +49,27 @@ describe('Use Dashboards', () => {
     })
 
     it('ensure that all elements used to edit Chronograf are not visible', () => {
-        cy.getByTestID('sidebar').should('not.exist')
-        cy.getByTestID('import-dashboard--button').should('not.exist')
-        cy.getByTestID('create-dashboard-button').should('not.exist')
-        cy.getByTestID('dashboard-filter--input').type('Empty')
-        cy.getByTestID('dashboard-panel').should('have.text', `Looks like you don’t have any dashboards`)
-        cy.getByTestID('dashboard-filter--input').clear().type('Dashboard')
-        cy.getByTestID('reader-dashboard').click()
-        cy.get('.dashboard-empty--menu').should('not.exist')
-        cy.getByTestID('add-cell').should('not.exist')
-        cy.getByTestID('show-variables--button').click()
-        cy.getByTestID('add-template-variable').should('not.exist')
-        cy.getByTestID('show-annotations--button').click()
-        cy.getByTestID('add-annotation--button').should('not.exist')
-        cy.getByTestID('add-annotation-filter--button').should('not.exist')
+      cy.getByTestID('sidebar').should('not.exist')
+      cy.getByTestID('import-dashboard--button').should('not.exist')
+      cy.getByTestID('create-dashboard-button').should('not.exist')
+      cy.getByTestID('dashboard-filter--input').type('Empty')
+      cy.getByTestID('dashboard-panel').should(
+        'have.text',
+        `Looks like you don’t have any dashboards`
+      )
+
+      cy.getByTestID('dashboard-filter--input').clear().type('Dashboard')
+      cy.get('@dashboards').then(dashboards => {
+        cy.getByTestID(`dashboard-link-${dashboards[0].id}`).click()
+      })
+
+      cy.get('.dashboard-empty--menu').should('not.exist')
+      cy.getByTestID('add-cell').should('not.exist')
+      cy.getByTestID('show-variables--button').click()
+      cy.getByTestID('add-template-variable').should('not.exist')
+      cy.getByTestID('show-annotations--button').click()
+      cy.getByTestID('add-annotation--button').should('not.exist')
+      cy.getByTestID('add-annotation-filter--button').should('not.exist')
     })
   })
 })
