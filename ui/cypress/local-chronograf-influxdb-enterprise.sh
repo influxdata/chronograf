@@ -58,8 +58,12 @@ deploy_influxdb_ent() {
         --set installCRDs=true
     kubectl apply -f "${RWD}/.github/workflows/resources/test-resources.yaml"
     kubectl create secret generic influxdb-license --from-literal=INFLUXDB_ENTERPRISE_LICENSE_KEY="${LICENSE_KEY}"
-    helm upgrade --wait --install influxdb influxdata/influxdb-enterprise --namespace default --set-string envFromSecret=influxdb-license --set-string data.service.type=NodePort
-    kubectl patch svc influxdb-influxdb-enterprise-data --type=json -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":30086}]'
+    helm upgrade --wait --install influxdb influxdata/influxdb-enterprise --namespace default \
+        --set-string envFromSecret=influxdb-license \
+        --set-string data.service.type=NodePort \
+        --set-string meta.service.type=NodePort \
+        --set data.service.nodePort=30086 \
+        --set meta.service.nodePort=30091
     sleep 5
     echo -e "InfluxDB data node status: $(curl -Isk "https://localhost:8086/ping" | head -n 1)"
 }
