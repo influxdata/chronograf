@@ -11,8 +11,8 @@ describe('Welcome Page', () => {
     cy.get('[id="Connection Name"]').clear().type(Cypress.env('connectionName'))
     cy.get('[id="Username"]').clear().type(Cypress.env('username'))
     cy.get('[id="Password"]').clear().type(Cypress.env('password'))
-    
-    if (Cypress.env('influxDBURL').startsWith('https')){
+
+    if (Cypress.env('influxDBURL').startsWith('https')) {
       cy.get('.wizard-checkbox--label').contains('Unsafe SSL').click()
     }
 
