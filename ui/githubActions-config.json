@@ -1,6 +1,13 @@
 {
-    "extends": "./cypress.json",
+    "$schema": "https://on.cypress.io/cypress.schema.json",
     "baseUrl": "http://host.docker.internal:8888",
     "video": true,
-    "videoCompression": 32
-}
+    "env": {
+      "ALLOW_SCREENSHOT": true,
+      "influxDBURL": "https://localhost:8086",
+      "username": "admin",
+      "password": "admin",
+      "connectionName": "E1M1",
+      "insecureSkipVerify": true
+    }
+  }
