@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      OAUTH2_HOSTNAME: localhost
+      OAUTH2_HOSTNAME: host.docker.internal
       OAUTH2_PORT: 8087
       OAUTH2_TEST_USER_NAME: test
       OAUTH2_TEST_USER_EMAIL: test@oauth2.mock
@@ -21,6 +21,10 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 1
+
+      - name: Add host to /etc/hosts
+        run: |
+          echo '127.0.0.1 host.docker.internal' | sudo tee -a /etc/hosts
 
       - name: Setup Go
         uses: actions/setup-go@v2
@@ -95,14 +99,14 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: cypress/browsers:node16.14.0-slim-chrome99-ff97
-          options: -i -v ${{ github.workspace }}:/chronograf -w /chronograf/ui --add-host=host.docker.internal:host-gateway
+          options: -i -v ${{ github.workspace }}:/chronograf -w /chronograf/ui --add-host=host.docker.internal:host-gateway --network=host
           shell: sh
           run: |
             apt update
             apt install -y build-essential
             yarn install --frozen-lockfile
             yarn run cypress install
-            yarn run cypress run --env oauth2ServerURL=http://host.docker.internal:${{ env.OAUTH2_PORT }} --browser chrome --config-file githubActions-config.json --reporter junit --reporter-options 'mochaFile=cypress/results/results-[hash].xml'
+            yarn run cypress run --env oauth2ServerURL=http://${{ env.OAUTH2_HOSTNAME }}:${{ env.OAUTH2_PORT }} --browser chrome --config-file githubActions-config.json --reporter junit --reporter-options 'mochaFile=cypress/results/results-[hash].xml'
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
