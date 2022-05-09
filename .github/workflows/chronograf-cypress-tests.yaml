@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      OAUTH2_HOSTNAME: host.docker.internal
+      OAUTH2_HOSTNAME: localhost
       OAUTH2_PORT: 8087
       OAUTH2_TEST_USER_NAME: test
       OAUTH2_TEST_USER_EMAIL: test@oauth2.mock
@@ -22,10 +22,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 1
-
-      - name: Add host to /etc/hosts
-        run: |
-          echo '127.0.0.1 host.docker.internal' | sudo tee -a /etc/hosts
 
       - name: Setup Go
         uses: actions/setup-go@v2
