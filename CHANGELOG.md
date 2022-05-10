@@ -7,6 +7,8 @@
 
 ### Bug Fixes
 
+1. [#5882](https://github.com/influxdata/chronograf/pull/5882): Repair table visualization of string values.
+
 ### Other
 
 1. [#5875](https://github.com/influxdata/chronograf/pull/5875): Upgrade to node 16 LTS.

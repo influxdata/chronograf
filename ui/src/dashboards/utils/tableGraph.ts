@@ -304,14 +304,15 @@ export const transformTableData = (
   - `parseFloat('02abc')` is 2
 
 */
-export const isNumerical = <T>(x: T | string): x is string =>
-  !isNaN(Number(x)) && !isNaN(parseFloat(x as string))
+export const isNumerical = (x: number | string): boolean =>
+  typeof x === 'number' || (!isNaN(Number(x)) && !isNaN(parseFloat(x)))
 
 export const formatNumericCell = (
-  cellData: string,
+  cellData: string | number,
   decimalPlaces: DecimalPlaces
 ) => {
-  const cellValue = parseFloat(cellData)
+  const cellValue =
+    typeof cellData === 'number' ? cellData : parseFloat(cellData)
 
   if (isTruncatedNumber(cellValue, decimalPlaces)) {
     return toFixed(cellValue, decimalPlaces)
