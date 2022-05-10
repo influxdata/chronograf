@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react'
 import classnames from 'classnames'
-import _ from 'lodash'
 
 import MultiSelectDropdown from 'src/shared/components/MultiSelectDropdown'
 
@@ -10,59 +9,58 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   user: User
-  allPermissions: string[]
   onUpdatePermissions: (user: User, permissions: UserPermission[]) => void
 }
 
+const ADMIN_YES_OPTION = 'YES'
+const ALL_PERMISSIONS = [{name: ADMIN_YES_OPTION}]
+
 @ErrorHandling
-class UserPermissionsDropdown extends PureComponent<Props> {
+class UserAdminDropdown extends PureComponent<Props> {
   public render() {
     return (
       <MultiSelectDropdown
         buttonSize="btn-xs"
         buttonColor="btn-primary"
         resetStateOnReceiveProps={false}
-        items={this.allPermissions}
+        items={ALL_PERMISSIONS}
         label={this.permissionsLabel}
         customClass={this.permissionsClass}
         selectedItems={this.selectedPermissions}
-        onApply={this.handleUpdatePermissions}
+        onApply={this.handleApply}
       />
     )
   }
 
-  private handleUpdatePermissions = (permissions): void => {
+  private handleApply = (items): void => {
     const {onUpdatePermissions, user} = this.props
-    const allowed = permissions.map(p => p.name)
-    onUpdatePermissions(user, [{scope: 'all', allowed}])
+    let permissions = (user.permissions || []).filter(x => x.scope !== 'all')
+    if (items && items.length) {
+      permissions = [{scope: 'all', allowed: ['ALL']}, ...permissions]
+    }
+    onUpdatePermissions(user, permissions)
   }
 
-  private get allPermissions() {
-    return this.props.allPermissions.map(p => ({name: p}))
+  private get admin() {
+    return (
+      (this.props.user.permissions || []).filter(
+        x => x.scope === 'all' && (x.allowed || []).includes('ALL')
+      ).length > 0
+    )
   }
-
-  private get userPermissions() {
-    return _.get(this.props.user, ['permissions', '0', 'allowed'], [])
-  }
-
   private get selectedPermissions() {
-    return this.userPermissions.map(p => ({name: p}))
+    return this.admin ? [{name: ADMIN_YES_OPTION}] : []
   }
 
   private get permissionsLabel() {
-    const {user} = this.props
-    if (user.permissions && user.permissions.length) {
-      return 'Select Permissions'
-    }
-
-    return ''
+    return this.admin ? 'YES' : 'NO'
   }
 
   private get permissionsClass() {
     return classnames(`dropdown-${USERS_TABLE.colPermissions}`, {
-      'admin-table--multi-select-empty': !this.props.user.permissions.length,
+      'admin-table--multi-select-empty': !this.admin,
     })
   }
 }
 
-export default UserPermissionsDropdown
+export default UserAdminDropdown

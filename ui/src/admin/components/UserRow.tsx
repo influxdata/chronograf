@@ -7,8 +7,9 @@ import ConfirmButton from 'src/shared/components/ConfirmButton'
 import {USERS_TABLE} from 'src/admin/constants/tableSizing'
 
 import UserRowEdit from 'src/admin/components/UserRowEdit'
-import {User} from 'src/types/influxAdmin'
+import {User, UserPermission} from 'src/types/influxAdmin'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import UserAdminDropdown from './UserAdminDropdown'
 
 interface UserRowProps {
   user: User
@@ -21,7 +22,7 @@ interface UserRowProps {
   onEdit: () => void
   onSave: () => void
   onDelete: (user: User) => void
-  onUpdatePermissions: (user: User, permissions: any[]) => void
+  onUpdatePermissions: (user: User, permissions: UserPermission[]) => void
   onUpdateRoles: (user: User, roles: any[]) => void
   onUpdatePassword: (user: User, password: string) => void
 }
@@ -77,10 +78,15 @@ class UserRow extends PureComponent<UserRowProps> {
           </td>
         )}
         <td>
-          {this.hasPermissions && (
+          {this.hasPermissions ? (
             <UserPermissionsDropdown
               user={user}
               allPermissions={allPermissions}
+              onUpdatePermissions={onUpdatePermissions}
+            />
+          ) : (
+            <UserAdminDropdown
+              user={user}
               onUpdatePermissions={onUpdatePermissions}
             />
           )}
@@ -114,8 +120,8 @@ class UserRow extends PureComponent<UserRowProps> {
   }
 
   private get hasPermissions() {
-    const {allPermissions} = this.props
-    return allPermissions && !!allPermissions.length
+    const {allPermissions, hasRoles} = this.props
+    return hasRoles && allPermissions && !!allPermissions.length
   }
 }
 
