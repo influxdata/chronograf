@@ -71,8 +71,9 @@ jobs:
 
       - name: OAuth2 Mock Server
         run: |
-          yarn --cwd $(git rev-parse --show-toplevel)/etc/oauth2-server-mock
-          RUNNER_TRACKING_ID="" && (nohup yarn --cwd $(git rev-parse --show-toplevel)/etc/oauth2-server-mock start > oauth2-mock.log 2>&1 &)
+          yarn
+          RUNNER_TRACKING_ID="" && (nohup yarn start > oauth2-mock.log 2>&1 &)
+        working-directory: ./etc/oauth2-server-mock
 
       - name: Chronograf
         run: |

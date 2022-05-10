@@ -40,7 +40,7 @@ export const getByTestID = (
 }
 
 // Function sends HTTP POST request to OAuth2 Mock server in order to change user information
-async function changeUserInfo(name: string) {
+function changeUserInfo(name: string) {
   const userData = {
     userinfo: {
       name: name,
@@ -48,14 +48,16 @@ async function changeUserInfo(name: string) {
     },
   }
 
-  await fetch(
-    Cypress.env('oauth2ServerURL') + '/config',
-    {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(userData),
-    }
-  )
+  cy.request({
+    method: 'POST',
+    url: Cypress.env('oauth2ServerURL') + '/config',
+    body: {
+      userinfo: {
+        name: name,
+        email: name + '@oauth2.mock',
+      },
+    },
+  })
 }
 
 export const OAuthLogin = (name: string) => {
