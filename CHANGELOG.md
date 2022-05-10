@@ -3,6 +3,7 @@
 ### Features
 
 1. [#5904](https://github.com/influxdata/chronograf/pull/5904): Add reader role.
+1. [#5916](https://github.com/influxdata/chronograf/pull/5916): Manage InfluxDB OSS admin users.
 
 ### Bug Fixes
 
