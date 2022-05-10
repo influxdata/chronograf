@@ -48,6 +48,7 @@ export enum InfluxDBPermissionScope {
 
 export interface Permission {
   scope: string
+  name?: string
   allowed: InfluxDBPermissions[]
 }
 

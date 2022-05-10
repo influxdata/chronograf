@@ -7,7 +7,7 @@ import ConfirmButton from 'src/shared/components/ConfirmButton'
 import {USERS_TABLE} from 'src/admin/constants/tableSizing'
 
 import UserRowEdit from 'src/admin/components/UserRowEdit'
-import {User} from 'src/types/influxAdmin'
+import {User, UserPermission} from 'src/types/influxAdmin'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import UserAdminDropdown from './UserAdminDropdown'
 
@@ -22,7 +22,7 @@ interface UserRowProps {
   onEdit: () => void
   onSave: () => void
   onDelete: (user: User) => void
-  onUpdatePermissions: (user: User, permissions: any[]) => void
+  onUpdatePermissions: (user: User, permissions: UserPermission[]) => void
   onUpdateRoles: (user: User, roles: any[]) => void
   onUpdatePassword: (user: User, password: string) => void
 }

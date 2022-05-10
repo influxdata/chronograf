@@ -5,13 +5,13 @@ import _ from 'lodash'
 import MultiSelectDropdown from 'src/shared/components/MultiSelectDropdown'
 
 import {USERS_TABLE} from 'src/admin/constants/tableSizing'
-import {User} from 'src/types/influxAdmin'
+import {User, UserPermission} from 'src/types/influxAdmin'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   user: User
   allPermissions: string[]
-  onUpdatePermissions: (user: User, permissions: any[]) => void
+  onUpdatePermissions: (user: User, permissions: UserPermission[]) => void
 }
 
 @ErrorHandling
