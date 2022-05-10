@@ -2,8 +2,10 @@ export interface UserRole {
   name: string
 }
 
-interface UserPermission {
-  name: string
+export interface UserPermission {
+  scope: string
+  name?: string
+  allowed: string[]
 }
 
 export interface User {
