@@ -6,7 +6,7 @@ import (
 	"time"
 
 	gojwt "github.com/golang-jwt/jwt/v4"
-	"github.com/lestrrat-go/jwx/jwk"
+	"github.com/lestrrat-go/jwx/v2/jwk"
 )
 
 // Ensure JWT conforms to the Tokenizer interface
@@ -120,7 +120,7 @@ func (j *JWT) KeyFuncRS256(token *gojwt.Token) (interface{}, error) {
 		return nil, fmt.Errorf("JWKSURL not specified, cannot validate RS256 signature")
 	}
 
-	set, err := jwk.Fetch(j.Jwksurl)
+	set, err := jwk.Fetch(context.TODO(), j.Jwksurl)
 	if err != nil {
 		return nil, err
 	}
@@ -130,17 +130,17 @@ func (j *JWT) KeyFuncRS256(token *gojwt.Token) (interface{}, error) {
 		return nil, fmt.Errorf("could not convert JWT header kid to string")
 	}
 
-	keys := set.LookupKeyID(kid)
-	if len(keys) == 0 {
+	key, ok := set.LookupKeyID(kid)
+	if !ok {
 		return nil, fmt.Errorf("no JWK found with kid %s", kid)
 	}
 
-	key, err := keys[0].Materialize()
-	if err != nil {
+	var rawkey interface{}
+	if err := key.Raw(&rawkey); err != nil {
 		return nil, fmt.Errorf("failed to read JWK public key: %s", err)
 	}
 
-	return key, nil
+	return rawkey, nil
 }
 
 // ValidClaims validates a token with StandardClaims
