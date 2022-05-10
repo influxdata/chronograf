@@ -15,7 +15,7 @@ jobs:
       OAUTH2_PORT: 8087
       OAUTH2_TEST_USER_NAME: test
       OAUTH2_TEST_USER_EMAIL: test@oauth2.mock
-      OAUTH2_REDIRECT_URL: http://host.docker.internal:8888/oauth/oauth-mock/callback
+      OAUTH2_REDIRECT_URL: http://localhost:8888/oauth/oauth-mock/callback
 
     steps:
       - name: Checkout
@@ -71,8 +71,8 @@ jobs:
 
       - name: OAuth2 Mock Server
         run: |
-          yarn --cwd $(git rev-parse --show-toplevel)/etc/oauth2-server-mock
-          RUNNER_TRACKING_ID="" && (nohup yarn --cwd $(git rev-parse --show-toplevel)/etc/oauth2-server-mock start > oauth2-mock.log 2>&1 &)
+          yarn --cwd ../etc/oauth2-server-mock
+          RUNNER_TRACKING_ID="" && (nohup yarn --cwd ../etc/oauth2-server-mock start > oauth2-mock.log 2>&1 &)
 
       - name: Chronograf
         run: |
@@ -85,7 +85,7 @@ jobs:
           --generic-auth-url="http://$OAUTH2_HOSTNAME:$OAUTH2_PORT/oauth/authorize" \
           --generic-api-url="http://$OAUTH2_HOSTNAME:$OAUTH2_PORT/userinfo" \
           --generic-token-url="http://$OAUTH2_HOSTNAME:$OAUTH2_PORT/oauth/token" \
-          --public-url=http://host.docker.internal:8888 \
+          --public-url=http://localhost:8888 \
           --token-secret=Q4O1T8FTbErOnmx03mGeVH3pkvKtdKr6HEmzEpNBiVMynZ/qKDdOResI3OMx4Zg9kmIfAI9ihlIV3OV5+VRfZ+iB2knLuGagEmFpG/h51CRcQY58j2NpnxdBewz91E51RRfjDYvqMrISHZCjdeuw0338Xp5UnEg32utr0ThRN0Ucv2isRr4KYJNYuvUXrjKJzjh76394JwY+bzn20L/enR2rLEtJ40ePxwuEvsE0MBUGZy79ecLZPaolQ3lkPE6X3+iV/9suN0BkBNtbQe1sGv4P522jSm24fFhXaFjetQQ/dJGehbWzsBo8uVAWB2RO0+xU2LhHFN0k0LAESD6MWw== \
           --redir-auth-login=oauth-mock > out.log 2>&1 &)
           sleep 10
@@ -100,7 +100,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: cypress/browsers:node16.14.0-slim-chrome99-ff97
-          options: -i -v ${{ github.workspace }}:/chronograf -w /chronograf/ui --add-host=host.docker.internal:host-gateway --network=host
+          options: -i -v ${{ github.workspace }}:/chronograf -w /chronograf/ui --network=host
           shell: sh
           run: |
             apt update
