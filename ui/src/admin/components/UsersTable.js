@@ -35,7 +35,9 @@ const UsersTable = ({
             <th>User</th>
             <th>Password</th>
             {hasRoles && <th className="admin-table--left-offset">Roles</th>}
-            <th className="admin-table--left-offset">Permissions</th>
+            <th className="admin-table--left-offset">
+              {hasRoles ? 'Permissions' : 'Administrator'}
+            </th>
             <th />
           </tr>
         </thead>

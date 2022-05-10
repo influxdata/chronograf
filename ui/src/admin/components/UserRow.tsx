@@ -9,6 +9,7 @@ import {USERS_TABLE} from 'src/admin/constants/tableSizing'
 import UserRowEdit from 'src/admin/components/UserRowEdit'
 import {User} from 'src/types/influxAdmin'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import UserAdminDropdown from './UserAdminDropdown'
 
 interface UserRowProps {
   user: User
@@ -77,10 +78,15 @@ class UserRow extends PureComponent<UserRowProps> {
           </td>
         )}
         <td>
-          {this.hasPermissions && (
+          {this.hasPermissions ? (
             <UserPermissionsDropdown
               user={user}
               allPermissions={allPermissions}
+              onUpdatePermissions={onUpdatePermissions}
+            />
+          ) : (
+            <UserAdminDropdown
+              user={user}
               onUpdatePermissions={onUpdatePermissions}
             />
           )}
@@ -114,8 +120,8 @@ class UserRow extends PureComponent<UserRowProps> {
   }
 
   private get hasPermissions() {
-    const {allPermissions} = this.props
-    return allPermissions && !!allPermissions.length
+    const {allPermissions, hasRoles} = this.props
+    return hasRoles && allPermissions && !!allPermissions.length
   }
 }
 
