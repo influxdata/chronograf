@@ -119,5 +119,6 @@ jobs:
               oauth2-mock.log
               out.log
               ui/cypress/videos/*.mp4
+              ui/cypress/screenshots/
               ui/cypress/results/results-*.xml
 
