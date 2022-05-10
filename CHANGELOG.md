@@ -8,6 +8,7 @@
 ### Bug Fixes
 
 1. [#5882](https://github.com/influxdata/chronograf/pull/5882): Repair table visualization of string values.
+1. [#5913](https://github.com/influxdata/chronograf/pull/5913): Improve InfluxDB Enterprise detection. 
 
 ### Other
 
@@ -16,6 +17,7 @@
 1. [#5898](https://github.com/influxdata/chronograf/pull/5898): Upgrade javascript dependencies.
 1. [#5754](https://github.com/influxdata/chronograf/pull/5754): Upgrade golang to 1.18.
 1. [#5915](https://github.com/influxdata/chronograf/pull/5915): Upgrade github.com/lestrrat-go/jwx to v2
+
 ## v1.9.4 [2022-03-22]
 
 ### Features
