@@ -203,7 +203,7 @@ func (m *MetaClient) RemoveUserPerms(ctx context.Context, name string, perms Per
 	return m.Post(ctx, "/user", a, nil)
 }
 
-// RemoveUserPerms revokes permissions for a user in Influx Enterprise
+// AddUserPerms adds permissions for a user in Influx Enterprise
 func (m *MetaClient) AddUserPerms(ctx context.Context, name string, perms Permissions) error {
 	a := &UserAction{
 		Action: "add-permissions",

@@ -176,8 +176,8 @@ func TestClient_Add(t *testing.T) {
 	}
 }
 
-// TestClient_Add_UserNotFound check fix for #5840, the API waits
-// for the creation of the user (up to 1 second) OOTB
+// TestClient_Add_UserNotFound verifies fix of defect #5840, the API has to wait
+// for the creation of the user OOTB
 func TestClient_Add_UserNotFound(t *testing.T) {
 	notFoundAttempts := 1
 	c := &enterprise.UserStore{
