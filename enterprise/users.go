@@ -20,8 +20,10 @@ func (c *UserStore) Add(ctx context.Context, u *chronograf.User) (*chronograf.Us
 	}
 	perms := ToEnterprise(u.Permissions)
 
-	if err := c.Ctrl.SetUserPerms(ctx, u.Name, perms); err != nil {
-		return nil, err
+	if len(perms) > 0 {
+		if err := c.Ctrl.SetUserPerms(ctx, u.Name, perms); err != nil {
+			return nil, err
+		}
 	}
 	for _, role := range u.Roles {
 		if err := c.Ctrl.AddRoleUsers(ctx, role.Name, []string{u.Name}); err != nil {
