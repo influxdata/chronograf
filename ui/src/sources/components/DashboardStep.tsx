@@ -134,6 +134,7 @@ class DashboardStep extends Component<Props, State> {
             <SearchBar
               placeholder="Filter by name..."
               onSearch={this.setSearchTerm}
+              testId="filter-dashboards--input"
             />
           </div>
           {this.suggestedDashboardCards}

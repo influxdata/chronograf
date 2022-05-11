@@ -70,6 +70,7 @@ class AnnotationControlBar extends PureComponent<Props> {
                 color={ComponentColor.Primary}
                 text={'Filter'}
                 titleText={'Add New Annotation Tag Filter'}
+                testId={'add-annotation-filter--button'}
               />
             </>
           )}

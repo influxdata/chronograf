@@ -1,0 +1,13 @@
+{
+    "$schema": "https://on.cypress.io/cypress.schema.json",
+    "baseUrl": "http://localhost:8888",
+    "video": true,
+    "env": {
+      "ALLOW_SCREENSHOT": true,
+      "influxDBURL": "https://localhost:8086",
+      "username": "admin",
+      "password": "admin",
+      "connectionName": "E1M1",
+      "insecureSkipVerify": true
+    }
+  }

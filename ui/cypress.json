@@ -4,7 +4,7 @@
   "video": false,
   "env": {
     "ALLOW_SCREENSHOT": true,
-    "url": "https://localhost:8086",
+    "influxDBURL": "https://localhost:8086",
     "username": "admin",
     "password": "admin",
     "connectionName": "E1M1",

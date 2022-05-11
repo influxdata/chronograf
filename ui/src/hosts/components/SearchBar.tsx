@@ -9,6 +9,7 @@ interface Props {
   width?: number
   placeholder: string
   onSearch: (searchTerm: string) => void
+  testId?: string
 }
 
 interface State {
@@ -35,7 +36,7 @@ class SearchBar extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {placeholder, width} = this.props
+    const {placeholder, width, testId} = this.props
     return (
       <div className="search-widget" style={{width: `${width}px`}}>
         <input
@@ -43,6 +44,7 @@ class SearchBar extends PureComponent<Props, State> {
           className="form-control input-sm"
           placeholder={placeholder}
           onChange={this.handleChange}
+          data-test={testId}
         />
         <span className="icon search" />
       </div>

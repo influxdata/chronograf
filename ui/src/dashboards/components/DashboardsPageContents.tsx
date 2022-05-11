@@ -83,6 +83,7 @@ class DashboardsPageContents extends Component<Props, State> {
             <SearchBar
               placeholder="Filter by Name..."
               onSearch={this.filterDashboards}
+              testId="dashboard-filter--input"
             />
             <Authorized requiredRole={EDITOR_ROLE}>
               <>
@@ -90,12 +91,14 @@ class DashboardsPageContents extends Component<Props, State> {
                   text="Import Dashboard"
                   icon={IconFont.Import}
                   onClick={this.handleToggleOverlay}
+                  testId="import-dashboard--button"
                 />
                 <Button
                   text="Create Dashboard"
                   icon={IconFont.Plus}
                   onClick={onCreateDashboard}
                   color={ComponentColor.Primary}
+                  testId="create-dashboard-button"
                 />
               </>
             </Authorized>
