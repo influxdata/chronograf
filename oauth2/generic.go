@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"strings"
 
-	gojwt "github.com/golang-jwt/jwt/v4"
 	"github.com/influxdata/chronograf"
+	"github.com/lestrrat-go/jwx/v2/jwt"
 	"golang.org/x/oauth2"
 )
 
@@ -18,8 +18,8 @@ import (
 type ExtendedProvider interface {
 	Provider
 	// get PrincipalID from id_token
-	PrincipalIDFromClaims(claims gojwt.MapClaims) (string, error)
-	GroupFromClaims(claims gojwt.MapClaims) (string, error)
+	PrincipalIDFromClaims(jwt.Token) (string, error)
+	GroupFromClaims(jwt.Token) (string, error)
 }
 
 var _ ExtendedProvider = &Generic{}
@@ -243,23 +243,27 @@ func ofDomain(requiredDomains []string, email string) bool {
 }
 
 // PrincipalIDFromClaims verifies an optional id_token and extracts email address of the user
-func (g *Generic) PrincipalIDFromClaims(claims gojwt.MapClaims) (string, error) {
-	if id, ok := claims[g.APIKey].(string); ok {
-		return id, nil
+func (g *Generic) PrincipalIDFromClaims(token jwt.Token) (string, error) {
+	if v, ok := token.Get(g.APIKey); ok {
+		if id, ok := v.(string); ok {
+			return id, nil
+		}
 	}
 	return "", fmt.Errorf("no claim for %s", g.APIKey)
 }
 
 // GroupFromClaims verifies an optional id_token, extracts the email address of the user and splits off the domain part
-func (g *Generic) GroupFromClaims(claims gojwt.MapClaims) (string, error) {
-	if id, ok := claims[g.APIKey].(string); ok {
-		email := strings.Split(id, "@")
-		if len(email) != 2 {
-			g.Logger.Error("malformed email address, expected %q to contain @ symbol", id)
-			return "DEFAULT", nil
-		}
+func (g *Generic) GroupFromClaims(token jwt.Token) (string, error) {
+	if v, ok := token.Get(g.APIKey); ok {
+		if id, ok := v.(string); ok {
+			email := strings.Split(id, "@")
+			if len(email) != 2 {
+				g.Logger.Error("malformed email address, expected %q to contain @ symbol", id)
+				return "DEFAULT", nil
+			}
 
-		return email[1], nil
+			return email[1], nil
+		}
 	}
 
 	return "", fmt.Errorf("no claim for %s", g.APIKey)

@@ -5,8 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	jwt "github.com/golang-jwt/jwt/v4"
 	"github.com/influxdata/chronograf"
+	"github.com/lestrrat-go/jwx/v2/jwa"
+	"github.com/lestrrat-go/jwx/v2/jwt"
 )
 
 // Authorizer adds optional authorization header to request
@@ -100,16 +101,17 @@ func (b *BearerJWT) Token(username string) (string, error) {
 
 // JWT returns a token string accepted by InfluxDB using the sharedSecret as an Authorization: Bearer header
 func JWT(username, sharedSecret string, now Now) (string, error) {
-	token := &jwt.Token{
-		Header: map[string]interface{}{
-			"typ": "JWT",
-			"alg": jwt.SigningMethodHS512.Alg(),
-		},
-		Claims: jwt.MapClaims{
-			"username": username,
-			"exp":      now().Add(time.Minute).Unix(),
-		},
-		Method: jwt.SigningMethodHS512,
+	tok, err := jwt.NewBuilder().
+		Claim(`username`, username).
+		Expiration(now().Add(time.Minute)).
+		Build()
+	if err != nil {
+		return "", err
 	}
-	return token.SignedString([]byte(sharedSecret))
+	signed, err := jwt.Sign(tok, jwt.WithKey(jwa.HS512, []byte(sharedSecret)))
+	if err != nil {
+		return "", err
+	}
+
+	return string(signed), nil
 }

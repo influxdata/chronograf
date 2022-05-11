@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	gojwt "github.com/golang-jwt/jwt/v4"
+	"github.com/lestrrat-go/jwx/v2/jwt"
 )
 
 type MockTokenizer struct {
@@ -38,8 +38,8 @@ func (m *MockTokenizer) ExtendedPrincipal(ctx context.Context, principal Princip
 	return principal, m.ExtendErr
 }
 
-func (m *MockTokenizer) GetClaims(tokenString string) (gojwt.MapClaims, error) {
-	return gojwt.MapClaims{}, nil
+func (m *MockTokenizer) GetClaims(tokenString string) (jwt.Token, error) {
+	return jwt.New(), nil
 }
 
 func TestCookieAuthorize(t *testing.T) {
