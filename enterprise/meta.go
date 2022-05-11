@@ -206,6 +206,18 @@ func (m *MetaClient) RemoveUserPerms(ctx context.Context, name string, perms Per
 	return m.Post(ctx, "/user", a, nil)
 }
 
+// RemoveUserPerms revokes permissions for a user in Influx Enterprise
+func (m *MetaClient) AddUserPerms(ctx context.Context, name string, perms Permissions) error {
+	a := &UserAction{
+		Action: "add-permissions",
+		User: &User{
+			Name:        name,
+			Permissions: perms,
+		},
+	}
+	return m.Post(ctx, "/user", a, nil)
+}
+
 // SetUserPerms removes permissions not in set and then adds the requested perms
 func (m *MetaClient) SetUserPerms(ctx context.Context, name string, perms Permissions) error {
 	user, err := m.User(ctx, name)
@@ -226,14 +238,7 @@ func (m *MetaClient) SetUserPerms(ctx context.Context, name string, perms Permis
 
 	// ... next, add any permissions the user should have
 	if len(add) > 0 {
-		a := &UserAction{
-			Action: "add-permissions",
-			User: &User{
-				Name:        name,
-				Permissions: add,
-			},
-		}
-		return m.Post(ctx, "/user", a, nil)
+		return m.AddUserPerms(ctx, name, add)
 	}
 	return nil
 }
