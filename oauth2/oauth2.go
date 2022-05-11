@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	gojwt "github.com/golang-jwt/jwt/v4"
+	"github.com/lestrrat-go/jwx/v2/jwt"
 	"golang.org/x/oauth2"
 )
 
@@ -97,5 +97,5 @@ type Tokenizer interface {
 	// ExtendedPrincipal adds the extention to the principal's lifespan.
 	ExtendedPrincipal(ctx context.Context, principal Principal, extension time.Duration) (Principal, error)
 	// GetClaims returns a map with verified claims
-	GetClaims(tokenString string) (gojwt.MapClaims, error)
+	GetClaims(tokenString string) (jwt.Token, error)
 }

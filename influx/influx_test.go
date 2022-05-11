@@ -11,11 +11,12 @@ import (
 	"testing"
 	"time"
 
-	gojwt "github.com/golang-jwt/jwt/v4"
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/influx"
 	"github.com/influxdata/chronograf/log"
 	"github.com/influxdata/chronograf/mocks"
+	"github.com/lestrrat-go/jwx/v2/jwa"
+	"github.com/lestrrat-go/jwx/v2/jwt"
 )
 
 // NewClient initializes an HTTP Client for InfluxDB.
@@ -79,25 +80,17 @@ func Test_Influx_AuthorizationBearer(t *testing.T) {
 		rw.Write([]byte(`{}`))
 		auth := r.Header.Get("Authorization")
 		tokenString := strings.Split(auth, " ")[1]
-		token, err := gojwt.Parse(tokenString, func(token *gojwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*gojwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-			}
-			return []byte("42"), nil
-		})
+		token, err := jwt.Parse([]byte(tokenString), jwt.WithKey(jwa.HS512, []byte("42")))
 		if err != nil {
 			t.Errorf("Invalid token %v", err)
-		}
-
-		if claims, ok := token.Claims.(gojwt.MapClaims); ok && token.Valid {
-			got := claims["username"]
-			want := "AzureDiamond"
-			if got != want {
-				t.Errorf("Test_Influx_AuthorizationBearer got %s want %s", got, want)
-			}
 			return
 		}
-		t.Errorf("Invalid token %v", token)
+
+		got, _ := token.Get(`username`)
+		want := "AzureDiamond"
+		if got != want {
+			t.Errorf("Test_Influx_AuthorizationBearer got %s want %s", got, want)
+		}
 	}))
 	defer ts.Close()
 
@@ -131,24 +124,12 @@ func Test_Influx_AuthorizationBearerCtx(t *testing.T) {
 		}
 		incomingToken := strings.Split(got, " ")[1]
 
-		alg := func(token *gojwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*gojwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-			}
-			return []byte("hunter2"), nil
-		}
-		claims := &gojwt.MapClaims{}
-		token, err := gojwt.ParseWithClaims(string(incomingToken), claims, alg)
+		token, err := jwt.Parse([]byte(incomingToken), jwt.WithKey(jwa.HS512, []byte("hunter2")))
 		if err != nil {
 			t.Errorf("Test_Influx_AuthorizationBearerCtx unexpected claims error %v", err)
+			return
 		}
-		if !token.Valid {
-			t.Error("Test_Influx_AuthorizationBearerCtx unexpected valid claim")
-		}
-		if err := claims.Valid(); err != nil {
-			t.Errorf("Test_Influx_AuthorizationBearerCtx not expires already %v", err)
-		}
-		user := (*claims)["username"].(string)
+		user, _ := token.Get(`username`)
 		if user != "AzureDiamond" {
 			t.Errorf("Test_Influx_AuthorizationBearerCtx expected username AzureDiamond but got %s", user)
 		}

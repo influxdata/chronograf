@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"regexp"
 	"testing"
 	"time"
 
@@ -31,7 +32,7 @@ func TestAuthenticate(t *testing.T) {
 			Principal: oauth2.Principal{
 				Subject: "",
 			},
-			Err: errors.New("token contains an invalid number of segments"),
+			Err: errors.New("failed to parse jws: invalid compact serialization format: invalid number of segments"),
 		},
 		{
 			Desc:     "Test valid jwt token",
@@ -66,31 +67,35 @@ func TestAuthenticate(t *testing.T) {
 				ExpiresAt: history.Add(time.Second),
 				IssuedAt:  history,
 			},
-			Err: errors.New("token is expired by 1s"),
+			Err: errors.New("Token is expired"),
 		},
 		{
-			Desc:     "Test jwt token not before time",
-			Secret:   "secret",
-			Token:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIvY2hyb25vZ3JhZi92MS91c2Vycy8xIiwibmFtZSI6IkRvYyBCcm93biIsImlhdCI6LTQ0Njc3NDQwMCwiZXhwIjotNDQ2Nzc0NDAwLCJuYmYiOi00NDY3NzQzOTl9.TMGAhv57u1aosjc4ywKC7cElP1tKyQH7GmRF2ToAxlE",
+			Desc:   "Test jwt token not before time",
+			Secret: "secret",
+			// Note: because expiration is checked before nbf,
+			// his token must have a valid expiration time
+			Token:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOi00NDY3NzE4MDAsImlhdCI6LTQ0Njc3NDQwMCwibmFtZSI6IkRvYyBCcm93biIsIm5iZiI6LTQ0Njc3NDM5OSwic3ViIjoiL2Nocm9ub2dyYWYvdjEvdXNlcnMvMSJ9.Vtr_7E46II0sqvk4MDfFUqDjMlcvtKPZC44CXhUBEGw",
 			Duration: time.Second,
 			Principal: oauth2.Principal{
 				Subject:   "",
 				ExpiresAt: history.Add(time.Second),
 				IssuedAt:  history,
 			},
-			Err: errors.New("token is not valid yet"),
+			Err: errors.New("\"nbf\" not satisfied"),
 		},
 		{
-			Desc:     "Test jwt with empty subject is invalid",
-			Secret:   "secret",
-			Token:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOi00NDY3NzQ0MDAsImV4cCI6LTQ0Njc3NDQwMCwibmJmIjotNDQ2Nzc0NDAwfQ.gxsA6_Ei3s0f2I1TAtrrb8FmGiO25OqVlktlF_ylhX4",
+			Desc:   "Test jwt with empty subject is invalid",
+			Secret: "secret",
+			// Note: because expiration is checked before required
+			// claims, this token must have a valid expiration time
+			Token:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOi00NDY3NzE4MDAsImlhdCI6LTQ0Njc3NDQwMCwibmJmIjotNDQ2Nzc0NDAwfQ.W2KIE7OW0nWsn8_NG-URUEiP88ELfEW54lIJInG8bBs",
 			Duration: time.Second,
 			Principal: oauth2.Principal{
 				Subject:   "",
 				ExpiresAt: history.Add(time.Second),
 				IssuedAt:  history,
 			},
-			Err: errors.New("claim has no subject"),
+			Err: errors.New("\"sub\" not satisfied: required claim not found"),
 		},
 		{
 			Desc:     "Test jwt duration matches auth duration",
@@ -153,10 +158,12 @@ func TestToken(t *testing.T) {
 func TestSigningMethod(t *testing.T) {
 	token := oauth2.Token("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.EkN-DOsnsuRjRO6BxXemmJDm3HbxrbRzXglbN2S4sOkopdU4IsDxTI8jO19W_A4K8ZPJijNLis4EZsHeY559a4DFOd50_OqgHGuERTqYZyuhtF39yxJPAjUESwxk2J5k_4zM3O-vtd1Ghyo4IbqKKSy6J9mTniYJPenn5-HIirE")
 	j := oauth2.JWT{}
+
+	const errmsg = `key provider 0 failed: JWKSURL not specified, cannot validate RS256 signature`
 	if _, err := j.ValidPrincipal(context.Background(), token, 0); err == nil {
 		t.Error("Error was expected while validating incorrectly signed token")
-	} else if err.Error() != "JWKSURL not specified, cannot validate RS256 signature" {
-		t.Errorf("Error wanted 'JWKSURL not specified, cannot validate RS256 signature', got %s", err.Error())
+	} else if err.Error() != errmsg {
+		t.Errorf("Error wanted %q, cannot validate RS256 signature', got %s", errmsg, err.Error())
 	}
 }
 
@@ -167,6 +174,7 @@ func TestGetClaims(t *testing.T) {
 		JwksDocument string
 		Iat          int64
 		Err          error
+		ErrPattern   *regexp.Regexp
 	}{
 		{
 			Name:         "Valid Token with RS256 signature verified against correct JWKS document",
@@ -193,11 +201,13 @@ func TestGetClaims(t *testing.T) {
 			TokenString:  "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IllEQlVocWRXa3NLWGRHdVgwc3l0amFVdXhoQSIsImtpZCI6IllEQlVocWRXa3NLWGRHdVgwc3l0amFVdXhoQSJ9.eyJhdWQiOiJjaHJvbm9ncmFmIiwiaXNzIjoiaHR0cHM6Ly9kc3RjaW1hYWQxcC5kc3QtaXRzLmRlL2FkZnMiLCJpYXQiOjE1MTMxNjU4ODksImV4cCI6MTUxMzE2OTQ4OSwiYXV0aF90aW1lIjoxNTEzMTY1ODg4LCJzdWIiOiJlWVYzamRsZE55RlkxcUZGSDRvQWRCdkRGZmJWZm51RzI5SGlIa1N1andrPSIsInVwbiI6ImJzY0Bkc3QtaXRzLmRlIiwidW5pcXVlX25hbWUiOiJEU1RcXGJzYyIsInNpZCI6IlMtMS01LTIxLTI1MDUxNTEzOTgtMjY2MTAyODEwOS0zNzU0MjY1ODIwLTExMDQifQ.nK51Ui4XN45SVul9igNaKFQd-F63BNstBzW-T5LBVm_ANHCEHyP3_88C3ffkkQIi3PxYacRJGtfswP35ws7YJUcNp-GoGZARqz62NpMtbQyhos6mCaVXwPoxPbrZx4AkMQgxkZwJcOzceX7mpjcT3kCth30chN3lkhzSjGrXe4ZDOAV25liS-dsdBiqDiaTB91sS534GM76qJQxFUs51oSbYTRdCN1VJ0XopMcasfVDzFrtSbyvEIVXlpKK2HplnhheqF4QHrM_3cjV_NGRr3tYLe-AGTdDXKWlJD1GDz1ECXeMGQHPoz3U8cqNsFLYBstIlCgfnBWgWsPZSvJPJUg",
 			JwksDocument: "",
 			Iat:          int64(1513165889),
-			Err:          errors.New("failed to unmarshal JWK set: EOF"),
+			// This test expects an error that contains dynamic component
+			// (namely, the server URL), so we use a pattern
+			ErrPattern: regexp.MustCompile(`key provider 0 failed: failed to fetch "http://[0-9.:]+": failed to transform HTTP response for "http://[0-9.:]+": failed to parse JWK set at "http://[0-9.:]+": failed to unmarshal JWK set: EOF`),
 		},
 		{
 			Name: "Invalid Token",
-			Err:  errors.New("token contains an invalid number of segments"),
+			Err:  errors.New("failed to parse jws: invalid byte sequence"),
 		},
 	}
 
@@ -217,9 +227,13 @@ func TestGetClaims(t *testing.T) {
 				},
 			}
 			_, err := j.GetClaims(tt.TokenString)
-			if tt.Err != nil {
+			if tt.Err != nil || tt.ErrPattern != nil {
 				if err != nil {
-					if tt.Err.Error() != err.Error() {
+					if tt.ErrPattern != nil {
+						if !tt.ErrPattern.MatchString(err.Error()) {
+							t.Errorf("Error in test %s expected error: %v actual: %v", tt.Name, tt.ErrPattern, err)
+						}
+					} else if tt.Err.Error() != err.Error() {
 						t.Errorf("Error in test %s expected error: %v actual: %v", tt.Name, tt.Err, err)
 					} // else: that's what we expect
 				} else {
