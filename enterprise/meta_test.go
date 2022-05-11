@@ -1281,12 +1281,18 @@ func (a *mockAuthorizer) Set(req *http.Request) error {
 }
 
 func Test_AuthedCheckRedirect_Do(t *testing.T) {
+	path := "/test"
 	var ts2URL *url.URL
+	ts1Called := 0
 	ts1 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ts1Called++
 		want := http.Header{
-			"Referer":         []string{ts2URL.String()},
 			"Accept-Encoding": []string{"gzip"},
 			"Authorization":   []string{"hunter2"},
+		}
+		if ts1Called == 1 {
+			// referer is filled when doing a first redirect
+			want.Add("Referer", ts2URL.String()+path)
 		}
 		for k, v := range want {
 			if !reflect.DeepEqual(r.Header[k], v) {
@@ -1301,13 +1307,15 @@ func Test_AuthedCheckRedirect_Do(t *testing.T) {
 	}))
 	defer ts1.Close()
 
+	ts2Called := 0
 	ts2 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ts2Called++
 		http.Redirect(w, r, ts1.URL, http.StatusFound)
 	}))
 	defer ts2.Close()
 	ts2URL, _ = url.Parse(ts2.URL)
 
-	d := &defaultClient{InsecureSkipVerify: true, URL: ts2URL}
+	d := newDefaultClient(ts2URL, true)
 	authorizer := &mockAuthorizer{
 		set: func(req *http.Request) error {
 			req.Header.Add("Cookie", "foo=bar")
@@ -1317,18 +1325,26 @@ func Test_AuthedCheckRedirect_Do(t *testing.T) {
 			return nil
 		},
 	}
-	res, err := d.Do("", "GET", authorizer, nil, nil)
-	if err != nil {
-		t.Fatal(err)
+	repetitions := 3
+	for i := 0; i < repetitions; i++ {
+		res, err := d.Do(path, "GET", authorizer, nil, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer res.Body.Close()
+		if res.StatusCode != 200 {
+			t.Fatal(res.Status)
+		}
+		if got := res.Header.Get("Result"); got != "ok" {
+			t.Errorf("result = %q; want ok", got)
+		}
 	}
 
-	defer res.Body.Close()
-	if res.StatusCode != 200 {
-		t.Fatal(res.Status)
+	if ts1Called != repetitions {
+		t.Errorf("Master server called %v; expected %v", ts1Called, repetitions)
 	}
-
-	if got := res.Header.Get("Result"); got != "ok" {
-		t.Errorf("result = %q; want ok", got)
+	if ts2Called != 1 {
+		t.Errorf("Follower server called %v; expected 1", ts2Called)
 	}
 }
 
@@ -1390,7 +1406,7 @@ func Test_defaultClient_Do(t *testing.T) {
 			defer ts.Close()
 
 			u, _ := url.Parse(ts.URL)
-			d := &defaultClient{URL: u}
+			d := newDefaultClient(u, true)
 			_, err := d.Do(tt.args.path, tt.args.method, tt.args.authorizer, tt.args.params, tt.args.body)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("defaultClient.Do() error = %v, wantErr %v", err, tt.wantErr)

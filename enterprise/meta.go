@@ -12,6 +12,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"sync"
 	"time"
 
 	"github.com/influxdata/chronograf"
@@ -48,10 +49,7 @@ type MetaClient struct {
 // NewMetaClient represents a meta node in an Influx Enterprise cluster
 func NewMetaClient(url *url.URL, InsecureSkipVerify bool, authorizer influx.Authorizer) *MetaClient {
 	return &MetaClient{
-		client: &defaultClient{
-			URL:                url,
-			InsecureSkipVerify: InsecureSkipVerify,
-		},
+		client:     newDefaultClient(url, InsecureSkipVerify),
 		authorizer: authorizer,
 	}
 }
@@ -480,6 +478,33 @@ func (m *MetaClient) Post(ctx context.Context, path string, action interface{}, 
 type defaultClient struct {
 	InsecureSkipVerify bool
 	URL                *url.URL
+
+	masterURL *url.URL
+	mu        sync.Mutex
+}
+
+func newDefaultClient(URL *url.URL, InsecureSkipVerify bool) *defaultClient {
+	return &defaultClient{
+		URL:                URL,
+		InsecureSkipVerify: InsecureSkipVerify,
+	}
+}
+
+func (d *defaultClient) setMasterURL(URL *url.URL) {
+	if URL.Host != "" && URL.Scheme != "" {
+		d.mu.Lock()
+		defer d.mu.Unlock()
+		d.masterURL = &url.URL{Host: URL.Host, Scheme: URL.Scheme}
+	}
+}
+
+func (d *defaultClient) getMasterURL() url.URL {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if d.masterURL != nil {
+		return *d.masterURL
+	}
+	return *d.URL
 }
 
 // Do is a helper function to interface with Influx Enterprise's Meta API
@@ -488,7 +513,7 @@ func (d *defaultClient) Do(path, method string, authorizer influx.Authorizer, pa
 	for k, v := range params {
 		p.Add(k, v)
 	}
-	URL := *d.URL
+	URL := d.getMasterURL()
 
 	URL.Path = path
 	URL.RawQuery = p.Encode()
@@ -543,6 +568,7 @@ func (d *defaultClient) Do(path, method string, authorizer influx.Authorizer, pa
 // AuthedCheckRedirect tries to follow the Influx Enterprise pattern of
 // redirecting to the leader but preserving authentication headers.
 func (d *defaultClient) AuthedCheckRedirect(req *http.Request, via []*http.Request) error {
+	d.setMasterURL(req.URL)
 	if len(via) >= 10 {
 		return errors.New("too many redirects")
 	} else if len(via) == 0 {
