@@ -36,12 +36,11 @@ var (
 )
 
 type client interface {
-	Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
+	Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
 }
 
 // MetaClient represents a Meta node in an Influx Enterprise cluster
 type MetaClient struct {
-	URL        *url.URL
 	client     client
 	authorizer influx.Authorizer
 }
@@ -49,8 +48,8 @@ type MetaClient struct {
 // NewMetaClient represents a meta node in an Influx Enterprise cluster
 func NewMetaClient(url *url.URL, InsecureSkipVerify bool, authorizer influx.Authorizer) *MetaClient {
 	return &MetaClient{
-		URL: url,
 		client: &defaultClient{
+			URL:                url,
 			InsecureSkipVerify: InsecureSkipVerify,
 		},
 		authorizer: authorizer,
@@ -480,14 +479,16 @@ func (m *MetaClient) Post(ctx context.Context, path string, action interface{}, 
 
 type defaultClient struct {
 	InsecureSkipVerify bool
+	URL                *url.URL
 }
 
 // Do is a helper function to interface with Influx Enterprise's Meta API
-func (d *defaultClient) Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error) {
+func (d *defaultClient) Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error) {
 	p := url.Values{}
 	for k, v := range params {
 		p.Add(k, v)
 	}
+	URL := *d.URL
 
 	URL.Path = path
 	URL.RawQuery = p.Encode()
@@ -563,7 +564,7 @@ func (m *MetaClient) Do(ctx context.Context, path, method string, authorizer inf
 
 	resps := make(chan (result))
 	go func() {
-		resp, err := m.client.Do(m.URL, path, method, authorizer, params, body)
+		resp, err := m.client.Do(path, method, authorizer, params, body)
 		resps <- result{resp, err}
 	}()
 

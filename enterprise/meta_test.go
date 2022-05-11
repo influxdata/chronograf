@@ -18,9 +18,8 @@ import (
 
 func TestMetaClient_ShowCluster(t *testing.T) {
 	type fields struct {
-		URL    *url.URL
 		client interface {
-			Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
+			Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
 		}
 	}
 	tests := []struct {
@@ -32,10 +31,6 @@ func TestMetaClient_ShowCluster(t *testing.T) {
 		{
 			name: "Successful Show Cluster",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					[]byte(`{"data":[{"id":2,"version":"1.1.0-c1.1.0","tcpAddr":"data-1.twinpinesmall.net:8088","httpAddr":"data-1.twinpinesmall.net:8086","httpScheme":"https","status":"joined"}],"meta":[{"id":1,"addr":"meta-0.twinpinesmall.net:8091","httpScheme":"http","tcpAddr":"meta-0.twinpinesmall.net:8089","version":"1.1.0-c1.1.0"}]}`),
@@ -66,10 +61,6 @@ func TestMetaClient_ShowCluster(t *testing.T) {
 		{
 			name: "Failed Show Cluster",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusBadGateway,
 					nil,
@@ -82,10 +73,6 @@ func TestMetaClient_ShowCluster(t *testing.T) {
 		{
 			name: "Bad JSON from Show Cluster",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					[]byte(`{data}`),
@@ -98,7 +85,6 @@ func TestMetaClient_ShowCluster(t *testing.T) {
 	}
 	for _, tt := range tests {
 		m := &MetaClient{
-			URL:    tt.fields.URL,
 			client: tt.fields.client,
 		}
 		got, err := m.ShowCluster(context.Background())
@@ -129,9 +115,8 @@ func TestMetaClient_ShowCluster(t *testing.T) {
 
 func TestMetaClient_Users(t *testing.T) {
 	type fields struct {
-		URL    *url.URL
 		client interface {
-			Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
+			Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
 		}
 	}
 	type args struct {
@@ -148,10 +133,6 @@ func TestMetaClient_Users(t *testing.T) {
 		{
 			name: "Successful Show users",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					[]byte(`{"users":[{"name":"admin","hash":"1234","permissions":{"":["ViewAdmin","ViewChronograf"]}}]}`),
@@ -179,10 +160,6 @@ func TestMetaClient_Users(t *testing.T) {
 		{
 			name: "Successful Show users single user",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					[]byte(`{"users":[{"name":"admin","hash":"1234","permissions":{"":["ViewAdmin","ViewChronograf"]}}]}`),
@@ -210,10 +187,6 @@ func TestMetaClient_Users(t *testing.T) {
 		{
 			name: "Failure Show users",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					[]byte(`{"users":[{"name":"admin","hash":"1234","permissions":{"":["ViewAdmin","ViewChronograf"]}}]}`),
@@ -230,10 +203,6 @@ func TestMetaClient_Users(t *testing.T) {
 		{
 			name: "Bad JSON from Show users",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					[]byte(`{foo}`),
@@ -250,7 +219,6 @@ func TestMetaClient_Users(t *testing.T) {
 	}
 	for _, tt := range tests {
 		m := &MetaClient{
-			URL:    tt.fields.URL,
 			client: tt.fields.client,
 		}
 		got, err := m.Users(tt.args.ctx, tt.args.name)
@@ -266,9 +234,8 @@ func TestMetaClient_Users(t *testing.T) {
 
 func TestMetaClient_User(t *testing.T) {
 	type fields struct {
-		URL    *url.URL
 		client interface {
-			Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
+			Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
 		}
 	}
 	type args struct {
@@ -285,10 +252,6 @@ func TestMetaClient_User(t *testing.T) {
 		{
 			name: "Successful Show users",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					[]byte(`{"users":[{"name":"admin","hash":"1234","permissions":{"":["ViewAdmin","ViewChronograf"]}}]}`),
@@ -312,10 +275,6 @@ func TestMetaClient_User(t *testing.T) {
 		{
 			name: "No such user",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusNotFound,
 					[]byte(`{"error":"user not found"}`),
@@ -332,10 +291,6 @@ func TestMetaClient_User(t *testing.T) {
 		{
 			name: "Bad JSON",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusNotFound,
 					[]byte(`{BAD}`),
@@ -351,7 +306,6 @@ func TestMetaClient_User(t *testing.T) {
 	}
 	for _, tt := range tests {
 		m := &MetaClient{
-			URL:    tt.fields.URL,
 			client: tt.fields.client,
 		}
 		got, err := m.User(tt.args.ctx, tt.args.name)
@@ -367,9 +321,8 @@ func TestMetaClient_User(t *testing.T) {
 
 func TestMetaClient_CreateUser(t *testing.T) {
 	type fields struct {
-		URL    *url.URL
 		client interface {
-			Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
+			Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
 		}
 	}
 	type args struct {
@@ -387,10 +340,6 @@ func TestMetaClient_CreateUser(t *testing.T) {
 		{
 			name: "Successful Create User",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					nil,
@@ -408,7 +357,6 @@ func TestMetaClient_CreateUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		m := &MetaClient{
-			URL:    tt.fields.URL,
 			client: tt.fields.client,
 		}
 		if err := m.CreateUser(tt.args.ctx, tt.args.name, tt.args.passwd); (err != nil) != tt.wantErr {
@@ -438,9 +386,8 @@ func TestMetaClient_CreateUser(t *testing.T) {
 
 func TestMetaClient_ChangePassword(t *testing.T) {
 	type fields struct {
-		URL    *url.URL
 		client interface {
-			Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
+			Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
 		}
 	}
 	type args struct {
@@ -458,10 +405,6 @@ func TestMetaClient_ChangePassword(t *testing.T) {
 		{
 			name: "Successful Change Password",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					nil,
@@ -479,7 +422,6 @@ func TestMetaClient_ChangePassword(t *testing.T) {
 	}
 	for _, tt := range tests {
 		m := &MetaClient{
-			URL:    tt.fields.URL,
 			client: tt.fields.client,
 		}
 		if err := m.ChangePassword(tt.args.ctx, tt.args.name, tt.args.passwd); (err != nil) != tt.wantErr {
@@ -510,9 +452,8 @@ func TestMetaClient_ChangePassword(t *testing.T) {
 
 func TestMetaClient_DeleteUser(t *testing.T) {
 	type fields struct {
-		URL    *url.URL
 		client interface {
-			Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
+			Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
 		}
 	}
 	type args struct {
@@ -529,10 +470,6 @@ func TestMetaClient_DeleteUser(t *testing.T) {
 		{
 			name: "Successful delete User",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					nil,
@@ -549,7 +486,6 @@ func TestMetaClient_DeleteUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		m := &MetaClient{
-			URL:    tt.fields.URL,
 			client: tt.fields.client,
 		}
 		if err := m.DeleteUser(tt.args.ctx, tt.args.name); (err != nil) != tt.wantErr {
@@ -579,9 +515,8 @@ func TestMetaClient_DeleteUser(t *testing.T) {
 
 func TestMetaClient_SetUserPerms(t *testing.T) {
 	type fields struct {
-		URL    *url.URL
 		client interface {
-			Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
+			Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
 		}
 	}
 	type args struct {
@@ -600,10 +535,6 @@ func TestMetaClient_SetUserPerms(t *testing.T) {
 		{
 			name: "Remove all permissions for a user",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					[]byte(`{"users":[{"name":"admin","hash":"1234","permissions":{"":["ViewAdmin","ViewChronograf"]}}]}`),
@@ -620,10 +551,6 @@ func TestMetaClient_SetUserPerms(t *testing.T) {
 		{
 			name: "Remove some permissions and add others",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					[]byte(`{"users":[{"name":"admin","hash":"1234","permissions":{"":["ViewAdmin","ViewChronograf"]}}]}`),
@@ -646,7 +573,6 @@ func TestMetaClient_SetUserPerms(t *testing.T) {
 	}
 	for _, tt := range tests {
 		m := &MetaClient{
-			URL:    tt.fields.URL,
 			client: tt.fields.client,
 		}
 		if err := m.SetUserPerms(tt.args.ctx, tt.args.name, tt.args.perms); (err != nil) != tt.wantErr {
@@ -700,9 +626,8 @@ func TestMetaClient_SetUserPerms(t *testing.T) {
 
 func TestMetaClient_Roles(t *testing.T) {
 	type fields struct {
-		URL    *url.URL
 		client interface {
-			Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
+			Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
 		}
 	}
 	type args struct {
@@ -719,10 +644,6 @@ func TestMetaClient_Roles(t *testing.T) {
 		{
 			name: "Successful Show role",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					[]byte(`{"roles":[{"name":"admin","users":["marty"],"permissions":{"":["ViewAdmin","ViewChronograf"]}}]}`),
@@ -751,10 +672,6 @@ func TestMetaClient_Roles(t *testing.T) {
 		{
 			name: "Successful Show role single role",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					[]byte(`{"roles":[{"name":"admin","users":["marty"],"permissions":{"":["ViewAdmin","ViewChronograf"]}}]}`),
@@ -783,7 +700,6 @@ func TestMetaClient_Roles(t *testing.T) {
 	}
 	for _, tt := range tests {
 		m := &MetaClient{
-			URL:    tt.fields.URL,
 			client: tt.fields.client,
 		}
 		got, err := m.Roles(tt.args.ctx, tt.args.name)
@@ -799,9 +715,8 @@ func TestMetaClient_Roles(t *testing.T) {
 
 func TestMetaClient_Role(t *testing.T) {
 	type fields struct {
-		URL    *url.URL
 		client interface {
-			Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
+			Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
 		}
 	}
 	type args struct {
@@ -818,10 +733,6 @@ func TestMetaClient_Role(t *testing.T) {
 		{
 			name: "Successful Show role",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					[]byte(`{"roles":[{"name":"admin","users":["marty"],"permissions":{"":["ViewAdmin","ViewChronograf"]}}]}`),
@@ -846,10 +757,6 @@ func TestMetaClient_Role(t *testing.T) {
 		{
 			name: "No such role",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusNotFound,
 					[]byte(`{"error":"user not found"}`),
@@ -866,7 +773,6 @@ func TestMetaClient_Role(t *testing.T) {
 	}
 	for _, tt := range tests {
 		m := &MetaClient{
-			URL:    tt.fields.URL,
 			client: tt.fields.client,
 		}
 		got, err := m.Role(tt.args.ctx, tt.args.name)
@@ -882,9 +788,8 @@ func TestMetaClient_Role(t *testing.T) {
 
 func TestMetaClient_UserRoles(t *testing.T) {
 	type fields struct {
-		URL    *url.URL
 		client interface {
-			Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
+			Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
 		}
 	}
 	type args struct {
@@ -901,10 +806,6 @@ func TestMetaClient_UserRoles(t *testing.T) {
 		{
 			name: "Successful Show all roles",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					[]byte(`{"roles":[{"name":"timetravelers","users":["marty","docbrown"],"permissions":{"":["ViewAdmin","ViewChronograf"]}},{"name":"mcfly","users":["marty","george"],"permissions":{"":["ViewAdmin","ViewChronograf"]}}]}`),
@@ -970,7 +871,6 @@ func TestMetaClient_UserRoles(t *testing.T) {
 	}
 	for _, tt := range tests {
 		m := &MetaClient{
-			URL:    tt.fields.URL,
 			client: tt.fields.client,
 		}
 		got, err := m.UserRoles(tt.args.ctx)
@@ -986,9 +886,8 @@ func TestMetaClient_UserRoles(t *testing.T) {
 
 func TestMetaClient_CreateRole(t *testing.T) {
 	type fields struct {
-		URL    *url.URL
 		client interface {
-			Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
+			Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
 		}
 	}
 	type args struct {
@@ -1005,10 +904,6 @@ func TestMetaClient_CreateRole(t *testing.T) {
 		{
 			name: "Successful Create Role",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					nil,
@@ -1025,7 +920,6 @@ func TestMetaClient_CreateRole(t *testing.T) {
 	}
 	for _, tt := range tests {
 		m := &MetaClient{
-			URL:    tt.fields.URL,
 			client: tt.fields.client,
 		}
 		if err := m.CreateRole(tt.args.ctx, tt.args.name); (err != nil) != tt.wantErr {
@@ -1052,9 +946,8 @@ func TestMetaClient_CreateRole(t *testing.T) {
 
 func TestMetaClient_DeleteRole(t *testing.T) {
 	type fields struct {
-		URL    *url.URL
 		client interface {
-			Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
+			Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
 		}
 	}
 	type args struct {
@@ -1071,10 +964,6 @@ func TestMetaClient_DeleteRole(t *testing.T) {
 		{
 			name: "Successful delete role",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					nil,
@@ -1091,7 +980,6 @@ func TestMetaClient_DeleteRole(t *testing.T) {
 	}
 	for _, tt := range tests {
 		m := &MetaClient{
-			URL:    tt.fields.URL,
 			client: tt.fields.client,
 		}
 		if err := m.DeleteRole(tt.args.ctx, tt.args.name); (err != nil) != tt.wantErr {
@@ -1121,9 +1009,8 @@ func TestMetaClient_DeleteRole(t *testing.T) {
 
 func TestMetaClient_SetRolePerms(t *testing.T) {
 	type fields struct {
-		URL    *url.URL
 		client interface {
-			Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
+			Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
 		}
 	}
 	type args struct {
@@ -1142,10 +1029,6 @@ func TestMetaClient_SetRolePerms(t *testing.T) {
 		{
 			name: "Remove all roles from user",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					[]byte(`{"roles":[{"name":"admin","users":["marty"],"permissions":{"":["ViewAdmin","ViewChronograf"]}}]}`),
@@ -1162,10 +1045,6 @@ func TestMetaClient_SetRolePerms(t *testing.T) {
 		{
 			name: "Remove some users and add permissions to other",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					[]byte(`{"roles":[{"name":"admin","users":["marty"],"permissions":{"":["ViewAdmin","ViewChronograf"]}}]}`),
@@ -1188,7 +1067,6 @@ func TestMetaClient_SetRolePerms(t *testing.T) {
 	}
 	for _, tt := range tests {
 		m := &MetaClient{
-			URL:    tt.fields.URL,
 			client: tt.fields.client,
 		}
 		if err := m.SetRolePerms(tt.args.ctx, tt.args.name, tt.args.perms); (err != nil) != tt.wantErr {
@@ -1242,9 +1120,8 @@ func TestMetaClient_SetRolePerms(t *testing.T) {
 
 func TestMetaClient_SetRoleUsers(t *testing.T) {
 	type fields struct {
-		URL    *url.URL
 		client interface {
-			Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
+			Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
 		}
 	}
 	type args struct {
@@ -1262,10 +1139,6 @@ func TestMetaClient_SetRoleUsers(t *testing.T) {
 		{
 			name: "Successful set users role (remove user from role)",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					[]byte(`{"roles":[{"name":"admin","users":["marty"],"permissions":{"":["ViewAdmin","ViewChronograf"]}}]}`),
@@ -1282,10 +1155,6 @@ func TestMetaClient_SetRoleUsers(t *testing.T) {
 		{
 			name: "Successful set single user role",
 			fields: fields{
-				URL: &url.URL{
-					Host:   "twinpinesmall.net:8091",
-					Scheme: "https",
-				},
 				client: NewMockClient(
 					http.StatusOK,
 					[]byte(`{"roles":[{"name":"admin","users":[],"permissions":{"":["ViewAdmin","ViewChronograf"]}}]}`),
@@ -1305,7 +1174,6 @@ func TestMetaClient_SetRoleUsers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		m := &MetaClient{
-			URL:    tt.fields.URL,
 			client: tt.fields.client,
 		}
 		if err := m.SetRoleUsers(tt.args.ctx, tt.args.name, tt.args.users); (err != nil) != tt.wantErr {
@@ -1346,6 +1214,7 @@ func TestMetaClient_SetRoleUsers(t *testing.T) {
 }
 
 type MockClient struct {
+	URL       *url.URL
 	Code      int // HTTP Status code
 	Body      []byte
 	HeaderMap http.Header
@@ -1356,6 +1225,10 @@ type MockClient struct {
 
 func NewMockClient(code int, body []byte, headers http.Header, err error) *MockClient {
 	return &MockClient{
+		URL: &url.URL{
+			Host:   "twinpinesmall.net:8091",
+			Scheme: "https",
+		},
 		Code:      code,
 		Body:      body,
 		HeaderMap: headers,
@@ -1364,12 +1237,9 @@ func NewMockClient(code int, body []byte, headers http.Header, err error) *MockC
 	}
 }
 
-func (c *MockClient) Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error) {
+func (c *MockClient) Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error) {
 	if c == nil {
 		return nil, fmt.Errorf("NIL MockClient")
-	}
-	if URL == nil {
-		return nil, fmt.Errorf("NIL url")
 	}
 	if c.Err != nil {
 		return nil, c.Err
@@ -1381,6 +1251,7 @@ func (c *MockClient) Do(URL *url.URL, path, method string, authorizer influx.Aut
 		p.Add(k, v)
 	}
 
+	URL := *c.URL
 	URL.Path = path
 	URL.RawQuery = p.Encode()
 
@@ -1401,17 +1272,25 @@ func (c *MockClient) Do(URL *url.URL, path, method string, authorizer influx.Aut
 	}, nil
 }
 
+type mockAuthorizer struct {
+	set func(req *http.Request) error
+}
+
+func (a *mockAuthorizer) Set(req *http.Request) error {
+	return a.set(req)
+}
+
 func Test_AuthedCheckRedirect_Do(t *testing.T) {
-	var ts2URL string
+	var ts2URL *url.URL
 	ts1 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		want := http.Header{
-			"Referer":         []string{ts2URL},
+			"Referer":         []string{ts2URL.String()},
 			"Accept-Encoding": []string{"gzip"},
 			"Authorization":   []string{"hunter2"},
 		}
 		for k, v := range want {
 			if !reflect.DeepEqual(r.Header[k], v) {
-				t.Errorf("Request.Header = %#v; want %#v", r.Header[k], v)
+				t.Errorf("Request.Header[%s] = %#v; want %#v", k, r.Header[k], v)
 			}
 		}
 		if t.Failed() {
@@ -1426,23 +1305,19 @@ func Test_AuthedCheckRedirect_Do(t *testing.T) {
 		http.Redirect(w, r, ts1.URL, http.StatusFound)
 	}))
 	defer ts2.Close()
-	ts2URL = ts2.URL
+	ts2URL, _ = url.Parse(ts2.URL)
 
-	tr := &http.Transport{}
-	defer tr.CloseIdleConnections()
-	d := &defaultClient{}
-	c := &http.Client{
-		Transport:     tr,
-		CheckRedirect: d.AuthedCheckRedirect,
+	d := &defaultClient{InsecureSkipVerify: true, URL: ts2URL}
+	authorizer := &mockAuthorizer{
+		set: func(req *http.Request) error {
+			req.Header.Add("Cookie", "foo=bar")
+			req.Header.Add("Authorization", "hunter2")
+			req.Header.Add("Howdy", "doody")
+			req.Header.Set("User-Agent", "Darth Vader, an extraterrestrial from the Planet Vulcan")
+			return nil
+		},
 	}
-
-	req, _ := http.NewRequest("GET", ts2.URL, nil)
-	req.Header.Add("Cookie", "foo=bar")
-	req.Header.Add("Authorization", "hunter2")
-	req.Header.Add("Howdy", "doody")
-	req.Header.Set("User-Agent", "Darth Vader, an extraterrestrial from the Planet Vulcan")
-
-	res, err := c.Do(req)
+	res, err := d.Do("", "GET", authorizer, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1514,9 +1389,9 @@ func Test_defaultClient_Do(t *testing.T) {
 			}))
 			defer ts.Close()
 
-			d := &defaultClient{}
 			u, _ := url.Parse(ts.URL)
-			_, err := d.Do(u, tt.args.path, tt.args.method, tt.args.authorizer, tt.args.params, tt.args.body)
+			d := &defaultClient{URL: u}
+			_, err := d.Do(tt.args.path, tt.args.method, tt.args.authorizer, tt.args.params, tt.args.body)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("defaultClient.Do() error = %v, wantErr %v", err, tt.wantErr)
 				return
