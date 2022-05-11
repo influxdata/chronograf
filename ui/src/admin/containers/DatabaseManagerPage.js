@@ -21,17 +21,6 @@ class DatabaseManagerPage extends Component {
     super(props)
   }
 
-  componentDidMount() {
-    const {
-      source: {
-        links: {databases},
-      },
-      actions,
-    } = this.props
-
-    actions.loadDBsAndRPsAsync(databases)
-  }
-
   handleDeleteRetentionPolicy = (db, rp) => () => {
     this.props.actions.deleteRetentionPolicyAsync(db, rp)
   }

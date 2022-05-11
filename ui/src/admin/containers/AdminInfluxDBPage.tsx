@@ -22,6 +22,7 @@ import {
   updateUserPermissionsAsync,
   filterUsers as filterUsersAction,
   filterRoles as filterRolesAction,
+  loadDBsAndRPsAsync,
 } from 'src/admin/actions/influxdb'
 
 import PageSpinner from 'src/shared/components/PageSpinner'
@@ -76,6 +77,7 @@ interface Props {
   loadUsers: (url: string) => Promise<void>
   loadRoles: (url: string) => Promise<void>
   loadPermissions: (url: string) => Promise<void>
+  loadDBsAndRPs: (url: string) => Promise<void>
   addUser: () => void
   addRole: () => void
   removeUser: (user: User) => void
@@ -112,7 +114,13 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
     }
   }
   public async componentDidMount() {
-    const {source, loadUsers, loadRoles, loadPermissions} = this.props
+    const {
+      source,
+      loadUsers,
+      loadRoles,
+      loadPermissions,
+      loadDBsAndRPs,
+    } = this.props
     if (!source.version || source.version.startsWith('2')) {
       // administration is not possible for v2 type
       return
@@ -127,6 +135,7 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
     try {
       await loadUsers(source.links.users)
       await loadPermissions(source.links.permissions)
+      await loadDBsAndRPs(source.links.databases)
       this.setState({loading: RemoteDataState.Done})
     } catch (error) {
       console.error(error)
@@ -352,6 +361,7 @@ const mapDispatchToProps = dispatch => ({
   loadUsers: bindActionCreators(loadUsersAsync, dispatch),
   loadRoles: bindActionCreators(loadRolesAsync, dispatch),
   loadPermissions: bindActionCreators(loadPermissionsAsync, dispatch),
+  loadDBsAndRPs: bindActionCreators(loadDBsAndRPsAsync, dispatch),
   addUser: bindActionCreators(addUser, dispatch),
   addRole: bindActionCreators(addRole, dispatch),
   removeUser: bindActionCreators(deleteUser, dispatch),
