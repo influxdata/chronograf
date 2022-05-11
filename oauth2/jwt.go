@@ -163,11 +163,7 @@ func (j *JWT) FetchKeys(_ context.Context, sink jws.KeySink, sig *jws.Signature,
 			return fmt.Errorf("no JWK found with kid %s", kid)
 		}
 
-		var rawkey interface{}
-		if err := key.Raw(&rawkey); err != nil {
-			return fmt.Errorf("failed to read JWK public key: %s", err)
-		}
-		sink.Key(jwa.RS256, rawkey)
+		sink.Key(jwa.RS256, key)
 	default:
 		return fmt.Errorf("unexpected signing method: %v", sig.ProtectedHeaders().Algorithm())
 	}
