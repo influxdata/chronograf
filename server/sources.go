@@ -544,11 +544,6 @@ func (s *Service) NewSourceUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error(), s.Logger)
-		return
-	}
-
 	su := newSourceUserResponse(srcID, res.Name).WithPermissions(res.Permissions)
 	if _, hasRoles := s.hasRoles(ctx, ts); hasRoles {
 		su.WithRoles(srcID, res.Roles)
