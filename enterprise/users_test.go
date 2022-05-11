@@ -2,6 +2,7 @@ package enterprise_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"reflect"
 	"testing"
@@ -172,6 +173,48 @@ func TestClient_Add(t *testing.T) {
 		if !reflect.DeepEqual(got, tt.want) {
 			t.Errorf("%q. Client.Add() = \n%#v\n, want \n%#v\n", tt.name, got, tt.want)
 		}
+	}
+}
+
+// TestClient_Add_UserNotFound check fix for #5840, the API waits
+// for the creation of the user (up to 1 second) OOTB
+func TestClient_Add_UserNotFound(t *testing.T) {
+	notFoundAttempts := 1
+	c := &enterprise.UserStore{
+		Ctrl: &mockCtrl{
+			createUser: func(ctx context.Context, name, passwd string) error {
+				return nil
+			},
+			user: func(ctx context.Context, name string) (*enterprise.User, error) {
+				if notFoundAttempts > 0 {
+					notFoundAttempts--
+					return nil, errors.New("user not found")
+				}
+				return &enterprise.User{
+					Name:        "pavel",
+					Permissions: map[string][]string{},
+				}, nil
+			},
+			userRoles: func(ctx context.Context) (map[string]enterprise.Roles, error) {
+				return map[string]enterprise.Roles{}, nil
+			},
+		},
+	}
+	got, err := c.Add(context.Background(), &chronograf.User{
+		Name:   "pavel",
+		Passwd: "levap",
+	})
+	if err != nil {
+		t.Errorf("Client.Add() error = %v", err)
+		return
+	}
+	want := &chronograf.User{
+		Name:        "pavel",
+		Permissions: chronograf.Permissions{},
+		Roles:       []chronograf.Role{},
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("Client.Add() = \n%#v\n, want \n%#v\n", got, want)
 	}
 }
 

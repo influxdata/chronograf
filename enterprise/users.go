@@ -3,6 +3,7 @@ package enterprise
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/influxdata/chronograf"
 )
@@ -18,13 +19,35 @@ func (c *UserStore) Add(ctx context.Context, u *chronograf.User) (*chronograf.Us
 	if err := c.Ctrl.CreateUser(ctx, u.Name, u.Passwd); err != nil {
 		return nil, err
 	}
-	perms := ToEnterprise(u.Permissions)
+	// fix #5840: eventual consistency can cause delays in user creation
+	// wait for the user to become available
+	_, err := c.Ctrl.User(ctx, u.Name)
+	timer := time.NewTimer(2_000_000_000) // retry at most 2 seconds
+	defer timer.Stop()
+	for err != nil {
+		if err.Error() != "user not found" {
+			return nil, err
+		}
+		// wait before the next attempt
+		select {
+		case <-ctx.Done():
+			return nil, err
+		case <-timer.C:
+			return nil, err
+		case <-time.After(50_000_000):
+			break
+		}
+		_, err = c.Ctrl.User(ctx, u.Name)
+	}
 
+	// add permissions
+	perms := ToEnterprise(u.Permissions)
 	if len(perms) > 0 {
 		if err := c.Ctrl.SetUserPerms(ctx, u.Name, perms); err != nil {
 			return nil, err
 		}
 	}
+	// add roles
 	for _, role := range u.Roles {
 		if err := c.Ctrl.AddRoleUsers(ctx, role.Name, []string{u.Name}); err != nil {
 			return nil, err
