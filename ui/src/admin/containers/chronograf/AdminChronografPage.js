@@ -5,10 +5,10 @@ import {connect} from 'react-redux'
 import {Page} from 'src/reusable_ui'
 import SubSections from 'src/shared/components/SubSections'
 
-import UsersPage from 'src/admin/containers/chronograf/UsersPage'
-import AllUsersPage from 'src/admin/containers/chronograf/AllUsersPage'
-import OrganizationsPage from 'src/admin/containers/chronograf/OrganizationsPage'
-import ProvidersPage from 'src/admin/containers/ProvidersPage'
+import UsersPage from './UsersPage'
+import AllUsersPage from './AllUsersPage'
+import OrganizationsPage from './OrganizationsPage'
+import ProvidersPage from './ProvidersPage'
 
 import {isUserAuthorized, ADMIN_ROLE, SUPERADMIN_ROLE} from 'src/auth/roles'
 
