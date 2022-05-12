@@ -1,7 +1,7 @@
 import React from 'react'
 import {shallow} from 'enzyme'
 
-import {AdminInfluxDBPage} from 'src/admin/containers/AdminInfluxDBPage'
+import {AdminInfluxDBPage} from 'src/admin/containers/influxdb/AdminInfluxDBPage'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import Title from 'src/reusable_ui/components/page_layout/PageHeaderTitle'
 import {source} from 'test/resources'
