@@ -14,6 +14,7 @@ describe('AdminInfluxDBPage', () => {
       loadUsers: async () => {},
       loadRoles: async () => {},
       loadPermissions: async () => {},
+      loadDBsAndRPs: async () => {},
       notify: () => {},
       params: {tab: ''},
       users: [],
