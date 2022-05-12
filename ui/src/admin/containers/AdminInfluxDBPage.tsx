@@ -103,6 +103,8 @@ interface Props {
 
 interface State {
   loading: RemoteDataState
+  error?: any
+  errorMessage?: string
 }
 
 @ErrorHandling
@@ -132,23 +134,26 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
       return this.setState({loading: RemoteDataState.Done})
     }
 
+    let errorMessage: string
     try {
+      errorMessage = 'Failed to load users.'
       await loadUsers(source.links.users)
+      errorMessage = 'Failed to load permissions.'
       await loadPermissions(source.links.permissions)
+      errorMessage = 'Failed to load databases.'
       await loadDBsAndRPs(source.links.databases)
+      if (source.links.roles) {
+        errorMessage = 'Failed to load roles.'
+        await loadRoles(source.links.roles)
+      }
       this.setState({loading: RemoteDataState.Done})
     } catch (error) {
       console.error(error)
-      this.setState({loading: RemoteDataState.Error})
-    }
-
-    if (source.links.roles) {
-      try {
-        await loadRoles(source.links.roles)
-      } catch (error) {
-        this.setState({loading: RemoteDataState.Error})
-        console.error('could not load roles: ', error)
-      }
+      this.setState({
+        loading: RemoteDataState.Error,
+        error,
+        errorMessage: `Unable to administer InfluxDB. ${errorMessage}`,
+      })
     }
   }
 
@@ -168,9 +173,20 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
 
   private get admin(): JSX.Element {
     const {source, params} = this.props
-    const {loading} = this.state
+    const {loading, error, errorMessage} = this.state
     if (loading === RemoteDataState.Loading) {
       return <PageSpinner />
+    }
+
+    if (loading === RemoteDataState.Error) {
+      return (
+        <div className="container-fluid">
+          <div className="panel-body">
+            <p className="unexpected-error">{errorMessage}</p>
+            <p className="unexpected-error">{(error || '').toString()}</p>
+          </div>
+        </div>
+      )
     }
 
     if (!source.version || source.version.startsWith('2')) {
