@@ -479,6 +479,8 @@ type defaultClient struct {
 	InsecureSkipVerify bool
 	URL                *url.URL
 
+	// masterURL is setup when doing redirects, communication with a master
+	// node prevents stale reads from follower nodes after master node modifications
 	masterURL *url.URL
 	mu        sync.Mutex
 }
@@ -513,6 +515,7 @@ func (d *defaultClient) Do(path, method string, authorizer influx.Authorizer, pa
 	for k, v := range params {
 		p.Add(k, v)
 	}
+	// prefer communication with the master node, to avoid stale reads
 	URL := d.getMasterURL()
 
 	URL.Path = path

@@ -19,7 +19,7 @@ func (c *UserStore) Add(ctx context.Context, u *chronograf.User) (*chronograf.Us
 	if err := c.Ctrl.CreateUser(ctx, u.Name, u.Passwd); err != nil {
 		return nil, err
 	}
-	// fix #5840: eventual consistency can cause delays in user creation
+	// fix #5840: eventual consistency can cause delays in user creation,
 	// wait for the user to become available
 	_, err := c.Ctrl.User(ctx, u.Name)
 	timer := time.NewTimer(2_000_000_000) // retry at most 2 seconds
