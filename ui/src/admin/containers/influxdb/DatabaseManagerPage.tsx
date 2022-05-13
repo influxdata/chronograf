@@ -1,39 +1,74 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
+import React, {ChangeEvent, Component} from 'react'
 import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
+import {Action, bindActionCreators, Dispatch} from 'redux'
 import _ from 'lodash'
 
 import DatabaseManager from 'src/admin/components/DatabaseManager'
 
 import * as adminActionCreators from 'src/admin/actions/influxdb'
-import {notify as notifyAction} from 'shared/actions/notifications'
+import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {
   notifyDatabaseDeleteConfirmationRequired,
   notifyDatabaseNameAlreadyExists,
   notifyDatabaseNameInvalid,
-} from 'shared/copy/notifications'
+} from 'src/shared/copy/notifications'
+import {Source} from 'src/types'
+import {Database, RetentionPolicy} from 'src/types/influxAdmin'
 
-class DatabaseManagerPage extends Component {
+interface Props {
+  source: Source
+  params: {
+    tab: string
+  }
+  databases: Database[]
+  actions: {
+    deleteRetentionPolicyAsync: (
+      db: Database,
+      rp: RetentionPolicy
+    ) => Promise<void>
+    addDatabaseDeleteCode: (db: Database) => Promise<void>
+    addDatabase: () => void
+    editDatabase: (db: Database, updates: Partial<Database>) => void
+    removeDatabase: (db: Database) => void
+    createDatabaseAsync: (databasesLink: string, db: Database) => Promise<void>
+    deleteDatabaseAsync: (db: Database) => Promise<void>
+    removeDatabaseDeleteCode: (db: Database) => void
+    removeRetentionPolicy: (rp: RetentionPolicy) => void
+    addRetentionPolicy: (db: Database) => void
+    createRetentionPolicyAsync: (
+      db: Database,
+      rp: RetentionPolicy
+    ) => Promise<void>
+    updateRetentionPolicyAsync: (
+      db: Database,
+      oldRP: RetentionPolicy,
+      newRP: RetentionPolicy
+    ) => Promise<void>
+  }
+  notify: typeof notifyAction
+}
+class DatabaseManagerPage extends Component<Props> {
   constructor(props) {
     super(props)
   }
 
-  handleDeleteRetentionPolicy = (db, rp) => () => {
+  handleDeleteRetentionPolicy = (db: Database, rp: RetentionPolicy) => () => {
     this.props.actions.deleteRetentionPolicyAsync(db, rp)
   }
 
-  handleStartDeleteDatabase = database => () => {
+  handleStartDeleteDatabase = (database: Database) => () => {
     this.props.actions.addDatabaseDeleteCode(database)
   }
 
-  handleEditDatabase = database => e => {
+  handleEditDatabase = (database: Database) => (
+    e: ChangeEvent<HTMLInputElement>
+  ) => {
     this.props.actions.editDatabase(database, {name: e.target.value})
   }
 
-  handleCreateDatabase = database => {
+  handleCreateDatabase = (database: Database) => {
     const {actions, notify, source, databases} = this.props
     if (!database.name) {
       return notify(notifyDatabaseNameInvalid())
@@ -46,17 +81,18 @@ class DatabaseManagerPage extends Component {
     actions.createDatabaseAsync(source.links.databases, database)
   }
 
-  handleAddRetentionPolicy = database => () => {
+  handleAddRetentionPolicy = (database: Database) => () => {
     const {addRetentionPolicy} = this.props.actions
     addRetentionPolicy(database)
   }
 
-  handleKeyDownDatabase = database => e => {
+  handleKeyDownDatabase = (database: Database) => (e: KeyboardEvent) => {
     const {key} = e
     const {actions, notify, source, databases} = this.props
 
     if (key === 'Escape') {
       actions.removeDatabase(database)
+      return
     }
 
     if (key === 'Enter') {
@@ -72,7 +108,10 @@ class DatabaseManagerPage extends Component {
     }
   }
 
-  handleDatabaseDeleteConfirm = database => e => {
+  handleDatabaseDeleteConfirm = (database: Database) => (e: {
+    key: string
+    target: {value: string}
+  }) => {
     const {
       key,
       target: {value},
@@ -80,7 +119,8 @@ class DatabaseManagerPage extends Component {
     const {actions, notify} = this.props
 
     if (key === 'Escape') {
-      return actions.removeDatabaseDeleteCode(database)
+      actions.removeDatabaseDeleteCode(database)
+      return
     }
 
     if (key === 'Enter') {
@@ -95,10 +135,9 @@ class DatabaseManagerPage extends Component {
   }
 
   render() {
-    const {source, databases, actions, notify} = this.props
+    const {source, databases, actions} = this.props
     return (
       <DatabaseManager
-        notify={notify}
         databases={databases}
         isRFDisplayed={!!source.metaUrl}
         addDatabase={actions.addDatabase}
@@ -121,51 +160,12 @@ class DatabaseManagerPage extends Component {
   }
 }
 
-const {arrayOf, bool, func, number, shape, string} = PropTypes
-
-DatabaseManagerPage.propTypes = {
-  source: shape({
-    links: shape({
-      proxy: string,
-    }),
-  }),
-  databases: arrayOf(
-    shape({
-      name: string,
-      isEditing: bool,
-    })
-  ),
-  retentionPolicies: arrayOf(
-    arrayOf(
-      shape({
-        name: string,
-        duration: string,
-        replication: number,
-        isDefault: bool,
-      })
-    )
-  ),
-  actions: shape({
-    addRetentionPolicy: func,
-    loadDBsAndRPsAsync: func,
-    createDatabaseAsync: func,
-    createRetentionPolicyAsync: func,
-    addDatabase: func,
-    removeDatabase: func,
-    startDeleteDatabase: func,
-    removeDatabaseDeleteCode: func,
-    removeRetentionPolicy: func,
-    deleteRetentionPolicyAsync: func,
-  }),
-  notify: func.isRequired,
-}
-
 const mapStateToProps = ({adminInfluxDB: {databases, retentionPolicies}}) => ({
   databases,
   retentionPolicies,
 })
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch: Dispatch<Action>) => ({
   actions: bindActionCreators(adminActionCreators, dispatch),
   notify: bindActionCreators(notifyAction, dispatch),
 })
