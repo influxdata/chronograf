@@ -1,32 +1,22 @@
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
+import {Action, bindActionCreators, Dispatch} from 'redux'
 import {
-  addUser,
   addRole,
-  editUser,
   editRole,
-  deleteUser,
   deleteRole,
   loadUsersAsync,
   loadRolesAsync,
-  createUserAsync,
   createRoleAsync,
-  deleteUserAsync,
   deleteRoleAsync,
   loadPermissionsAsync,
   updateRoleUsersAsync,
-  updateUserRolesAsync,
-  updateUserPasswordAsync,
   updateRolePermissionsAsync,
-  updateUserPermissionsAsync,
-  filterUsers as filterUsersAction,
   filterRoles as filterRolesAction,
   loadDBsAndRPsAsync,
 } from 'src/admin/actions/influxdb'
 
 import PageSpinner from 'src/shared/components/PageSpinner'
-import UsersTable from 'src/admin/components/UsersTable'
 import RolesTable from 'src/admin/components/RolesTable'
 import QueriesPage from './QueriesPage'
 import DatabaseManagerPage from './DatabaseManagerPage'
@@ -46,15 +36,8 @@ import {
 import {InfluxDBPermissions} from 'src/types/auth'
 import {NotificationAction} from 'src/types/notifications'
 
-import {
-  notifyRoleNameInvalid,
-  notifyDBUserNamePasswordInvalid,
-} from 'src/shared/copy/notifications'
-
-const isValidUser = user => {
-  const minLen = 3
-  return user.name.length >= minLen && user.password.length >= minLen
-}
+import {notifyRoleNameInvalid} from 'src/shared/copy/notifications'
+import UsersPage from './UsersPage'
 
 const isValidRole = role => {
   const minLen = 3
@@ -78,23 +61,14 @@ interface Props {
   loadRoles: (url: string) => Promise<void>
   loadPermissions: (url: string) => Promise<void>
   loadDBsAndRPs: (url: string) => Promise<void>
-  addUser: () => void
   addRole: () => void
-  removeUser: (user: User) => void
   removeRole: (role: Role) => void
-  editUser: (user: User, updates: Partial<User>) => void
   editRole: (role: Role, updates: Partial<Role>) => void
-  createUser: (url: string, user: User) => void
   createRole: (url: string, role: Role) => void
   deleteRole: (role: Role) => void
-  deleteUser: (user: User) => void
   filterRoles: () => void
-  filterUsers: () => void
   updateRoleUsers: (role: Role, users: User[]) => void
   updateRolePermissions: (role: Role, permissions: Permission[]) => void
-  updateUserPermissions: (user: User, permissions: Permission[]) => void
-  updateUserRoles: (user: User, roles: Role[]) => void
-  updateUserPassword: (user: User, password: string) => void
   notify: NotificationAction
   params: {
     tab: string
@@ -209,34 +183,12 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
     )
   }
 
-  private handleClickCreate = type => () => {
-    if (type === 'users') {
-      this.props.addUser()
-    } else if (type === 'roles') {
-      this.props.addRole()
-    }
-  }
-
-  private handleEditUser = (user, updates) => {
-    this.props.editUser(user, updates)
+  private handleClickCreate = () => () => {
+    this.props.addRole()
   }
 
   private handleEditRole = (role, updates) => {
     this.props.editRole(role, updates)
-  }
-
-  // eslint-disable-next-line @typescript-eslint/require-await
-  private handleSaveUser = async user => {
-    const {notify} = this.props
-    if (!isValidUser(user)) {
-      notify(notifyDBUserNamePasswordInvalid())
-      return
-    }
-    if (user.isNew) {
-      this.props.createUser(this.props.source.links.users, user)
-    } else {
-      // TODO update user
-    }
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
@@ -253,10 +205,6 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
     }
   }
 
-  private handleCancelEditUser = user => {
-    this.props.removeUser(user)
-  }
-
   private handleCancelEditRole = role => {
     this.props.removeRole(role)
   }
@@ -265,28 +213,12 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
     this.props.deleteRole(role)
   }
 
-  private handleDeleteUser = user => {
-    this.props.deleteUser(user)
-  }
-
   private handleUpdateRoleUsers = (role, users) => {
     this.props.updateRoleUsers(role, users)
   }
 
   private handleUpdateRolePermissions = (role, permissions) => {
     this.props.updateRolePermissions(role, permissions)
-  }
-
-  private handleUpdateUserPermissions = (user, permissions) => {
-    this.props.updateUserPermissions(user, permissions)
-  }
-
-  private handleUpdateUserRoles = (user, roles) => {
-    this.props.updateUserRoles(user, roles)
-  }
-
-  private handleUpdateUserPassword = (user, password) => {
-    this.props.updateUserPassword(user, password)
   }
 
   private get allowed(): InfluxDBPermissions[] {
@@ -305,7 +237,7 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
   }
 
   private get adminSubSections() {
-    const {users, roles, source, filterUsers, filterRoles} = this.props
+    const {users, roles, source, filterRoles} = this.props
     return [
       {
         url: 'databases',
@@ -317,24 +249,7 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
         url: 'users',
         name: 'Users',
         enabled: !this.isLDAP,
-        component: (
-          <UsersTable
-            users={users}
-            allRoles={roles}
-            hasRoles={this.hasRoles}
-            permissions={this.allowed}
-            isEditing={users.some(u => u.isEditing)}
-            onSave={this.handleSaveUser}
-            onCancel={this.handleCancelEditUser}
-            onClickCreate={this.handleClickCreate}
-            onEdit={this.handleEditUser}
-            onDelete={this.handleDeleteUser}
-            onFilter={filterUsers}
-            onUpdatePermissions={this.handleUpdateUserPermissions}
-            onUpdateRoles={this.handleUpdateUserRoles}
-            onUpdatePassword={this.handleUpdateUserPassword}
-          />
-        ),
+        component: <UsersPage source={source} />,
       },
       {
         url: 'roles',
@@ -373,34 +288,22 @@ const mapStateToProps = ({adminInfluxDB: {users, roles, permissions}}) => ({
   permissions,
 })
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch: Dispatch<Action>) => ({
   loadUsers: bindActionCreators(loadUsersAsync, dispatch),
   loadRoles: bindActionCreators(loadRolesAsync, dispatch),
   loadPermissions: bindActionCreators(loadPermissionsAsync, dispatch),
   loadDBsAndRPs: bindActionCreators(loadDBsAndRPsAsync, dispatch),
-  addUser: bindActionCreators(addUser, dispatch),
   addRole: bindActionCreators(addRole, dispatch),
-  removeUser: bindActionCreators(deleteUser, dispatch),
   removeRole: bindActionCreators(deleteRole, dispatch),
-  editUser: bindActionCreators(editUser, dispatch),
   editRole: bindActionCreators(editRole, dispatch),
-  createUser: bindActionCreators(createUserAsync, dispatch),
   createRole: bindActionCreators(createRoleAsync, dispatch),
-  deleteUser: bindActionCreators(deleteUserAsync, dispatch),
   deleteRole: bindActionCreators(deleteRoleAsync, dispatch),
-  filterUsers: bindActionCreators(filterUsersAction, dispatch),
   filterRoles: bindActionCreators(filterRolesAction, dispatch),
   updateRoleUsers: bindActionCreators(updateRoleUsersAsync, dispatch),
   updateRolePermissions: bindActionCreators(
     updateRolePermissionsAsync,
     dispatch
   ),
-  updateUserPermissions: bindActionCreators(
-    updateUserPermissionsAsync,
-    dispatch
-  ),
-  updateUserRoles: bindActionCreators(updateUserRolesAsync, dispatch),
-  updateUserPassword: bindActionCreators(updateUserPasswordAsync, dispatch),
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
