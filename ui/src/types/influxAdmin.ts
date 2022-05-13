@@ -53,3 +53,17 @@ export interface Database {
   isEditing?: boolean
   deleteCode?: string
 }
+export interface QueryStat {
+  /** query id */
+  id: number
+  /** database */
+  database: string
+  /** query string */
+  query: string
+  /** query status */
+  status: string
+  /** query duration */
+  duration: string
+  /** tcpHost was used in older InfluxDBs*/
+  tcpHost?: string
+}
