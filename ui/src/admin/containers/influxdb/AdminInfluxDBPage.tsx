@@ -2,22 +2,13 @@ import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 import {Action, bindActionCreators, Dispatch} from 'redux'
 import {
-  addRole,
-  editRole,
-  deleteRole,
   loadUsersAsync,
   loadRolesAsync,
-  createRoleAsync,
-  deleteRoleAsync,
   loadPermissionsAsync,
-  updateRoleUsersAsync,
-  updateRolePermissionsAsync,
-  filterRoles as filterRolesAction,
   loadDBsAndRPsAsync,
 } from 'src/admin/actions/influxdb'
 
 import PageSpinner from 'src/shared/components/PageSpinner'
-import RolesTable from 'src/admin/components/RolesTable'
 import QueriesPage from './QueriesPage'
 import DatabaseManagerPage from './DatabaseManagerPage'
 import {Page} from 'src/reusable_ui'
@@ -25,50 +16,20 @@ import SubSections from 'src/shared/components/SubSections'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {notify as notifyAction} from 'src/shared/actions/notifications'
-import {
-  Source,
-  User as InfluxDBUser,
-  Role as InfluxDBRole,
-  Permission,
-  RemoteDataState,
-  SourceAuthenticationMethod,
-} from 'src/types'
-import {InfluxDBPermissions} from 'src/types/auth'
+import {Source, RemoteDataState, SourceAuthenticationMethod} from 'src/types'
 import {NotificationAction} from 'src/types/notifications'
 
-import {notifyRoleNameInvalid} from 'src/shared/copy/notifications'
 import UsersPage from './UsersPage'
+import RolesPage from './RolesPage'
 
-const isValidRole = role => {
-  const minLen = 3
-  return role.name.length >= minLen
-}
-
-interface User extends InfluxDBUser {
-  isEditing: boolean
-}
-
-interface Role extends InfluxDBRole {
-  isEditing: boolean
-}
-
+type LoaderFunc = (url: string) => Promise<void>
 interface Props {
   source: Source
-  users: User[]
-  roles: Role[]
-  permissions: Permission[]
-  loadUsers: (url: string) => Promise<void>
-  loadRoles: (url: string) => Promise<void>
-  loadPermissions: (url: string) => Promise<void>
-  loadDBsAndRPs: (url: string) => Promise<void>
-  addRole: () => void
-  removeRole: (role: Role) => void
-  editRole: (role: Role, updates: Partial<Role>) => void
-  createRole: (url: string, role: Role) => void
-  deleteRole: (role: Role) => void
-  filterRoles: () => void
-  updateRoleUsers: (role: Role, users: User[]) => void
-  updateRolePermissions: (role: Role, permissions: Permission[]) => void
+
+  loadUsers: LoaderFunc
+  loadRoles: LoaderFunc
+  loadPermissions: LoaderFunc
+  loadDBsAndRPs: LoaderFunc
   notify: NotificationAction
   params: {
     tab: string
@@ -83,7 +44,7 @@ interface State {
 
 @ErrorHandling
 export class AdminInfluxDBPage extends PureComponent<Props, State> {
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
     this.state = {
       loading: RemoteDataState.NotStarted,
@@ -183,50 +144,6 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
     )
   }
 
-  private handleClickCreate = () => () => {
-    this.props.addRole()
-  }
-
-  private handleEditRole = (role, updates) => {
-    this.props.editRole(role, updates)
-  }
-
-  // eslint-disable-next-line @typescript-eslint/require-await
-  private handleSaveRole = async role => {
-    const {notify} = this.props
-    if (!isValidRole(role)) {
-      notify(notifyRoleNameInvalid())
-      return
-    }
-    if (role.isNew) {
-      this.props.createRole(this.props.source.links.roles, role)
-    } else {
-      // TODO update role
-    }
-  }
-
-  private handleCancelEditRole = role => {
-    this.props.removeRole(role)
-  }
-
-  private handleDeleteRole = role => {
-    this.props.deleteRole(role)
-  }
-
-  private handleUpdateRoleUsers = (role, users) => {
-    this.props.updateRoleUsers(role, users)
-  }
-
-  private handleUpdateRolePermissions = (role, permissions) => {
-    this.props.updateRolePermissions(role, permissions)
-  }
-
-  private get allowed(): InfluxDBPermissions[] {
-    const {permissions} = this.props
-    const globalPermissions = permissions.find(p => p.scope === 'all')
-    return globalPermissions ? globalPermissions.allowed : []
-  }
-
   private get hasRoles(): boolean {
     return !!this.props.source.links.roles
   }
@@ -237,7 +154,7 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
   }
 
   private get adminSubSections() {
-    const {users, roles, source, filterRoles} = this.props
+    const {source} = this.props
     return [
       {
         url: 'databases',
@@ -255,22 +172,7 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
         url: 'roles',
         name: 'Roles',
         enabled: this.hasRoles && !this.isLDAP,
-        component: (
-          <RolesTable
-            roles={roles}
-            allUsers={users}
-            permissions={this.allowed}
-            isEditing={roles.some(r => r.isEditing)}
-            onClickCreate={this.handleClickCreate}
-            onEdit={this.handleEditRole}
-            onSave={this.handleSaveRole}
-            onCancel={this.handleCancelEditRole}
-            onDelete={this.handleDeleteRole}
-            onFilter={filterRoles}
-            onUpdateRoleUsers={this.handleUpdateRoleUsers}
-            onUpdateRolePermissions={this.handleUpdateRolePermissions}
-          />
-        ),
+        component: <RolesPage source={source} />,
       },
       {
         url: 'queries',
@@ -282,29 +184,24 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
   }
 }
 
-const mapStateToProps = ({adminInfluxDB: {users, roles, permissions}}) => ({
-  users,
-  roles,
-  permissions,
-})
-
 const mapDispatchToProps = (dispatch: Dispatch<Action>) => ({
-  loadUsers: bindActionCreators(loadUsersAsync, dispatch),
-  loadRoles: bindActionCreators(loadRolesAsync, dispatch),
-  loadPermissions: bindActionCreators(loadPermissionsAsync, dispatch),
-  loadDBsAndRPs: bindActionCreators(loadDBsAndRPsAsync, dispatch),
-  addRole: bindActionCreators(addRole, dispatch),
-  removeRole: bindActionCreators(deleteRole, dispatch),
-  editRole: bindActionCreators(editRole, dispatch),
-  createRole: bindActionCreators(createRoleAsync, dispatch),
-  deleteRole: bindActionCreators(deleteRoleAsync, dispatch),
-  filterRoles: bindActionCreators(filterRolesAction, dispatch),
-  updateRoleUsers: bindActionCreators(updateRoleUsersAsync, dispatch),
-  updateRolePermissions: bindActionCreators(
-    updateRolePermissionsAsync,
+  loadUsers: bindActionCreators<typeof loadUsersAsync, LoaderFunc>(
+    loadUsersAsync,
+    dispatch
+  ),
+  loadRoles: bindActionCreators<typeof loadRolesAsync, LoaderFunc>(
+    loadRolesAsync,
+    dispatch
+  ),
+  loadPermissions: bindActionCreators<typeof loadPermissionsAsync, LoaderFunc>(
+    loadPermissionsAsync,
+    dispatch
+  ),
+  loadDBsAndRPs: bindActionCreators<typeof loadDBsAndRPsAsync, LoaderFunc>(
+    loadDBsAndRPsAsync,
     dispatch
   ),
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(AdminInfluxDBPage)
+export default connect(null, mapDispatchToProps)(AdminInfluxDBPage)
