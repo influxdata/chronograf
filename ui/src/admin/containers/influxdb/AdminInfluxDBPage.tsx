@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react'
-import {connect} from 'react-redux'
-import {Action, bindActionCreators, Dispatch} from 'redux'
+import {connect, ResolveThunks} from 'react-redux'
 import {
   loadUsersAsync,
   loadRolesAsync,
@@ -17,25 +16,28 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {Source, RemoteDataState, SourceAuthenticationMethod} from 'src/types'
-import {NotificationAction} from 'src/types/notifications'
 
 import UsersPage from './UsersPage'
 import RolesPage from './RolesPage'
 
-type LoaderFunc = (url: string) => Promise<void>
-interface Props {
-  source: Source
+const mapDispatchToProps = {
+  loadUsers: loadUsersAsync,
+  loadRoles: loadRolesAsync,
+  loadPermissions: loadPermissionsAsync,
+  loadDBsAndRPs: loadDBsAndRPsAsync,
+  notify: notifyAction,
+}
 
-  loadUsers: LoaderFunc
-  loadRoles: LoaderFunc
-  loadPermissions: LoaderFunc
-  loadDBsAndRPs: LoaderFunc
-  notify: NotificationAction
+interface OwnProps {
+  source: Source
   params: {
     tab: string
   }
 }
 
+type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
+
+type Props = OwnProps & ReduxDispatchProps
 interface State {
   loading: RemoteDataState
   error?: any
@@ -183,25 +185,5 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
     ]
   }
 }
-
-const mapDispatchToProps = (dispatch: Dispatch<Action>) => ({
-  loadUsers: bindActionCreators<typeof loadUsersAsync, LoaderFunc>(
-    loadUsersAsync,
-    dispatch
-  ),
-  loadRoles: bindActionCreators<typeof loadRolesAsync, LoaderFunc>(
-    loadRolesAsync,
-    dispatch
-  ),
-  loadPermissions: bindActionCreators<typeof loadPermissionsAsync, LoaderFunc>(
-    loadPermissionsAsync,
-    dispatch
-  ),
-  loadDBsAndRPs: bindActionCreators<typeof loadDBsAndRPsAsync, LoaderFunc>(
-    loadDBsAndRPsAsync,
-    dispatch
-  ),
-  notify: bindActionCreators(notifyAction, dispatch),
-})
 
 export default connect(null, mapDispatchToProps)(AdminInfluxDBPage)

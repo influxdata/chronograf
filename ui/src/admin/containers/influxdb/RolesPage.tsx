@@ -1,14 +1,12 @@
 import React from 'react'
 import {Component} from 'react'
-import {connect} from 'react-redux'
-import {Action, bindActionCreators, Dispatch} from 'redux'
+import {connect, ResolveThunks} from 'react-redux'
 import {Source, SourceAuthenticationMethod} from 'src/types'
 import {InfluxDBPermissions, Permission, Role, User} from 'src/types/auth'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
-import {NotificationAction} from 'src/types/notifications'
 import {
-  addRole,
-  editRole,
+  addRole as addRoleActionCreator,
+  editRole as editRoleActionCreator,
   deleteRole,
   createRoleAsync,
   deleteRoleAsync,
@@ -24,24 +22,36 @@ const isValidRole = role => {
   return role.name.length >= minLen
 }
 
-interface Props {
-  source: Source
+const mapStateToProps = ({adminInfluxDB: {users, roles, permissions}}) => ({
+  users,
+  roles,
+  permissions,
+})
 
+const mapDispatchToProps = {
+  addRole: addRoleActionCreator,
+  removeRole: deleteRole,
+  editRole: editRoleActionCreator,
+  createRole: createRoleAsync,
+  deleteRole: deleteRoleAsync,
+  filterRoles: filterRolesAction,
+  updateRoleUsers: updateRoleUsersAsync,
+  updateRolePermissions: updateRolePermissionsAsync,
+  notify: notifyAction,
+}
+
+interface OwnProps {
+  source: Source
+}
+interface ConnectedProps {
   users: User[]
   roles: Role[]
   permissions: Permission[]
-
-  addRole: () => void
-  removeRole: (role: Role) => void
-  editRole: (role: Role, updates: Partial<Role>) => void
-  createRole: (url: string, role: Role) => void
-  deleteRole: (role: Role) => void
-  filterRoles: () => void
-  updateRoleUsers: (role: Role, users: User[]) => void
-  updateRolePermissions: (role: Role, permissions: Permission[]) => void
-
-  notify: NotificationAction
 }
+
+type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
+
+type Props = OwnProps & ConnectedProps & ReduxDispatchProps
 
 class RolesPage extends Component<Props> {
   private get hasRoles(): boolean {
@@ -127,26 +137,5 @@ class RolesPage extends Component<Props> {
     )
   }
 }
-
-const mapStateToProps = ({adminInfluxDB: {users, roles, permissions}}) => ({
-  users,
-  roles,
-  permissions,
-})
-
-const mapDispatchToProps = (dispatch: Dispatch<Action>) => ({
-  addRole: bindActionCreators(addRole, dispatch),
-  removeRole: bindActionCreators(deleteRole, dispatch),
-  editRole: bindActionCreators(editRole, dispatch),
-  createRole: bindActionCreators(createRoleAsync, dispatch),
-  deleteRole: bindActionCreators(deleteRoleAsync, dispatch),
-  filterRoles: bindActionCreators(filterRolesAction, dispatch),
-  updateRoleUsers: bindActionCreators(updateRoleUsersAsync, dispatch),
-  updateRolePermissions: bindActionCreators(
-    updateRolePermissionsAsync,
-    dispatch
-  ),
-  notify: bindActionCreators(notifyAction, dispatch),
-})
 
 export default connect(mapStateToProps, mapDispatchToProps)(RolesPage)

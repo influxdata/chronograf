@@ -1,12 +1,10 @@
 import React from 'react'
 import {Component} from 'react'
-import {connect} from 'react-redux'
-import {Action, bindActionCreators, Dispatch} from 'redux'
+import {connect, ResolveThunks} from 'react-redux'
 import UsersTable from 'src/admin/components/UsersTable'
 import {Source, SourceAuthenticationMethod} from 'src/types'
 import {InfluxDBPermissions, Permission, Role, User} from 'src/types/auth'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
-import {NotificationAction} from 'src/types/notifications'
 import {
   addUser as addUserActionCreator,
   editUser as editUserActionCreator,
@@ -25,25 +23,36 @@ const isValidUser = (user: User) => {
   return user.name.length >= minLen && user.password.length >= minLen
 }
 
-interface Props {
-  source: Source
+const mapStateToProps = ({adminInfluxDB: {users, roles, permissions}}) => ({
+  users,
+  roles,
+  permissions,
+})
 
+const mapDispatchToProps = {
+  filterUsers: filterUsersAction,
+  createUser: createUserAsync,
+  removeUser: deleteUserActionCreator,
+  addUser: addUserActionCreator,
+  editUser: editUserActionCreator,
+  deleteUser: deleteUserAsync,
+  updateUserPermissions: updateUserPermissionsAsync,
+  updateUserRoles: updateUserRolesAsync,
+  updateUserPassword: updateUserPasswordAsync,
+  notify: notifyAction,
+}
+
+interface OwnProps {
+  source: Source
+}
+interface ConnectedProps {
   users: User[]
   roles: Role[]
   permissions: Permission[]
-
-  filterUsers: () => void
-  createUser: (url: string, user: User) => void
-  removeUser: (user: User) => void
-  addUser: () => void
-  editUser: (user: User, updates: Partial<User>) => void
-  deleteUser: (user: User) => void
-  updateUserPermissions: (user: User, permissions: Permission[]) => void
-  updateUserRoles: (user: User, roles: Role[]) => void
-  updateUserPassword: (user: User, password: string) => void
-
-  notify: NotificationAction
 }
+
+type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
+type Props = OwnProps & ConnectedProps & ReduxDispatchProps
 
 class UsersPage extends Component<Props> {
   private get hasRoles(): boolean {
@@ -110,27 +119,5 @@ class UsersPage extends Component<Props> {
     )
   }
 }
-
-const mapStateToProps = ({adminInfluxDB: {users, roles, permissions}}) => ({
-  users,
-  roles,
-  permissions,
-})
-
-const mapDispatchToProps = (dispatch: Dispatch<Action>) => ({
-  filterUsers: bindActionCreators(filterUsersAction, dispatch),
-  createUser: bindActionCreators(createUserAsync, dispatch),
-  removeUser: bindActionCreators(deleteUserActionCreator, dispatch),
-  addUser: bindActionCreators(addUserActionCreator, dispatch),
-  editUser: bindActionCreators(editUserActionCreator, dispatch),
-  deleteUser: bindActionCreators(deleteUserAsync, dispatch),
-  updateUserPermissions: bindActionCreators(
-    updateUserPermissionsAsync,
-    dispatch
-  ),
-  updateUserRoles: bindActionCreators(updateUserRolesAsync, dispatch),
-  updateUserPassword: bindActionCreators(updateUserPasswordAsync, dispatch),
-  notify: bindActionCreators(notifyAction, dispatch),
-})
 
 export default connect(mapStateToProps, mapDispatchToProps)(UsersPage)
