@@ -1,10 +1,11 @@
 import React from 'react'
 import {Component} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
-import UsersTable from 'src/admin/components/UsersTable'
+import {withSource} from 'src/CheckSources'
 import {Source} from 'src/types'
 import {InfluxDBPermissions, Permission, Role, User} from 'src/types/auth'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
+import UsersTable from 'src/admin/components/UsersTable'
 import {
   addUser as addUserActionCreator,
   editUser as editUserActionCreator,
@@ -124,4 +125,6 @@ class UsersPage extends Component<Props> {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UsersPage)
+export default withSource(
+  connect(mapStateToProps, mapDispatchToProps)(UsersPage)
+)

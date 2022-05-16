@@ -1,6 +1,7 @@
 // Libraries
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
+import {withSource} from 'src/CheckSources'
 
 // Components
 import LayoutRenderer from 'src/shared/components/LayoutRenderer'
@@ -124,4 +125,4 @@ const mdtp = {
   onSetTimeZone: appActions.setTimeZone,
 }
 
-export default connect(mstp, mdtp)(StatusPage)
+export default withSource(connect(mstp, mdtp)(StatusPage))

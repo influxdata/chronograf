@@ -1,4 +1,5 @@
 import React, {PureComponent} from 'react'
+import {withSource} from 'src/CheckSources'
 
 import DataExplorer from './DataExplorer'
 
@@ -21,4 +22,4 @@ class DataExplorerPage extends PureComponent<Props> {
   }
 }
 
-export default DataExplorerPage
+export default withSource(DataExplorerPage)

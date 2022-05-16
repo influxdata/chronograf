@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import _ from 'lodash'
 import {InjectedRouter, Link} from 'react-router'
 import {connect} from 'react-redux'
+import {withSource} from 'src/CheckSources'
 
 import PageSpinner from 'src/shared/components/PageSpinner'
 
@@ -182,4 +183,6 @@ const mapDispatchToProps = dispatch => ({
   ),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(KapacitorRulePage)
+export default withSource(
+  connect(mapStateToProps, mapDispatchToProps)(KapacitorRulePage)
+)

@@ -1,4 +1,5 @@
 import React, {useEffect, useMemo, useState} from 'react'
+import {withSource} from 'src/CheckSources'
 import {FluxTask, Kapacitor, Source} from 'src/types'
 import KapacitorScopedPage from './KapacitorScopedPage'
 import {useDispatch} from 'react-redux'
@@ -184,4 +185,4 @@ const FluxTasksPage = ({
   )
 }
 
-export default FluxTasksPage
+export default withSource(FluxTasksPage)

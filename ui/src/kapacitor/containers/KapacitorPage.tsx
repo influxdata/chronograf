@@ -1,5 +1,6 @@
 import React, {ChangeEvent, PureComponent} from 'react'
 import {connect} from 'react-redux'
+import {withSource} from 'src/CheckSources'
 import {withRouter} from 'react-router'
 import {bindActionCreators} from 'redux'
 
@@ -211,4 +212,6 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(null, mapDispatchToProps)(withRouter(KapacitorPage))
+export default withSource(
+  connect(null, mapDispatchToProps)(withRouter(KapacitorPage))
+)

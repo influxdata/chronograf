@@ -1,4 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import {withSource} from 'src/CheckSources'
 import {AlertRule, Kapacitor, Source} from 'src/types'
 import KapacitorScopedPage from './KapacitorScopedPage'
 import {useDispatch} from 'react-redux'
@@ -280,4 +281,4 @@ const TickscriptsPage = ({source: src, router}: Props) => {
   )
 }
 
-export default TickscriptsPage
+export default withSource(TickscriptsPage)

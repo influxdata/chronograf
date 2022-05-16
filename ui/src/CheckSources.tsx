@@ -228,8 +228,7 @@ export class CheckSources extends Component<Props, State> {
 
     return (
       <SourceContext.Provider value={source}>
-        {this.props.children &&
-          React.cloneElement(this.props.children, {...this.props, source})}
+        {this.props.children}
       </SourceContext.Provider>
     )
   }

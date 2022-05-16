@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
+import {withSource} from 'src/CheckSources'
 
 import {Page} from 'src/reusable_ui'
 import SubSections from 'src/shared/components/SubSections'
@@ -90,4 +91,4 @@ const mapStateToProps = ({auth: {me}}) => ({
   me,
 })
 
-export default connect(mapStateToProps, null)(AdminChronografPage)
+export default withSource(connect(mapStateToProps, null)(AdminChronografPage))

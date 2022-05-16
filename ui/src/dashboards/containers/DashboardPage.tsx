@@ -2,6 +2,7 @@
 import React, {Component, MouseEvent} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
 import {withRouter} from 'react-router'
+import {withSource} from 'src/CheckSources'
 import _ from 'lodash'
 
 // Components
@@ -687,4 +688,6 @@ const mdtp = {
   setTimeZone: appActions.setTimeZone,
 }
 
-export default withRouter(connect(mstp, mdtp)(ManualRefresh(DashboardPage)))
+export default withSource(
+  withRouter(connect(mstp, mdtp)(ManualRefresh(DashboardPage)))
+)

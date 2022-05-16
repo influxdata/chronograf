@@ -1,5 +1,6 @@
 import React, {ChangeEvent, Component} from 'react'
 import {connect} from 'react-redux'
+import {withSource} from 'src/CheckSources'
 import {Action, bindActionCreators, Dispatch} from 'redux'
 import _ from 'lodash'
 
@@ -170,7 +171,9 @@ const mapDispatchToProps = (dispatch: Dispatch<Action>) => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ErrorHandling(DatabaseManagerPage))
+export default withSource(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(ErrorHandling(DatabaseManagerPage))
+)

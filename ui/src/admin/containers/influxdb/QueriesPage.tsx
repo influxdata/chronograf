@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
+import {withSource} from 'src/CheckSources'
 
 import flatten from 'lodash/flatten'
 import uniqBy from 'lodash/uniqBy'
@@ -240,7 +241,6 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ErrorHandling(QueriesPage))
+export default withSource(
+  connect(mapStateToProps, mapDispatchToProps)(ErrorHandling(QueriesPage))
+)

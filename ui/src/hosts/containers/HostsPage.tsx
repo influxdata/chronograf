@@ -1,6 +1,7 @@
 // Libraries
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
+import {withSource} from 'src/CheckSources'
 import {bindActionCreators} from 'redux'
 import _ from 'lodash'
 import {getDeep} from 'src/utils/wrappers'
@@ -224,4 +225,4 @@ const mdtp = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(mstp, mdtp)(ManualRefresh<Props>(HostsPage))
+export default withSource(connect(mstp, mdtp)(ManualRefresh<Props>(HostsPage)))

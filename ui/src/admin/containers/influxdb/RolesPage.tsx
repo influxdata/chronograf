@@ -1,6 +1,7 @@
 import React from 'react'
 import {Component} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
+import {withSource} from 'src/CheckSources'
 import {Source} from 'src/types'
 import {InfluxDBPermissions, Permission, Role, User} from 'src/types/auth'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
@@ -146,4 +147,6 @@ class RolesPage extends Component<Props> {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(RolesPage)
+export default withSource(
+  connect(mapStateToProps, mapDispatchToProps)(RolesPage)
+)

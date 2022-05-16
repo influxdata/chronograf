@@ -1,5 +1,6 @@
 import React, {PureComponent} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
+import {withSource} from 'src/CheckSources'
 import classnames from 'classnames'
 
 import LayoutRenderer from 'src/shared/components/LayoutRenderer'
@@ -239,4 +240,6 @@ const mdtp = {
   onSetTimeZone: setTimeZone,
 }
 
-export default connect(mstp, mdtp)(ManualRefresh(ErrorHandling(HostPage)))
+export default withSource(
+  connect(mstp, mdtp)(ManualRefresh(ErrorHandling(HostPage)))
+)

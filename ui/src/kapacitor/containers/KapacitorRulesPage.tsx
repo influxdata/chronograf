@@ -1,6 +1,7 @@
 // Libraries
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
+import {withSource} from 'src/CheckSources'
 
 // APIs
 import {pingKapacitor} from 'src/shared/apis'
@@ -222,4 +223,4 @@ const mdtp = {
   notify: notifyAction,
 }
 
-export default connect(mstp, mdtp)(KapacitorRulesPage)
+export default withSource(connect(mstp, mdtp)(KapacitorRulesPage))
