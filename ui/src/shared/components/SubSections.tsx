@@ -58,7 +58,7 @@ class SubSections extends Component<Props> {
     return found?.component || children || <NotFound />
   }
 
-  public handleTabClick = url => () => {
+  public handleTabClick = (url: string) => () => {
     const {router, sourceID, parentUrl} = this.props
     router.push(`/sources/${sourceID}/${parentUrl}/${url}`)
   }
