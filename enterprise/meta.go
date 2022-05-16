@@ -12,6 +12,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"sync"
 	"time"
 
 	"github.com/influxdata/chronograf"
@@ -36,12 +37,11 @@ var (
 )
 
 type client interface {
-	Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
+	Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error)
 }
 
 // MetaClient represents a Meta node in an Influx Enterprise cluster
 type MetaClient struct {
-	URL        *url.URL
 	client     client
 	authorizer influx.Authorizer
 }
@@ -49,10 +49,7 @@ type MetaClient struct {
 // NewMetaClient represents a meta node in an Influx Enterprise cluster
 func NewMetaClient(url *url.URL, InsecureSkipVerify bool, authorizer influx.Authorizer) *MetaClient {
 	return &MetaClient{
-		URL: url,
-		client: &defaultClient{
-			InsecureSkipVerify: InsecureSkipVerify,
-		},
+		client:     newDefaultClient(url, InsecureSkipVerify),
 		authorizer: authorizer,
 	}
 }
@@ -206,6 +203,18 @@ func (m *MetaClient) RemoveUserPerms(ctx context.Context, name string, perms Per
 	return m.Post(ctx, "/user", a, nil)
 }
 
+// AddUserPerms adds permissions for a user in Influx Enterprise
+func (m *MetaClient) AddUserPerms(ctx context.Context, name string, perms Permissions) error {
+	a := &UserAction{
+		Action: "add-permissions",
+		User: &User{
+			Name:        name,
+			Permissions: perms,
+		},
+	}
+	return m.Post(ctx, "/user", a, nil)
+}
+
 // SetUserPerms removes permissions not in set and then adds the requested perms
 func (m *MetaClient) SetUserPerms(ctx context.Context, name string, perms Permissions) error {
 	user, err := m.User(ctx, name)
@@ -226,14 +235,7 @@ func (m *MetaClient) SetUserPerms(ctx context.Context, name string, perms Permis
 
 	// ... next, add any permissions the user should have
 	if len(add) > 0 {
-		a := &UserAction{
-			Action: "add-permissions",
-			User: &User{
-				Name:        name,
-				Permissions: add,
-			},
-		}
-		return m.Post(ctx, "/user", a, nil)
+		return m.AddUserPerms(ctx, name, add)
 	}
 	return nil
 }
@@ -475,14 +477,46 @@ func (m *MetaClient) Post(ctx context.Context, path string, action interface{}, 
 
 type defaultClient struct {
 	InsecureSkipVerify bool
+	URL                *url.URL
+
+	// masterURL is setup when doing redirects, communication with a master
+	// node prevents stale reads from follower nodes after master node modifications
+	masterURL *url.URL
+	mu        sync.Mutex
+}
+
+func newDefaultClient(URL *url.URL, InsecureSkipVerify bool) *defaultClient {
+	return &defaultClient{
+		URL:                URL,
+		InsecureSkipVerify: InsecureSkipVerify,
+	}
+}
+
+func (d *defaultClient) setMasterURL(URL *url.URL) {
+	if URL.Host != "" && URL.Scheme != "" {
+		d.mu.Lock()
+		defer d.mu.Unlock()
+		d.masterURL = &url.URL{Host: URL.Host, Scheme: URL.Scheme}
+	}
+}
+
+func (d *defaultClient) getMasterURL() url.URL {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if d.masterURL != nil {
+		return *d.masterURL
+	}
+	return *d.URL
 }
 
 // Do is a helper function to interface with Influx Enterprise's Meta API
-func (d *defaultClient) Do(URL *url.URL, path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error) {
+func (d *defaultClient) Do(path, method string, authorizer influx.Authorizer, params map[string]string, body io.Reader) (*http.Response, error) {
 	p := url.Values{}
 	for k, v := range params {
 		p.Add(k, v)
 	}
+	// prefer communication with the master node, to avoid stale reads
+	URL := d.getMasterURL()
 
 	URL.Path = path
 	URL.RawQuery = p.Encode()
@@ -537,6 +571,7 @@ func (d *defaultClient) Do(URL *url.URL, path, method string, authorizer influx.
 // AuthedCheckRedirect tries to follow the Influx Enterprise pattern of
 // redirecting to the leader but preserving authentication headers.
 func (d *defaultClient) AuthedCheckRedirect(req *http.Request, via []*http.Request) error {
+	d.setMasterURL(req.URL)
 	if len(via) >= 10 {
 		return errors.New("too many redirects")
 	} else if len(via) == 0 {
@@ -558,7 +593,7 @@ func (m *MetaClient) Do(ctx context.Context, path, method string, authorizer inf
 
 	resps := make(chan (result))
 	go func() {
-		resp, err := m.client.Do(m.URL, path, method, authorizer, params, body)
+		resp, err := m.client.Do(path, method, authorizer, params, body)
 		resps <- result{resp, err}
 	}()
 
