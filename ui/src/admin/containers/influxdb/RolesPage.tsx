@@ -1,7 +1,7 @@
 import React from 'react'
 import {Component} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
-import {Source, SourceAuthenticationMethod} from 'src/types'
+import {Source} from 'src/types'
 import {InfluxDBPermissions, Permission, Role, User} from 'src/types/auth'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {
@@ -17,6 +17,7 @@ import {
 import {notifyRoleNameInvalid} from 'src/shared/copy/notifications'
 import RolesTable from 'src/admin/components/RolesTable'
 import AdminInfluxDBScopedPage from './AdminInfluxDBScopedPage'
+import {hasRoleManagement, isConnectedToLDAP} from './AdminInfluxDBTab'
 
 const isValidRole = role => {
   const minLen = 3
@@ -55,15 +56,6 @@ type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
 type Props = OwnProps & ConnectedProps & ReduxDispatchProps
 
 class RolesPage extends Component<Props> {
-  private get hasRoles(): boolean {
-    return !!this.props.source.links.roles
-  }
-
-  private get isLDAP(): boolean {
-    const {source} = this.props
-    return source.authentication === SourceAuthenticationMethod.LDAP
-  }
-
   private get allowed(): InfluxDBPermissions[] {
     const {permissions} = this.props
     const globalPermissions = permissions.find(p => p.scope === 'all')
@@ -104,11 +96,12 @@ class RolesPage extends Component<Props> {
   }
 
   public render() {
-    if (!this.hasRoles) {
+    const source = this.props.source
+    if (hasRoleManagement(source)) {
       return (
         <AdminInfluxDBScopedPage
           activeTab="roles"
-          source={this.props.source}
+          source={source}
           skipDataLoad={true}
         >
           <div className="container-fluid">
@@ -118,11 +111,11 @@ class RolesPage extends Component<Props> {
         </AdminInfluxDBScopedPage>
       )
     }
-    if (this.isLDAP) {
+    if (isConnectedToLDAP(source)) {
       return (
         <AdminInfluxDBScopedPage
           activeTab="roles"
-          source={this.props.source}
+          source={source}
           skipDataLoad={true}
         >
           <div className="container-fluid">
@@ -131,7 +124,7 @@ class RolesPage extends Component<Props> {
         </AdminInfluxDBScopedPage>
       )
     }
-    const {source, users, roles, filterRoles} = this.props
+    const {users, roles, filterRoles} = this.props
     return (
       <AdminInfluxDBScopedPage activeTab="roles" source={source}>
         <RolesTable

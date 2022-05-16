@@ -2,7 +2,7 @@ import React from 'react'
 import {Component} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
 import UsersTable from 'src/admin/components/UsersTable'
-import {Source, SourceAuthenticationMethod} from 'src/types'
+import {Source} from 'src/types'
 import {InfluxDBPermissions, Permission, Role, User} from 'src/types/auth'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {
@@ -18,6 +18,7 @@ import {
 } from 'src/admin/actions/influxdb'
 import {notifyDBUserNamePasswordInvalid} from 'src/shared/copy/notifications'
 import AdminInfluxDBScopedPage from './AdminInfluxDBScopedPage'
+import {hasRoleManagement, isConnectedToLDAP} from './AdminInfluxDBTab'
 
 const isValidUser = (user: User) => {
   const minLen = 3
@@ -56,15 +57,6 @@ type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
 type Props = OwnProps & ConnectedProps & ReduxDispatchProps
 
 class UsersPage extends Component<Props> {
-  private get hasRoles(): boolean {
-    return !!this.props.source.links.roles
-  }
-
-  private get isLDAP(): boolean {
-    const {source} = this.props
-    return source.authentication === SourceAuthenticationMethod.LDAP
-  }
-
   private get allowed(): InfluxDBPermissions[] {
     const {permissions} = this.props
     const globalPermissions = permissions.find(p => p.scope === 'all')
@@ -86,11 +78,12 @@ class UsersPage extends Component<Props> {
   }
 
   public render() {
-    if (this.isLDAP) {
+    const source = this.props.source
+    if (isConnectedToLDAP(source)) {
       return (
         <AdminInfluxDBScopedPage
           activeTab="users"
-          source={this.props.source}
+          source={source}
           skipDataLoad={true}
         >
           <div className="container-fluid">Users are managed via LDAP.</div>
@@ -98,7 +91,6 @@ class UsersPage extends Component<Props> {
       )
     }
     const {
-      source,
       users,
       roles,
       filterUsers,
@@ -114,7 +106,7 @@ class UsersPage extends Component<Props> {
         <UsersTable
           users={users}
           allRoles={roles}
-          hasRoles={this.hasRoles}
+          hasRoles={hasRoleManagement(source)}
           permissions={this.allowed}
           isEditing={users.some(u => u.isEditing)}
           onSave={this.handleSaveUser}
