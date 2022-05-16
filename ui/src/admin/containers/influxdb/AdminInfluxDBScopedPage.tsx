@@ -46,6 +46,10 @@ export class AdminInfluxDBScopedPage extends PureComponent<Props, State> {
     }
   }
   public async componentDidMount() {
+    await this.refresh()
+  }
+
+  private refresh = async () => {
     const {
       source,
       loadUsers,
@@ -92,7 +96,15 @@ export class AdminInfluxDBScopedPage extends PureComponent<Props, State> {
           <Page.Header.Left>
             <Page.Title title="InfluxDB Admin" />
           </Page.Header.Left>
-          <Page.Header.Right showSourceIndicator={true} />
+          <Page.Header.Right showSourceIndicator={true}>
+            {this.state.loading !== RemoteDataState.Loading && (
+              <span
+                className="icon refresh"
+                title="Refresh"
+                onClick={this.refresh}
+              />
+            )}
+          </Page.Header.Right>
         </Page.Header>
         <Page.Contents fullWidth={true}>{this.admin}</Page.Contents>
       </Page>
