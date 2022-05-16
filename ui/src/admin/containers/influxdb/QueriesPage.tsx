@@ -28,7 +28,7 @@ import moment from 'moment'
 import FormElementError from 'src/reusable_ui/components/form_layout/FormElementError'
 import {Source} from 'src/types'
 import {QueryStat} from 'src/types/influxAdmin'
-import AdminInfluxDBScopedPage from './AdminInfluxDBScopedPage'
+import AdminInfluxDBTab from './AdminInfluxDBTab'
 
 interface Props {
   source: Source
@@ -80,11 +80,7 @@ class QueriesPage extends Component<Props, State> {
     const {updateInterval, title, errors} = this.state
 
     return (
-      <AdminInfluxDBScopedPage
-        activeTab="queries"
-        source={source}
-        skipDataLoad={true}
-      >
+      <AdminInfluxDBTab activeTab="queries" source={source}>
         <div className="panel panel-solid">
           <div className="panel-heading">
             <h2 className="panel-title">{title}</h2>
@@ -128,7 +124,7 @@ class QueriesPage extends Component<Props, State> {
             ) : null}
           </div>
         </div>
-      </AdminInfluxDBScopedPage>
+      </AdminInfluxDBTab>
     )
   }
 

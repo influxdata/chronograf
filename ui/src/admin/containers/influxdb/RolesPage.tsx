@@ -17,8 +17,10 @@ import {
 } from 'src/admin/actions/influxdb'
 import {notifyRoleNameInvalid} from 'src/shared/copy/notifications'
 import RolesTable from 'src/admin/components/RolesTable'
-import AdminInfluxDBScopedPage from './AdminInfluxDBScopedPage'
-import {hasRoleManagement, isConnectedToLDAP} from './AdminInfluxDBTab'
+import AdminInfluxDBTab, {
+  hasRoleManagement,
+  isConnectedToLDAP,
+} from './AdminInfluxDBTab'
 
 const isValidRole = role => {
   const minLen = 3
@@ -100,34 +102,26 @@ class RolesPage extends Component<Props> {
     const source = this.props.source
     if (!hasRoleManagement(source)) {
       return (
-        <AdminInfluxDBScopedPage
-          activeTab="roles"
-          source={source}
-          skipDataLoad={true}
-        >
+        <AdminInfluxDBTab activeTab="roles" source={source}>
           <div className="container-fluid">
             Roles management is not available for the currently selected
             InfluxDB Connection.
           </div>
-        </AdminInfluxDBScopedPage>
+        </AdminInfluxDBTab>
       )
     }
     if (isConnectedToLDAP(source)) {
       return (
-        <AdminInfluxDBScopedPage
-          activeTab="roles"
-          source={source}
-          skipDataLoad={true}
-        >
+        <AdminInfluxDBTab activeTab="roles" source={source}>
           <div className="container-fluid">
             Users are managed via LDAP, roles management is not available.
           </div>
-        </AdminInfluxDBScopedPage>
+        </AdminInfluxDBTab>
       )
     }
     const {users, roles, filterRoles} = this.props
     return (
-      <AdminInfluxDBScopedPage activeTab="roles" source={source}>
+      <AdminInfluxDBTab activeTab="roles" source={source}>
         <RolesTable
           roles={roles}
           allUsers={users}
@@ -142,7 +136,7 @@ class RolesPage extends Component<Props> {
           onUpdateRoleUsers={this.handleUpdateRoleUsers}
           onUpdateRolePermissions={this.handleUpdateRolePermissions}
         />
-      </AdminInfluxDBScopedPage>
+      </AdminInfluxDBTab>
     )
   }
 }

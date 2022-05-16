@@ -18,8 +18,10 @@ import {
   filterUsers as filterUsersAction,
 } from 'src/admin/actions/influxdb'
 import {notifyDBUserNamePasswordInvalid} from 'src/shared/copy/notifications'
-import AdminInfluxDBScopedPage from './AdminInfluxDBScopedPage'
-import {hasRoleManagement, isConnectedToLDAP} from './AdminInfluxDBTab'
+import AdminInfluxDBTab, {
+  hasRoleManagement,
+  isConnectedToLDAP,
+} from './AdminInfluxDBTab'
 
 const isValidUser = (user: User) => {
   const minLen = 3
@@ -82,13 +84,9 @@ class UsersPage extends Component<Props> {
     const source = this.props.source
     if (isConnectedToLDAP(source)) {
       return (
-        <AdminInfluxDBScopedPage
-          activeTab="users"
-          source={source}
-          skipDataLoad={true}
-        >
+        <AdminInfluxDBTab activeTab="users" source={source}>
           <div className="container-fluid">Users are managed via LDAP.</div>
-        </AdminInfluxDBScopedPage>
+        </AdminInfluxDBTab>
       )
     }
     const {
@@ -103,7 +101,7 @@ class UsersPage extends Component<Props> {
       updateUserPassword,
     } = this.props
     return (
-      <AdminInfluxDBScopedPage activeTab="users" source={source}>
+      <AdminInfluxDBTab activeTab="users" source={source}>
         <UsersTable
           users={users}
           allRoles={roles}
@@ -120,7 +118,7 @@ class UsersPage extends Component<Props> {
           onUpdateRoles={updateUserRoles}
           onUpdatePassword={updateUserPassword}
         />
-      </AdminInfluxDBScopedPage>
+      </AdminInfluxDBTab>
     )
   }
 }

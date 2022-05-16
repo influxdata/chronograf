@@ -11,7 +11,6 @@ describe('AdminInfluxDBScopedPage', () => {
   it('should render the appropriate header text', () => {
     const props = {
       source,
-      activeTab: 'databases' as const,
       addUser: () => {},
       loadUsers: async () => {},
       loadRoles: async () => {},

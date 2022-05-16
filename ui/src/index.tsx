@@ -60,6 +60,7 @@ import {HEARTBEAT_INTERVAL} from 'src/shared/constants'
 import * as ErrorsModels from 'src/types/errors'
 import {setCustomAutoRefreshOptions} from './shared/components/dropdown_auto_refresh/autoRefreshOptions'
 import AdminChronografPage from './admin/containers/chronograf/AdminChronografPage'
+import AdminInfluxDBScopedPage from './admin/containers/influxdb/AdminInfluxDBScopedPage'
 import DatabaseManagerPage from './admin/containers/influxdb/DatabaseManagerPage'
 import UsersPage from './admin/containers/influxdb/UsersPage'
 import RolesPage from './admin/containers/influxdb/RolesPage'
@@ -228,12 +229,14 @@ class Root extends PureComponent<Record<string, never>, State> {
                   component={AdminChronografPage}
                 />
                 <Route
-                  path="admin-influxdb/databases"
-                  component={DatabaseManagerPage}
-                />
-                <Route path="admin-influxdb/users" component={UsersPage} />
-                <Route path="admin-influxdb/roles" component={RolesPage} />
-                <Route path="admin-influxdb/queries" component={QueriesPage} />
+                  path="admin-influxdb"
+                  component={AdminInfluxDBScopedPage}
+                >
+                  <Route path="databases" component={DatabaseManagerPage} />
+                  <Route path="users" component={UsersPage} />
+                  <Route path="roles" component={RolesPage} />
+                  <Route path="queries" component={QueriesPage} />
+                </Route>
                 <Route path="manage-sources" component={ManageSources} />
               </Route>
             </Route>
