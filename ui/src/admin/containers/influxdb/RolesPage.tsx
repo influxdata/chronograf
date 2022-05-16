@@ -97,7 +97,7 @@ class RolesPage extends Component<Props> {
 
   public render() {
     const source = this.props.source
-    if (hasRoleManagement(source)) {
+    if (!hasRoleManagement(source)) {
       return (
         <AdminInfluxDBScopedPage
           activeTab="roles"
