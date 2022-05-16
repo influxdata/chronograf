@@ -5,6 +5,7 @@ import {withRouter, InjectedRouter} from 'react-router'
 import SubSectionsTab from 'src/shared/components/SubSectionsTab'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {PageSection} from 'src/types/shared'
+import NotFound from './NotFound'
 
 interface Props {
   sections: PageSection[]
@@ -12,6 +13,7 @@ interface Props {
   sourceID: string
   router: InjectedRouter
   parentUrl: string
+  children?: ReactNode
 }
 
 @ErrorHandling
@@ -51,9 +53,9 @@ class SubSections extends Component<Props> {
   }
 
   private get activeSectionComponent(): ReactNode {
-    const {sections, activeSection} = this.props
-    const {component} = sections.find(section => section.url === activeSection)
-    return component
+    const {sections, activeSection, children} = this.props
+    const found = sections.find(section => section.url === activeSection)
+    return found?.component || children || <NotFound />
   }
 
   public handleTabClick = url => () => {
