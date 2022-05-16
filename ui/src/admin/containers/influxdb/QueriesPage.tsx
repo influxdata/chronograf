@@ -27,6 +27,7 @@ import moment from 'moment'
 import FormElementError from 'src/reusable_ui/components/form_layout/FormElementError'
 import {Source} from 'src/types'
 import {QueryStat} from 'src/types/influxAdmin'
+import AdminInfluxDBScopedPage from './AdminInfluxDBScopedPage'
 
 interface Props {
   source: Source
@@ -74,53 +75,59 @@ class QueriesPage extends Component<Props, State> {
   }
 
   render() {
-    const {queries, queriesSort, changeSort} = this.props
+    const {queries, queriesSort, changeSort, source} = this.props
     const {updateInterval, title, errors} = this.state
 
     return (
-      <div className="panel panel-solid">
-        <div className="panel-heading">
-          <h2 className="panel-title">{title}</h2>
-          <div style={{float: 'right', display: 'flex'}}>
+      <AdminInfluxDBScopedPage
+        activeTab="queries"
+        source={source}
+        skipDataLoad={true}
+      >
+        <div className="panel panel-solid">
+          <div className="panel-heading">
+            <h2 className="panel-title">{title}</h2>
+            <div style={{float: 'right', display: 'flex'}}>
+              {queries && queries.length ? (
+                <div style={{marginRight: '5px'}}>
+                  <Button
+                    customClass="csv-export"
+                    text="CSV"
+                    icon={IconFont.Download}
+                    status={ComponentStatus.Default}
+                    onClick={this.downloadCSV}
+                  />
+                </div>
+              ) : null}
+              <AutoRefreshDropdown
+                selected={updateInterval}
+                onChoose={this.changeRefreshInterval}
+                onManualRefresh={this.updateQueries}
+                showManualRefresh={true}
+              />
+            </div>
+          </div>
+          <div className="panel-body">
             {queries && queries.length ? (
-              <div style={{marginRight: '5px'}}>
-                <Button
-                  customClass="csv-export"
-                  text="CSV"
-                  icon={IconFont.Download}
-                  status={ComponentStatus.Default}
-                  onClick={this.downloadCSV}
-                />
+              <QueriesTable
+                queries={queries}
+                queriesSort={queriesSort}
+                changeSort={changeSort}
+                onKillQuery={this.handleKillQuery}
+              />
+            ) : null}
+            {errors.length ? (
+              <div style={{marginTop: '5px'}}>
+                {errors.map((e, i) => (
+                  <div key={`error${i}`}>
+                    <FormElementError message={e} />
+                  </div>
+                ))}
               </div>
             ) : null}
-            <AutoRefreshDropdown
-              selected={updateInterval}
-              onChoose={this.changeRefreshInterval}
-              onManualRefresh={this.updateQueries}
-              showManualRefresh={true}
-            />
           </div>
         </div>
-        <div className="panel-body">
-          {queries && queries.length ? (
-            <QueriesTable
-              queries={queries}
-              queriesSort={queriesSort}
-              changeSort={changeSort}
-              onKillQuery={this.handleKillQuery}
-            />
-          ) : null}
-          {errors.length ? (
-            <div style={{marginTop: '5px'}}>
-              {errors.map((e, i) => (
-                <div key={`error${i}`}>
-                  <FormElementError message={e} />
-                </div>
-              ))}
-            </div>
-          ) : null}
-        </div>
-      </div>
+      </AdminInfluxDBScopedPage>
     )
   }
 

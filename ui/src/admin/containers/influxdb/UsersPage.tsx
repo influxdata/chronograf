@@ -17,6 +17,7 @@ import {
   filterUsers as filterUsersAction,
 } from 'src/admin/actions/influxdb'
 import {notifyDBUserNamePasswordInvalid} from 'src/shared/copy/notifications'
+import AdminInfluxDBScopedPage from './AdminInfluxDBScopedPage'
 
 const isValidUser = (user: User) => {
   const minLen = 3
@@ -86,9 +87,18 @@ class UsersPage extends Component<Props> {
 
   public render() {
     if (this.isLDAP) {
-      return <div className="container-fluid">Users are managed via LDAP.</div>
+      return (
+        <AdminInfluxDBScopedPage
+          activeTab="users"
+          source={this.props.source}
+          skipDataLoad={true}
+        >
+          <div className="container-fluid">Users are managed via LDAP.</div>
+        </AdminInfluxDBScopedPage>
+      )
     }
     const {
+      source,
       users,
       roles,
       filterUsers,
@@ -100,22 +110,24 @@ class UsersPage extends Component<Props> {
       updateUserPassword,
     } = this.props
     return (
-      <UsersTable
-        users={users}
-        allRoles={roles}
-        hasRoles={this.hasRoles}
-        permissions={this.allowed}
-        isEditing={users.some(u => u.isEditing)}
-        onSave={this.handleSaveUser}
-        onCancel={removeUser}
-        onClickCreate={this.handleClickCreate}
-        onEdit={editUser}
-        onDelete={deleteUser}
-        onFilter={filterUsers}
-        onUpdatePermissions={updateUserPermissions}
-        onUpdateRoles={updateUserRoles}
-        onUpdatePassword={updateUserPassword}
-      />
+      <AdminInfluxDBScopedPage activeTab="users" source={source}>
+        <UsersTable
+          users={users}
+          allRoles={roles}
+          hasRoles={this.hasRoles}
+          permissions={this.allowed}
+          isEditing={users.some(u => u.isEditing)}
+          onSave={this.handleSaveUser}
+          onCancel={removeUser}
+          onClickCreate={this.handleClickCreate}
+          onEdit={editUser}
+          onDelete={deleteUser}
+          onFilter={filterUsers}
+          onUpdatePermissions={updateUserPermissions}
+          onUpdateRoles={updateUserRoles}
+          onUpdatePassword={updateUserPassword}
+        />
+      </AdminInfluxDBScopedPage>
     )
   }
 }

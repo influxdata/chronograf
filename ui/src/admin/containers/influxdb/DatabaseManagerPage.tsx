@@ -16,12 +16,10 @@ import {
 } from 'src/shared/copy/notifications'
 import {Source} from 'src/types'
 import {Database, RetentionPolicy} from 'src/types/influxAdmin'
+import AdminInfluxDBScopedPage from './AdminInfluxDBScopedPage'
 
 interface Props {
   source: Source
-  params: {
-    tab: string
-  }
   databases: Database[]
   actions: {
     deleteRetentionPolicyAsync: (
@@ -137,25 +135,27 @@ class DatabaseManagerPage extends Component<Props> {
   render() {
     const {source, databases, actions} = this.props
     return (
-      <DatabaseManager
-        databases={databases}
-        isRFDisplayed={!!source.metaUrl}
-        addDatabase={actions.addDatabase}
-        onEditDatabase={this.handleEditDatabase}
-        onCancelDatabase={actions.removeDatabase}
-        onConfirmDatabase={this.handleCreateDatabase}
-        onDeleteDatabase={actions.deleteDatabaseAsync}
-        onKeyDownDatabase={this.handleKeyDownDatabase}
-        onAddRetentionPolicy={this.handleAddRetentionPolicy}
-        onRemoveDeleteCode={actions.removeDatabaseDeleteCode}
-        onStartDeleteDatabase={this.handleStartDeleteDatabase}
-        isAddDBDisabled={!!databases.some(db => db.isEditing)}
-        onRemoveRetentionPolicy={actions.removeRetentionPolicy}
-        onDeleteRetentionPolicy={this.handleDeleteRetentionPolicy}
-        onDatabaseDeleteConfirm={this.handleDatabaseDeleteConfirm}
-        onCreateRetentionPolicy={actions.createRetentionPolicyAsync}
-        onUpdateRetentionPolicy={actions.updateRetentionPolicyAsync}
-      />
+      <AdminInfluxDBScopedPage activeTab="databases" source={source}>
+        <DatabaseManager
+          databases={databases}
+          isRFDisplayed={!!source.metaUrl}
+          addDatabase={actions.addDatabase}
+          onEditDatabase={this.handleEditDatabase}
+          onCancelDatabase={actions.removeDatabase}
+          onConfirmDatabase={this.handleCreateDatabase}
+          onDeleteDatabase={actions.deleteDatabaseAsync}
+          onKeyDownDatabase={this.handleKeyDownDatabase}
+          onAddRetentionPolicy={this.handleAddRetentionPolicy}
+          onRemoveDeleteCode={actions.removeDatabaseDeleteCode}
+          onStartDeleteDatabase={this.handleStartDeleteDatabase}
+          isAddDBDisabled={!!databases.some(db => db.isEditing)}
+          onRemoveRetentionPolicy={actions.removeRetentionPolicy}
+          onDeleteRetentionPolicy={this.handleDeleteRetentionPolicy}
+          onDatabaseDeleteConfirm={this.handleDatabaseDeleteConfirm}
+          onCreateRetentionPolicy={actions.createRetentionPolicyAsync}
+          onUpdateRetentionPolicy={actions.updateRetentionPolicyAsync}
+        />
+      </AdminInfluxDBScopedPage>
     )
   }
 }

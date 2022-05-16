@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react'
+import React, {PureComponent, ReactElement} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
 import {
   loadUsersAsync,
@@ -8,17 +8,12 @@ import {
 } from 'src/admin/actions/influxdb'
 
 import PageSpinner from 'src/shared/components/PageSpinner'
-import QueriesPage from './QueriesPage'
-import DatabaseManagerPage from './DatabaseManagerPage'
 import {Page} from 'src/reusable_ui'
-import SubSections from 'src/shared/components/SubSections'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {Source, RemoteDataState, SourceAuthenticationMethod} from 'src/types'
-
-import UsersPage from './UsersPage'
-import RolesPage from './RolesPage'
+import AdminInfluxDBTab from './AdminInfluxDBTab'
 
 const mapDispatchToProps = {
   loadUsers: loadUsersAsync,
@@ -30,9 +25,9 @@ const mapDispatchToProps = {
 
 interface OwnProps {
   source: Source
-  params: {
-    tab: string
-  }
+  activeTab: 'databases' | 'users' | 'roles' | 'queries'
+  children: ReactElement<any>
+  skipDataLoad?: boolean
 }
 
 type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
@@ -45,7 +40,7 @@ interface State {
 }
 
 @ErrorHandling
-export class AdminInfluxDBPage extends PureComponent<Props, State> {
+export class AdminInfluxDBScopedPage extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -55,33 +50,34 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
   public async componentDidMount() {
     const {
       source,
+      skipDataLoad,
       loadUsers,
       loadRoles,
       loadPermissions,
       loadDBsAndRPs,
     } = this.props
-    if (!source.version || source.version.startsWith('2')) {
+    if (!source || !source.version || source.version.startsWith('2')) {
       // administration is not possible for v2 type
       return
     }
 
     this.setState({loading: RemoteDataState.Loading})
 
-    if (source.authentication === SourceAuthenticationMethod.LDAP) {
-      return this.setState({loading: RemoteDataState.Done})
-    }
-
     let errorMessage: string
     try {
-      errorMessage = 'Failed to load users.'
-      await loadUsers(source.links.users)
-      errorMessage = 'Failed to load permissions.'
-      await loadPermissions(source.links.permissions)
-      errorMessage = 'Failed to load databases.'
-      await loadDBsAndRPs(source.links.databases)
-      if (source.links.roles) {
-        errorMessage = 'Failed to load roles.'
-        await loadRoles(source.links.roles)
+      if (!skipDataLoad) {
+        errorMessage = 'Failed to load databases.'
+        await loadDBsAndRPs(source.links.databases)
+        if (source.authentication !== SourceAuthenticationMethod.LDAP) {
+          errorMessage = 'Failed to load users.'
+          await loadUsers(source.links.users)
+          errorMessage = 'Failed to load permissions.'
+          await loadPermissions(source.links.permissions)
+          if (source.links.roles) {
+            errorMessage = 'Failed to load roles.'
+            await loadRoles(source.links.roles)
+          }
+        }
       }
       this.setState({loading: RemoteDataState.Done})
     } catch (error) {
@@ -109,7 +105,7 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
   }
 
   private get admin(): JSX.Element {
-    const {source, params} = this.props
+    const {source, activeTab, children} = this.props
     const {loading, error, errorMessage} = this.state
     if (loading === RemoteDataState.Loading) {
       return <PageSpinner />
@@ -126,7 +122,7 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
       )
     }
 
-    if (!source.version || source.version.startsWith('2')) {
+    if (!source || !source.version || source.version.startsWith('2')) {
       return (
         <div className="container-fluid">
           These functions are not available for the currently selected InfluxDB
@@ -136,54 +132,12 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
     }
     return (
       <div className="container-fluid">
-        <SubSections
-          parentUrl="admin-influxdb"
-          sourceID={source.id}
-          activeSection={params.tab}
-          sections={this.adminSubSections}
-        />
+        <AdminInfluxDBTab source={source} activeTab={activeTab}>
+          {children}
+        </AdminInfluxDBTab>
       </div>
     )
   }
-
-  private get hasRoles(): boolean {
-    return !!this.props.source.links.roles
-  }
-
-  private get isLDAP(): boolean {
-    const {source} = this.props
-    return source.authentication === SourceAuthenticationMethod.LDAP
-  }
-
-  private get adminSubSections() {
-    const {source} = this.props
-    return [
-      {
-        url: 'databases',
-        name: 'Databases',
-        enabled: true,
-        component: <DatabaseManagerPage source={source} />,
-      },
-      {
-        url: 'users',
-        name: 'Users',
-        enabled: !this.isLDAP,
-        component: <UsersPage source={source} />,
-      },
-      {
-        url: 'roles',
-        name: 'Roles',
-        enabled: this.hasRoles && !this.isLDAP,
-        component: <RolesPage source={source} />,
-      },
-      {
-        url: 'queries',
-        name: 'Queries',
-        enabled: true,
-        component: <QueriesPage source={source} />,
-      },
-    ]
-  }
 }
 
-export default connect(null, mapDispatchToProps)(AdminInfluxDBPage)
+export default connect(null, mapDispatchToProps)(AdminInfluxDBScopedPage)

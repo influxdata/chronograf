@@ -16,6 +16,7 @@ import {
 } from 'src/admin/actions/influxdb'
 import {notifyRoleNameInvalid} from 'src/shared/copy/notifications'
 import RolesTable from 'src/admin/components/RolesTable'
+import AdminInfluxDBScopedPage from './AdminInfluxDBScopedPage'
 
 const isValidRole = role => {
   const minLen = 3
@@ -105,35 +106,49 @@ class RolesPage extends Component<Props> {
   public render() {
     if (!this.hasRoles) {
       return (
-        <div className="container-fluid">
-          Roles managemebnt is not available for the currently selected InfluxDB
-          Connection.
-        </div>
+        <AdminInfluxDBScopedPage
+          activeTab="roles"
+          source={this.props.source}
+          skipDataLoad={true}
+        >
+          <div className="container-fluid">
+            Roles management is not available for the currently selected
+            InfluxDB Connection.
+          </div>
+        </AdminInfluxDBScopedPage>
       )
     }
     if (this.isLDAP) {
       return (
-        <div className="container-fluid">
-          Users are managed via LDAP, roles management not available.
-        </div>
+        <AdminInfluxDBScopedPage
+          activeTab="roles"
+          source={this.props.source}
+          skipDataLoad={true}
+        >
+          <div className="container-fluid">
+            Users are managed via LDAP, roles management is not available.
+          </div>
+        </AdminInfluxDBScopedPage>
       )
     }
-    const {users, roles, filterRoles} = this.props
+    const {source, users, roles, filterRoles} = this.props
     return (
-      <RolesTable
-        roles={roles}
-        allUsers={users}
-        permissions={this.allowed}
-        isEditing={roles.some(r => r.isEditing)}
-        onClickCreate={this.handleClickCreate}
-        onEdit={this.handleEditRole}
-        onSave={this.handleSaveRole}
-        onCancel={this.handleCancelEditRole}
-        onDelete={this.handleDeleteRole}
-        onFilter={filterRoles}
-        onUpdateRoleUsers={this.handleUpdateRoleUsers}
-        onUpdateRolePermissions={this.handleUpdateRolePermissions}
-      />
+      <AdminInfluxDBScopedPage activeTab="roles" source={source}>
+        <RolesTable
+          roles={roles}
+          allUsers={users}
+          permissions={this.allowed}
+          isEditing={roles.some(r => r.isEditing)}
+          onClickCreate={this.handleClickCreate}
+          onEdit={this.handleEditRole}
+          onSave={this.handleSaveRole}
+          onCancel={this.handleCancelEditRole}
+          onDelete={this.handleDeleteRole}
+          onFilter={filterRoles}
+          onUpdateRoleUsers={this.handleUpdateRoleUsers}
+          onUpdateRolePermissions={this.handleUpdateRolePermissions}
+        />
+      </AdminInfluxDBScopedPage>
     )
   }
 }

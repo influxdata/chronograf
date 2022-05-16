@@ -8,11 +8,17 @@ interface Props {
   activeTab: 'databases' | 'users' | 'roles' | 'queries'
   children: ReactNode
 }
+export function hasRoleManagement(source: Source) {
+  return !!source?.links?.roles
+}
+export function isConnectedToLDAP(source: Source) {
+  return source.authentication === SourceAuthenticationMethod.LDAP
+}
 
-const AdminInfluxDBScopedPage = ({source, activeTab, children}: Props) => {
+const AdminInfluxDBTab = ({source, activeTab, children}: Props) => {
   const sections = useMemo(() => {
-    const hasRoles = !!source?.links?.roles
-    const isLDAP = source.authentication === SourceAuthenticationMethod.LDAP
+    const hasRoles = hasRoleManagement(source)
+    const isLDAP = isConnectedToLDAP(source)
     return [
       {
         url: 'databases',
@@ -37,16 +43,14 @@ const AdminInfluxDBScopedPage = ({source, activeTab, children}: Props) => {
     ]
   }, [source])
   return (
-    <div className="container-fluid">
-      <SubSections
-        parentUrl="admin-influxdb"
-        sourceID={source.id}
-        activeSection={activeTab}
-        sections={sections}
-      >
-        {children}
-      </SubSections>
-    </div>
+    <SubSections
+      parentUrl="admin-influxdb"
+      sourceID={source.id}
+      activeSection={activeTab}
+      sections={sections}
+    >
+      {children}
+    </SubSections>
   )
 }
-export default AdminInfluxDBScopedPage
+export default AdminInfluxDBTab

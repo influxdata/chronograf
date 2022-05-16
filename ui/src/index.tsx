@@ -37,7 +37,6 @@ import {
   TickscriptPage,
   TickscriptsPage,
 } from 'src/kapacitor'
-import {AdminChronografPage, AdminInfluxDBPage} from 'src/admin'
 import {ManageSources, OnboardingWizard} from 'src/sources'
 import LandingPage from './auth/LandingPage'
 
@@ -60,6 +59,11 @@ import {HEARTBEAT_INTERVAL} from 'src/shared/constants'
 
 import * as ErrorsModels from 'src/types/errors'
 import {setCustomAutoRefreshOptions} from './shared/components/dropdown_auto_refresh/autoRefreshOptions'
+import AdminChronografPage from './admin/containers/chronograf/AdminChronografPage'
+import DatabaseManagerPage from './admin/containers/influxdb/DatabaseManagerPage'
+import UsersPage from './admin/containers/influxdb/UsersPage'
+import RolesPage from './admin/containers/influxdb/RolesPage'
+import QueriesPage from './admin/containers/influxdb/QueriesPage'
 
 const errorsQueue = []
 
@@ -224,9 +228,12 @@ class Root extends PureComponent<Record<string, never>, State> {
                   component={AdminChronografPage}
                 />
                 <Route
-                  path="admin-influxdb/:tab"
-                  component={AdminInfluxDBPage}
+                  path="admin-influxdb/databases"
+                  component={DatabaseManagerPage}
                 />
+                <Route path="admin-influxdb/users" component={UsersPage} />
+                <Route path="admin-influxdb/roles" component={RolesPage} />
+                <Route path="admin-influxdb/queries" component={QueriesPage} />
                 <Route path="manage-sources" component={ManageSources} />
               </Route>
             </Route>
