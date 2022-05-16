@@ -1,4 +1,4 @@
-import React, {ReactElement, Component} from 'react'
+import React, {ReactElement, Component, ComponentType} from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import {withRouter, InjectedRouter} from 'react-router'
@@ -51,7 +51,19 @@ interface Props {
   notify: (message: Notification | NotificationFunc) => void
 }
 
-export const SourceContext = React.createContext(undefined)
+export const SourceContext = React.createContext<Source>(undefined)
+export interface WithSourceProps {
+  source: Source
+}
+export function withSource<P>(
+  Wrapped: ComponentType<P & WithSourceProps>
+): ComponentType<P> {
+  return (props: P) => (
+    <SourceContext.Consumer>
+      {(source: Source) => <Wrapped {...props} source={source} />}
+    </SourceContext.Consumer>
+  )
+}
 
 // Acts as a 'router middleware'. The main `App` component is responsible for
 // getting the list of data sources, but not every page requires them to function.
@@ -213,8 +225,6 @@ export class CheckSources extends Component<Props, State> {
     if (isFetching || !source || (isUsingAuth && !currentOrganization)) {
       return <PageSpinner />
     }
-
-    // TODO: guard against invalid resource access
 
     return (
       <SourceContext.Provider value={source}>
