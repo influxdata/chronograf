@@ -1,12 +1,13 @@
 import React from 'react'
 import {shallow} from 'enzyme'
 
-import {AdminInfluxDBPage} from 'src/admin/containers/AdminInfluxDBPage'
+import {AdminInfluxDBScopedPage} from 'src/admin/containers/influxdb/AdminInfluxDBScopedPage'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import Title from 'src/reusable_ui/components/page_layout/PageHeaderTitle'
 import {source} from 'test/resources'
+import {notify as notifyActionCreator} from 'src/shared/actions/notifications'
 
-describe('AdminInfluxDBPage', () => {
+describe('AdminInfluxDBScopedPage', () => {
   it('should render the appropriate header text', () => {
     const props = {
       source,
@@ -14,30 +15,16 @@ describe('AdminInfluxDBPage', () => {
       loadUsers: async () => {},
       loadRoles: async () => {},
       loadPermissions: async () => {},
-      notify: () => {},
+      loadDBsAndRPs: async () => {},
+      notify: notifyActionCreator,
       params: {tab: ''},
       users: [],
       roles: [],
       permissions: [],
-      addRole: () => {},
-      removeUser: () => {},
-      removeRole: () => {},
-      editUser: () => {},
-      editRole: () => {},
-      createUser: () => {},
-      createRole: () => {},
-      deleteRole: () => {},
-      deleteUser: () => {},
-      filterRoles: () => {},
-      filterUsers: () => {},
-      updateRoleUsers: () => {},
-      updateRolePermissions: () => {},
-      updateUserPermissions: () => {},
-      updateUserRoles: () => {},
-      updateUserPassword: () => {},
+      children: null,
     }
 
-    const wrapper = shallow(<AdminInfluxDBPage {...props} />)
+    const wrapper = shallow(<AdminInfluxDBScopedPage {...props} />)
 
     const pageTitle = wrapper
       .find(PageHeader)

@@ -1,4 +1,5 @@
 import React, {FC, useEffect, useState} from 'react'
+import {withSource} from 'src/CheckSources'
 import FluxScriptEditor from 'src/flux/components/FluxScriptEditor'
 import {
   Button,
@@ -315,4 +316,4 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
   )
 }
 
-export default FluxTaskPage
+export default withSource(FluxTaskPage)

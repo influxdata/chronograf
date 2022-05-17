@@ -1,5 +1,6 @@
 import React, {PureComponent, ChangeEvent} from 'react'
 import {connect} from 'react-redux'
+import {withSource} from 'src/CheckSources'
 import {bindActionCreators} from 'redux'
 import uuid from 'uuid'
 
@@ -451,4 +452,6 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(TickscriptPage)
+export default withSource(
+  connect(mapStateToProps, mapDispatchToProps)(TickscriptPage)
+)

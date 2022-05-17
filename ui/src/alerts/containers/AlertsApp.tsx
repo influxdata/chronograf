@@ -1,4 +1,5 @@
 import React, {PureComponent} from 'react'
+import {withSource} from 'src/CheckSources'
 
 import PageSpinner from 'src/shared/components/PageSpinner'
 import AlertsTable from 'src/alerts/components/AlertsTable'
@@ -218,4 +219,4 @@ class AlertsApp extends PureComponent<Props, State> {
   }
 }
 
-export default AlertsApp
+export default withSource(AlertsApp)

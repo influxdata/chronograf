@@ -1,5 +1,6 @@
 import React, {PureComponent} from 'react'
 import {withRouter, InjectedRouter, WithRouterProps} from 'react-router'
+import {withSource} from 'src/CheckSources'
 import {connect} from 'react-redux'
 import download from 'src/external/download'
 import _ from 'lodash'
@@ -233,7 +234,6 @@ const mapDispatchToProps = {
   retainDashRefresh: retainDashRefreshAction,
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withRouter(DashboardsPage))
+export default withSource(
+  connect(mapStateToProps, mapDispatchToProps)(withRouter(DashboardsPage))
+)

@@ -1,5 +1,6 @@
 import React, {PureComponent} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
+import {withSource} from 'src/CheckSources'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import * as sourcesActions from 'src/shared/actions/sources'
@@ -157,4 +158,4 @@ const mdtp = {
   deleteKapacitor: sourcesActions.deleteKapacitorAsync,
 }
 
-export default connect(mstp, mdtp)(ManageSources)
+export default withSource(connect(mstp, mdtp)(ManageSources))

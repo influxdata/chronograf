@@ -1,17 +1,17 @@
 import React, {Component} from 'react'
-import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
+import {withSource} from 'src/CheckSources'
 
 import flatten from 'lodash/flatten'
 import uniqBy from 'lodash/uniqBy'
 
-import {showDatabases, showQueries} from 'shared/apis/metaQuery'
+import {showDatabases, showQueries} from 'src/shared/apis/metaQuery'
 
 import QueriesTable from 'src/admin/components/QueriesTable'
-import showDatabasesParser from 'shared/parsing/showDatabases'
-import showQueriesParser from 'shared/parsing/showQueries'
-import {notifyQueriesError} from 'shared/copy/notifications'
+import showDatabasesParser from 'src/shared/parsing/showDatabases'
+import showQueriesParser from 'src/shared/parsing/showQueries'
+import {notifyQueriesError} from 'src/shared/copy/notifications'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import AutoRefreshDropdown from 'src/shared/components/dropdown_auto_refresh/AutoRefreshDropdown'
 
@@ -22,17 +22,41 @@ import {
   killQueryAsync,
 } from 'src/admin/actions/influxdb'
 
-import {notify as notifyAction} from 'shared/actions/notifications'
+import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {Button, IconFont, ComponentStatus} from 'src/reusable_ui'
 import moment from 'moment'
 import FormElementError from 'src/reusable_ui/components/form_layout/FormElementError'
+import {Source} from 'src/types'
+import {QueryStat} from 'src/types/influxAdmin'
+import AdminInfluxDBTab from './AdminInfluxDBTab'
 
-class QueriesPage extends Component {
-  constructor(props) {
+interface Props {
+  source: Source
+  queriesSort: string
+  queryIDToKill?: string
+  queries: QueryStat[]
+
+  loadQueries: (queries: QueryStat[]) => void
+  changeSort: (sort: string) => void
+  killQuery: (proxyURL: string, query: QueryStat) => Promise<void>
+  setQueryToKill: (queryIDToKill: number) => void
+  notify: typeof notifyAction
+}
+
+interface State {
+  updateInterval: number
+  errors: any[]
+  title: string
+}
+
+class QueriesPage extends Component<Props, State> {
+  private intervalID: ReturnType<typeof setInterval>
+  constructor(props: Props) {
     super(props)
     this.state = {
       updateInterval: 5000,
       errors: [],
+      title: '',
     }
   }
   componentDidMount() {
@@ -52,53 +76,55 @@ class QueriesPage extends Component {
   }
 
   render() {
-    const {queries, queriesSort, changeSort} = this.props
+    const {queries, queriesSort, changeSort, source} = this.props
     const {updateInterval, title, errors} = this.state
 
     return (
-      <div className="panel panel-solid">
-        <div className="panel-heading">
-          <h2 className="panel-title">{title}</h2>
-          <div style={{float: 'right', display: 'flex'}}>
+      <AdminInfluxDBTab activeTab="queries" source={source}>
+        <div className="panel panel-solid">
+          <div className="panel-heading">
+            <h2 className="panel-title">{title}</h2>
+            <div style={{float: 'right', display: 'flex'}}>
+              {queries && queries.length ? (
+                <div style={{marginRight: '5px'}}>
+                  <Button
+                    customClass="csv-export"
+                    text="CSV"
+                    icon={IconFont.Download}
+                    status={ComponentStatus.Default}
+                    onClick={this.downloadCSV}
+                  />
+                </div>
+              ) : null}
+              <AutoRefreshDropdown
+                selected={updateInterval}
+                onChoose={this.changeRefreshInterval}
+                onManualRefresh={this.updateQueries}
+                showManualRefresh={true}
+              />
+            </div>
+          </div>
+          <div className="panel-body">
             {queries && queries.length ? (
-              <div style={{marginRight: '5px'}}>
-                <Button
-                  customClass="csv-export"
-                  text="CSV"
-                  icon={IconFont.Download}
-                  status={ComponentStatus.Default}
-                  onClick={this.downloadCSV}
-                />
+              <QueriesTable
+                queries={queries}
+                queriesSort={queriesSort}
+                changeSort={changeSort}
+                onKillQuery={this.handleKillQuery}
+              />
+            ) : null}
+            {errors.length ? (
+              <div style={{marginTop: '5px'}}>
+                {errors.map((e, i) => (
+                  <div key={`error${i}`}>
+                    <FormElementError message={e} />
+                  </div>
+                ))}
               </div>
             ) : null}
-            <AutoRefreshDropdown
-              selected={updateInterval}
-              onChoose={this.changeRefreshInterval}
-              onManualRefresh={this.updateQueries}
-              showManualRefresh={true}
-            />
           </div>
         </div>
-        <div className="panel-body">
-          {queries && queries.length ? (
-            <QueriesTable
-              queries={queries}
-              queriesSort={queriesSort}
-              changeSort={changeSort}
-              onKillQuery={this.handleKillQuery}
-            />
-          ) : null}
-          {errors.length ? (
-            <div style={{marginTop: '5px'}}>
-              {errors.map((e, i) => (
-                <div key={`error${i}`}>
-                  <FormElementError message={e} />
-                </div>
-              ))}
-            </div>
-          ) : null}
-        </div>
-      </div>
+      </AdminInfluxDBTab>
     )
   }
 
@@ -126,7 +152,7 @@ class QueriesPage extends Component {
         return Promise.allSettled(fetches).then(results => {
           const allQueries = []
           results.forEach((settledResponse, i) => {
-            if (!settledResponse.value) {
+            if (settledResponse.status !== 'fulfilled') {
               const msg = `Unable to show queries on '${databases[i]}': ${settledResponse.reason}`
               dbErrors.push(msg)
               console.error(
@@ -174,7 +200,7 @@ class QueriesPage extends Component {
   }
 
   downloadCSV = () => {
-    const queries = this.props.queries || {}
+    const queries = this.props.queries || []
     const csv = queries.reduce((acc, val) => {
       const db = val.database.replace(/"/g, '""')
       const query = val.query.replace(/"/g, '""')
@@ -195,24 +221,6 @@ class QueriesPage extends Component {
   }
 }
 
-const {arrayOf, func, string, shape} = PropTypes
-
-QueriesPage.propTypes = {
-  source: shape({
-    links: shape({
-      proxy: string,
-    }),
-  }),
-  queries: arrayOf(shape()),
-  queriesSort: string,
-  loadQueries: func,
-  queryIDToKill: string,
-  setQueryToKill: func,
-  changeSort: func,
-  killQuery: func,
-  notify: func.isRequired,
-}
-
 const mapStateToProps = ({
   adminInfluxDB: {queries, queriesSort, queryIDToKill},
 }) => ({
@@ -229,7 +237,6 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ErrorHandling(QueriesPage))
+export default withSource(
+  connect(mapStateToProps, mapDispatchToProps)(ErrorHandling(QueriesPage))
+)
