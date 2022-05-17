@@ -1,34 +1,55 @@
 import React, {Component, ReactNode} from 'react'
 import uuid from 'uuid'
-import {withRouter, InjectedRouter} from 'react-router'
+import {withRouter, WithRouterProps} from 'react-router'
 
 import SubSectionsTab from 'src/shared/components/SubSectionsTab'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {PageSection} from 'src/types/shared'
 import NotFound from './NotFound'
 
-interface Props {
+interface ClassNames {
+  top: string
+  nav: string
+  tabs: string
+  content: string
+}
+
+const TOP: ClassNames = {
+  top: 'subsection',
+  nav: 'subsection--nav',
+  tabs: 'subsection__tabs subsection__tabs--row',
+  content: 'subsection--content',
+}
+
+const LEFT: ClassNames = {
+  top: 'row subsection',
+  nav: 'col-md-2 subsection--nav',
+  tabs: 'subsection__tabs',
+  content: 'col-md-10 subsection--content',
+}
+interface Props extends WithRouterProps {
   sections: PageSection[]
   activeSection: string
   sourceID: string
-  router: InjectedRouter
   parentUrl: string
   children?: ReactNode
+  position?: 'left' | 'top'
 }
 
 @ErrorHandling
 class SubSections extends Component<Props> {
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
   }
 
   public render() {
-    const {sections, activeSection} = this.props
+    const {sections, activeSection, position} = this.props
+    const classes = position === 'top' ? TOP : LEFT
 
     return (
-      <div className="row subsection">
-        <div className="col-md-2 subsection--nav" data-test="subsectionNav">
-          <div className="subsection--tabs">
+      <div className={classes.top}>
+        <div className={classes.nav} data-test="subsectionNav">
+          <div className={classes.tabs}>
             {sections.map(
               section =>
                 section.enabled && (
@@ -42,10 +63,7 @@ class SubSections extends Component<Props> {
             )}
           </div>
         </div>
-        <div
-          className="col-md-10 subsection--content"
-          data-test="subsectionContent"
-        >
+        <div className={classes.content} data-test="subsectionContent">
           {this.activeSectionComponent}
         </div>
       </div>

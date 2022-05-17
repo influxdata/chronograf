@@ -1,4 +1,4 @@
-import React, {ReactNode} from 'react'
+import React from 'react'
 import {useMemo} from 'react'
 import SubSections from 'src/shared/components/SubSections'
 import {Source, SourceAuthenticationMethod} from 'src/types'
@@ -6,7 +6,7 @@ import {Source, SourceAuthenticationMethod} from 'src/types'
 interface Props {
   source: Source
   activeTab: 'databases' | 'users' | 'roles' | 'queries'
-  children: ReactNode
+  children: JSX.Element
 }
 export function hasRoleManagement(source: Source) {
   return !!source?.links?.roles
@@ -48,6 +48,7 @@ const AdminInfluxDBTab = ({source, activeTab, children}: Props) => {
       sourceID={source.id}
       activeSection={activeTab}
       sections={sections}
+      position="top"
     >
       {children}
     </SubSections>
