@@ -92,24 +92,22 @@ export class AdminInfluxDBScopedPage extends PureComponent<Props, State> {
   public render() {
     return (
       <Page>
-        <div className="deceo--page">
-          <div className="deceo">
-            <Page.Header fullWidth={true}>
-              <Page.Header.Left>
-                <Page.Title title="InfluxDB Admin" />
-              </Page.Header.Left>
-              <Page.Header.Right showSourceIndicator={true}>
-                {this.state.loading !== RemoteDataState.Loading && (
-                  <span
-                    className="icon refresh"
-                    title="Refresh"
-                    onClick={this.refresh}
-                  />
-                )}
-              </Page.Header.Right>
-            </Page.Header>
-            <div style={{height: 'calc(100% - 60px)'}}>{this.admin}</div>
-          </div>
+        <div className="deceo">
+          <Page.Header fullWidth={true}>
+            <Page.Header.Left>
+              <Page.Title title="InfluxDB Admin" />
+            </Page.Header.Left>
+            <Page.Header.Right showSourceIndicator={true}>
+              {this.state.loading !== RemoteDataState.Loading && (
+                <span
+                  className="icon refresh"
+                  title="Refresh"
+                  onClick={this.refresh}
+                />
+              )}
+            </Page.Header.Right>
+          </Page.Header>
+          <div style={{height: 'calc(100% - 60px)'}}>{this.admin}</div>
         </div>
       </Page>
     )

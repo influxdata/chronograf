@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import RoleRow from 'src/admin/components/RoleRow'
 import EmptyRow from 'src/admin/components/EmptyRow'
 import FilterBar from 'src/admin/components/FilterBar'
+import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
 const RolesTable = ({
   roles,
@@ -18,7 +19,7 @@ const RolesTable = ({
   onUpdateRoleUsers,
   onUpdateRolePermissions,
 }) => (
-  <div className="panel panel-solid">
+  <div className="panel panel-solid influxdb-admin">
     <FilterBar
       type="roles"
       onFilter={onFilter}
@@ -26,40 +27,42 @@ const RolesTable = ({
       onClickCreate={onClickCreate}
     />
     <div className="panel-body">
-      <table className="table v-center admin-table table-highlight">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th className="admin-table--left-offset">Permissions</th>
-            <th className="admin-table--left-offset">Users</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          {roles.length ? (
-            roles
-              .filter(r => !r.hidden)
-              .map(role => (
-                <RoleRow
-                  key={role.links.self}
-                  allUsers={allUsers}
-                  allPermissions={permissions}
-                  role={role}
-                  onEdit={onEdit}
-                  onSave={onSave}
-                  onCancel={onCancel}
-                  onDelete={onDelete}
-                  onUpdateRoleUsers={onUpdateRoleUsers}
-                  onUpdateRolePermissions={onUpdateRolePermissions}
-                  isEditing={role.isEditing}
-                  isNew={role.isNew}
-                />
-              ))
-          ) : (
-            <EmptyRow tableName={'Roles'} />
-          )}
-        </tbody>
-      </table>
+      <FancyScrollbar>
+        <table className="table v-center admin-table table-highlight">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th className="admin-table--left-offset">Permissions</th>
+              <th className="admin-table--left-offset">Users</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {roles.length ? (
+              roles
+                .filter(r => !r.hidden)
+                .map(role => (
+                  <RoleRow
+                    key={role.links.self}
+                    allUsers={allUsers}
+                    allPermissions={permissions}
+                    role={role}
+                    onEdit={onEdit}
+                    onSave={onSave}
+                    onCancel={onCancel}
+                    onDelete={onDelete}
+                    onUpdateRoleUsers={onUpdateRoleUsers}
+                    onUpdateRolePermissions={onUpdateRolePermissions}
+                    isEditing={role.isEditing}
+                    isNew={role.isNew}
+                  />
+                ))
+            ) : (
+              <EmptyRow tableName={'Roles'} />
+            )}
+          </tbody>
+        </table>
+      </FancyScrollbar>
     </div>
   </div>
 )

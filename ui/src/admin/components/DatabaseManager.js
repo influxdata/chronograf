@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import DatabaseTable from 'src/admin/components/DatabaseTable'
+import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
 const DatabaseManager = ({
   databases,
@@ -25,7 +26,7 @@ const DatabaseManager = ({
   onDeleteRetentionPolicy,
 }) => {
   return (
-    <div className="panel panel-solid">
+    <div className="panel panel-solid influxdb-admin">
       <div className="panel-heading">
         <h2 className="panel-title">
           {databases.length === 1
@@ -40,29 +41,33 @@ const DatabaseManager = ({
           <span className="icon plus" /> Create Database
         </button>
       </div>
-      <div className="panel-body">
-        {databases.map(db => (
-          <DatabaseTable
-            key={db.links.self}
-            database={db}
-            isRFDisplayed={isRFDisplayed}
-            onEditDatabase={onEditDatabase}
-            onKeyDownDatabase={onKeyDownDatabase}
-            onCancelDatabase={onCancelDatabase}
-            onConfirmDatabase={onConfirmDatabase}
-            onRemoveDeleteCode={onRemoveDeleteCode}
-            onDeleteDatabase={onDeleteDatabase}
-            onStartDeleteDatabase={onStartDeleteDatabase}
-            onDatabaseDeleteConfirm={onDatabaseDeleteConfirm}
-            onAddRetentionPolicy={onAddRetentionPolicy}
-            onStopEditRetentionPolicy={onStopEditRetentionPolicy}
-            onCancelRetentionPolicy={onCancelRetentionPolicy}
-            onCreateRetentionPolicy={onCreateRetentionPolicy}
-            onUpdateRetentionPolicy={onUpdateRetentionPolicy}
-            onRemoveRetentionPolicy={onRemoveRetentionPolicy}
-            onDeleteRetentionPolicy={onDeleteRetentionPolicy}
-          />
-        ))}
+      <div className="panel-body" style={{paddingRight: 20}}>
+        <FancyScrollbar>
+          <div style={{paddingRight: 10}}>
+            {databases.map(db => (
+              <DatabaseTable
+                key={db.links.self}
+                database={db}
+                isRFDisplayed={isRFDisplayed}
+                onEditDatabase={onEditDatabase}
+                onKeyDownDatabase={onKeyDownDatabase}
+                onCancelDatabase={onCancelDatabase}
+                onConfirmDatabase={onConfirmDatabase}
+                onRemoveDeleteCode={onRemoveDeleteCode}
+                onDeleteDatabase={onDeleteDatabase}
+                onStartDeleteDatabase={onStartDeleteDatabase}
+                onDatabaseDeleteConfirm={onDatabaseDeleteConfirm}
+                onAddRetentionPolicy={onAddRetentionPolicy}
+                onStopEditRetentionPolicy={onStopEditRetentionPolicy}
+                onCancelRetentionPolicy={onCancelRetentionPolicy}
+                onCreateRetentionPolicy={onCreateRetentionPolicy}
+                onUpdateRetentionPolicy={onUpdateRetentionPolicy}
+                onRemoveRetentionPolicy={onRemoveRetentionPolicy}
+                onDeleteRetentionPolicy={onDeleteRetentionPolicy}
+              />
+            ))}
+          </div>
+        </FancyScrollbar>
       </div>
     </div>
   )

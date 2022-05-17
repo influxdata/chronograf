@@ -106,6 +106,17 @@ pre.admin-table--query {
   }
 }
 
+.influxdb-admin.panel.panel-solid {
+  border-radius: 0px;
+  .panel-heading {
+    height: 90px;
+  }
+  .panel-body {
+    border-radius: 0px;
+    height: calc(100vh - 180px);
+    min-height: 10px;
+  }
+}
 /*
     Database Manager
     ----------------------------------------------------------------------------
