@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import UserRow from 'src/admin/components/UserRow'
 import EmptyRow from 'src/admin/components/EmptyRow'
 import FilterBar from 'src/admin/components/FilterBar'
+import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
 const UsersTable = ({
   users,
@@ -21,7 +22,7 @@ const UsersTable = ({
   onUpdateRoles,
   onUpdatePassword,
 }) => (
-  <div className="panel panel-solid">
+  <div className="panel panel-solid influxdb-admin">
     <FilterBar
       type="users"
       onFilter={onFilter}
@@ -29,45 +30,47 @@ const UsersTable = ({
       onClickCreate={onClickCreate}
     />
     <div className="panel-body">
-      <table className="table v-center admin-table table-highlight">
-        <thead>
-          <tr>
-            <th>User</th>
-            <th>Password</th>
-            {hasRoles && <th className="admin-table--left-offset">Roles</th>}
-            <th className="admin-table--left-offset">
-              {hasRoles ? 'Permissions' : 'Administrator'}
-            </th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          {users.length ? (
-            users
-              .filter(u => !u.hidden)
-              .map(user => (
-                <UserRow
-                  key={user.links.self}
-                  user={user}
-                  onEdit={onEdit}
-                  onSave={onSave}
-                  onCancel={onCancel}
-                  onDelete={onDelete}
-                  isEditing={user.isEditing}
-                  isNew={user.isNew}
-                  allRoles={allRoles}
-                  hasRoles={hasRoles}
-                  allPermissions={permissions}
-                  onUpdatePermissions={onUpdatePermissions}
-                  onUpdateRoles={onUpdateRoles}
-                  onUpdatePassword={onUpdatePassword}
-                />
-              ))
-          ) : (
-            <EmptyRow tableName={'Users'} />
-          )}
-        </tbody>
-      </table>
+      <FancyScrollbar>
+        <table className="table v-center admin-table table-highlight">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Password</th>
+              {hasRoles && <th className="admin-table--left-offset">Roles</th>}
+              <th className="admin-table--left-offset">
+                {hasRoles ? 'Permissions' : 'Administrator'}
+              </th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {users.length ? (
+              users
+                .filter(u => !u.hidden)
+                .map(user => (
+                  <UserRow
+                    key={user.links.self}
+                    user={user}
+                    onEdit={onEdit}
+                    onSave={onSave}
+                    onCancel={onCancel}
+                    onDelete={onDelete}
+                    isEditing={user.isEditing}
+                    isNew={user.isNew}
+                    allRoles={allRoles}
+                    hasRoles={hasRoles}
+                    allPermissions={permissions}
+                    onUpdatePermissions={onUpdatePermissions}
+                    onUpdateRoles={onUpdateRoles}
+                    onUpdatePassword={onUpdatePassword}
+                  />
+                ))
+            ) : (
+              <EmptyRow tableName={'Users'} />
+            )}
+          </tbody>
+        </table>
+      </FancyScrollbar>
     </div>
   </div>
 )

@@ -20,10 +20,22 @@ $subsection-font: 17px;
     }
 }
 
-.subsection--tabs {
+.subsection__tabs {
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    &.subsection__tabs--row {
+        flex-direction: row;
+        .subsection--tab {
+            height: ($chronograf-page-header-height / 2);
+            line-height: ($chronograf-page-header-height / 2);
+            border-radius: $radius $radius 0 0;
+            padding: 0 8px 0 10px;
+            &:nth-child(1) {
+                margin: 0 0 0 20px;
+            }
+        }
+    }
 }
 
 .subsection--tab {
@@ -44,6 +56,9 @@ $subsection-font: 17px;
         cursor: pointer;
         color: $g18-cloud;
         background-color: $g3-castle;
+    }
+    & .subsection__tabs--row {
+        padding: 0 8px 0 8px;
     }
 }
 

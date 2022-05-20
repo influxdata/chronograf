@@ -29,6 +29,7 @@ import FormElementError from 'src/reusable_ui/components/form_layout/FormElement
 import {Source} from 'src/types'
 import {QueryStat} from 'src/types/influxAdmin'
 import AdminInfluxDBTab from './AdminInfluxDBTab'
+import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
 interface Props {
   source: Source
@@ -81,7 +82,7 @@ class QueriesPage extends Component<Props, State> {
 
     return (
       <AdminInfluxDBTab activeTab="queries" source={source}>
-        <div className="panel panel-solid">
+        <div className="panel panel-solid influxdb-admin">
           <div className="panel-heading">
             <h2 className="panel-title">{title}</h2>
             <div style={{float: 'right', display: 'flex'}}>
@@ -105,23 +106,25 @@ class QueriesPage extends Component<Props, State> {
             </div>
           </div>
           <div className="panel-body">
-            {queries && queries.length ? (
-              <QueriesTable
-                queries={queries}
-                queriesSort={queriesSort}
-                changeSort={changeSort}
-                onKillQuery={this.handleKillQuery}
-              />
-            ) : null}
-            {errors.length ? (
-              <div style={{marginTop: '5px'}}>
-                {errors.map((e, i) => (
-                  <div key={`error${i}`}>
-                    <FormElementError message={e} />
-                  </div>
-                ))}
-              </div>
-            ) : null}
+            <FancyScrollbar>
+              {queries && queries.length ? (
+                <QueriesTable
+                  queries={queries}
+                  queriesSort={queriesSort}
+                  changeSort={changeSort}
+                  onKillQuery={this.handleKillQuery}
+                />
+              ) : null}
+              {errors.length ? (
+                <div style={{marginTop: '5px'}}>
+                  {errors.map((e, i) => (
+                    <div key={`error${i}`}>
+                      <FormElementError message={e} />
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </FancyScrollbar>
           </div>
         </div>
       </AdminInfluxDBTab>

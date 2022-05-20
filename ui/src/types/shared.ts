@@ -13,6 +13,6 @@ export interface DropdownAction {
 export interface PageSection {
   url: string
   name: string
-  component: ReactNode
+  component?: ReactNode
   enabled: boolean
 }
