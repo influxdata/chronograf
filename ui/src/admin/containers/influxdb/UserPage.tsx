@@ -7,7 +7,12 @@ import AdminInfluxDBTab, {isConnectedToLDAP} from './AdminInfluxDBTab'
 import {withRouter, WithRouterProps} from 'react-router'
 import {useMemo} from 'react'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
-import {deleteUserAsync} from 'src/admin/actions/influxdb'
+import {
+  deleteUserAsync,
+  updateUserPasswordAsync,
+} from 'src/admin/actions/influxdb'
+import {Button, ComponentStatus} from 'src/reusable_ui'
+import ConfirmOrCancel from 'src/shared/components/ConfirmOrCancel'
 
 const mapStateToProps = ({adminInfluxDB: {users, roles, permissions}}) => ({
   users,
@@ -22,6 +27,7 @@ interface RouterParams {
 
 const mapDispatchToProps = {
   deleteUserAsync,
+  updateUserPasswordAsync,
 }
 
 interface OwnProps {
@@ -40,29 +46,43 @@ type Props = WithRouterProps<RouterParams> &
 const UserPageContent = ({
   users,
   source,
+  router,
   params: {userName, sourceID},
   deleteUserAsync: deleteUserDispatchAsync,
-  router,
+  updateUserPasswordAsync: updatePasswordAsync,
 }: Props) => {
   if (isConnectedToLDAP(source)) {
     return <div className="container-fluid">Users are managed via LDAP.</div>
   }
-  const [running, setRunning] = useState(0)
+  const [running, setRunning] = useState(false)
+  const [password, setPassword] = useState<string | undefined>(undefined)
   const [user, deleteUser] = useMemo(() => {
     const u = users.find(x => x.name === userName)
     return [
       u,
       async () => {
-        setRunning(running + 1)
+        setRunning(true)
         try {
           await deleteUserDispatchAsync(u)
           router.push(`/sources/${sourceID}/admin-influxdb/users`)
         } finally {
-          setRunning(running - 1)
+          setRunning(false)
         }
       },
     ]
   }, [source, users, userName, running, setRunning])
+  const updatePassword = useMemo(
+    () => async () => {
+      setRunning(true)
+      try {
+        await updatePasswordAsync(user, password)
+        setPassword(undefined)
+      } finally {
+        setRunning(false)
+      }
+    },
+    [user, password, running]
+  )
   if (!user) {
     return (
       <div className="container-fluid">
@@ -74,17 +94,65 @@ const UserPageContent = ({
   return (
     <div className="panel panel-solid influxdb-admin">
       <div className="panel-heading">
-        <h2 className="panel-title" style={{flex: '1 1 auto'}}>
-          User {userName}
+        <h2 className="panel-title">
+          {password === undefined ? 'User ' : 'Set password for user: '}
+          <span title={userName}>{userName}</span>
         </h2>
-        <ConfirmButton
-          type="btn-danger"
-          text="Delete User"
-          confirmAction={deleteUser}
-          disabled={!!running}
-        ></ConfirmButton>
+        {password === undefined ? (
+          <>
+            <Button
+              text="Change password"
+              onClick={() => setPassword('')}
+              status={
+                running ? ComponentStatus.Disabled : ComponentStatus.Default
+              }
+            />
+            <ConfirmButton
+              type="btn-danger"
+              text="Delete User"
+              confirmAction={deleteUser}
+              disabled={running}
+            ></ConfirmButton>
+          </>
+        ) : null}
       </div>
-      <div className="panel-body"></div>
+      <div className="panel-body">
+        {password !== undefined ? (
+          <div
+            style={{
+              display: 'flex',
+              justifyItems: 'flex-start',
+              alignItems: 'center',
+              columnGap: '10px',
+            }}
+          >
+            <input
+              className="form-control input-sm"
+              name="password"
+              type="password"
+              value={password}
+              placeholder="New Password"
+              disabled={running}
+              onChange={e => setPassword(e.target.value)}
+              onKeyPress={e => {
+                if (e.key === 'Enter') {
+                  updatePassword()
+                }
+              }}
+              style={{flex: '0 0 auto', width: '200px'}}
+              spellCheck={false}
+              autoComplete="false"
+            />
+            <ConfirmOrCancel
+              item={user}
+              onConfirm={updatePassword}
+              isDisabled={running}
+              onCancel={() => setPassword(undefined)}
+              buttonSize="btn-sm"
+            />
+          </div>
+        ) : null}
+      </div>
     </div>
   )
 }

@@ -110,6 +110,17 @@ pre.admin-table--query {
   border-radius: 0px;
   .panel-heading {
     height: 90px;
+    padding: 0 30px;
+    flex-wrap: wrap;
+    *:first-child {
+      flex: 1 0 auto;
+    }
+    .btn {
+      margin-left: 5px;
+      &:first-child {
+        margin-left: 0px;
+      }
+    }
   }
   .panel-body {
     border-radius: 0px;
