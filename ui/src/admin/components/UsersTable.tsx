@@ -37,11 +37,9 @@ const UsersTable = ({
   onCancel,
   onClickCreate,
   onEdit,
-  onDelete,
   onFilter,
   onUpdatePermissions,
   onUpdateRoles,
-  onUpdatePassword,
 }: Props) => (
   <div className="panel panel-solid influxdb-admin">
     <FilterBar
@@ -56,12 +54,10 @@ const UsersTable = ({
           <thead>
             <tr>
               <th>User</th>
-              <th>Password</th>
               {hasRoles && <th className="admin-table--left-offset">Roles</th>}
               <th className="admin-table--left-offset">
                 {hasRoles ? 'Permissions' : 'Administrator'}
               </th>
-              <th />
             </tr>
           </thead>
           <tbody>
@@ -76,7 +72,6 @@ const UsersTable = ({
                     onEdit={onEdit}
                     onSave={onSave}
                     onCancel={onCancel}
-                    onDelete={onDelete}
                     isEditing={user.isEditing}
                     isNew={user.isNew}
                     allRoles={allRoles}
@@ -84,11 +79,10 @@ const UsersTable = ({
                     allPermissions={permissions}
                     onUpdatePermissions={onUpdatePermissions}
                     onUpdateRoles={onUpdateRoles}
-                    onUpdatePassword={onUpdatePassword}
                   />
                 ))
             ) : (
-              <EmptyRow tableName={'Users'} />
+              <EmptyRow tableName={'Users'} colSpan={hasRoles ? 3 : 2} />
             )}
           </tbody>
         </table>

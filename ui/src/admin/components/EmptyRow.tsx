@@ -2,6 +2,7 @@ import React, {FunctionComponent} from 'react'
 
 interface Props {
   tableName: string
+  colSpan: number
 }
 const EmptyRow: FunctionComponent<Props> = ({tableName}) => (
   <tr className="table-empty-state">

@@ -2,8 +2,6 @@ import React, {PureComponent} from 'react'
 
 import UserPermissionsDropdown from 'src/admin/components/UserPermissionsDropdown'
 import UserRoleDropdown from 'src/admin/components/UserRoleDropdown'
-import ChangePassRow from 'src/admin/components/ChangePassRow'
-import ConfirmButton from 'src/shared/components/ConfirmButton'
 import {USERS_TABLE} from 'src/admin/constants/tableSizing'
 
 import UserRowEdit from 'src/admin/components/UserRowEdit'
@@ -23,10 +21,8 @@ interface UserRowProps {
   onCancel: (user: User) => void
   onEdit: (User: User, updates: Partial<User>) => void
   onSave: (user: User) => Promise<void>
-  onDelete: (user: User) => void
   onUpdatePermissions: (user: User, permissions: UserPermission[]) => void
   onUpdateRoles: (user: User, roles: any[]) => void
-  onUpdatePassword: (user: User, password: string) => void
 }
 
 @ErrorHandling
@@ -65,14 +61,6 @@ class UserRow extends PureComponent<UserRowProps> {
         <td style={{width: `${USERS_TABLE.colUsername}px`}}>
           <Link to={page}>{user.name}</Link>
         </td>
-        <td style={{width: `${USERS_TABLE.colPassword}px`}}>
-          <ChangePassRow
-            user={user}
-            onEdit={onEdit}
-            buttonSize="btn-xs"
-            onApply={this.handleUpdatePassword}
-          />
-        </td>
         {hasRoles && (
           <td>
             <UserRoleDropdown
@@ -96,32 +84,8 @@ class UserRow extends PureComponent<UserRowProps> {
             />
           )}
         </td>
-        <td
-          className="text-right"
-          style={{width: `${USERS_TABLE.colDelete}px`}}
-        >
-          <ConfirmButton
-            size="btn-xs"
-            type="btn-danger"
-            text="Delete User"
-            confirmAction={this.handleDelete}
-            customClass="table--show-on-row-hover"
-          />
-        </td>
       </tr>
     )
-  }
-
-  private handleDelete = (): void => {
-    const {user, onDelete} = this.props
-
-    onDelete(user)
-  }
-
-  private handleUpdatePassword = (): void => {
-    const {user, onUpdatePassword} = this.props
-
-    onUpdatePassword(user, user.password)
   }
 
   private get hasPermissions() {

@@ -58,7 +58,7 @@ const RolesTable = ({
                   />
                 ))
             ) : (
-              <EmptyRow tableName={'Roles'} />
+              <EmptyRow tableName={'Roles'} colspan={4} />
             )}
           </tbody>
         </table>
