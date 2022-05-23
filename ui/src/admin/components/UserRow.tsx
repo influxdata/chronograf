@@ -10,6 +10,7 @@ import UserRowEdit from 'src/admin/components/UserRowEdit'
 import {User, UserPermission} from 'src/types/influxAdmin'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import UserAdminDropdown from './UserAdminDropdown'
+import {Link} from 'react-router'
 
 interface UserRowProps {
   user: User
@@ -18,6 +19,7 @@ interface UserRowProps {
   hasRoles: boolean
   isNew: boolean
   isEditing: boolean
+  page: string
   onCancel: (user: User) => void
   onEdit: (User: User, updates: Partial<User>) => void
   onSave: (user: User) => Promise<void>
@@ -37,6 +39,7 @@ class UserRow extends PureComponent<UserRowProps> {
       hasRoles,
       isNew,
       isEditing,
+      page,
       onEdit,
       onSave,
       onCancel,
@@ -59,7 +62,9 @@ class UserRow extends PureComponent<UserRowProps> {
 
     return (
       <tr>
-        <td style={{width: `${USERS_TABLE.colUsername}px`}}>{user.name}</td>
+        <td style={{width: `${USERS_TABLE.colUsername}px`}}>
+          <Link to={page}>{user.name}</Link>
+        </td>
         <td style={{width: `${USERS_TABLE.colPassword}px`}}>
           <ChangePassRow
             user={user}

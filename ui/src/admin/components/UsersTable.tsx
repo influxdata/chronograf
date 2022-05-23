@@ -12,6 +12,7 @@ interface Props {
   hasRoles: boolean
   permissions: string[]
   isEditing: boolean
+  usersPage: string
   onSave: (user: User) => Promise<void>
   onCancel: (user: User) => void
   onClickCreate: () => () => void
@@ -31,6 +32,7 @@ const UsersTable = ({
   hasRoles,
   permissions,
   isEditing,
+  usersPage,
   onSave,
   onCancel,
   onClickCreate,
@@ -70,6 +72,7 @@ const UsersTable = ({
                   <UserRow
                     key={user.name}
                     user={user}
+                    page={`${usersPage}/${encodeURIComponent(user.name || '')}`}
                     onEdit={onEdit}
                     onSave={onSave}
                     onCancel={onCancel}

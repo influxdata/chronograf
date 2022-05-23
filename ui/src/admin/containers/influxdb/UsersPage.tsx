@@ -105,6 +105,7 @@ class UsersPage extends Component<Props> {
         <UsersTable
           users={users}
           allRoles={roles}
+          usersPage={`/sources/${source.id}/admin-influxdb/users`}
           hasRoles={hasRoleManagement(source)}
           permissions={this.allowed}
           isEditing={users.some(u => u.isEditing)}
