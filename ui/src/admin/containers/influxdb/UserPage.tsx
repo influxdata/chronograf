@@ -95,8 +95,8 @@ const UserPageContent = ({
     <div className="panel panel-solid influxdb-admin">
       <div className="panel-heading">
         <h2 className="panel-title">
-          {password === undefined ? 'User ' : 'Set password for user: '}
-          <span title={userName}>{userName}</span>
+          {password === undefined ? '' : 'Set password for user: '}
+          <span title={`User: ${userName}`}>{userName}</span>
         </h2>
         {password === undefined ? (
           <>
@@ -112,6 +112,7 @@ const UserPageContent = ({
               text="Delete User"
               confirmAction={deleteUser}
               disabled={running}
+              position="bottom"
             ></ConfirmButton>
           </>
         ) : null}
