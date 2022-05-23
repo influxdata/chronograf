@@ -1,5 +1,6 @@
 export const USERS_TABLE = {
   colUsername: 240,
+  colAdministrator: 70,
   colPassword: 186,
   colRoles: 190,
   colPermissions: 190,

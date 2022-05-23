@@ -7,8 +7,49 @@ import {USERS_TABLE} from 'src/admin/constants/tableSizing'
 import UserRowEdit from 'src/admin/components/UserRowEdit'
 import {User, UserPermission} from 'src/types/influxAdmin'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import UserAdminDropdown from './UserAdminDropdown'
 import {Link} from 'react-router'
+
+const ADMIN_STYLES = [
+  {
+    style: 'admin--not-admin',
+    text: 'No',
+  },
+  {
+    style: 'admin--is-admin',
+    text: 'Yes',
+  },
+]
+
+const mapOSSPermission = (allowed: string[]) => {
+  let retVal = ''
+  for (const x of allowed) {
+    if (x === 'WRITE') {
+      retVal += 'W'
+      continue
+    }
+    if (x === 'READ') {
+      retVal = 'R' + retVal
+      continue
+    }
+  }
+  return retVal
+}
+const OssUserDBPermissions = ({user}: {user: User}) => (
+  <>
+    {(user.permissions || [])
+      .filter(x => x.scope === 'database')
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(x => (
+        <>
+          <span className="permission--db">{x.name}</span>
+          {':'}
+          <span className="permission--values">
+            {mapOSSPermission(x.allowed)}
+          </span>
+        </>
+      ))}
+  </>
+)
 
 interface UserRowProps {
   user: User
@@ -56,18 +97,29 @@ class UserRow extends PureComponent<UserRowProps> {
       )
     }
 
+    const adminStyle =
+      ADMIN_STYLES[
+        +!!user.permissions.find(
+          x => x.scope === 'all' && (x.allowed || []).includes('ALL')
+        )
+      ]
+
     return (
       <tr>
         <td style={{width: `${USERS_TABLE.colUsername}px`}}>
           <Link to={page}>{user.name}</Link>
         </td>
-        {hasRoles && (
+        {hasRoles ? (
           <td>
             <UserRoleDropdown
               user={user}
               allRoles={allRoles}
               onUpdateRoles={onUpdateRoles}
             />
+          </td>
+        ) : (
+          <td style={{width: `${USERS_TABLE.colAdministrator}px`}}>
+            <span className={adminStyle.style}>{adminStyle.text}</span>
           </td>
         )}
         <td>
@@ -78,10 +130,7 @@ class UserRow extends PureComponent<UserRowProps> {
               onUpdatePermissions={onUpdatePermissions}
             />
           ) : (
-            <UserAdminDropdown
-              user={user}
-              onUpdatePermissions={onUpdatePermissions}
-            />
+            <OssUserDBPermissions user={user} />
           )}
         </td>
       </tr>

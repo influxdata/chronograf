@@ -232,7 +232,7 @@ const UserPageContent = ({
           {password === undefined ? '' : 'Set password for user: '}
           <span title={`User: ${userName}`}>{userName}</span>
         </h2>
-        {password === undefined ? (
+        {password === undefined && (
           <>
             <Button
               text="Change password"
@@ -241,7 +241,7 @@ const UserPageContent = ({
                 running ? ComponentStatus.Disabled : ComponentStatus.Default
               }
             />
-            {isOSS ? (
+            {isOSS && (
               <ConfirmButton
                 type="btn-default"
                 text={isAdmin ? 'Revoke Admin' : 'Grant Admin'}
@@ -252,7 +252,7 @@ const UserPageContent = ({
                 disabled={running}
                 position="bottom"
               ></ConfirmButton>
-            ) : null}
+            )}
             <ConfirmButton
               type="btn-danger"
               text="Delete User"
@@ -261,7 +261,7 @@ const UserPageContent = ({
               position="bottom"
             ></ConfirmButton>
           </>
-        ) : null}
+        )}
       </div>
       <div className="panel-body">
         {password !== undefined ? (
@@ -305,7 +305,7 @@ const UserPageContent = ({
                 <h4>
                   Database Privileges{permissionsChanged ? ' (unsaved)' : ''}
                 </h4>
-                {permissionsChanged ? (
+                {permissionsChanged && (
                   <Button
                     text="Apply Changes"
                     onClick={changePermissions}
@@ -316,15 +316,15 @@ const UserPageContent = ({
                         : ComponentStatus.Default
                     }
                   />
-                ) : null}
+                )}
               </div>
               <div className="db-manager-body">
-                {isAdmin ? (
+                {isAdmin && (
                   <div className="db-manager-text">
                     The user is an <b>admin</b>, ALL PRIVILEGES are granted
                     irrespectively of database permissions.
                   </div>
-                ) : null}
+                )}
                 <div className="db-manager-table">
                   <table className="table v-center table-highlight">
                     <thead>

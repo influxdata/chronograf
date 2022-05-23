@@ -54,10 +54,10 @@ const UsersTable = ({
           <thead>
             <tr>
               <th>User</th>
-              {hasRoles && <th className="admin-table--left-offset">Roles</th>}
               <th className="admin-table--left-offset">
-                {hasRoles ? 'Permissions' : 'Administrator'}
+                {hasRoles ? 'Roles' : 'Admin'}
               </th>
+              <th>Permissions</th>
             </tr>
           </thead>
           <tbody>
@@ -82,7 +82,7 @@ const UsersTable = ({
                   />
                 ))
             ) : (
-              <EmptyRow tableName={'Users'} colSpan={hasRoles ? 3 : 2} />
+              <EmptyRow tableName={'Users'} colSpan={3} />
             )}
           </tbody>
         </table>

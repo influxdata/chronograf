@@ -7,6 +7,26 @@
     Admin Table
     ----------------------------------------------------------------------------
 */
+.admin-table {
+  .admin--is-admin {
+    color: $g14-chromium;
+    padding-left: 7px;
+  }
+  .admin--not-admin {
+    color: $g8-storm;
+    padding-left: 7px;
+  }
+  span.permission--db{
+    padding-left: 3px;
+    &:first-child {
+      padding-left: 0px;
+    }
+  }
+  span.permission--allowed{
+    font-style: italic;
+  }
+}
+
 .admin-table .dropdown-toggle {
   background-color: transparent;
   font-weight: 600;
