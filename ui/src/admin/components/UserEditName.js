@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
-import {USERS_TABLE} from 'src/admin/constants/tableSizing'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 class UserEditName extends Component {
@@ -26,20 +25,18 @@ class UserEditName extends Component {
   render() {
     const {user} = this.props
     return (
-      <td style={{width: `${USERS_TABLE.colUsername}px`}}>
-        <input
-          className="form-control input-xs"
-          name="name"
-          type="text"
-          value={user.name || ''}
-          placeholder="Username"
-          onChange={this.handleEdit(user)}
-          onKeyPress={this.handleKeyPress(user)}
-          autoFocus={true}
-          spellCheck={false}
-          autoComplete="false"
-        />
-      </td>
+      <input
+        className="form-control input-xs"
+        name="name"
+        type="text"
+        value={user.name || ''}
+        placeholder="Username"
+        onChange={this.handleEdit(user)}
+        onKeyPress={this.handleKeyPress(user)}
+        autoFocus={true}
+        spellCheck={false}
+        autoComplete="false"
+      />
     )
   }
 }

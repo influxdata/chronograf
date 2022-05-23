@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
-import {USERS_TABLE} from 'src/admin/constants/tableSizing'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 class UserNewPassword extends Component {
@@ -21,25 +20,19 @@ class UserNewPassword extends Component {
 
   render() {
     const {user, isNew} = this.props
-    return (
-      <td style={{width: `${USERS_TABLE.colPassword}px`}}>
-        {isNew ? (
-          <input
-            className="form-control input-xs"
-            name="password"
-            type="password"
-            value={user.password || ''}
-            placeholder="Password"
-            onChange={this.handleEdit(user)}
-            onKeyPress={this.handleKeyPress(user)}
-            spellCheck={false}
-            autoComplete="false"
-          />
-        ) : (
-          '--'
-        )}
-      </td>
-    )
+    return isNew ? (
+      <input
+        className="form-control input-xs"
+        name="password"
+        type="password"
+        value={user.password || ''}
+        placeholder="Password"
+        onChange={this.handleEdit(user)}
+        onKeyPress={this.handleKeyPress(user)}
+        spellCheck={false}
+        autoComplete="false"
+      />
+    ) : null
   }
 }
 

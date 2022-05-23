@@ -1,9 +1,5 @@
 import React, {FunctionComponent} from 'react'
-import UserEditName from 'src/admin/components/UserEditName'
-import UserNewPassword from 'src/admin/components/UserNewPassword'
 import ConfirmOrCancel from 'src/shared/components/ConfirmOrCancel'
-import {USERS_TABLE} from 'src/admin/constants/tableSizing'
-
 import {User} from 'src/types/influxAdmin'
 
 interface UserRowEditProps {
@@ -20,28 +16,54 @@ const UserRowEdit: FunctionComponent<UserRowEditProps> = ({
   onEdit,
   onSave,
   onCancel,
-  isNew,
   hasRoles,
-}) => (
-  <tr className="admin-table--edit-row">
-    <UserEditName user={user} onEdit={onEdit} onSave={onSave} />
-    <UserNewPassword
-      user={user}
-      onEdit={onEdit}
-      onSave={onSave}
-      isNew={isNew}
-    />
-    {hasRoles ? <td className="admin-table--left-offset">--</td> : null}
-    <td className="admin-table--left-offset">--</td>
-    <td className="text-right" style={{width: `${USERS_TABLE.colDelete}px`}}>
-      <ConfirmOrCancel
-        item={user}
-        onConfirm={onSave}
-        onCancel={onCancel}
-        buttonSize="btn-xs"
-      />
-    </td>
-  </tr>
-)
+}) => {
+  const onKeyPress: React.KeyboardEventHandler = e => {
+    if (e.key === 'Enter') {
+      onSave(user)
+    }
+  }
+  return (
+    <tr className="admin-table--edit-row">
+      <td colSpan={hasRoles ? 5 : 4} style={{padding: '5px 0 5px 5px'}}>
+        <div style={{display: 'flex', flexDirection: 'row'}}>
+          <div>
+            <input
+              className="form-control input-xs"
+              name="name"
+              type="text"
+              value={user.name || ''}
+              placeholder="Username"
+              onChange={e => onEdit(user, {name: e.target.value})}
+              onKeyPress={onKeyPress}
+              autoFocus={true}
+              spellCheck={false}
+              autoComplete="false"
+            />
+          </div>
+          <div style={{padding: '0 5px 0 5px'}}>
+            <input
+              className="form-control input-xs"
+              name="password"
+              type="password"
+              value={user.password || ''}
+              placeholder="Password"
+              onChange={e => onEdit(user, {password: e.target.value})}
+              onKeyPress={onKeyPress}
+              spellCheck={false}
+              autoComplete="false"
+            />
+          </div>
+          <ConfirmOrCancel
+            item={user}
+            onConfirm={onSave}
+            onCancel={onCancel}
+            buttonSize="btn-xs"
+          />
+        </div>
+      </td>
+    </tr>
+  )
+}
 
 export default UserRowEdit
