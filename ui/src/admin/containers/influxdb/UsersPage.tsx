@@ -3,7 +3,7 @@ import {Component} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
 import {withSource} from 'src/CheckSources'
 import {Source} from 'src/types'
-import {InfluxDBPermissions, Permission, Role, User} from 'src/types/auth'
+import {UserPermission, UserRole, User} from 'src/types/influxAdmin'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import UsersTable from 'src/admin/components/UsersTable'
 import {
@@ -52,15 +52,15 @@ interface OwnProps {
 }
 interface ConnectedProps {
   users: User[]
-  roles: Role[]
-  permissions: Permission[]
+  roles: UserRole[]
+  permissions: UserPermission[]
 }
 
 type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
 type Props = OwnProps & ConnectedProps & ReduxDispatchProps
 
 class UsersPage extends Component<Props> {
-  private get allowed(): InfluxDBPermissions[] {
+  private get allowed(): string[] {
     const {permissions} = this.props
     const globalPermissions = permissions.find(p => p.scope === 'all')
     return globalPermissions ? globalPermissions.allowed : []

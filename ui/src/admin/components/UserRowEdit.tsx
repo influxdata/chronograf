@@ -8,9 +8,9 @@ import {User} from 'src/types/influxAdmin'
 
 interface UserRowEditProps {
   user: User
-  onEdit: () => void
-  onSave: () => void
-  onCancel: () => void
+  onEdit: (user: User, updates: Partial<User>) => void
+  onSave: (user: User) => Promise<void>
+  onCancel: (user: User) => void
   isNew: boolean
   hasRoles: boolean
 }

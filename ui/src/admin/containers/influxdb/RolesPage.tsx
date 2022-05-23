@@ -3,7 +3,7 @@ import {Component} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
 import {withSource} from 'src/CheckSources'
 import {Source} from 'src/types'
-import {InfluxDBPermissions, Permission, Role, User} from 'src/types/auth'
+import {UserPermission, UserRole, User} from 'src/types/influxAdmin'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {
   addRole as addRoleActionCreator,
@@ -22,7 +22,7 @@ import AdminInfluxDBTab, {
   isConnectedToLDAP,
 } from './AdminInfluxDBTab'
 
-const isValidRole = role => {
+const isValidRole = (role: UserRole): boolean => {
   const minLen = 3
   return role.name.length >= minLen
 }
@@ -50,8 +50,8 @@ interface OwnProps {
 }
 interface ConnectedProps {
   users: User[]
-  roles: Role[]
-  permissions: Permission[]
+  roles: UserRole[]
+  permissions: UserPermission[]
 }
 
 type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
@@ -59,7 +59,7 @@ type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
 type Props = OwnProps & ConnectedProps & ReduxDispatchProps
 
 class RolesPage extends Component<Props> {
-  private get allowed(): InfluxDBPermissions[] {
+  private get allowed(): string[] {
     const {permissions} = this.props
     const globalPermissions = permissions.find(p => p.scope === 'all')
     return globalPermissions ? globalPermissions.allowed : []

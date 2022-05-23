@@ -18,9 +18,9 @@ interface UserRowProps {
   hasRoles: boolean
   isNew: boolean
   isEditing: boolean
-  onCancel: () => void
-  onEdit: () => void
-  onSave: () => void
+  onCancel: (user: User) => void
+  onEdit: (User: User, updates: Partial<User>) => void
+  onSave: (user: User) => Promise<void>
   onDelete: (user: User) => void
   onUpdatePermissions: (user: User, permissions: UserPermission[]) => void
   onUpdateRoles: (user: User, roles: any[]) => void
