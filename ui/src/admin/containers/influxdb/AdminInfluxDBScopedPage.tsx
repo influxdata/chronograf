@@ -37,6 +37,19 @@ interface State {
   errorMessage?: string
 }
 
+export const WrapToPage = ({children}: {children: JSX.Element}) => (
+  <Page>
+    <div className="deceo">
+      <Page.Header fullWidth={true}>
+        <Page.Header.Left>
+          <Page.Title title="InfluxDB Admin" />
+        </Page.Header.Left>
+        <Page.Header.Right showSourceIndicator={true} />
+      </Page.Header>
+      <div style={{height: 'calc(100% - 60px)'}}>{children}</div>
+    </div>
+  </Page>
+)
 @ErrorHandling
 export class AdminInfluxDBScopedPage extends PureComponent<Props, State> {
   constructor(props: Props) {
@@ -90,56 +103,40 @@ export class AdminInfluxDBScopedPage extends PureComponent<Props, State> {
   }
 
   public render() {
-    return (
-      <Page>
-        <div className="deceo">
-          <Page.Header fullWidth={true}>
-            <Page.Header.Left>
-              <Page.Title title="InfluxDB Admin" />
-            </Page.Header.Left>
-            <Page.Header.Right showSourceIndicator={true}>
-              {this.state.loading !== RemoteDataState.Loading && (
-                <span
-                  className="icon refresh"
-                  title="Refresh"
-                  onClick={this.refresh}
-                />
-              )}
-            </Page.Header.Right>
-          </Page.Header>
-          <div style={{height: 'calc(100% - 60px)'}}>{this.admin}</div>
-        </div>
-      </Page>
-    )
-  }
-
-  private get admin(): JSX.Element {
     const {source, children} = this.props
     const {loading, error, errorMessage} = this.state
     if (loading === RemoteDataState.Loading) {
-      return <PageSpinner />
+      return (
+        <WrapToPage>
+          <PageSpinner />
+        </WrapToPage>
+      )
     }
 
     if (loading === RemoteDataState.Error) {
       return (
-        <div className="container-fluid">
-          <div className="panel-body">
-            <p className="unexpected-error">{errorMessage}</p>
-            <p className="unexpected-error">{(error || '').toString()}</p>
+        <WrapToPage>
+          <div className="container-fluid">
+            <div className="panel-body">
+              <p className="unexpected-error">{errorMessage}</p>
+              <p className="unexpected-error">{(error || '').toString()}</p>
+            </div>
           </div>
-        </div>
+        </WrapToPage>
       )
     }
 
     if (!source.version || source.version.startsWith('2')) {
       return (
-        <div className="container-fluid">
-          These functions are not available for the currently selected InfluxDB
-          Connection.
-        </div>
+        <WrapToPage>
+          <div className="container-fluid">
+            These functions are not available for the currently selected
+            InfluxDB Connection.
+          </div>
+        </WrapToPage>
       )
     }
-    return <div>{children}</div>
+    return children
   }
 }
 

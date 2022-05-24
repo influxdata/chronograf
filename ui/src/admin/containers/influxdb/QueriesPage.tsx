@@ -28,7 +28,7 @@ import moment from 'moment'
 import FormElementError from 'src/reusable_ui/components/form_layout/FormElementError'
 import {Source} from 'src/types'
 import {QueryStat} from 'src/types/influxAdmin'
-import AdminInfluxDBTab from './AdminInfluxDBTab'
+import AdminInfluxDBTabbedPage from './AdminInfluxDBTabbedPage'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
 interface Props {
@@ -81,7 +81,7 @@ class QueriesPage extends Component<Props, State> {
     const {updateInterval, title, errors} = this.state
 
     return (
-      <AdminInfluxDBTab activeTab="queries" source={source}>
+      <AdminInfluxDBTabbedPage activeTab="queries" source={source}>
         <div className="panel panel-solid influxdb-admin">
           <div className="panel-heading">
             <h2 className="panel-title">{title}</h2>
@@ -127,7 +127,7 @@ class QueriesPage extends Component<Props, State> {
             </FancyScrollbar>
           </div>
         </div>
-      </AdminInfluxDBTab>
+      </AdminInfluxDBTabbedPage>
     )
   }
 

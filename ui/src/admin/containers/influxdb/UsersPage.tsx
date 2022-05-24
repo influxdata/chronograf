@@ -16,10 +16,10 @@ import {
   filterUsers as filterUsersAction,
 } from 'src/admin/actions/influxdb'
 import {notifyDBUserNamePasswordInvalid} from 'src/shared/copy/notifications'
-import AdminInfluxDBTab, {
+import AdminInfluxDBTabbedPage, {
   hasRoleManagement,
   isConnectedToLDAP,
-} from './AdminInfluxDBTab'
+} from './AdminInfluxDBTabbedPage'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import EmptyRow from 'src/admin/components/EmptyRow'
 import UserRow from 'src/admin/components/UserRow'
@@ -82,9 +82,9 @@ const UsersPage = ({
 }: Props) => {
   if (isConnectedToLDAP(source)) {
     return (
-      <AdminInfluxDBTab activeTab="users" source={source}>
+      <AdminInfluxDBTabbedPage activeTab="users" source={source}>
         <div className="container-fluid">Users are managed via LDAP.</div>
-      </AdminInfluxDBTab>
+      </AdminInfluxDBTabbedPage>
     )
   }
   const allAllowedPermissions = useMemo(() => {
@@ -114,7 +114,7 @@ const UsersPage = ({
   )
   const visibleUsers = useMemo(() => users.filter(x => !x.hidden), [users])
   return (
-    <AdminInfluxDBTab activeTab="users" source={source}>
+    <AdminInfluxDBTabbedPage activeTab="users" source={source}>
       <div className="panel panel-solid influxdb-admin">
         <FilterBar
           type="users"
@@ -164,7 +164,7 @@ const UsersPage = ({
           </FancyScrollbar>
         </div>
       </div>
-    </AdminInfluxDBTab>
+    </AdminInfluxDBTabbedPage>
   )
 }
 

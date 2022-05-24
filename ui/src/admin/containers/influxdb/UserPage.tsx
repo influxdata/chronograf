@@ -3,10 +3,10 @@ import {connect, ResolveThunks} from 'react-redux'
 import {withSource} from 'src/CheckSources'
 import {Source} from 'src/types'
 import {Database, User, UserPermission, UserRole} from 'src/types/influxAdmin'
-import AdminInfluxDBTab, {
+import AdminInfluxDBTabbedPage, {
   hasRoleManagement,
   isConnectedToLDAP,
-} from './AdminInfluxDBTab'
+} from './AdminInfluxDBTabbedPage'
 import {withRouter, WithRouterProps} from 'react-router'
 import {useMemo} from 'react'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
@@ -379,9 +379,9 @@ const UserPageContent = ({
 }
 
 const UserPage = (props: Props) => (
-  <AdminInfluxDBTab activeTab="users" source={props.source}>
+  <AdminInfluxDBTabbedPage activeTab="users" source={props.source}>
     <UserPageContent {...props} />
-  </AdminInfluxDBTab>
+  </AdminInfluxDBTabbedPage>
 )
 export default withSource(
   withRouter(connect(mapStateToProps, mapDispatchToProps)(UserPage))

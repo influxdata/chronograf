@@ -2,6 +2,7 @@ import React from 'react'
 import {useMemo} from 'react'
 import SubSections from 'src/shared/components/SubSections'
 import {Source, SourceAuthenticationMethod} from 'src/types'
+import {WrapToPage} from './AdminInfluxDBScopedPage'
 
 interface Props {
   source: Source
@@ -15,7 +16,7 @@ export function isConnectedToLDAP(source: Source) {
   return source.authentication === SourceAuthenticationMethod.LDAP
 }
 
-const AdminInfluxDBTab = ({source, activeTab, children}: Props) => {
+const AdminInfluxDBTabbedPage = ({source, activeTab, children}: Props) => {
   const sections = useMemo(() => {
     const hasRoles = hasRoleManagement(source)
     const isLDAP = isConnectedToLDAP(source)
@@ -43,15 +44,17 @@ const AdminInfluxDBTab = ({source, activeTab, children}: Props) => {
     ]
   }, [source])
   return (
-    <SubSections
-      parentUrl="admin-influxdb"
-      sourceID={source.id}
-      activeSection={activeTab}
-      sections={sections}
-      position="top"
-    >
-      {children}
-    </SubSections>
+    <WrapToPage>
+      <SubSections
+        parentUrl="admin-influxdb"
+        sourceID={source.id}
+        activeSection={activeTab}
+        sections={sections}
+        position="top"
+      >
+        {children}
+      </SubSections>
+    </WrapToPage>
   )
 }
-export default AdminInfluxDBTab
+export default AdminInfluxDBTabbedPage
