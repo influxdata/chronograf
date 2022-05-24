@@ -331,7 +331,7 @@ const UserPageContent = ({
                         <td>{db.name}</td>
                         <td>
                           {dbPermisssions.map((perm, i) => (
-                            <span
+                            <div
                               key={i}
                               title="Click to change, click Apply Changes to save all changes"
                               data-db={db.name}
@@ -349,7 +349,7 @@ const UserPageContent = ({
                               onClick={onPermissionChange}
                             >
                               {perm}
-                            </span>
+                            </div>
                           ))}
                         </td>
                       </tr>

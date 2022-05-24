@@ -5,7 +5,7 @@ import UserRoleDropdown from 'src/admin/components/UserRoleDropdown'
 import {USERS_TABLE} from 'src/admin/constants/tableSizing'
 
 import UserRowEdit from 'src/admin/components/UserRowEdit'
-import {Database, User, UserPermission} from 'src/types/influxAdmin'
+import {User, UserPermission} from 'src/types/influxAdmin'
 import {Link} from 'react-router'
 
 const ADMIN_STYLES = [
@@ -19,39 +19,7 @@ const ADMIN_STYLES = [
   },
 ]
 
-const mapOSSPermission = (allowed: string[]) => {
-  let retVal = ''
-  for (const x of allowed) {
-    if (x === 'WRITE') {
-      retVal += 'W'
-      continue
-    }
-    if (x === 'READ') {
-      retVal = 'R' + retVal
-      continue
-    }
-  }
-  return retVal
-}
-const OssUserDBPermissions = ({user}: {user: User}) => (
-  <>
-    {(user.permissions || [])
-      .filter(x => x.scope === 'database')
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map(x => (
-        <React.Fragment key={x.name}>
-          <span className="permission--db">{x.name}</span>
-          {':'}
-          <span className="permission--values">
-            {mapOSSPermission(x.allowed)}
-          </span>
-        </React.Fragment>
-      ))}
-  </>
-)
-
 interface Props {
-  databases: Database[]
   user: User
   allRoles: any[]
   allPermissions: string[]
@@ -59,6 +27,7 @@ interface Props {
   isNew: boolean
   isEditing: boolean
   page: string
+  userDBPermissions: Array<Record<string, boolean>>
   onCancel: (user: User) => void
   onEdit: (User: User, updates: Partial<User>) => void
   onSave: (user: User) => Promise<void>
@@ -74,6 +43,7 @@ const UserRow = ({
   isNew,
   isEditing,
   page,
+  userDBPermissions,
   onEdit,
   onSave,
   onCancel,
@@ -118,17 +88,34 @@ const UserRow = ({
           <span className={adminStyle.style}>{adminStyle.text}</span>
         </td>
       )}
-      <td>
-        {hasRoles ? (
+      {hasRoles ? (
+        <td>
           <UserPermissionsDropdown
             user={user}
             allPermissions={allPermissions}
             onUpdatePermissions={onUpdatePermissions}
           />
-        ) : (
-          <OssUserDBPermissions user={user} />
-        )}
-      </td>
+        </td>
+      ) : (
+        userDBPermissions.map((perms, i) => (
+          <td className="admin-table__dbperm" key={i}>
+            <span
+              className={`permission-value ${
+                perms.READ || perms.Read ? 'granted' : 'denied'
+              }`}
+            >
+              Read
+            </span>
+            <span
+              className={`permission-value ${
+                perms.WRITE || perms.Write ? 'granted' : 'denied'
+              }`}
+            >
+              Write
+            </span>
+          </td>
+        ))
+      )}
     </tr>
   )
 }

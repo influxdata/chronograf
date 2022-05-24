@@ -25,6 +25,10 @@
   span.permission--allowed{
     font-style: italic;
   }
+  
+  &.admin-table--compact{
+    width: auto
+  }
 }
 
 .admin-table .dropdown-toggle {
@@ -59,6 +63,13 @@
 table > tbody > tr > td.admin-table--left-offset,
 table > thead > tr > th.admin-table--left-offset {
   padding-left: 15px;
+}
+table > thead > tr > th.admin-table__dbheader {
+  font-weight: 450;
+  padding: 8px 12px; 
+}
+table > tbody > tr > td.admin-table__dbperm {
+  min-width: 100px;
 }
 
 .admin-table > thead > tr > th.col--sort-asc,
@@ -133,7 +144,7 @@ pre.admin-table--query {
   .influxdb-admin--contents{
     height: calc(100%-60px);
   }
-  .permission-value{
+  div.permission-value{
     @include btn-base-styles(
       $g5-pepper,
       $g6-smoke,
@@ -169,6 +180,15 @@ pre.admin-table--query {
         text-decoration: line-through;
         border: 2px solid $c-banana;
       }
+    }
+  }
+  span.permission-value{
+    padding: 0 2px;
+    display: inline-block;
+    color: $g18-cloud;
+    &.denied {
+      font-style: italic;
+      color: $g5-pepper;
     }
   }
 }

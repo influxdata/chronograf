@@ -113,6 +113,24 @@ const UsersPage = ({
     [source]
   )
   const visibleUsers = useMemo(() => users.filter(x => !x.hidden), [users])
+  const userDBPermissions = useMemo<Array<Array<Record<string, boolean>>>>(
+    () =>
+      visibleUsers.map(u => {
+        const permRecord = u.permissions.reduce((acc, userPerm) => {
+          if (userPerm.scope === 'database') {
+            acc[userPerm.name] = userPerm.allowed.reduce<
+              Record<string, boolean>
+            >((obj, perm) => {
+              obj[perm] = true
+              return obj
+            }, {})
+          }
+          return acc
+        }, {})
+        return databases.map(db => permRecord[db.name] || {})
+      }),
+    [databases, visibleUsers]
+  )
   return (
     <AdminInfluxDBTabbedPage activeTab="users" source={source}>
       <div className="panel panel-solid influxdb-admin">
@@ -124,26 +142,40 @@ const UsersPage = ({
         />
         <div className="panel-body">
           <FancyScrollbar>
-            <table className="table v-center admin-table table-highlight">
+            <table className="table v-center admin-table table-highlight admin-table--compact">
               <thead>
                 <tr>
                   <th>User</th>
                   <th className="admin-table--left-offset">
                     {hasRoles ? 'Roles' : 'Admin'}
                   </th>
-                  <th>Permissions</th>
+
+                  {visibleUsers.length &&
+                    (hasRoles ? (
+                      <th>Permissions</th>
+                    ) : (
+                      databases.map(db => (
+                        <th
+                          className="admin-table__dbheader"
+                          title={`Database ${db.name}`}
+                          key={db.name}
+                        >
+                          {db.name}
+                        </th>
+                      ))
+                    ))}
                 </tr>
               </thead>
               <tbody>
                 {visibleUsers.length ? (
-                  visibleUsers.map(user => (
+                  visibleUsers.map((user, userIndex) => (
                     <UserRow
                       key={user.name}
                       user={user}
                       page={`${usersPage}/${encodeURIComponent(
                         user.name || ''
                       )}`}
-                      databases={databases}
+                      userDBPermissions={userDBPermissions[userIndex]}
                       allRoles={roles}
                       hasRoles={hasRoles}
                       onEdit={editUser}
@@ -157,7 +189,7 @@ const UsersPage = ({
                     />
                   ))
                 ) : (
-                  <EmptyRow tableName={'Users'} colSpan={3} />
+                  <EmptyRow tableName={'Users'} colSpan={2} />
                 )}
               </tbody>
             </table>
