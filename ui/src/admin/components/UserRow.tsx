@@ -39,13 +39,13 @@ const OssUserDBPermissions = ({user}: {user: User}) => (
       .filter(x => x.scope === 'database')
       .sort((a, b) => a.name.localeCompare(b.name))
       .map(x => (
-        <>
+        <React.Fragment key={x.name}>
           <span className="permission--db">{x.name}</span>
           {':'}
           <span className="permission--values">
             {mapOSSPermission(x.allowed)}
           </span>
-        </>
+        </React.Fragment>
       ))}
   </>
 )
