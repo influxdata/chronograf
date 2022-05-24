@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react'
+import React from 'react'
 
 import UserPermissionsDropdown from 'src/admin/components/UserPermissionsDropdown'
 import UserRoleDropdown from 'src/admin/components/UserRoleDropdown'
@@ -6,7 +6,6 @@ import {USERS_TABLE} from 'src/admin/constants/tableSizing'
 
 import UserRowEdit from 'src/admin/components/UserRowEdit'
 import {User, UserPermission} from 'src/types/influxAdmin'
-import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Link} from 'react-router'
 
 const ADMIN_STYLES = [
@@ -51,7 +50,7 @@ const OssUserDBPermissions = ({user}: {user: User}) => (
   </>
 )
 
-interface UserRowProps {
+interface Props {
   user: User
   allRoles: any[]
   allPermissions: string[]
@@ -66,81 +65,71 @@ interface UserRowProps {
   onUpdateRoles: (user: User, roles: any[]) => void
 }
 
-@ErrorHandling
-class UserRow extends PureComponent<UserRowProps> {
-  public render() {
-    const {
-      user,
-      allRoles,
-      allPermissions,
-      hasRoles,
-      isNew,
-      isEditing,
-      page,
-      onEdit,
-      onSave,
-      onCancel,
-      onUpdatePermissions,
-      onUpdateRoles,
-    } = this.props
-
-    if (isEditing) {
-      return (
-        <UserRowEdit
-          user={user}
-          isNew={isNew}
-          onEdit={onEdit}
-          onSave={onSave}
-          onCancel={onCancel}
-          hasRoles={hasRoles}
-        />
-      )
-    }
-
-    const adminStyle =
-      ADMIN_STYLES[
-        +!!user.permissions.find(
-          x => x.scope === 'all' && (x.allowed || []).includes('ALL')
-        )
-      ]
-
+const UserRow = ({
+  user,
+  allRoles,
+  allPermissions,
+  hasRoles,
+  isNew,
+  isEditing,
+  page,
+  onEdit,
+  onSave,
+  onCancel,
+  onUpdatePermissions,
+  onUpdateRoles,
+}: Props) => {
+  if (isEditing) {
     return (
-      <tr>
-        <td style={{width: `${USERS_TABLE.colUsername}px`}}>
-          <Link to={page}>{user.name}</Link>
-        </td>
-        {hasRoles ? (
-          <td>
-            <UserRoleDropdown
-              user={user}
-              allRoles={allRoles}
-              onUpdateRoles={onUpdateRoles}
-            />
-          </td>
-        ) : (
-          <td style={{width: `${USERS_TABLE.colAdministrator}px`}}>
-            <span className={adminStyle.style}>{adminStyle.text}</span>
-          </td>
-        )}
-        <td>
-          {this.hasPermissions ? (
-            <UserPermissionsDropdown
-              user={user}
-              allPermissions={allPermissions}
-              onUpdatePermissions={onUpdatePermissions}
-            />
-          ) : (
-            <OssUserDBPermissions user={user} />
-          )}
-        </td>
-      </tr>
+      <UserRowEdit
+        user={user}
+        isNew={isNew}
+        onEdit={onEdit}
+        onSave={onSave}
+        onCancel={onCancel}
+        hasRoles={hasRoles}
+      />
     )
   }
 
-  private get hasPermissions() {
-    const {allPermissions, hasRoles} = this.props
-    return hasRoles && allPermissions && !!allPermissions.length
-  }
+  const adminStyle =
+    ADMIN_STYLES[
+      +!!user.permissions.find(
+        x => x.scope === 'all' && (x.allowed || []).includes('ALL')
+      )
+    ]
+
+  return (
+    <tr>
+      <td style={{width: `${USERS_TABLE.colUsername}px`}}>
+        <Link to={page}>{user.name}</Link>
+      </td>
+      {hasRoles ? (
+        <td>
+          <UserRoleDropdown
+            user={user}
+            allRoles={allRoles}
+            onUpdateRoles={onUpdateRoles}
+          />
+        </td>
+      ) : (
+        <td style={{width: `${USERS_TABLE.colAdministrator}px`}}>
+          <span className={adminStyle.style}>{adminStyle.text}</span>
+        </td>
+      )}
+      <td>
+        {hasRoles ? (
+          <UserPermissionsDropdown
+            user={user}
+            allPermissions={allPermissions}
+            onUpdatePermissions={onUpdatePermissions}
+          />
+        ) : (
+          <OssUserDBPermissions user={user} />
+        )}
+      </td>
+    </tr>
+  )
 }
 
 export default UserRow
