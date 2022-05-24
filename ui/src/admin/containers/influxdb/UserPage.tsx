@@ -231,7 +231,7 @@ const UserPageContent = ({
           <span title={`User: ${userName}`}>{userName}</span>
         </h2>
         {password === undefined && (
-          <>
+          <div style={{display: 'flex'}}>
             <Button
               text="Change password"
               onClick={() => setPassword('')}
@@ -258,19 +258,12 @@ const UserPageContent = ({
               disabled={running}
               position="bottom"
             ></ConfirmButton>
-          </>
+          </div>
         )}
       </div>
-      <div className="panel-body influxdb-admin--user">
+      <div className="panel-body influxdb-admin--detail">
         {password !== undefined ? (
-          <div
-            style={{
-              display: 'flex',
-              justifyItems: 'flex-start',
-              alignItems: 'center',
-              columnGap: '10px',
-            }}
-          >
+          <div className="influxdb-admin--pwdchange">
             <input
               className="form-control input-sm"
               name="password"
@@ -298,75 +291,71 @@ const UserPageContent = ({
           </div>
         ) : (
           <FancyScrollbar>
-            <div className="db-manager">
-              <div className="db-manager-header privileges">
-                <h4>
-                  Database Privileges{permissionsChanged ? ' (unsaved)' : ''}
-                </h4>
-                {permissionsChanged && (
-                  <Button
-                    text="Apply Changes"
-                    onClick={changePermissions}
-                    color={ComponentColor.Secondary}
-                    status={
-                      running
-                        ? ComponentStatus.Disabled
-                        : ComponentStatus.Default
-                    }
-                  />
-                )}
-              </div>
-              <div className="db-manager-body">
-                {isAdmin && (
-                  <div className="db-manager-text">
-                    The user is an <b>admin</b>, ALL PRIVILEGES are granted
-                    irrespectively of database permissions.
-                  </div>
-                )}
-                <div className="db-manager-table">
-                  <table className="table v-center table-highlight">
-                    <thead>
-                      <tr>
-                        <th style={{minWidth: '100px', whiteSpace: 'nowrap'}}>
-                          Database
-                        </th>
-                        <th style={{width: '99%', whiteSpace: 'nowrap'}}>
-                          Priviledges
-                        </th>
+            <div className="infludb-admin-section__header">
+              <h4>
+                Database Privileges{permissionsChanged ? ' (unsaved)' : ''}
+              </h4>
+              {permissionsChanged && (
+                <Button
+                  text="Apply Changes"
+                  onClick={changePermissions}
+                  color={ComponentColor.Secondary}
+                  status={
+                    running ? ComponentStatus.Disabled : ComponentStatus.Default
+                  }
+                />
+              )}
+            </div>
+            <div className="infludb-admin-section__body">
+              {isAdmin && (
+                <p>
+                  The user is an <b>admin</b>, ALL PRIVILEGES are granted
+                  irrespectively of database permissions.
+                </p>
+              )}
+              <div>
+                <table className="table v-center table-highlight">
+                  <thead>
+                    <tr>
+                      <th style={{minWidth: '100px', whiteSpace: 'nowrap'}}>
+                        Database
+                      </th>
+                      <th style={{width: '99%', whiteSpace: 'nowrap'}}>
+                        Priviledges
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(databases || []).map(db => (
+                      <tr key={db.name}>
+                        <td>{db.name}</td>
+                        <td>
+                          {dbPermisssions.map((perm, i) => (
+                            <span
+                              key={i}
+                              title="Click to change, click Apply Changes to save all changes"
+                              data-db={db.name}
+                              data-perm={perm}
+                              className={`permission-value ${
+                                userDBPermissions[db.name]?.[perm]
+                                  ? 'granted'
+                                  : 'denied'
+                              } ${
+                                changedPermissions[db.name]?.[perm] !==
+                                undefined
+                                  ? 'perm-changed'
+                                  : ''
+                              }`}
+                              onClick={onPermissionChange}
+                            >
+                              {perm}
+                            </span>
+                          ))}
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {(databases || []).map(db => (
-                        <tr key={db.name}>
-                          <td>{db.name}</td>
-                          <td>
-                            {dbPermisssions.map((perm, i) => (
-                              <span
-                                key={i}
-                                title="Click to change, click Apply Changes to save all changes"
-                                data-db={db.name}
-                                data-perm={perm}
-                                className={`permission-value ${
-                                  userDBPermissions[db.name]?.[perm]
-                                    ? 'granted'
-                                    : 'denied'
-                                } ${
-                                  changedPermissions[db.name]?.[perm] !==
-                                  undefined
-                                    ? 'perm-changed'
-                                    : ''
-                                }`}
-                                onClick={onPermissionChange}
-                              >
-                                {perm}
-                              </span>
-                            ))}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </FancyScrollbar>
@@ -390,7 +379,7 @@ const UserPage = (props: Props) => {
           <Button text="Exit" onClick={exitHandler} />
         </Page.Header.Right>
       </Page.Header>
-      <div style={{height: 'calc(100% - 60px)'}}>
+      <div className="influxdb-admin--contents">
         <UserPageContent {...props} />
       </div>
     </Page>

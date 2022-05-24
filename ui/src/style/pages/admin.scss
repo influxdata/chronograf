@@ -125,17 +125,61 @@ pre.admin-table--query {
     margin-right: 4px;
   }
 }
-.page.influxdb-admin{
+.influxdb-admin.page {
   .page-header{
     padding: 0 30px;
+    min-height: 60px;
+  }
+  .influxdb-admin--contents{
+    height: calc(100%-60px);
+  }
+  .permission-value{
+    @include btn-base-styles(
+      $g5-pepper,
+      $g6-smoke,
+      $g7-graphite,
+      $g14-chromium,
+      $g18-cloud
+    );
+    padding: 4px;
+    margin: 0 2px;
+    display: inline-block;
+    border-radius: $radius;
+    font-family: $ix-text-font;
+    &:hover{
+      background-color: $g2-kevlar;
+    }
+    &.denied{
+      font-style: italic;
+      background-color: $g5-pepper;
+      color: $g7-graphite;
+      &:hover{
+        background-color: $g2-kevlar;
+        color: $g9-mountain;
+      }
+      &.perm-changed{
+        color: $g13-mist;
+        padding: 2px;
+        border: 2px solid $c-banana;
+      }
+    }
+    &.granted{
+      &.perm-changed{
+        padding: 2px;
+        text-decoration: line-through;
+        border: 2px solid $c-banana;
+      }
+    }
   }
 }
 .influxdb-admin.panel.panel-solid {
   border-radius: 0px;
   .panel-heading {
-    height: 90px;
+    height: 60px;
+    min-height: 60px;
     padding: 0 30px;
     flex-wrap: wrap;
+    justify-content: end;
     *:first-child {
       flex: 1 0 auto;
     }
@@ -148,11 +192,54 @@ pre.admin-table--query {
   }
   .panel-body {
     border-radius: 0px;
-    height: calc(100vh - 180px);
+    height: calc(100vh - 150px);
     min-height: 10px;
-    &.influxdb-admin--user{
-      height: calc(100vh - 150px);
+    &.influxdb-admin--detail{
+      height: calc(100vh - 120px);
+      padding: 10px 0 0;
+      background-color: $g1-raven;
+    }
+    .influxdb-admin--pwdchange{
+      display: flex;
+      padding-left: 30px;
+      justify-items: flex-start;
+      align-items: center;
+      column-gap: 10px;
+    }
+    .infludb-admin-section__header{
       padding: 0 30px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      h4 {
+        margin: 0;
+        color: $g12-forge;
+        font-size: 16px;
+        font-family: "RobotoMono", monospace;
+        @include no-user-select();
+      }
+    }
+    .infludb-admin-section__body{
+      margin: 0 30px;
+      background-color: $g1-raven;
+      p {
+        padding: 17px;
+      }
+      & > * {
+        margin: 0 0 2px 0;
+        background-color: $g3-castle;
+        padding: 9px 11px;
+        .table-highlight > tbody > tr:hover {
+          background-color: $g5-pepper;
+        }
+      }
+      & > *:first-child{
+        border-radius: $radius $radius 0 0;        
+      }
+      & > *:last-child{
+        border-radius: 0 0 $radius $radius;        
+      }
     }
   }
 }
@@ -190,19 +277,6 @@ pre.admin-table--query {
     padding-left: 6px;
     @include no-user-select();
   }
-  &.privileges {
-    .all-privileges {
-      display: inline-block;
-      vertical-align: middle;
-      font-size: 13px;
-      font-weight: 500;
-      background-color: $g2-kevlar;
-      color: $c-pool;
-      border-radius: 3px;
-      padding: 2px 6px;
-      margin-left: 4px;
-    }
-  }
 }
 .db-manager-header--actions {
   display: flex;
@@ -229,37 +303,9 @@ pre.admin-table--query {
 }
 .db-manager-body {
   width: 100%;
-  .db-manager-text {
-    background-color: $g4-onyx;
-    padding: 17px;
-  }
   .db-manager-table {
     .table {
       width: auto
-    }
-  }
-  .permission-value{
-    padding: 2px;
-    &:hover{
-      background-color: $g2-kevlar;
-    }
-    &.denied{
-      color: $g5-pepper;
-      &:hover{
-        color: $g9-mountain;
-      }
-      &.perm-changed{
-        color: $g13-mist;
-        padding: 1px;
-        border: 1px solid $c-banana;
-      }
-    }
-    &.granted{
-      &.perm-changed{
-        padding: 1px;
-        text-decoration: line-through;
-        border: 1px solid $c-banana;
-      }
     }
   }
 }
