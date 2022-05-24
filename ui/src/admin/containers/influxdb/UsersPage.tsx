@@ -5,7 +5,6 @@ import {withSource} from 'src/CheckSources'
 import {Source} from 'src/types'
 import {UserPermission, UserRole, User} from 'src/types/influxAdmin'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
-import UsersTable from 'src/admin/components/UsersTable'
 import {
   addUser as addUserActionCreator,
   editUser as editUserActionCreator,
@@ -22,6 +21,10 @@ import AdminInfluxDBTab, {
   hasRoleManagement,
   isConnectedToLDAP,
 } from './AdminInfluxDBTab'
+import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+import EmptyRow from 'src/admin/components/EmptyRow'
+import UserRow from 'src/admin/components/UserRow'
+import FilterBar from 'src/admin/components/FilterBar'
 
 const isValidUser = (user: User) => {
   const minLen = 3
@@ -95,30 +98,63 @@ class UsersPage extends Component<Props> {
       filterUsers,
       removeUser,
       editUser,
-      deleteUser,
       updateUserPermissions,
       updateUserRoles,
-      updateUserPassword,
     } = this.props
+    const hasRoles = hasRoleManagement(source)
+    const usersPage = `/sources/${source.id}/admin-influxdb/users`
     return (
       <AdminInfluxDBTab activeTab="users" source={source}>
-        <UsersTable
-          users={users}
-          allRoles={roles}
-          usersPage={`/sources/${source.id}/admin-influxdb/users`}
-          hasRoles={hasRoleManagement(source)}
-          permissions={this.allowed}
-          isEditing={users.some(u => u.isEditing)}
-          onSave={this.handleSaveUser}
-          onCancel={removeUser}
-          onClickCreate={this.handleClickCreate}
-          onEdit={editUser}
-          onDelete={deleteUser}
-          onFilter={filterUsers}
-          onUpdatePermissions={updateUserPermissions}
-          onUpdateRoles={updateUserRoles}
-          onUpdatePassword={updateUserPassword}
-        />
+        <div className="panel panel-solid influxdb-admin">
+          <FilterBar
+            type="users"
+            onFilter={filterUsers}
+            isEditing={users.some(u => u.isEditing)}
+            onClickCreate={this.handleClickCreate}
+          />
+          <div className="panel-body">
+            <FancyScrollbar>
+              <table className="table v-center admin-table table-highlight">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th className="admin-table--left-offset">
+                      {hasRoles ? 'Roles' : 'Admin'}
+                    </th>
+                    <th>Permissions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.length ? (
+                    users
+                      .filter(u => !u.hidden)
+                      .map(user => (
+                        <UserRow
+                          key={user.name}
+                          user={user}
+                          page={`${usersPage}/${encodeURIComponent(
+                            user.name || ''
+                          )}`}
+                          onEdit={editUser}
+                          onSave={this.handleSaveUser}
+                          onCancel={removeUser}
+                          isEditing={user.isEditing}
+                          isNew={user.isNew}
+                          allRoles={roles}
+                          hasRoles={hasRoles}
+                          allPermissions={this.allowed}
+                          onUpdatePermissions={updateUserPermissions}
+                          onUpdateRoles={updateUserRoles}
+                        />
+                      ))
+                  ) : (
+                    <EmptyRow tableName={'Users'} colSpan={3} />
+                  )}
+                </tbody>
+              </table>
+            </FancyScrollbar>
+          </div>
+        </div>
       </AdminInfluxDBTab>
     )
   }
