@@ -42,7 +42,7 @@ class FilterBar extends Component {
         <button
           className="btn btn-sm btn-primary"
           disabled={isEditing}
-          onClick={onClickCreate(type)}
+          onClick={onClickCreate}
         >
           <span className="icon plus" /> Create{' '}
           {placeholderText.substring(0, placeholderText.length - 1)}

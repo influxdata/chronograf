@@ -65,9 +65,6 @@ class RolesPage extends Component<Props> {
     return globalPermissions ? globalPermissions.allowed : []
   }
 
-  private handleClickCreate = () => () => {
-    this.props.addRole()
-  }
   private handleEditRole = (role, updates) => {
     this.props.editRole(role, updates)
   }
@@ -119,7 +116,7 @@ class RolesPage extends Component<Props> {
         </AdminInfluxDBTab>
       )
     }
-    const {users, roles, filterRoles} = this.props
+    const {users, roles, addRole, filterRoles} = this.props
     return (
       <AdminInfluxDBTab activeTab="roles" source={source}>
         <RolesTable
@@ -127,7 +124,7 @@ class RolesPage extends Component<Props> {
           allUsers={users}
           permissions={this.allowed}
           isEditing={roles.some(r => r.isEditing)}
-          onClickCreate={this.handleClickCreate}
+          onClickCreate={addRole}
           onEdit={this.handleEditRole}
           onSave={this.handleSaveRole}
           onCancel={this.handleCancelEditRole}

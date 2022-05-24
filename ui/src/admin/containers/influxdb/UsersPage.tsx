@@ -79,9 +79,6 @@ class UsersPage extends Component<Props> {
       return this.props.createUser(this.props.source.links.users, user)
     }
   }
-  private handleClickCreate = () => () => {
-    this.props.addUser()
-  }
 
   public render() {
     const source = this.props.source
@@ -96,6 +93,7 @@ class UsersPage extends Component<Props> {
       users,
       roles,
       filterUsers,
+      addUser,
       removeUser,
       editUser,
       updateUserPermissions,
@@ -110,7 +108,7 @@ class UsersPage extends Component<Props> {
             type="users"
             onFilter={filterUsers}
             isEditing={users.some(u => u.isEditing)}
-            onClickCreate={this.handleClickCreate}
+            onClickCreate={addUser}
           />
           <div className="panel-body">
             <FancyScrollbar>
