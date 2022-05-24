@@ -1,9 +1,8 @@
-import React from 'react'
-import {Component} from 'react'
+import React, {useCallback, useMemo} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
 import {withSource} from 'src/CheckSources'
 import {Source} from 'src/types'
-import {UserPermission, UserRole, User} from 'src/types/influxAdmin'
+import {UserPermission, UserRole, User, Database} from 'src/types/influxAdmin'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {
   addUser as addUserActionCreator,
@@ -31,7 +30,10 @@ const isValidUser = (user: User) => {
   return user.name.length >= minLen && user.password.length >= minLen
 }
 
-const mapStateToProps = ({adminInfluxDB: {users, roles, permissions}}) => ({
+const mapStateToProps = ({
+  adminInfluxDB: {databases, users, roles, permissions},
+}) => ({
+  databases,
   users,
   roles,
   permissions,
@@ -54,6 +56,7 @@ interface OwnProps {
   source: Source
 }
 interface ConnectedProps {
+  databases: Database[]
   users: User[]
   roles: UserRole[]
   permissions: UserPermission[]
@@ -62,100 +65,107 @@ interface ConnectedProps {
 type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
 type Props = OwnProps & ConnectedProps & ReduxDispatchProps
 
-class UsersPage extends Component<Props> {
-  private get allowed(): string[] {
-    const {permissions} = this.props
-    const globalPermissions = permissions.find(p => p.scope === 'all')
-    return globalPermissions ? globalPermissions.allowed : []
-  }
-
-  private handleSaveUser = async (user: User) => {
-    const {notify} = this.props
-    if (!isValidUser(user)) {
-      notify(notifyDBUserNamePasswordInvalid())
-      return
-    }
-    if (user.isNew) {
-      return this.props.createUser(this.props.source.links.users, user)
-    }
-  }
-
-  public render() {
-    const source = this.props.source
-    if (isConnectedToLDAP(source)) {
-      return (
-        <AdminInfluxDBTab activeTab="users" source={source}>
-          <div className="container-fluid">Users are managed via LDAP.</div>
-        </AdminInfluxDBTab>
-      )
-    }
-    const {
-      users,
-      roles,
-      filterUsers,
-      addUser,
-      removeUser,
-      editUser,
-      updateUserPermissions,
-      updateUserRoles,
-    } = this.props
-    const hasRoles = hasRoleManagement(source)
-    const usersPage = `/sources/${source.id}/admin-influxdb/users`
+const UsersPage = ({
+  source,
+  databases,
+  users,
+  roles,
+  permissions,
+  notify,
+  createUser,
+  filterUsers,
+  addUser,
+  removeUser,
+  editUser,
+  updateUserPermissions,
+  updateUserRoles,
+}: Props) => {
+  if (isConnectedToLDAP(source)) {
     return (
       <AdminInfluxDBTab activeTab="users" source={source}>
-        <div className="panel panel-solid influxdb-admin">
-          <FilterBar
-            type="users"
-            onFilter={filterUsers}
-            isEditing={users.some(u => u.isEditing)}
-            onClickCreate={addUser}
-          />
-          <div className="panel-body">
-            <FancyScrollbar>
-              <table className="table v-center admin-table table-highlight">
-                <thead>
-                  <tr>
-                    <th>User</th>
-                    <th className="admin-table--left-offset">
-                      {hasRoles ? 'Roles' : 'Admin'}
-                    </th>
-                    <th>Permissions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.length ? (
-                    users
-                      .filter(u => !u.hidden)
-                      .map(user => (
-                        <UserRow
-                          key={user.name}
-                          user={user}
-                          page={`${usersPage}/${encodeURIComponent(
-                            user.name || ''
-                          )}`}
-                          onEdit={editUser}
-                          onSave={this.handleSaveUser}
-                          onCancel={removeUser}
-                          isEditing={user.isEditing}
-                          isNew={user.isNew}
-                          allRoles={roles}
-                          hasRoles={hasRoles}
-                          allPermissions={this.allowed}
-                          onUpdatePermissions={updateUserPermissions}
-                          onUpdateRoles={updateUserRoles}
-                        />
-                      ))
-                  ) : (
-                    <EmptyRow tableName={'Users'} colSpan={3} />
-                  )}
-                </tbody>
-              </table>
-            </FancyScrollbar>
-          </div>
-        </div>
+        <div className="container-fluid">Users are managed via LDAP.</div>
       </AdminInfluxDBTab>
     )
   }
+  const allAllowedPermissions = useMemo(() => {
+    const globalPermissions = permissions.find(p => p.scope === 'all')
+    return globalPermissions ? globalPermissions.allowed : []
+  }, [permissions])
+
+  const handleSaveUser = useCallback(
+    async (user: User) => {
+      if (!isValidUser(user)) {
+        notify(notifyDBUserNamePasswordInvalid())
+        return
+      }
+      if (user.isNew) {
+        return createUser(source.links.users, user)
+      }
+    },
+    [notify, source]
+  )
+
+  const [hasRoles, usersPage] = useMemo(
+    () => [
+      hasRoleManagement(source),
+      `/sources/${source.id}/admin-influxdb/users`,
+    ],
+    [source]
+  )
+  const visibleUsers = useMemo(() => users.filter(x => !x.hidden), [users])
+  return (
+    <AdminInfluxDBTab activeTab="users" source={source}>
+      <div className="panel panel-solid influxdb-admin">
+        <FilterBar
+          type="users"
+          onFilter={filterUsers}
+          isEditing={users.some(u => u.isEditing)}
+          onClickCreate={addUser}
+        />
+        <div className="panel-body">
+          <FancyScrollbar>
+            <table className="table v-center admin-table table-highlight">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th className="admin-table--left-offset">
+                    {hasRoles ? 'Roles' : 'Admin'}
+                  </th>
+                  <th>Permissions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleUsers.length ? (
+                  visibleUsers.map(user => (
+                    <UserRow
+                      key={user.name}
+                      user={user}
+                      page={`${usersPage}/${encodeURIComponent(
+                        user.name || ''
+                      )}`}
+                      databases={databases}
+                      allRoles={roles}
+                      hasRoles={hasRoles}
+                      onEdit={editUser}
+                      onSave={handleSaveUser}
+                      onCancel={removeUser}
+                      isEditing={user.isEditing}
+                      isNew={user.isNew}
+                      allPermissions={allAllowedPermissions}
+                      onUpdatePermissions={updateUserPermissions}
+                      onUpdateRoles={updateUserRoles}
+                    />
+                  ))
+                ) : (
+                  <EmptyRow tableName={'Users'} colSpan={3} />
+                )}
+              </tbody>
+            </table>
+          </FancyScrollbar>
+        </div>
+      </div>
+    </AdminInfluxDBTab>
+  )
 }
 
 export default withSource(

@@ -5,7 +5,7 @@ import UserRoleDropdown from 'src/admin/components/UserRoleDropdown'
 import {USERS_TABLE} from 'src/admin/constants/tableSizing'
 
 import UserRowEdit from 'src/admin/components/UserRowEdit'
-import {User, UserPermission} from 'src/types/influxAdmin'
+import {Database, User, UserPermission} from 'src/types/influxAdmin'
 import {Link} from 'react-router'
 
 const ADMIN_STYLES = [
@@ -51,6 +51,7 @@ const OssUserDBPermissions = ({user}: {user: User}) => (
 )
 
 interface Props {
+  databases: Database[]
   user: User
   allRoles: any[]
   allPermissions: string[]
