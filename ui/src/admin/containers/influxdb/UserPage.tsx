@@ -3,10 +3,7 @@ import {connect, ResolveThunks} from 'react-redux'
 import {withSource} from 'src/CheckSources'
 import {Source} from 'src/types'
 import {Database, User, UserPermission, UserRole} from 'src/types/influxAdmin'
-import AdminInfluxDBTabbedPage, {
-  hasRoleManagement,
-  isConnectedToLDAP,
-} from './AdminInfluxDBTabbedPage'
+import {hasRoleManagement, isConnectedToLDAP} from './AdminInfluxDBTabbedPage'
 import {withRouter, WithRouterProps} from 'react-router'
 import {useMemo} from 'react'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
@@ -15,10 +12,11 @@ import {
   updateUserPasswordAsync,
   updateUserPermissionsAsync,
 } from 'src/admin/actions/influxdb'
-import {Button, ComponentColor, ComponentStatus} from 'src/reusable_ui'
+import {Button, ComponentColor, ComponentStatus, Page} from 'src/reusable_ui'
 import ConfirmOrCancel from 'src/shared/components/ConfirmOrCancel'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {useEffect} from 'react'
+import {useCallback} from 'react'
 
 const mapStateToProps = ({
   adminInfluxDB: {databases, users, roles, permissions},
@@ -263,7 +261,7 @@ const UserPageContent = ({
           </>
         )}
       </div>
-      <div className="panel-body">
+      <div className="panel-body influxdb-admin--user">
         {password !== undefined ? (
           <div
             style={{
@@ -378,11 +376,26 @@ const UserPageContent = ({
   )
 }
 
-const UserPage = (props: Props) => (
-  <AdminInfluxDBTabbedPage activeTab="users" source={props.source}>
-    <UserPageContent {...props} />
-  </AdminInfluxDBTabbedPage>
-)
+const UserPage = (props: Props) => {
+  const exitHandler = useCallback(() => {
+    props.router.push(`/sources/${props.params.sourceID}/admin-influxdb/users`)
+  }, [props.router, props.source])
+  return (
+    <Page className="influxdb-admin">
+      <Page.Header fullWidth={true}>
+        <Page.Header.Left>
+          <Page.Title title="Manage User" />
+        </Page.Header.Left>
+        <Page.Header.Right showSourceIndicator={true}>
+          <Button text="Exit" onClick={exitHandler} />
+        </Page.Header.Right>
+      </Page.Header>
+      <div style={{height: 'calc(100% - 60px)'}}>
+        <UserPageContent {...props} />
+      </div>
+    </Page>
+  )
+}
 export default withSource(
   withRouter(connect(mapStateToProps, mapDispatchToProps)(UserPage))
 )

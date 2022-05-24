@@ -125,7 +125,11 @@ pre.admin-table--query {
     margin-right: 4px;
   }
 }
-
+.page.influxdb-admin{
+  .page-header{
+    padding: 0 30px;
+  }
+}
 .influxdb-admin.panel.panel-solid {
   border-radius: 0px;
   .panel-heading {
@@ -146,6 +150,10 @@ pre.admin-table--query {
     border-radius: 0px;
     height: calc(100vh - 180px);
     min-height: 10px;
+    &.influxdb-admin--user{
+      height: calc(100vh - 150px);
+      padding: 0 30px;
+    }
   }
 }
 /*

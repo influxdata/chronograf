@@ -38,16 +38,14 @@ interface State {
 }
 
 export const WrapToPage = ({children}: {children: JSX.Element}) => (
-  <Page>
-    <div className="deceo">
-      <Page.Header fullWidth={true}>
-        <Page.Header.Left>
-          <Page.Title title="InfluxDB Admin" />
-        </Page.Header.Left>
-        <Page.Header.Right showSourceIndicator={true} />
-      </Page.Header>
-      <div style={{height: 'calc(100% - 60px)'}}>{children}</div>
-    </div>
+  <Page className="influxdb-admin">
+    <Page.Header fullWidth={true}>
+      <Page.Header.Left>
+        <Page.Title title="InfluxDB Admin" />
+      </Page.Header.Left>
+      <Page.Header.Right showSourceIndicator={true} />
+    </Page.Header>
+    <div style={{height: 'calc(100% - 60px)'}}>{children}</div>
   </Page>
 )
 @ErrorHandling
