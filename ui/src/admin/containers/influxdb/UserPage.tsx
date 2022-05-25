@@ -19,6 +19,12 @@ import {useEffect} from 'react'
 import {useCallback} from 'react'
 import {PERMISSIONS} from 'src/shared/constants'
 
+const FAKE_USER: User = {
+  name: '',
+  permissions: [],
+  roles: [],
+}
+
 const mapStateToProps = ({
   adminInfluxDB: {databases, users, roles, permissions},
 }) => ({
@@ -72,7 +78,7 @@ const UserPage = ({
   const [running, setRunning] = useState(false)
   const [password, setPassword] = useState<string | undefined>(undefined)
   const [user, deleteUser] = useMemo(() => {
-    const u = users.find(x => x.name === userName)
+    const u = users.find(x => x.name === userName) || FAKE_USER
     return [
       u,
       async () => {
@@ -86,13 +92,6 @@ const UserPage = ({
       },
     ]
   }, [source, users, userName])
-  if (!user) {
-    return (
-      <div className="container-fluid">
-        User <span className="error-warning">{userName}</span> not found!
-      </div>
-    )
-  }
   const updatePassword = useMemo(
     () => async () => {
       setRunning(true)
@@ -224,143 +223,148 @@ const UserPage = ({
     },
     [user, changedPermissions, userDBPermissions]
   )
-  const body = (
-    <div className="panel panel-solid influxdb-admin">
-      <div className="panel-heading">
-        <h2 className="panel-title">
-          {password === undefined ? '' : 'Set password for user: '}
-          <span title={`User: ${userName}`}>{userName}</span>
-        </h2>
-        {password === undefined && (
-          <div style={{display: 'flex'}}>
-            <Button
-              text="Change password"
-              onClick={() => setPassword('')}
-              status={
-                running ? ComponentStatus.Disabled : ComponentStatus.Default
-              }
-            />
-            {isOSS && (
-              <ConfirmButton
-                type="btn-default"
-                text={isAdmin ? 'Revoke Admin' : 'Grant Admin'}
-                confirmText={
-                  isAdmin ? 'Revoke ALL Privileges' : 'Grant ALL Privileges'
-                }
-                confirmAction={changeAdmin}
-                disabled={running}
-                position="bottom"
-              ></ConfirmButton>
-            )}
-            <ConfirmButton
-              type="btn-danger"
-              text="Delete User"
-              confirmAction={deleteUser}
-              disabled={running}
-              position="bottom"
-            ></ConfirmButton>
-          </div>
-        )}
-      </div>
-      <div className="panel-body influxdb-admin--detail">
-        {password !== undefined ? (
-          <div className="influxdb-admin--pwdchange">
-            <input
-              className="form-control input-sm"
-              name="password"
-              type="password"
-              value={password}
-              placeholder="New Password"
-              disabled={running}
-              onChange={e => setPassword(e.target.value)}
-              onKeyPress={e => {
-                if (e.key === 'Enter') {
-                  updatePassword()
-                }
-              }}
-              style={{flex: '0 0 auto', width: '200px'}}
-              spellCheck={false}
-              autoComplete="false"
-            />
-            <ConfirmOrCancel
-              item={user}
-              onConfirm={updatePassword}
-              isDisabled={running}
-              onCancel={() => setPassword(undefined)}
-              buttonSize="btn-sm"
-            />
-          </div>
-        ) : (
-          <FancyScrollbar>
-            <div className="infludb-admin-section__header">
-              <h4>
-                Database Privileges{permissionsChanged ? ' (unsaved)' : ''}
-              </h4>
-            </div>
-            <div className="infludb-admin-section__body">
-              {isAdmin && (
-                <p>
-                  The user is an <b>admin</b>, ALL PRIVILEGES are granted
-                  irrespectively of database permissions.
-                </p>
-              )}
-              <div>
-                <table className="table v-center table-highlight">
-                  <thead>
-                    <tr>
-                      <th style={{minWidth: '100px', whiteSpace: 'nowrap'}}>
-                        Database
-                      </th>
-                      <th style={{width: '99%', whiteSpace: 'nowrap'}}>
-                        Priviledges
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(databases || []).map(db => (
-                      <tr key={db.name}>
-                        <td>{db.name}</td>
-                        <td>
-                          {dbPermisssions.map((perm, i) => (
-                            <div
-                              key={i}
-                              title={
-                                PERMISSIONS[perm]?.description ||
-                                'Click to change, click Apply Changes to save all changes'
-                              }
-                              data-db={db.name}
-                              data-perm={perm}
-                              className={`permission-value ${
-                                userDBPermissions[db.name]?.[perm]
-                                  ? 'granted'
-                                  : 'denied'
-                              } ${
-                                changedPermissions[db.name]?.[perm] !==
-                                undefined
-                                  ? 'perm-changed'
-                                  : ''
-                              }`}
-                              onClick={onPermissionChange}
-                            >
-                              {perm}
-                            </div>
-                          ))}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </FancyScrollbar>
-        )}
-      </div>
-    </div>
-  )
   const exitHandler = useCallback(() => {
     router.push(`/sources/${sourceID}/admin-influxdb/users`)
   }, [router, source])
 
+  const body =
+    user === FAKE_USER ? (
+      <div className="container-fluid">
+        User <span className="error-warning">{userName}</span> not found!
+      </div>
+    ) : (
+      <div className="panel panel-solid influxdb-admin">
+        <div className="panel-heading">
+          <h2 className="panel-title">
+            {password === undefined ? '' : 'Set password for user: '}
+            <span title={`User: ${userName}`}>{userName}</span>
+          </h2>
+          {password === undefined && (
+            <div style={{display: 'flex'}}>
+              <Button
+                text="Change password"
+                onClick={() => setPassword('')}
+                status={
+                  running ? ComponentStatus.Disabled : ComponentStatus.Default
+                }
+              />
+              {isOSS && (
+                <ConfirmButton
+                  type="btn-default"
+                  text={isAdmin ? 'Revoke Admin' : 'Grant Admin'}
+                  confirmText={
+                    isAdmin ? 'Revoke ALL Privileges' : 'Grant ALL Privileges'
+                  }
+                  confirmAction={changeAdmin}
+                  disabled={running}
+                  position="bottom"
+                ></ConfirmButton>
+              )}
+              <ConfirmButton
+                type="btn-danger"
+                text="Delete User"
+                confirmAction={deleteUser}
+                disabled={running}
+                position="bottom"
+              ></ConfirmButton>
+            </div>
+          )}
+        </div>
+        <div className="panel-body influxdb-admin--detail">
+          {password !== undefined ? (
+            <div className="influxdb-admin--pwdchange">
+              <input
+                className="form-control input-sm"
+                name="password"
+                type="password"
+                value={password}
+                placeholder="New Password"
+                disabled={running}
+                onChange={e => setPassword(e.target.value)}
+                onKeyPress={e => {
+                  if (e.key === 'Enter') {
+                    updatePassword()
+                  }
+                }}
+                style={{flex: '0 0 auto', width: '200px'}}
+                spellCheck={false}
+                autoComplete="false"
+              />
+              <ConfirmOrCancel
+                item={user}
+                onConfirm={updatePassword}
+                isDisabled={running}
+                onCancel={() => setPassword(undefined)}
+                buttonSize="btn-sm"
+              />
+            </div>
+          ) : (
+            <FancyScrollbar>
+              <div className="infludb-admin-section__header">
+                <h4>
+                  Database Privileges{permissionsChanged ? ' (unsaved)' : ''}
+                </h4>
+              </div>
+              <div className="infludb-admin-section__body">
+                {isAdmin && (
+                  <p>
+                    The user is an <b>admin</b>, ALL PRIVILEGES are granted
+                    irrespectively of database permissions.
+                  </p>
+                )}
+                <div>
+                  <table className="table v-center table-highlight">
+                    <thead>
+                      <tr>
+                        <th style={{minWidth: '100px', whiteSpace: 'nowrap'}}>
+                          Database
+                        </th>
+                        <th style={{width: '99%', whiteSpace: 'nowrap'}}>
+                          Priviledges
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(databases || []).map(db => (
+                        <tr key={db.name}>
+                          <td>{db.name}</td>
+                          <td>
+                            {dbPermisssions.map((perm, i) => (
+                              <div
+                                key={i}
+                                title={
+                                  PERMISSIONS[perm]?.description ||
+                                  'Click to change, click Apply Changes to save all changes'
+                                }
+                                data-db={db.name}
+                                data-perm={perm}
+                                className={`permission-value ${
+                                  userDBPermissions[db.name]?.[perm]
+                                    ? 'granted'
+                                    : 'denied'
+                                } ${
+                                  changedPermissions[db.name]?.[perm] !==
+                                  undefined
+                                    ? 'perm-changed'
+                                    : ''
+                                }`}
+                                onClick={onPermissionChange}
+                              >
+                                {perm}
+                              </div>
+                            ))}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </FancyScrollbar>
+          )}
+        </div>
+      </div>
+    )
   return (
     <Page className="influxdb-admin">
       <Page.Header fullWidth={true}>
