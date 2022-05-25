@@ -96,7 +96,7 @@ const UsersPage = ({
     [notify, source]
   )
 
-  const [hasRoles, usersPage] = useMemo(
+  const [isEnterprise, usersPage] = useMemo(
     () => [
       hasRoleManagement(source),
       `/sources/${source.id}/admin-influxdb/users`,
@@ -230,7 +230,7 @@ const UsersPage = ({
                 <tr>
                   <th>User</th>
                   <th className="admin-table--left-offset">
-                    {hasRoles ? 'Roles' : 'Admin'}
+                    {isEnterprise ? 'Roles' : 'Admin'}
                   </th>
                   {visibleUsers.length && visibleDBNames.length
                     ? visibleDBNames.map(name => (
@@ -256,7 +256,7 @@ const UsersPage = ({
                       )}`}
                       userDBPermissions={userDBPermissions[userIndex]}
                       allRoles={roles}
-                      hasRoles={hasRoles}
+                      hasRoles={isEnterprise}
                       onEdit={editUser}
                       onSave={handleSaveUser}
                       onCancel={removeUser}

@@ -54,7 +54,7 @@ const UserRow = ({
         onEdit={onEdit}
         onSave={onSave}
         onCancel={onCancel}
-        hasRoles={hasRoles}
+        colSpan={2 + userDBPermissions.length}
       />
     )
   }
@@ -72,12 +72,16 @@ const UserRow = ({
         <Link to={page}>{user.name}</Link>
       </td>
       {hasRoles ? (
-        <td>
-          <UserRoleDropdown
-            user={user}
-            allRoles={allRoles}
-            onUpdateRoles={onUpdateRoles}
-          />
+        <td className="admin-table--left-offset">
+          {allRoles.length ? (
+            <UserRoleDropdown
+              user={user}
+              allRoles={allRoles}
+              onUpdateRoles={onUpdateRoles}
+            />
+          ) : (
+            <i>N/A</i>
+          )}
         </td>
       ) : (
         <td style={{width: `${USERS_TABLE.colAdministrator}px`}}>

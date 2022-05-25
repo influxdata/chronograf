@@ -8,7 +8,7 @@ interface UserRowEditProps {
   onSave: (user: User) => Promise<void>
   onCancel: (user: User) => void
   isNew: boolean
-  hasRoles: boolean
+  colSpan: number
 }
 
 const UserRowEdit: FunctionComponent<UserRowEditProps> = ({
@@ -16,7 +16,7 @@ const UserRowEdit: FunctionComponent<UserRowEditProps> = ({
   onEdit,
   onSave,
   onCancel,
-  hasRoles,
+  colSpan,
 }) => {
   const onKeyPress: React.KeyboardEventHandler = e => {
     if (e.key === 'Enter') {
@@ -25,7 +25,7 @@ const UserRowEdit: FunctionComponent<UserRowEditProps> = ({
   }
   return (
     <tr className="admin-table--edit-row">
-      <td colSpan={hasRoles ? 5 : 4} style={{padding: '5px 0 5px 5px'}}>
+      <td colSpan={colSpan} style={{padding: '5px 0 5px 5px'}}>
         <div style={{display: 'flex', flexDirection: 'row'}}>
           <div>
             <input
