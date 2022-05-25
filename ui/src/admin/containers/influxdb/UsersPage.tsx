@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react'
+import React, {useCallback, useMemo, useState} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
 import {withSource} from 'src/CheckSources'
 import {Source} from 'src/types'
@@ -23,7 +23,8 @@ import AdminInfluxDBTabbedPage, {
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import EmptyRow from 'src/admin/components/EmptyRow'
 import UserRow from 'src/admin/components/UserRow'
-import FilterBar from 'src/admin/components/FilterBar'
+import useDebounce from 'src/utils/useDebounce'
+import useChangeEffect from 'src/utils/useChangeEffect'
 
 const isValidUser = (user: User) => {
   const minLen = 3
@@ -112,6 +113,8 @@ const UsersPage = ({
     ],
     [source]
   )
+
+  // effective permissions
   const visibleUsers = useMemo(() => users.filter(x => !x.hidden), [users])
   const userDBPermissions = useMemo<Array<Array<Record<string, boolean>>>>(
     () =>
@@ -141,15 +144,41 @@ const UsersPage = ({
       }),
     [databases, visibleUsers]
   )
+
+  // filter users
+  const [filterText, setFilterText] = useState('')
+  const changeFilterText = useCallback(e => setFilterText(e.target.value), [
+    setFilterText,
+  ])
+  const debouncedFilterText = useDebounce(filterText, 200)
+  useChangeEffect(() => {
+    filterUsers(debouncedFilterText)
+  }, [debouncedFilterText])
+
   return (
     <AdminInfluxDBTabbedPage activeTab="users" source={source}>
       <div className="panel panel-solid influxdb-admin">
-        <FilterBar
-          type="users"
-          onFilter={filterUsers}
-          isEditing={users.some(u => u.isEditing)}
-          onClickCreate={addUser}
-        />
+        <div className="panel-heading">
+          <div>
+            <div className="search-widget" style={{width: '250px'}}>
+              <input
+                type="text"
+                className="form-control input-sm"
+                placeholder={`Filter Users...`}
+                value={filterText}
+                onChange={changeFilterText}
+              />
+              <span className="icon search" />
+            </div>
+          </div>
+          <button
+            className="btn btn-sm btn-primary"
+            disabled={users.some(u => u.isEditing)}
+            onClick={addUser}
+          >
+            <span className="icon plus" /> Create User
+          </button>
+        </div>
         <div className="panel-body">
           <FancyScrollbar>
             <table className="table v-center admin-table table-highlight admin-table--compact">
@@ -159,12 +188,11 @@ const UsersPage = ({
                   <th className="admin-table--left-offset">
                     {hasRoles ? 'Roles' : 'Admin'}
                   </th>
-
-                  {visibleUsers.length &&
-                    (hasRoles ? (
-                      <th>Permissions</th>
-                    ) : (
-                      databases.map(db => (
+                  {visibleUsers.length && hasRoles ? (
+                    <th>Permissions</th>
+                  ) : null}
+                  {visibleUsers.length && databases.length
+                    ? databases.map(db => (
                         <th
                           className="admin-table__dbheader"
                           title={`Database ${db.name}`}
@@ -173,7 +201,7 @@ const UsersPage = ({
                           {db.name}
                         </th>
                       ))
-                    ))}
+                    : null}
                 </tr>
               </thead>
               <tbody>
@@ -199,7 +227,11 @@ const UsersPage = ({
                     />
                   ))
                 ) : (
-                  <EmptyRow tableName={'Users'} colSpan={2} />
+                  <EmptyRow
+                    tableName={'Users'}
+                    colSpan={2}
+                    filtered={!!filterText}
+                  />
                 )}
               </tbody>
             </table>
