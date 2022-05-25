@@ -202,54 +202,49 @@ func Test_Enterprise_ComplainsIfNotOpened(t *testing.T) {
 }
 
 func TestClient_Permissions(t *testing.T) {
-	tests := []struct {
-		name string
-
-		want chronograf.Permissions
-	}{
+	want := chronograf.Permissions{
 		{
-			name: "All possible enterprise permissions",
-			want: chronograf.Permissions{
-				{
-					Scope: chronograf.AllScope,
-					Allowed: chronograf.Allowances{
-						"NoPermissions",
-						"ReadData",
-						"WriteData",
-						"DropData",
-						"ManageContinuousQuery",
-						"ManageQuery",
-						"ManageSubscription",
-						"ViewAdmin",
-						"CreateDatabase",
-						"DropDatabase",
-						"CreateUserAndRole",
-						"CopyShard",
-						"ManageShard",
-						"Rebalance",
-						"AddRemoveNode",
-						"Monitor",
-					},
-				},
-				{
-					Scope: chronograf.DBScope,
-					Allowed: chronograf.Allowances{
-						"NoPermissions",
-						"ReadData",
-						"WriteData",
-						"DropData",
-						"ManageContinuousQuery",
-						"ManageQuery",
-						"ManageSubscription",
-					},
-				},
+			Scope: chronograf.AllScope,
+			Allowed: chronograf.Allowances{
+				"NoPermissions",
+				"ReadData",
+				"WriteData",
+				"DropData",
+				"ManageContinuousQuery",
+				"ManageQuery",
+				"ManageSubscription",
+				"ViewAdmin",
+				"CreateDatabase",
+				"DropDatabase",
+				"CreateUserAndRole",
+				"CopyShard",
+				"ManageShard",
+				"Rebalance",
+				"AddRemoveNode",
+				"Monitor",
+			},
+		},
+		{
+			Scope: chronograf.DBScope,
+			Allowed: chronograf.Allowances{
+				"NoPermissions",
+				"ReadData",
+				"WriteData",
+				"DropData",
+				"ManageContinuousQuery",
+				"ManageQuery",
+				"ManageSubscription",
 			},
 		},
 	}
-	for _, tt := range tests {
-		c := &enterprise.Client{}
-		if got := c.Permissions(context.Background()); !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("%q. Client.Permissions() = %v, want %v", tt.name, got, tt.want)
+
+	c := &enterprise.Client{}
+	if got := c.Permissions(context.Background()); !reflect.DeepEqual(got, want) {
+		t.Errorf("Client.Permissions() = %v, want %v", got, want)
+		dbAllowed := got[1].Allowed
+		allCommonAllowed := got[0].Allowed[0:len(dbAllowed)]
+		if !reflect.DeepEqual(allCommonAllowed, dbAllowed) {
+			t.Errorf("Database allowed permissions do not start all allowed permissions = %v, want %v", got, want)
 		}
 	}
 }
