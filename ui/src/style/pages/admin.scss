@@ -104,6 +104,9 @@ table > tbody > tr > td.admin-table__dbperm {
 .admin-table > thead > tr > th.col--sortable.col--sort-next-asc:after {
   transform: translateY(-50%) rotate(180deg);
 }
+.admin-table > tbody > tr.table-empty-state > th {
+  min-width: 250px;
+}
 
 table > tbody > tr.admin-table--edit-row,
 table > tbody > tr.admin-table--edit-row:hover,
