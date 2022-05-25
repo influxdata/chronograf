@@ -6,6 +6,7 @@ import {USERS_TABLE} from 'src/admin/constants/tableSizing'
 import UserRowEdit from 'src/admin/components/UserRowEdit'
 import {User} from 'src/types/influxAdmin'
 import {Link} from 'react-router'
+import {PERMISSIONS} from 'src/shared/constants'
 
 const ADMIN_STYLES = [
   {
@@ -89,15 +90,17 @@ const UserRow = ({
             className={`permission-value ${
               perms.READ || perms.ReadData ? 'granted' : 'denied'
             }`}
+            title={PERMISSIONS.ReadData.description}
           >
-            Read
+            {PERMISSIONS.ReadData.displayName}
           </span>
           <span
             className={`permission-value ${
               perms.WRITE || perms.WriteData ? 'granted' : 'denied'
             }`}
+            title={PERMISSIONS.WriteData.description}
           >
-            Write
+            {PERMISSIONS.WriteData.displayName}
           </span>
         </td>
       ))}
