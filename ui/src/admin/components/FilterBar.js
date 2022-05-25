@@ -41,14 +41,16 @@ class FilterBar extends Component {
             <span className="icon search" />
           </div>
         </div>
-        <button
-          className="btn btn-sm btn-primary"
-          disabled={isEditing}
-          onClick={onClickCreate}
-        >
-          <span className="icon plus" /> Create{' '}
-          {placeholderText.substring(0, placeholderText.length - 1)}
-        </button>
+        <div className="panel-heading--right">
+          <button
+            className="btn btn-sm btn-primary"
+            disabled={isEditing}
+            onClick={onClickCreate}
+          >
+            <span className="icon plus" /> Create{' '}
+            {placeholderText.substring(0, placeholderText.length - 1)}
+          </button>
+        </div>
       </div>
     )
   }

@@ -202,28 +202,29 @@ pre.admin-table--query {
     min-height: 60px;
     padding: 0 30px;
     flex-wrap: wrap;
-    justify-content: end;
-    *:first-child {
-      flex: 1 0 auto;
-    }
-    .heading-filters {
-      display: flex;
-      justify-content: flex-start;
-      column-gap: 5px;
-    }
+    justify-content: flex-start;
+    column-gap: 5px;
     .search-widget {
-      flex-grow: 0;
       width: 250px;
     }
     .db-selector {
-      flex-grow: 0;
       width: 150px;
     }
-    .btn {
-      margin-left: 5px;
-      &:first-child {
-        margin-left: 0px;
+    .hide-roles-toggle {
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      color: $g13-mist;
+      font-weight: 600;
+      @include no-user-select();
+      .slide-toggle {
+        margin-right: 3px;
       }
+    }
+    .panel-heading--right {
+      flex-grow: 1;
+      display: flex;
+      justify-content: flex-end;
     }
   }
   .panel-body {

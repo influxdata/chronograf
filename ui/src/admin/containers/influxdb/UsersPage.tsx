@@ -26,6 +26,7 @@ import UserRow from 'src/admin/components/UserRow'
 import useDebounce from 'src/utils/useDebounce'
 import useChangeEffect from 'src/utils/useChangeEffect'
 import MultiSelectDropdown from 'src/reusable_ui/components/dropdowns/MultiSelectDropdown'
+import {ComponentSize, SlideToggle} from 'src/reusable_ui'
 
 const isValidUser = (user: User) => {
   const minLen = 3
@@ -171,57 +172,73 @@ const UsersPage = ({
     filterUsers(debouncedFilterText)
   }, [debouncedFilterText])
 
+  // hide role
+  const [hideRoles, setHideRoles] = useState(false)
+  const changeHideRoles = useCallback(() => setHideRoles(!hideRoles), [
+    hideRoles,
+    setHideRoles,
+  ])
   return (
     <AdminInfluxDBTabbedPage activeTab="users" source={source}>
       <div className="panel panel-solid influxdb-admin">
         <div className="panel-heading">
-          <div className="heading-filters">
-            <div className="search-widget">
-              <input
-                type="text"
-                className="form-control input-sm"
-                placeholder={`Filter Users...`}
-                value={filterText}
-                onChange={changeFilterText}
-              />
-              <span className="icon search" />
-            </div>
-            <div className="db-selector">
-              <MultiSelectDropdown
-                onChange={changeSelectedDBs}
-                selectedIDs={selectedDBs}
-                emptyText="<no database>"
-              >
-                {databases.reduce(
-                  (acc, db) => {
-                    acc.push(
-                      <MultiSelectDropdown.Item
-                        key={db.name}
-                        id={db.name}
-                        value={{id: db.name}}
-                      >
-                        {db.name}
-                      </MultiSelectDropdown.Item>
-                    )
-                    return acc
-                  },
-                  [
-                    <MultiSelectDropdown.Item id="*" key="*" value={{id: '*'}}>
-                      All Databases
-                    </MultiSelectDropdown.Item>,
-                    <MultiSelectDropdown.Divider id="" key="" />,
-                  ]
-                )}
-              </MultiSelectDropdown>
-            </div>
+          <div className="search-widget">
+            <input
+              type="text"
+              className="form-control input-sm"
+              placeholder={`Filter Users...`}
+              value={filterText}
+              onChange={changeFilterText}
+            />
+            <span className="icon search" />
           </div>
-          <button
-            className="btn btn-sm btn-primary"
-            disabled={users.some(u => u.isEditing)}
-            onClick={addUser}
-          >
-            <span className="icon plus" /> Create User
-          </button>
+          <div className="db-selector">
+            <MultiSelectDropdown
+              onChange={changeSelectedDBs}
+              selectedIDs={selectedDBs}
+              emptyText="<no database>"
+            >
+              {databases.reduce(
+                (acc, db) => {
+                  acc.push(
+                    <MultiSelectDropdown.Item
+                      key={db.name}
+                      id={db.name}
+                      value={{id: db.name}}
+                    >
+                      {db.name}
+                    </MultiSelectDropdown.Item>
+                  )
+                  return acc
+                },
+                [
+                  <MultiSelectDropdown.Item id="*" key="*" value={{id: '*'}}>
+                    All Databases
+                  </MultiSelectDropdown.Item>,
+                  <MultiSelectDropdown.Divider id="" key="" />,
+                ]
+              )}
+            </MultiSelectDropdown>
+          </div>
+          {isEnterprise && (
+            <div className="hide-roles-toggle">
+              <SlideToggle
+                active={hideRoles}
+                onChange={changeHideRoles}
+                size={ComponentSize.ExtraSmall}
+              />
+              Hide Roles
+            </div>
+          )}
+          <div className="panel-heading--right">
+            <button
+              className="btn btn-sm btn-primary"
+              disabled={users.some(u => u.isEditing)}
+              onClick={addUser}
+            >
+              <span className="icon plus" /> Create User
+            </button>
+          </div>
         </div>
         <div className="panel-body">
           <FancyScrollbar>
@@ -229,9 +246,11 @@ const UsersPage = ({
               <thead>
                 <tr>
                   <th>User</th>
-                  <th className="admin-table--left-offset">
-                    {isEnterprise ? 'Roles' : 'Admin'}
-                  </th>
+                  {!hideRoles && (
+                    <th className="admin-table--left-offset">
+                      {isEnterprise ? 'Roles' : 'Admin'}
+                    </th>
+                  )}
                   {visibleUsers.length && visibleDBNames.length
                     ? visibleDBNames.map(name => (
                         <th
@@ -256,6 +275,7 @@ const UsersPage = ({
                       )}`}
                       userDBPermissions={userDBPermissions[userIndex]}
                       allRoles={roles}
+                      hideRoles={hideRoles}
                       hasRoles={isEnterprise}
                       onEdit={editUser}
                       onSave={handleSaveUser}
@@ -268,7 +288,7 @@ const UsersPage = ({
                 ) : (
                   <EmptyRow
                     tableName={'Users'}
-                    colSpan={2}
+                    colSpan={1 + +!hideRoles}
                     filtered={!!filterText}
                   />
                 )}

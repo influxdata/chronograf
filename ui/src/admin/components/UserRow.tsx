@@ -27,6 +27,7 @@ interface Props {
   isEditing: boolean
   page: string
   userDBPermissions: Array<Record<string, boolean>>
+  hideRoles: boolean
   onCancel: (user: User) => void
   onEdit: (User: User, updates: Partial<User>) => void
   onSave: (user: User) => Promise<void>
@@ -41,6 +42,7 @@ const UserRow = ({
   isEditing,
   page,
   userDBPermissions,
+  hideRoles,
   onEdit,
   onSave,
   onCancel,
@@ -54,7 +56,7 @@ const UserRow = ({
         onEdit={onEdit}
         onSave={onSave}
         onCancel={onCancel}
-        colSpan={2 + userDBPermissions.length}
+        colSpan={1 + +!hideRoles + userDBPermissions.length}
       />
     )
   }
@@ -71,7 +73,7 @@ const UserRow = ({
       <td style={{width: `${USERS_TABLE.colUsername}px`}}>
         <Link to={page}>{user.name}</Link>
       </td>
-      {hasRoles ? (
+      {hasRoles && !hideRoles && (
         <td className="admin-table--left-offset">
           {allRoles.length ? (
             <UserRoleDropdown
@@ -83,7 +85,8 @@ const UserRow = ({
             <i>N/A</i>
           )}
         </td>
-      ) : (
+      )}
+      {!hasRoles && (
         <td style={{width: `${USERS_TABLE.colAdministrator}px`}}>
           <span className={adminStyle.style}>{adminStyle.text}</span>
         </td>
