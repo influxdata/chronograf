@@ -25,6 +25,7 @@ import EmptyRow from 'src/admin/components/EmptyRow'
 import UserRow from 'src/admin/components/UserRow'
 import useDebounce from 'src/utils/useDebounce'
 import useChangeEffect from 'src/utils/useChangeEffect'
+import MultiSelectDropdown from 'src/reusable_ui/components/dropdowns/MultiSelectDropdown'
 
 const isValidUser = (user: User) => {
   const minLen = 3
@@ -113,6 +114,32 @@ const UsersPage = ({
     ],
     [source]
   )
+  // filter databases
+  const [selectedDBs, setSelectedDBs] = useState<string[]>(['*'])
+  const visibleDBNames = useMemo<string[]>(() => {
+    if (selectedDBs.includes('*')) {
+      return databases.map(db => db.name)
+    }
+    return selectedDBs
+  }, [databases, selectedDBs])
+  const changeSelectedDBs = useCallback(
+    (newDBs: string[]) =>
+      setSelectedDBs((oldDBs: string[]) => {
+        if (newDBs.length <= 1) {
+          return newDBs
+        }
+        const isAll = newDBs.includes('*')
+        const wasAll = oldDBs.includes('*')
+        if (wasAll && isAll) {
+          return newDBs.filter(x => x !== '*')
+        }
+        if (!wasAll && isAll) {
+          return ['*']
+        }
+        return newDBs
+      }),
+    [setSelectedDBs]
+  )
 
   // effective permissions
   const visibleUsers = useMemo(() => users.filter(x => !x.hidden), [users])
@@ -127,8 +154,8 @@ const UsersPage = ({
                   obj[x] = true
                   return obj
                 }, {})
-            databases.forEach(
-              db => (acc[db.name] = {...allowed, ...acc[db.name]})
+            visibleDBNames.forEach(
+              name => (acc[name] = {...allowed, ...acc[name]})
             )
           } else if (userPerm.scope === 'database') {
             acc[userPerm.name] = userPerm.allowed.reduce<
@@ -140,9 +167,9 @@ const UsersPage = ({
           }
           return acc
         }, {})
-        return databases.map(db => permRecord[db.name] || {})
+        return visibleDBNames.map(name => permRecord[name] || {})
       }),
-    [databases, visibleUsers]
+    [visibleDBNames, visibleUsers]
   )
 
   // filter users
@@ -159,8 +186,8 @@ const UsersPage = ({
     <AdminInfluxDBTabbedPage activeTab="users" source={source}>
       <div className="panel panel-solid influxdb-admin">
         <div className="panel-heading">
-          <div>
-            <div className="search-widget" style={{width: '250px'}}>
+          <div className="heading-filters">
+            <div className="search-widget">
               <input
                 type="text"
                 className="form-control input-sm"
@@ -169,6 +196,34 @@ const UsersPage = ({
                 onChange={changeFilterText}
               />
               <span className="icon search" />
+            </div>
+            <div className="db-selector">
+              <MultiSelectDropdown
+                onChange={changeSelectedDBs}
+                selectedIDs={selectedDBs}
+                emptyText="<no database>"
+              >
+                {databases.reduce(
+                  (acc, db) => {
+                    acc.push(
+                      <MultiSelectDropdown.Item
+                        key={db.name}
+                        id={db.name}
+                        value={{id: db.name}}
+                      >
+                        {db.name}
+                      </MultiSelectDropdown.Item>
+                    )
+                    return acc
+                  },
+                  [
+                    <MultiSelectDropdown.Item id="*" key="*" value={{id: '*'}}>
+                      All Databases
+                    </MultiSelectDropdown.Item>,
+                    <MultiSelectDropdown.Divider id="" key="" />,
+                  ]
+                )}
+              </MultiSelectDropdown>
             </div>
           </div>
           <button
@@ -191,14 +246,14 @@ const UsersPage = ({
                   {visibleUsers.length && hasRoles ? (
                     <th>Permissions</th>
                   ) : null}
-                  {visibleUsers.length && databases.length
-                    ? databases.map(db => (
+                  {visibleUsers.length && visibleDBNames.length
+                    ? visibleDBNames.map(name => (
                         <th
                           className="admin-table__dbheader"
-                          title={`Database ${db.name}`}
-                          key={db.name}
+                          title={`Database ${name}`}
+                          key={name}
                         >
-                          {db.name}
+                          {name}
                         </th>
                       ))
                     : null}
