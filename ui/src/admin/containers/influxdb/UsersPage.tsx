@@ -2,7 +2,7 @@ import React, {useCallback, useMemo, useState} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
 import {withSource} from 'src/CheckSources'
 import {Source} from 'src/types'
-import {UserPermission, UserRole, User, Database} from 'src/types/influxAdmin'
+import {UserRole, User, Database} from 'src/types/influxAdmin'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {
   addUser as addUserActionCreator,
@@ -32,13 +32,10 @@ const isValidUser = (user: User) => {
   return user.name.length >= minLen && user.password.length >= minLen
 }
 
-const mapStateToProps = ({
-  adminInfluxDB: {databases, users, roles, permissions},
-}) => ({
+const mapStateToProps = ({adminInfluxDB: {databases, users, roles}}) => ({
   databases,
   users,
   roles,
-  permissions,
 })
 
 const mapDispatchToProps = {
@@ -61,7 +58,6 @@ interface ConnectedProps {
   databases: Database[]
   users: User[]
   roles: UserRole[]
-  permissions: UserPermission[]
 }
 
 type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
@@ -72,14 +68,12 @@ const UsersPage = ({
   databases,
   users,
   roles,
-  permissions,
   notify,
   createUser,
   filterUsers,
   addUser,
   removeUser,
   editUser,
-  updateUserPermissions,
   updateUserRoles,
 }: Props) => {
   if (isConnectedToLDAP(source)) {
@@ -89,11 +83,6 @@ const UsersPage = ({
       </AdminInfluxDBTabbedPage>
     )
   }
-  const allAllowedPermissions = useMemo(() => {
-    const globalPermissions = permissions.find(p => p.scope === 'all')
-    return globalPermissions ? globalPermissions.allowed : []
-  }, [permissions])
-
   const handleSaveUser = useCallback(
     async (user: User) => {
       if (!isValidUser(user)) {
@@ -243,9 +232,6 @@ const UsersPage = ({
                   <th className="admin-table--left-offset">
                     {hasRoles ? 'Roles' : 'Admin'}
                   </th>
-                  {visibleUsers.length && hasRoles ? (
-                    <th>Permissions</th>
-                  ) : null}
                   {visibleUsers.length && visibleDBNames.length
                     ? visibleDBNames.map(name => (
                         <th
@@ -276,8 +262,6 @@ const UsersPage = ({
                       onCancel={removeUser}
                       isEditing={user.isEditing}
                       isNew={user.isNew}
-                      allPermissions={allAllowedPermissions}
-                      onUpdatePermissions={updateUserPermissions}
                       onUpdateRoles={updateUserRoles}
                     />
                   ))

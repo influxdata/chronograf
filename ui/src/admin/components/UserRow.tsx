@@ -1,11 +1,10 @@
 import React from 'react'
 
-import UserPermissionsDropdown from 'src/admin/components/UserPermissionsDropdown'
 import UserRoleDropdown from 'src/admin/components/UserRoleDropdown'
 import {USERS_TABLE} from 'src/admin/constants/tableSizing'
 
 import UserRowEdit from 'src/admin/components/UserRowEdit'
-import {User, UserPermission} from 'src/types/influxAdmin'
+import {User} from 'src/types/influxAdmin'
 import {Link} from 'react-router'
 
 const ADMIN_STYLES = [
@@ -22,7 +21,6 @@ const ADMIN_STYLES = [
 interface Props {
   user: User
   allRoles: any[]
-  allPermissions: string[]
   hasRoles: boolean
   isNew: boolean
   isEditing: boolean
@@ -31,14 +29,12 @@ interface Props {
   onCancel: (user: User) => void
   onEdit: (User: User, updates: Partial<User>) => void
   onSave: (user: User) => Promise<void>
-  onUpdatePermissions: (user: User, permissions: UserPermission[]) => void
   onUpdateRoles: (user: User, roles: any[]) => void
 }
 
 const UserRow = ({
   user,
   allRoles,
-  allPermissions,
   hasRoles,
   isNew,
   isEditing,
@@ -47,7 +43,6 @@ const UserRow = ({
   onEdit,
   onSave,
   onCancel,
-  onUpdatePermissions,
   onUpdateRoles,
 }: Props) => {
   if (isEditing) {
@@ -88,34 +83,24 @@ const UserRow = ({
           <span className={adminStyle.style}>{adminStyle.text}</span>
         </td>
       )}
-      {hasRoles ? (
-        <td>
-          <UserPermissionsDropdown
-            user={user}
-            allPermissions={allPermissions}
-            onUpdatePermissions={onUpdatePermissions}
-          />
+      {userDBPermissions.map((perms, i) => (
+        <td className="admin-table__dbperm" key={i}>
+          <span
+            className={`permission-value ${
+              perms.READ || perms.ReadData ? 'granted' : 'denied'
+            }`}
+          >
+            Read
+          </span>
+          <span
+            className={`permission-value ${
+              perms.WRITE || perms.WriteData ? 'granted' : 'denied'
+            }`}
+          >
+            Write
+          </span>
         </td>
-      ) : (
-        userDBPermissions.map((perms, i) => (
-          <td className="admin-table__dbperm" key={i}>
-            <span
-              className={`permission-value ${
-                perms.READ || perms.Read ? 'granted' : 'denied'
-              }`}
-            >
-              Read
-            </span>
-            <span
-              className={`permission-value ${
-                perms.WRITE || perms.Write ? 'granted' : 'denied'
-              }`}
-            >
-              Write
-            </span>
-          </td>
-        ))
-      )}
+      ))}
     </tr>
   )
 }
