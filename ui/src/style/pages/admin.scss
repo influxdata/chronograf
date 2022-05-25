@@ -107,6 +107,12 @@ table > tbody > tr > td.admin-table__dbperm {
 .admin-table > tbody > tr.table-empty-state > th {
   min-width: 250px;
 }
+.permission-table > tbody > tr {
+  border-bottom: 1px solid $g2-kevlar;
+  &.all-databases{
+    border-bottom: $ix-border solid $table--border-color;
+  }
+}
 
 table > tbody > tr.admin-table--edit-row,
 table > tbody > tr.admin-table--edit-row:hover,
@@ -225,6 +231,12 @@ pre.admin-table--query {
       flex-grow: 1;
       display: flex;
       justify-content: flex-end;
+      &>* {
+        margin-left: 5px;
+        &:first-child {
+          margin-left: 0px;
+        }
+      }
     }
   }
   .panel-body {
