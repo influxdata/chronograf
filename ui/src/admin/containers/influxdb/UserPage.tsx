@@ -54,7 +54,7 @@ type Props = WithRouterProps<RouterParams> &
   ConnectedProps &
   ReduxDispatchProps
 
-const UserPageContent = ({
+const UserPage = ({
   users,
   databases,
   permissions: serverPermissions,
@@ -223,7 +223,7 @@ const UserPageContent = ({
     },
     [user, changedPermissions, userDBPermissions]
   )
-  return (
+  const body = (
     <div className="panel panel-solid influxdb-admin">
       <div className="panel-heading">
         <h2 className="panel-title">
@@ -295,16 +295,6 @@ const UserPageContent = ({
               <h4>
                 Database Privileges{permissionsChanged ? ' (unsaved)' : ''}
               </h4>
-              {permissionsChanged && (
-                <Button
-                  text="Apply Changes"
-                  onClick={changePermissions}
-                  color={ComponentColor.Secondary}
-                  status={
-                    running ? ComponentStatus.Disabled : ComponentStatus.Default
-                  }
-                />
-              )}
             </div>
             <div className="infludb-admin-section__body">
               {isAdmin && (
@@ -363,12 +353,10 @@ const UserPageContent = ({
       </div>
     </div>
   )
-}
-
-const UserPage = (props: Props) => {
   const exitHandler = useCallback(() => {
-    props.router.push(`/sources/${props.params.sourceID}/admin-influxdb/users`)
-  }, [props.router, props.source])
+    router.push(`/sources/${sourceID}/admin-influxdb/users`)
+  }, [router, source])
+
   return (
     <Page className="influxdb-admin">
       <Page.Header fullWidth={true}>
@@ -376,15 +364,33 @@ const UserPage = (props: Props) => {
           <Page.Title title="Manage User" />
         </Page.Header.Left>
         <Page.Header.Right showSourceIndicator={true}>
-          <Button text="Exit" onClick={exitHandler} />
+          {permissionsChanged ? (
+            <ConfirmButton
+              text="Exit"
+              confirmText="Discard unsaved changes?"
+              confirmAction={exitHandler}
+              position="left"
+            />
+          ) : (
+            <Button text="Exit" onClick={exitHandler} />
+          )}
+          {permissionsChanged && (
+            <Button
+              text="Apply Changes"
+              onClick={changePermissions}
+              color={ComponentColor.Secondary}
+              status={
+                running ? ComponentStatus.Disabled : ComponentStatus.Default
+              }
+            />
+          )}
         </Page.Header.Right>
       </Page.Header>
-      <div className="influxdb-admin--contents">
-        <UserPageContent {...props} />
-      </div>
+      <div className="influxdb-admin--contents">{body}</div>
     </Page>
   )
 }
+
 export default withSource(
   withRouter(connect(mapStateToProps, mapDispatchToProps)(UserPage))
 )
