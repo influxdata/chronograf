@@ -117,13 +117,23 @@ const UsersPage = ({
     () =>
       visibleUsers.map(u => {
         const permRecord = u.permissions.reduce((acc, userPerm) => {
-          if (userPerm.scope === 'database') {
+          if (userPerm.scope === 'all') {
+            const allowed = userPerm.allowed.includes('ALL')
+              ? {READ: true, WRITE: true}
+              : userPerm.allowed.reduce((obj, x) => {
+                  obj[x] = true
+                  return obj
+                }, {})
+            databases.forEach(
+              db => (acc[db.name] = {...allowed, ...acc[db.name]})
+            )
+          } else if (userPerm.scope === 'database') {
             acc[userPerm.name] = userPerm.allowed.reduce<
               Record<string, boolean>
             >((obj, perm) => {
               obj[perm] = true
               return obj
-            }, {})
+            }, acc[userPerm.name] || {})
           }
           return acc
         }, {})
