@@ -128,18 +128,21 @@ const UserPage = ({
     },
     [user, isAdmin]
   )
-  const [dbPermisssions, userDBPermissions] = useMemo(
+  const [dbPermisssions, clusterPermissions, userDBPermissions] = useMemo(
     () => [
       serverPermissions.find(x => x.scope === 'database')?.allowed || [],
+      serverPermissions.find(x => x.scope === 'all')?.allowed || [],
       user.permissions.reduce((acc, perm) => {
-        if (perm.scope === 'database') {
-          const dbPerms = acc[perm.name] || (acc[perm.name] = {})
-          perm.allowed.forEach(x => (dbPerms[x] = true))
+        if (isOSS && perm.scope !== 'database') {
+          return acc // do not include all permissions in OSS, they have separate administration
         }
+        const dbName = perm.name || ''
+        const dbPerms = acc[dbName] || (acc[dbName] = {})
+        perm.allowed.forEach(x => (dbPerms[x] = true))
         return acc
       }, {}),
     ],
-    [serverPermissions, user]
+    [serverPermissions, user, isOSS]
   )
 
   const [changedPermissions, setChangedPermissions] = useState<
@@ -171,7 +174,7 @@ const UserPage = ({
             ...otherDBs,
           })
         } else {
-          // there is no chnage for the current database
+          // there is no change for the current database
           setChangedPermissions(otherDBs)
         }
       }
@@ -210,22 +213,41 @@ const UserPage = ({
               []
             )
             if (allowed.length) {
-              acc.push({scope: 'database', name: db, allowed})
+              acc.push({
+                scope: db ? 'database' : 'all',
+                name: db || undefined,
+                allowed,
+              })
             }
             return acc
           },
-          (user.permissions || []).filter(x => x.scope !== 'database')
+          isOSS
+            ? (user.permissions || []).filter(x => x.scope !== 'database')
+            : []
         )
         await updatePermissionsAsync(user, permissions)
       } finally {
         setRunning(false)
       }
     },
-    [user, changedPermissions, userDBPermissions]
+    [user, changedPermissions, userDBPermissions, isOSS]
   )
   const exitHandler = useCallback(() => {
     router.push(`/sources/${sourceID}/admin-influxdb/users`)
   }, [router, source])
+
+  const dataChanged = useMemo(() => permissionsChanged, [permissionsChanged])
+  const databaseNames = useMemo<string[]>(
+    () =>
+      databases.reduce(
+        (acc, db) => {
+          acc.push(db.name)
+          return acc
+        },
+        isOSS ? [] : ['']
+      ),
+    [isOSS, databases]
+  )
 
   const body =
     user === FAKE_USER ? (
@@ -240,7 +262,7 @@ const UserPage = ({
             <span title={`User: ${userName}`}>{userName}</span>
           </h2>
           {password === undefined && (
-            <div style={{display: 'flex'}}>
+            <div className="panel-heading--right">
               <Button
                 text="Change password"
                 onClick={() => setPassword('')}
@@ -313,7 +335,7 @@ const UserPage = ({
                   </p>
                 )}
                 <div>
-                  <table className="table v-center table-highlight">
+                  <table className="table v-center table-highlight permission-table">
                     <thead>
                       <tr>
                         <th style={{minWidth: '100px', whiteSpace: 'nowrap'}}>
@@ -325,34 +347,43 @@ const UserPage = ({
                       </tr>
                     </thead>
                     <tbody>
-                      {(databases || []).map(db => (
-                        <tr key={db.name}>
-                          <td>{db.name}</td>
+                      {(databaseNames || []).map(db => (
+                        <tr
+                          key={db}
+                          className={db ? '' : 'all-databases'}
+                          title={
+                            db
+                              ? db
+                              : 'Cluster-Wide Permissions applies to all databases'
+                          }
+                        >
+                          <td>{db || '*'}</td>
                           <td>
-                            {dbPermisssions.map((perm, i) => (
-                              <div
-                                key={i}
-                                title={
-                                  PERMISSIONS[perm]?.description ||
-                                  'Click to change, click Apply Changes to save all changes'
-                                }
-                                data-db={db.name}
-                                data-perm={perm}
-                                className={`permission-value ${
-                                  userDBPermissions[db.name]?.[perm]
-                                    ? 'granted'
-                                    : 'denied'
-                                } ${
-                                  changedPermissions[db.name]?.[perm] !==
-                                  undefined
-                                    ? 'perm-changed'
-                                    : ''
-                                }`}
-                                onClick={onPermissionChange}
-                              >
-                                {PERMISSIONS[perm]?.id || perm}
-                              </div>
-                            ))}
+                            {(db ? dbPermisssions : clusterPermissions).map(
+                              (perm, i) => (
+                                <div
+                                  key={i}
+                                  title={
+                                    PERMISSIONS[perm]?.description ||
+                                    'Click to change, click Apply Changes to save all changes'
+                                  }
+                                  data-db={db}
+                                  data-perm={perm}
+                                  className={`permission-value ${
+                                    userDBPermissions[db]?.[perm]
+                                      ? 'granted'
+                                      : 'denied'
+                                  } ${
+                                    changedPermissions[db]?.[perm] !== undefined
+                                      ? 'perm-changed'
+                                      : ''
+                                  }`}
+                                  onClick={onPermissionChange}
+                                >
+                                  {perm}
+                                </div>
+                              )
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -382,7 +413,7 @@ const UserPage = ({
           ) : (
             <Button text="Exit" onClick={exitHandler} />
           )}
-          {permissionsChanged && (
+          {dataChanged && (
             <Button
               text="Apply Changes"
               onClick={changePermissions}
