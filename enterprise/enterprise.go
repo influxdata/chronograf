@@ -164,36 +164,39 @@ func (c *Client) Roles(ctx context.Context) (chronograf.RolesStore, error) {
 
 // Permissions returns all Influx Enterprise permission strings
 func (c *Client) Permissions(context.Context) chronograf.Permissions {
-	all := chronograf.Allowances{
-		"NoPermissions",
-		"ViewAdmin",
-		"ViewChronograf",
-		"CreateDatabase",
-		"CreateUserAndRole",
-		"AddRemoveNode",
-		"DropDatabase",
-		"DropData",
-		"ReadData",
-		"WriteData",
-		"Rebalance",
-		"ManageShard",
-		"ManageContinuousQuery",
-		"ManageQuery",
-		"ManageSubscription",
-		"Monitor",
-		"CopyShard",
-		"KapacitorAPI",
-		"KapacitorConfigAPI",
-	}
-
 	return chronograf.Permissions{
 		{
-			Scope:   chronograf.AllScope,
-			Allowed: all,
+			Scope: chronograf.AllScope,
+			Allowed: chronograf.Allowances{
+				"NoPermissions",
+				"ReadData",
+				"WriteData",
+				"DropData",
+				"ManageContinuousQuery",
+				"ManageQuery",
+				"ManageSubscription",
+				"ViewAdmin",
+				"CreateDatabase",
+				"DropDatabase",
+				"CreateUserAndRole",
+				"CopyShard",
+				"ManageShard",
+				"Rebalance",
+				"AddRemoveNode",
+				"Monitor",
+			},
 		},
 		{
-			Scope:   chronograf.DBScope,
-			Allowed: all,
+			Scope: chronograf.DBScope,
+			Allowed: chronograf.Allowances{
+				"NoPermissions",
+				"ReadData",
+				"WriteData",
+				"DropData",
+				"ManageContinuousQuery",
+				"ManageQuery",
+				"ManageSubscription",
+			},
 		},
 	}
 }
