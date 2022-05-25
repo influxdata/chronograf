@@ -350,7 +350,7 @@ const UserPage = ({
                                 }`}
                                 onClick={onPermissionChange}
                               >
-                                {perm}
+                                {PERMISSIONS[perm]?.id || perm}
                               </div>
                             ))}
                           </td>

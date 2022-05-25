@@ -39,7 +39,7 @@ export const PERMISSIONS = {
   },
   DropData: {
     displayName: 'Drop Data',
-    description: 'Can drop measurement and series queries',
+    description: 'Can drop measurements and series',
   },
   ReadData: {
     displayName: 'Read',
@@ -77,11 +77,11 @@ export const PERMISSIONS = {
     displayName: 'Copy Shard',
     description: 'Can copy shards',
   },
-  // TODO: get clarification on this one
-  // KapacitorAPI: {
-  //   displayName: 'Kapacitor',
-  //   description: 'Can access the Kapacitor API',
-  // },
+  NoPermissions: {
+    id: 'ShowDatabases',
+    displayName: 'Show Databases',
+    description: 'Can show databases',
+  },
 }
 
 export const DEFAULT_LINE_COLORS = [
