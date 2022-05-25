@@ -17,6 +17,7 @@ import ConfirmOrCancel from 'src/shared/components/ConfirmOrCancel'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {useEffect} from 'react'
 import {useCallback} from 'react'
+import {PERMISSIONS} from 'src/shared/constants'
 
 const mapStateToProps = ({
   adminInfluxDB: {databases, users, roles, permissions},
@@ -323,7 +324,10 @@ const UserPage = ({
                           {dbPermisssions.map((perm, i) => (
                             <div
                               key={i}
-                              title="Click to change, click Apply Changes to save all changes"
+                              title={
+                                PERMISSIONS[perm]?.description ||
+                                'Click to change, click Apply Changes to save all changes'
+                              }
                               data-db={db.name}
                               data-perm={perm}
                               className={`permission-value ${
