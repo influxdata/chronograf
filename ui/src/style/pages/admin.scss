@@ -153,7 +153,7 @@ pre.admin-table--query {
   .influxdb-admin--contents{
     height: calc(100%-60px);
   }
-  div.permission-value{
+  div.permission-value,div.role-value{
     @include btn-base-styles(
       $g5-pepper,
       $g6-smoke,
@@ -166,38 +166,38 @@ pre.admin-table--query {
     display: inline-block;
     border-radius: $radius;
     font-family: $ix-text-font;
+    white-space: nowrap;
+    font-weight: 500;
     &:hover{
       background-color: $g2-kevlar;
     }
     &.denied{
       font-style: italic;
-      background-color: $g5-pepper;
-      color: $g7-graphite;
-      &:hover{
-        background-color: $g2-kevlar;
-        color: $g9-mountain;
-      }
-      &.perm-changed{
-        color: $g13-mist;
+      color: $g9-mountain;
+      &.value-changed{
+        // background-color: $c-star;
+        color: $g18-cloud;
         padding: 2px;
-        border: 2px solid $c-banana;
+        border: 2px solid $c-pool;
       }
     }
     &.granted{
-      &.perm-changed{
+      &.value-changed{
+        // background-color: $c-star;
         padding: 2px;
         text-decoration: line-through;
-        border: 2px solid $c-banana;
+        border: 2px solid $c-pool;
       }
     }
   }
-  span.permission-value{
+  span.permission-value,span.role-value{
     padding: 0 2px;
     display: inline-block;
     color: $g18-cloud;
+    white-space: nowrap;
     &.denied {
       font-style: italic;
-      color: $g5-pepper;
+      color: $g7-graphite;
     }
   }
 }

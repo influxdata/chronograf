@@ -11,6 +11,7 @@ import {
   deleteUserAsync,
   updateUserPasswordAsync,
   updateUserPermissionsAsync,
+  updateUserRolesAsync,
 } from 'src/admin/actions/influxdb'
 import {Button, ComponentColor, ComponentStatus, Page} from 'src/reusable_ui'
 import ConfirmOrCancel from 'src/shared/components/ConfirmOrCancel'
@@ -43,6 +44,7 @@ const mapDispatchToProps = {
   deleteUserAsync,
   updateUserPasswordAsync,
   updateUserPermissionsAsync,
+  updateUserRolesAsync,
 }
 
 interface OwnProps {
@@ -65,12 +67,14 @@ const UserPage = ({
   users,
   databases,
   permissions: serverPermissions,
+  roles,
   source,
   router,
   params: {userName, sourceID},
   deleteUserAsync: deleteUserDispatchAsync,
   updateUserPasswordAsync: updatePasswordAsync,
   updateUserPermissionsAsync: updatePermissionsAsync,
+  updateUserRolesAsync: updateRolesAsync,
 }: Props) => {
   if (isConnectedToLDAP(source)) {
     return <div className="container-fluid">Users are managed via LDAP.</div>
@@ -105,6 +109,8 @@ const UserPage = ({
     [user, password]
   )
   const isOSS = !hasRoleManagement(source)
+
+  // admin
   const isAdmin =
     isOSS &&
     !!user.permissions.find(
@@ -128,6 +134,8 @@ const UserPage = ({
     },
     [user, isAdmin]
   )
+
+  // permissions
   const [dbPermisssions, clusterPermissions, userDBPermissions] = useMemo(
     () => [
       serverPermissions.find(x => x.scope === 'database')?.allowed || [],
@@ -144,7 +152,6 @@ const UserPage = ({
     ],
     [serverPermissions, user, isOSS]
   )
-
   const [changedPermissions, setChangedPermissions] = useState<
     Record<string, Record<string, boolean | undefined>>
   >({})
@@ -152,9 +159,9 @@ const UserPage = ({
     setChangedPermissions({})
   }, [user])
   const onPermissionChange = useMemo(
-    () => (e: React.MouseEvent<HTMLSpanElement>) => {
-      const db = (e.target as HTMLSpanElement).dataset.db
-      const perm = (e.target as HTMLSpanElement).dataset.perm
+    () => (e: React.MouseEvent<HTMLElement>) => {
+      const db = (e.target as HTMLElement).dataset.db
+      const perm = (e.target as HTMLElement).dataset.perm
       const origState = userDBPermissions[db]?.[perm]
       const {[db]: changedDB, ...otherDBs} = changedPermissions
       if (changedDB === undefined) {
@@ -232,11 +239,80 @@ const UserPage = ({
     },
     [user, changedPermissions, userDBPermissions, isOSS]
   )
+
+  // roles
+  const [allRoleNames, rolesRecord] = useMemo(() => {
+    if (isOSS) {
+      return [[], {}]
+    }
+    const rNames = (isOSS ? [] : roles).map(r => r.name).sort()
+    const urRecord = user.roles.reduce<Record<string, boolean>>((acc, r) => {
+      acc[r.name] = true
+      return acc
+    }, {})
+    return [rNames, urRecord]
+  }, [user, roles, isOSS])
+  const [changedRolesRecord, setChangedRolesRecord] = useState<
+    Record<string, boolean>
+  >({})
+  useEffect(() => setChangedRolesRecord({}), [user])
+  const rolesChanged = useMemo(() => !!Object.keys(changedRolesRecord).length, [
+    changedRolesRecord,
+  ])
+  const onRoleChange = useMemo(
+    () => (e: React.MouseEvent<HTMLElement>) => {
+      const role = (e.target as HTMLElement).dataset.role
+      const {[role]: roleChanged, ...restChanged} = changedRolesRecord
+      if (roleChanged === undefined) {
+        setChangedRolesRecord({
+          ...changedRolesRecord,
+          [role]: !rolesRecord[role],
+        })
+      } else {
+        // returning back to original state
+        setChangedRolesRecord(restChanged)
+      }
+      return
+    },
+    [rolesRecord, changedRolesRecord]
+  )
+  const changeRoles = useMemo(
+    () => async () => {
+      if (Object.entries(changedRolesRecord).length === 0) {
+        return
+      }
+      setRunning(true)
+      try {
+        const newRoles = roles.reduce<UserRole[]>((acc, role) => {
+          const roleName = role.name
+          if (
+            changedRolesRecord[roleName] === true ||
+            (changedRolesRecord[roleName] === undefined &&
+              rolesRecord[roleName])
+          ) {
+            acc.push(role)
+          }
+          return acc
+        }, [])
+        await updateRolesAsync(user, newRoles)
+      } finally {
+        setRunning(false)
+      }
+    },
+    [user, rolesRecord, changedRolesRecord, roles]
+  )
+
+  const dataChanged = useMemo(() => permissionsChanged || rolesChanged, [
+    permissionsChanged,
+    rolesChanged,
+  ])
+  const changeData = useCallback(async () => {
+    await changeRoles()
+    await changePermissions()
+  }, [changePermissions, changeRoles])
   const exitHandler = useCallback(() => {
     router.push(`/sources/${sourceID}/admin-influxdb/users`)
   }, [router, source])
-
-  const dataChanged = useMemo(() => permissionsChanged, [permissionsChanged])
   const databaseNames = useMemo<string[]>(
     () =>
       databases.reduce(
@@ -248,7 +324,6 @@ const UserPage = ({
       ),
     [isOSS, databases]
   )
-
   const body =
     user === FAKE_USER ? (
       <div className="container-fluid">
@@ -322,6 +397,41 @@ const UserPage = ({
             </div>
           ) : (
             <FancyScrollbar>
+              {!isOSS && (
+                <>
+                  <div className="infludb-admin-section__header">
+                    <h4>
+                      Roles
+                      {rolesChanged ? ' (unsaved)' : ''}
+                    </h4>
+                  </div>
+                  <div className="infludb-admin-section__body">
+                    {!allRoleNames.length ? (
+                      <p>No roles are defined.</p>
+                    ) : (
+                      <p>
+                        {allRoleNames.map((roleName, i) => (
+                          <div
+                            key={i}
+                            title="Click to change, click Apply Changes to save all changes"
+                            data-role={roleName}
+                            className={`role-value ${
+                              rolesRecord[roleName] ? 'granted' : 'denied'
+                            } ${
+                              changedRolesRecord[roleName] !== undefined
+                                ? 'value-changed'
+                                : ''
+                            }`}
+                            onClick={onRoleChange}
+                          >
+                            {roleName}
+                          </div>
+                        ))}
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
               <div className="infludb-admin-section__header">
                 <h4>
                   {isOSS ? 'Database Permissions' : 'Permissions'}
@@ -376,7 +486,7 @@ const UserPage = ({
                                       : 'denied'
                                   } ${
                                     changedPermissions[db]?.[perm] !== undefined
-                                      ? 'perm-changed'
+                                      ? 'value-changed'
                                       : ''
                                   }`}
                                   onClick={onPermissionChange}
@@ -404,7 +514,7 @@ const UserPage = ({
           <Page.Title title="Manage User" />
         </Page.Header.Left>
         <Page.Header.Right showSourceIndicator={true}>
-          {permissionsChanged ? (
+          {dataChanged ? (
             <ConfirmButton
               text="Exit"
               confirmText="Discard unsaved changes?"
@@ -417,8 +527,8 @@ const UserPage = ({
           {dataChanged && (
             <Button
               text="Apply Changes"
-              onClick={changePermissions}
-              color={ComponentColor.Secondary}
+              onClick={changeData}
+              color={ComponentColor.Primary}
               status={
                 running ? ComponentStatus.Disabled : ComponentStatus.Default
               }
