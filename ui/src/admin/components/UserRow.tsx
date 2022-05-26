@@ -1,6 +1,5 @@
 import React from 'react'
 
-import UserRoleDropdown from 'src/admin/components/UserRoleDropdown'
 import {USERS_TABLE} from 'src/admin/constants/tableSizing'
 
 import UserRowEdit from 'src/admin/components/UserRowEdit'
@@ -27,11 +26,10 @@ interface Props {
   isEditing: boolean
   page: string
   userDBPermissions: Array<Record<string, boolean>>
-  hideRoles: boolean
+  showRoles: boolean
   onCancel: (user: User) => void
   onEdit: (User: User, updates: Partial<User>) => void
   onSave: (user: User) => Promise<void>
-  onUpdateRoles: (user: User, roles: any[]) => void
 }
 
 const UserRow = ({
@@ -42,11 +40,10 @@ const UserRow = ({
   isEditing,
   page,
   userDBPermissions,
-  hideRoles,
+  showRoles,
   onEdit,
   onSave,
   onCancel,
-  onUpdateRoles,
 }: Props) => {
   if (isEditing) {
     return (
@@ -56,7 +53,7 @@ const UserRow = ({
         onEdit={onEdit}
         onSave={onSave}
         onCancel={onCancel}
-        colSpan={1 + +!hideRoles + userDBPermissions.length}
+        colSpan={1 + +showRoles + userDBPermissions.length}
       />
     )
   }
@@ -73,18 +70,16 @@ const UserRow = ({
       <td style={{width: `${USERS_TABLE.colUsername}px`}}>
         <Link to={page}>{user.name}</Link>
       </td>
-      {hasRoles && !hideRoles && (
+      {hasRoles && showRoles && (
         <td
           className="admin-table--left-offset"
           title={!allRoles.length ? 'No roles are defined' : ''}
         >
-          {allRoles.length ? (
-            <UserRoleDropdown
-              user={user}
-              allRoles={allRoles}
-              onUpdateRoles={onUpdateRoles}
-            />
-          ) : null}
+          {user.roles.map((role, i) => (
+            <span key={i} className="role-value granted">
+              {role.name}
+            </span>
+          ))}
         </td>
       )}
       {!hasRoles && (

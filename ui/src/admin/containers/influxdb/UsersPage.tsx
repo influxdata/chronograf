@@ -9,10 +9,6 @@ import {
   editUser as editUserActionCreator,
   deleteUser as deleteUserActionCreator,
   createUserAsync,
-  deleteUserAsync,
-  updateUserRolesAsync,
-  updateUserPasswordAsync,
-  updateUserPermissionsAsync,
   filterUsers as filterUsersAction,
 } from 'src/admin/actions/influxdb'
 import {notifyDBUserNamePasswordInvalid} from 'src/shared/copy/notifications'
@@ -45,10 +41,6 @@ const mapDispatchToProps = {
   removeUser: deleteUserActionCreator,
   addUser: addUserActionCreator,
   editUser: editUserActionCreator,
-  deleteUser: deleteUserAsync,
-  updateUserPermissions: updateUserPermissionsAsync,
-  updateUserRoles: updateUserRolesAsync,
-  updateUserPassword: updateUserPasswordAsync,
   notify: notifyAction,
 }
 
@@ -75,7 +67,6 @@ const UsersPage = ({
   addUser,
   removeUser,
   editUser,
-  updateUserRoles,
 }: Props) => {
   if (isConnectedToLDAP(source)) {
     return (
@@ -173,10 +164,10 @@ const UsersPage = ({
   }, [debouncedFilterText])
 
   // hide role
-  const [hideRoles, setHideRoles] = useState(false)
-  const changeHideRoles = useCallback(() => setHideRoles(!hideRoles), [
-    hideRoles,
-    setHideRoles,
+  const [showRoles, setShowRoles] = useState(true)
+  const changeHideRoles = useCallback(() => setShowRoles(!showRoles), [
+    showRoles,
+    setShowRoles,
   ])
   return (
     <AdminInfluxDBTabbedPage activeTab="users" source={source}>
@@ -223,11 +214,11 @@ const UsersPage = ({
           {isEnterprise && (
             <div className="hide-roles-toggle">
               <SlideToggle
-                active={hideRoles}
+                active={showRoles}
                 onChange={changeHideRoles}
                 size={ComponentSize.ExtraSmall}
               />
-              Hide Roles
+              Show Roles
             </div>
           )}
           <div className="panel-heading--right">
@@ -246,7 +237,7 @@ const UsersPage = ({
               <thead>
                 <tr>
                   <th>User</th>
-                  {!hideRoles && (
+                  {showRoles && (
                     <th className="admin-table--left-offset">
                       {isEnterprise ? 'Roles' : 'Admin'}
                     </th>
@@ -275,20 +266,19 @@ const UsersPage = ({
                       )}`}
                       userDBPermissions={userDBPermissions[userIndex]}
                       allRoles={roles}
-                      hideRoles={hideRoles}
+                      showRoles={showRoles}
                       hasRoles={isEnterprise}
                       onEdit={editUser}
                       onSave={handleSaveUser}
                       onCancel={removeUser}
                       isEditing={user.isEditing}
                       isNew={user.isNew}
-                      onUpdateRoles={updateUserRoles}
                     />
                   ))
                 ) : (
                   <EmptyRow
                     tableName={'Users'}
-                    colSpan={1 + +!hideRoles}
+                    colSpan={1 + +showRoles}
                     filtered={!!filterText}
                   />
                 )}

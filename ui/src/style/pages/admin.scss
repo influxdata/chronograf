@@ -190,7 +190,7 @@ pre.admin-table--query {
       }
     }
   }
-  span.permission-value,span.role-value{
+  span.permission-value{
     padding: 0 2px;
     display: inline-block;
     color: $g18-cloud;
@@ -198,6 +198,14 @@ pre.admin-table--query {
     &.denied {
       font-style: italic;
       color: $g7-graphite;
+    }
+  }
+  span.role-value{
+    padding: 0 2px;
+    display: inline-block;
+    white-space: nowrap;
+    &:not(:last-child)::after{
+      content: ',';
     }
   }
 }
