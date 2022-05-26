@@ -74,16 +74,17 @@ const UserRow = ({
         <Link to={page}>{user.name}</Link>
       </td>
       {hasRoles && !hideRoles && (
-        <td className="admin-table--left-offset">
+        <td
+          className="admin-table--left-offset"
+          title={!allRoles.length ? 'No roles are defined' : ''}
+        >
           {allRoles.length ? (
             <UserRoleDropdown
               user={user}
               allRoles={allRoles}
               onUpdateRoles={onUpdateRoles}
             />
-          ) : (
-            <i>N/A</i>
-          )}
+          ) : null}
         </td>
       )}
       {!hasRoles && (
