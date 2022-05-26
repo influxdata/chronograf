@@ -324,7 +324,8 @@ const UserPage = ({
             <FancyScrollbar>
               <div className="infludb-admin-section__header">
                 <h4>
-                  Database Privileges{permissionsChanged ? ' (unsaved)' : ''}
+                  {isOSS ? 'Database Permissions' : 'Permissions'}
+                  {permissionsChanged ? ' (unsaved)' : ''}
                 </h4>
               </div>
               <div className="infludb-admin-section__body">
@@ -342,7 +343,7 @@ const UserPage = ({
                           Database
                         </th>
                         <th style={{width: '99%', whiteSpace: 'nowrap'}}>
-                          Priviledges
+                          Permissions
                         </th>
                       </tr>
                     </thead>
