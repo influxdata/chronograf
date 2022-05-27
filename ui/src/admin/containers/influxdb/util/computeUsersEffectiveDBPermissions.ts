@@ -1,15 +1,11 @@
 import {User} from 'src/types/influxAdmin'
 
-/** Array of users, with Arrays of databases containing permission records (or record changes) */
+/** Array of users with Arrays of databases containing granted permission records */
 type UsersDBPermissions = Array<Array<Record<string, boolean>>>
 /**
  * Creates effective user permissions as a record
  * that contains permission names as keys and `true` values
  * for every assigned permission.
- *
- * @param dbNames
- * @param users
- * @returns
  */
 export default function computeUsersEffectiveDBPermissions(
   users: User[],

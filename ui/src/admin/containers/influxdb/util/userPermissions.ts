@@ -1,13 +1,12 @@
 import {User, UserPermission} from 'src/types/influxAdmin'
 
-/** Record with database keys and values being a record of granted permissions or permission changes */
+/** Record with databases as keys and values being a record of granted permissions or permission changes */
 export type UserDBPermissions = Record<string, Record<string, boolean>>
 
 /**
- * Create a record of user's database permissions, organized by every database that
- * has some granted permissions.
+ * ComputeUserPermissions creates a record of user's database permissions.
  * @param user infludb user
- * @param isEnterprise enteprise InfluxDB flag means that <ALL>-scoped permissions are mapped to an extra `''` database.
+ * @param isEnterprise enteprise InfluxDB flag means that all-scoped permissions are mapped to an extra '' database.
  */
 export function computeUserPermissions(
   user: User,
@@ -25,8 +24,9 @@ export function computeUserPermissions(
 }
 
 /**
- * Computes changes in user permissions for a specific db and permission,
- * having original permission and a set of changes, return a new set of changes.
+ * ComputeUserPermissionsChange computes changes in user permissions
+ * for a specific db and permission, having original user permission
+ * and a set of already performed changes.
  */
 export function computeUserPermissionsChange(
   db: string,
@@ -61,7 +61,9 @@ export function computeUserPermissionsChange(
 }
 
 /**
- * Creates server's user permissions out of existing and changed user permissions.
+ * ToUserPermissions creates server-side's user permissions
+ * out of existing and changed user permissions, optionally
+ * appended to supplied user permissions.
  */
 export function toUserPermissions(
   userPermissions: UserDBPermissions,
