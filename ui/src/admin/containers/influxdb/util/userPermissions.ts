@@ -1,4 +1,4 @@
-import {User} from 'src/types/influxAdmin'
+import {User, UserPermission} from 'src/types/influxAdmin'
 
 /**
  * Create a record of user's database permissions, separated by every database that
@@ -55,4 +55,47 @@ export function computeUserPermissionsChange(
   }
   // the current database is not changed as a result
   return otherDBs
+}
+
+export function toUserPermissions(
+  user: User,
+  userPermissions: Record<string, Record<string, boolean>>,
+  changedPermissions: Record<string, Record<string, boolean>>,
+  isEnterprise: boolean
+): UserPermission[] {
+  const newUserPermisssions = {...userPermissions}
+  Object.entries(changedPermissions).forEach(([db, perms]) => {
+    if (newUserPermisssions[db]) {
+      newUserPermisssions[db] = {
+        ...newUserPermisssions[db],
+        ...perms,
+      }
+    } else {
+      newUserPermisssions[db] = {...perms}
+    }
+  })
+  return Object.entries(newUserPermisssions).reduce(
+    (acc, [db, permRecord]) => {
+      const allowed = Object.entries(permRecord).reduce(
+        (allowedAcc, [perm, use]) => {
+          if (use) {
+            allowedAcc.push(perm)
+          }
+          return allowedAcc
+        },
+        []
+      )
+      if (allowed.length) {
+        acc.push({
+          scope: db ? 'database' : 'all',
+          name: db || undefined,
+          allowed,
+        })
+      }
+      return acc
+    },
+    isEnterprise
+      ? []
+      : (user.permissions || []).filter(x => x.scope !== 'database')
+  )
 }

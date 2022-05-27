@@ -1,7 +1,9 @@
 import {
   computeUserPermissions,
   computeUserPermissionsChange,
+  toUserPermissions,
 } from 'src/admin/containers/influxdb/util/userPermissions'
+import {User, UserPermission} from 'src/types/influxAdmin'
 describe('admin/containers/influxdb/util/userPermissions', () => {
   describe('computeUserDBPermissions', () => {
     it('computes no permissions', () => {
@@ -126,6 +128,87 @@ describe('admin/containers/influxdb/util/userPermissions', () => {
           db3: {A: true},
         })
       ).toEqual({db3: {A: true}})
+    })
+  })
+  describe('toUserPermissions', () => {
+    // sort the test results so that they are comparable with expected results
+    const sorted = (perms: UserPermission[]) =>
+      perms
+        .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+        .map(({name, scope, allowed}) => ({
+          name,
+          scope,
+          allowed: (allowed || []).sort(),
+        }))
+    const user: User = {
+      name: 'tod',
+      roles: [],
+      permissions: [
+        {scope: 'database', name: 'db1', allowed: ['READ']},
+        {scope: 'all', allowed: ['ALL']},
+      ],
+    }
+    it('changes permissions in OSS', () => {
+      expect(
+        sorted(
+          toUserPermissions(
+            user,
+            {db1: {READ: true}},
+            {db2: {WRITE: true}},
+            false
+          )
+        )
+      ).toEqual([
+        {scope: 'all', allowed: ['ALL']},
+        {scope: 'database', name: 'db1', allowed: ['READ']},
+        {scope: 'database', name: 'db2', allowed: ['WRITE']},
+      ])
+    })
+    it('removes permission in OSS', () => {
+      expect(
+        sorted(
+          toUserPermissions(
+            user,
+            {db1: {READ: true}},
+            {db1: {READ: false}, db2: {READ: true}},
+            false
+          )
+        )
+      ).toEqual([
+        {scope: 'all', allowed: ['ALL']},
+        {scope: 'database', name: 'db2', allowed: ['READ']},
+      ])
+    })
+    it('adds permissions in Enterprise', () => {
+      expect(
+        sorted(
+          toUserPermissions(
+            user,
+            {db1: {READ: true}},
+            {db2: {WRITE: true}, '': {Other: true}},
+            true
+          )
+        )
+      ).toEqual([
+        {scope: 'all', allowed: ['Other']},
+        {scope: 'database', name: 'db1', allowed: ['READ']},
+        {scope: 'database', name: 'db2', allowed: ['WRITE']},
+      ])
+    })
+    it('removes permissions in Enterprise', () => {
+      expect(
+        sorted(
+          toUserPermissions(
+            user,
+            {db1: {READ: true, WRITE: true}, '': {Other: true}},
+            {db1: {WRITE: false}, '': {Other: false}, db3: {Other: true}},
+            true
+          )
+        )
+      ).toEqual([
+        {scope: 'database', name: 'db1', allowed: ['READ']},
+        {scope: 'database', name: 'db3', allowed: ['Other']},
+      ])
     })
   })
 })

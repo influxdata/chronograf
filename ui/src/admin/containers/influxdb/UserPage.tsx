@@ -22,6 +22,7 @@ import {PERMISSIONS} from 'src/shared/constants'
 import {
   computeUserPermissions,
   computeUserPermissionsChange,
+  toUserPermissions,
 } from './util/userPermissions'
 
 const FAKE_USER: User = {
@@ -181,40 +182,11 @@ const UserPage = ({
       }
       setRunning(true)
       try {
-        const newUserDBPermisssions = {...userDBPermissions}
-        Object.entries(changedPermissions).forEach(([db, perms]) => {
-          if (newUserDBPermisssions[db]) {
-            newUserDBPermisssions[db] = {
-              ...newUserDBPermisssions[db],
-              ...perms,
-            }
-          } else {
-            newUserDBPermisssions[db] = {...perms}
-          }
-        })
-        const permissions = Object.entries(newUserDBPermisssions).reduce(
-          (acc, [db, permRecord]) => {
-            const allowed = Object.entries(permRecord).reduce(
-              (allowedAcc, [perm, use]) => {
-                if (use) {
-                  allowedAcc.push(perm)
-                }
-                return allowedAcc
-              },
-              []
-            )
-            if (allowed.length) {
-              acc.push({
-                scope: db ? 'database' : 'all',
-                name: db || undefined,
-                allowed,
-              })
-            }
-            return acc
-          },
+        const permissions = toUserPermissions(
+          user,
+          userDBPermissions,
+          changedPermissions,
           isEnterprise
-            ? []
-            : (user.permissions || []).filter(x => x.scope !== 'database')
         )
         await updatePermissionsAsync(user, permissions)
       } finally {
