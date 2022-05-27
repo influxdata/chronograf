@@ -1,7 +1,7 @@
 /**
- * AllOrParticularSelection function ensures that when all ('*') option is selected,
- * particular options are de-selected, and when a particular option is selected '*'
- * option is deselected.
+ * AllOrParticularSelection function modifies new values selection to
+ * exclude a particular option when all ('*') option is newly selected,
+ * and to exclude '*' option when a particular option is newly selected.
  */
 export default function allOrParticularSelection(
   oldVals: string[],
