@@ -1,16 +1,14 @@
-import computeUserDBPermissions from 'src/admin/containers/influxdb/util/computeUserDBPermissions'
-describe('admin/containers/influxdb/util/computeUserDBPermissions', () => {
+import subject from 'src/admin/containers/influxdb/util/computeUsersEffectiveDBPermissions'
+describe('admin/containers/influxdb/util/computeUsersEffectiveDBPermissions', () => {
   it('creates values for empty users', () => {
-    expect(computeUserDBPermissions([], ['whateverdb'])).toEqual([])
+    expect(subject([], ['whateverdb'])).toEqual([])
   })
   it('creates values for no databases', () => {
-    expect(
-      computeUserDBPermissions([{name: 'a', permissions: [], roles: []}], [])
-    ).toEqual([[]])
+    expect(subject([{name: 'a', permissions: [], roles: []}], [])).toEqual([[]])
   })
   it('computes db-specific permissions', () => {
     expect(
-      computeUserDBPermissions(
+      subject(
         [
           {
             name: 'a',
@@ -27,7 +25,7 @@ describe('admin/containers/influxdb/util/computeUserDBPermissions', () => {
   })
   it('maps all-scoped ALL permission to READ, WRITE', () => {
     expect(
-      computeUserDBPermissions(
+      subject(
         [
           {
             name: 'a',
@@ -46,7 +44,7 @@ describe('admin/containers/influxdb/util/computeUserDBPermissions', () => {
   })
   it('inherits all permissions', () => {
     expect(
-      computeUserDBPermissions(
+      subject(
         [
           {
             name: 'a',
@@ -69,7 +67,7 @@ describe('admin/containers/influxdb/util/computeUserDBPermissions', () => {
   })
   it('inherits independently on order', () => {
     expect(
-      computeUserDBPermissions(
+      subject(
         [
           {
             name: 'a',

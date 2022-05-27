@@ -11,7 +11,7 @@ type UserDBPermissions = Array<Array<Record<string, boolean>>>
  * @param users
  * @returns
  */
-export default function computeUserDBPermissions(
+export default function computeUsersEffectiveDBPermissions(
   users: User[],
   dbNames: string[]
 ): UserDBPermissions {

@@ -23,7 +23,7 @@ import useDebounce from 'src/utils/useDebounce'
 import useChangeEffect from 'src/utils/useChangeEffect'
 import MultiSelectDropdown from 'src/reusable_ui/components/dropdowns/MultiSelectDropdown'
 import {ComponentSize, SlideToggle} from 'src/reusable_ui'
-import computeUserDBPermissions from './util/computeUserDBPermissions'
+import computeUsersEffectiveDBPermissions from './util/computeUsersEffectiveDBPermissions'
 import allOrParticularSelection from './util/allOrParticularSelection'
 
 const isValidUser = (user: User) => {
@@ -118,7 +118,7 @@ const UsersPage = ({
   // effective permissions
   const visibleUsers = useMemo(() => users.filter(x => !x.hidden), [users])
   const userDBPermissions = useMemo(
-    () => computeUserDBPermissions(visibleUsers, visibleDBNames),
+    () => computeUsersEffectiveDBPermissions(visibleUsers, visibleDBNames),
     [visibleDBNames, visibleUsers]
   )
 
