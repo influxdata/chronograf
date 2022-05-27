@@ -23,6 +23,8 @@ import useDebounce from 'src/utils/useDebounce'
 import useChangeEffect from 'src/utils/useChangeEffect'
 import MultiSelectDropdown from 'src/reusable_ui/components/dropdowns/MultiSelectDropdown'
 import {ComponentSize, SlideToggle} from 'src/reusable_ui'
+import computeUserDBPermissions from './util/computeUserDBPermissions'
+import allOrParticularSelection from './util/allOrParticularSelection'
 
 const isValidUser = (user: User) => {
   const minLen = 3
@@ -108,50 +110,15 @@ const UsersPage = ({
   const changeSelectedDBs = useCallback(
     (newDBs: string[]) =>
       setSelectedDBs((oldDBs: string[]) => {
-        if (newDBs.length <= 1) {
-          return newDBs
-        }
-        const isAll = newDBs.includes('*')
-        const wasAll = oldDBs.includes('*')
-        if (wasAll && isAll) {
-          return newDBs.filter(x => x !== '*')
-        }
-        if (!wasAll && isAll) {
-          return ['*']
-        }
-        return newDBs
+        return allOrParticularSelection(oldDBs, newDBs)
       }),
     [setSelectedDBs]
   )
 
   // effective permissions
   const visibleUsers = useMemo(() => users.filter(x => !x.hidden), [users])
-  const userDBPermissions = useMemo<Array<Array<Record<string, boolean>>>>(
-    () =>
-      visibleUsers.map(u => {
-        const permRecord = u.permissions.reduce((acc, userPerm) => {
-          if (userPerm.scope === 'all') {
-            const allowed = userPerm.allowed.includes('ALL')
-              ? {READ: true, WRITE: true}
-              : userPerm.allowed.reduce((obj, x) => {
-                  obj[x] = true
-                  return obj
-                }, {})
-            visibleDBNames.forEach(
-              name => (acc[name] = {...allowed, ...acc[name]})
-            )
-          } else if (userPerm.scope === 'database') {
-            acc[userPerm.name] = userPerm.allowed.reduce<
-              Record<string, boolean>
-            >((obj, perm) => {
-              obj[perm] = true
-              return obj
-            }, acc[userPerm.name] || {})
-          }
-          return acc
-        }, {})
-        return visibleDBNames.map(name => permRecord[name] || {})
-      }),
+  const userDBPermissions = useMemo(
+    () => computeUserDBPermissions(visibleUsers, visibleDBNames),
     [visibleDBNames, visibleUsers]
   )
 
