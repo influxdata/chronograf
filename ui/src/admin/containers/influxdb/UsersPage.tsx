@@ -71,7 +71,9 @@ const UsersPage = ({
   if (isConnectedToLDAP(source)) {
     return (
       <AdminInfluxDBTabbedPage activeTab="users" source={source}>
-        <div className="container-fluid">Users are managed via LDAP.</div>
+        <div className="container-fluid">
+          Users are managed in LDAP directory.
+        </div>
       </AdminInfluxDBTabbedPage>
     )
   }
