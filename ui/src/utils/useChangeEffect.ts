@@ -1,7 +1,8 @@
 import React, {useEffect, useRef} from 'react'
 
 /**
- * Acts like React.useEffect, but it is not called for the first time, but only opon any change later.
+ * Acts like React.useEffect, but it does not call the effect
+ * for the first time, but only opon any change after initialization.
  */
 function useChangeEffect(
   effect: React.EffectCallback,
