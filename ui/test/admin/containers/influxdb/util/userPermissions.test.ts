@@ -3,7 +3,7 @@ import {
   computeUserPermissionsChange,
   toUserPermissions,
 } from 'src/admin/containers/influxdb/util/userPermissions'
-import {User, UserPermission} from 'src/types/influxAdmin'
+import {UserPermission} from 'src/types/influxAdmin'
 describe('admin/containers/influxdb/util/userPermissions', () => {
   describe('computeUserDBPermissions', () => {
     it('computes no permissions', () => {
@@ -140,23 +140,12 @@ describe('admin/containers/influxdb/util/userPermissions', () => {
           scope,
           allowed: (allowed || []).sort(),
         }))
-    const user: User = {
-      name: 'tod',
-      roles: [],
-      permissions: [
-        {scope: 'database', name: 'db1', allowed: ['READ']},
-        {scope: 'all', allowed: ['ALL']},
-      ],
-    }
     it('changes permissions in OSS', () => {
       expect(
         sorted(
-          toUserPermissions(
-            user,
-            {db1: {READ: true}},
-            {db2: {WRITE: true}},
-            false
-          )
+          toUserPermissions({db1: {READ: true}}, {db2: {WRITE: true}}, [
+            {scope: 'all', allowed: ['ALL']},
+          ])
         )
       ).toEqual([
         {scope: 'all', allowed: ['ALL']},
@@ -168,10 +157,9 @@ describe('admin/containers/influxdb/util/userPermissions', () => {
       expect(
         sorted(
           toUserPermissions(
-            user,
             {db1: {READ: true}},
             {db1: {READ: false}, db2: {READ: true}},
-            false
+            [{scope: 'all', allowed: ['ALL']}]
           )
         )
       ).toEqual([
@@ -183,10 +171,8 @@ describe('admin/containers/influxdb/util/userPermissions', () => {
       expect(
         sorted(
           toUserPermissions(
-            user,
             {db1: {READ: true}},
-            {db2: {WRITE: true}, '': {Other: true}},
-            true
+            {db2: {WRITE: true}, '': {Other: true}}
           )
         )
       ).toEqual([
@@ -199,10 +185,8 @@ describe('admin/containers/influxdb/util/userPermissions', () => {
       expect(
         sorted(
           toUserPermissions(
-            user,
             {db1: {READ: true, WRITE: true}, '': {Other: true}},
-            {db1: {WRITE: false}, '': {Other: false}, db3: {Other: true}},
-            true
+            {db1: {WRITE: false}, '': {Other: false}, db3: {Other: true}}
           )
         )
       ).toEqual([

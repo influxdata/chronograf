@@ -182,11 +182,11 @@ const UserPage = ({
       }
       setRunning(true)
       try {
+        // append to existing all-scoped permissions in OSS, they manage administrator status
         const permissions = toUserPermissions(
-          user,
           userDBPermissions,
           changedPermissions,
-          isEnterprise
+          isEnterprise ? [] : user.permissions.filter(x => x.scope === 'all')
         )
         await updatePermissionsAsync(user, permissions)
       } finally {

@@ -1,15 +1,18 @@
 import {User, UserPermission} from 'src/types/influxAdmin'
 
+/** Record with database keys and values being a record of granted permissions or permission changes */
+export type UserDBPermissions = Record<string, Record<string, boolean>>
+
 /**
- * Create a record of user's database permissions, separated by every database that
- * has some granted permissions. Enteprises
+ * Create a record of user's database permissions, organized by every database that
+ * has some granted permissions.
  * @param user infludb user
- * @param isEnterprise signalize enteprise InfluxDB, where <ALL> databases is mapped to an extra `''` database.
+ * @param isEnterprise enteprise InfluxDB flag means that <ALL>-scoped permissions are mapped to an extra `''` database.
  */
 export function computeUserPermissions(
   user: User,
   isEnterprise: boolean
-): Record<string, Record<string, boolean>> {
+): UserDBPermissions {
   return user.permissions.reduce((acc, perm) => {
     if (!isEnterprise && perm.scope !== 'database') {
       return acc // do not include all permissions in OSS, they have separate administration
@@ -28,9 +31,9 @@ export function computeUserPermissions(
 export function computeUserPermissionsChange(
   db: string,
   perm: string,
-  userPermissions: Record<string, Record<string, boolean>>,
-  changedPermissions: Record<string, Record<string, boolean>>
-): Record<string, Record<string, boolean>> | undefined {
+  userPermissions: UserDBPermissions,
+  changedPermissions: UserDBPermissions
+): UserDBPermissions {
   const origState = userPermissions[db]?.[perm]
   const {[db]: changedDB, ...otherDBs} = changedPermissions
   if (changedDB === undefined) {
@@ -57,11 +60,13 @@ export function computeUserPermissionsChange(
   return otherDBs
 }
 
+/**
+ * Creates server's user permissions out of existing and changed user permissions.
+ */
 export function toUserPermissions(
-  user: User,
-  userPermissions: Record<string, Record<string, boolean>>,
-  changedPermissions: Record<string, Record<string, boolean>>,
-  isEnterprise: boolean
+  userPermissions: UserDBPermissions,
+  changedPermissions: UserDBPermissions,
+  appendAfter: UserPermission[] = []
 ): UserPermission[] {
   const newUserPermisssions = {...userPermissions}
   Object.entries(changedPermissions).forEach(([db, perms]) => {
@@ -74,28 +79,23 @@ export function toUserPermissions(
       newUserPermisssions[db] = {...perms}
     }
   })
-  return Object.entries(newUserPermisssions).reduce(
-    (acc, [db, permRecord]) => {
-      const allowed = Object.entries(permRecord).reduce(
-        (allowedAcc, [perm, use]) => {
-          if (use) {
-            allowedAcc.push(perm)
-          }
-          return allowedAcc
-        },
-        []
-      )
-      if (allowed.length) {
-        acc.push({
-          scope: db ? 'database' : 'all',
-          name: db || undefined,
-          allowed,
-        })
-      }
-      return acc
-    },
-    isEnterprise
-      ? []
-      : (user.permissions || []).filter(x => x.scope !== 'database')
-  )
+  return Object.entries(newUserPermisssions).reduce((acc, [db, permRecord]) => {
+    const allowed = Object.entries(permRecord).reduce(
+      (allowedAcc, [perm, use]) => {
+        if (use) {
+          allowedAcc.push(perm)
+        }
+        return allowedAcc
+      },
+      []
+    )
+    if (allowed.length) {
+      acc.push({
+        scope: db ? 'database' : 'all',
+        name: db || undefined,
+        allowed,
+      })
+    }
+    return acc
+  }, appendAfter)
 }

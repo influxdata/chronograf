@@ -1,5 +1,5 @@
 import subject from 'src/admin/containers/influxdb/util/allOrParticularSelection'
-describe('admin/containers/influxdb/util/computeUserDBPermissions', () => {
+describe('admin/containers/influxdb/util/allOrParticularSelection', () => {
   it('keeps simple changes as-is', () => {
     expect(subject([], [])).toEqual([])
     expect(subject([], ['*'])).toEqual(['*'])

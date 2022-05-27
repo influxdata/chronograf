@@ -1,9 +1,9 @@
 import {User} from 'src/types/influxAdmin'
 
-type UserDBPermissions = Array<Array<Record<string, boolean>>>
+/** Array of users, with Arrays of databases containing permission records (or record changes) */
+type UsersDBPermissions = Array<Array<Record<string, boolean>>>
 /**
- * Creates aeffective permissions in array for every supplied user
- * contains an array for every supplied database with a record
+ * Creates effective user permissions as a record
  * that contains permission names as keys and `true` values
  * for every assigned permission.
  *
@@ -14,7 +14,7 @@ type UserDBPermissions = Array<Array<Record<string, boolean>>>
 export default function computeUsersEffectiveDBPermissions(
   users: User[],
   dbNames: string[]
-): UserDBPermissions {
+): UsersDBPermissions {
   return users.map(u => {
     const permRecord = u.permissions.reduce((acc, userPerm) => {
       if (userPerm.scope === 'all') {
