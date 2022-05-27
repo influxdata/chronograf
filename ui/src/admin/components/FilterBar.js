@@ -29,17 +29,15 @@ class FilterBar extends Component {
     })
     return (
       <div className="panel-heading">
-        <div>
-          <div className="search-widget" style={{width: '250px'}}>
-            <input
-              type="text"
-              className="form-control input-sm"
-              placeholder={`Filter ${placeholderText}...`}
-              value={this.state.filterText}
-              onChange={this.handleText}
-            />
-            <span className="icon search" />
-          </div>
+        <div className="search-widget" style={{width: '250px'}}>
+          <input
+            type="text"
+            className="form-control input-sm"
+            placeholder={`Filter ${placeholderText}...`}
+            value={this.state.filterText}
+            onChange={this.handleText}
+          />
+          <span className="icon search" />
         </div>
         <div className="panel-heading--right">
           <button
