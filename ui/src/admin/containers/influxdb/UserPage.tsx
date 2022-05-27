@@ -108,11 +108,11 @@ const UserPage = ({
     },
     [user, password]
   )
-  const isOSS = !hasRoleManagement(source)
+  const isEnterprise = hasRoleManagement(source)
 
   // admin
   const isAdmin =
-    isOSS &&
+    !isEnterprise &&
     !!user.permissions.find(
       x => x.scope === 'all' && (x.allowed || []).includes('ALL')
     )
@@ -141,7 +141,7 @@ const UserPage = ({
       serverPermissions.find(x => x.scope === 'database')?.allowed || [],
       serverPermissions.find(x => x.scope === 'all')?.allowed || [],
       user.permissions.reduce((acc, perm) => {
-        if (isOSS && perm.scope !== 'database') {
+        if (!isEnterprise && perm.scope !== 'database') {
           return acc // do not include all permissions in OSS, they have separate administration
         }
         const dbName = perm.name || ''
@@ -150,7 +150,7 @@ const UserPage = ({
         return acc
       }, {}),
     ],
-    [serverPermissions, user, isOSS]
+    [serverPermissions, user, isEnterprise]
   )
   const [changedPermissions, setChangedPermissions] = useState<
     Record<string, Record<string, boolean | undefined>>
@@ -228,30 +228,30 @@ const UserPage = ({
             }
             return acc
           },
-          isOSS
-            ? (user.permissions || []).filter(x => x.scope !== 'database')
-            : []
+          isEnterprise
+            ? []
+            : (user.permissions || []).filter(x => x.scope !== 'database')
         )
         await updatePermissionsAsync(user, permissions)
       } finally {
         setRunning(false)
       }
     },
-    [user, changedPermissions, userDBPermissions, isOSS]
+    [user, changedPermissions, userDBPermissions, isEnterprise]
   )
 
   // roles
   const [allRoleNames, rolesRecord] = useMemo(() => {
-    if (isOSS) {
+    if (!isEnterprise) {
       return [[], {}]
     }
-    const rNames = (isOSS ? [] : roles).map(r => r.name).sort()
+    const rNames = (isEnterprise ? roles : []).map(r => r.name).sort()
     const urRecord = user.roles.reduce<Record<string, boolean>>((acc, r) => {
       acc[r.name] = true
       return acc
     }, {})
     return [rNames, urRecord]
-  }, [user, roles, isOSS])
+  }, [user, roles, isEnterprise])
   const [changedRolesRecord, setChangedRolesRecord] = useState<
     Record<string, boolean>
   >({})
@@ -320,9 +320,9 @@ const UserPage = ({
           acc.push(db.name)
           return acc
         },
-        isOSS ? [] : ['']
+        isEnterprise ? [''] : []
       ),
-    [isOSS, databases]
+    [isEnterprise, databases]
   )
   const body =
     user === FAKE_USER ? (
@@ -345,7 +345,7 @@ const UserPage = ({
                   running ? ComponentStatus.Disabled : ComponentStatus.Default
                 }
               />
-              {isOSS && (
+              {!isEnterprise && (
                 <ConfirmButton
                   type="btn-default"
                   text={isAdmin ? 'Revoke Admin' : 'Grant Admin'}
@@ -397,7 +397,7 @@ const UserPage = ({
             </div>
           ) : (
             <FancyScrollbar>
-              {!isOSS && (
+              {isEnterprise && (
                 <>
                   <div className="infludb-admin-section__header">
                     <h4>
@@ -434,7 +434,7 @@ const UserPage = ({
               )}
               <div className="infludb-admin-section__header">
                 <h4>
-                  {isOSS ? 'Database Permissions' : 'Permissions'}
+                  {isEnterprise ? 'Permissions' : 'Database Permissions'}
                   {permissionsChanged ? ' (unsaved)' : ''}
                 </h4>
               </div>
