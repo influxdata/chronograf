@@ -19,6 +19,7 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {useEffect} from 'react'
 import {useCallback} from 'react'
 import {PERMISSIONS} from 'src/shared/constants'
+import {computeUserDBPermissions} from './util/userPermissions'
 
 const FAKE_USER: User = {
   name: '',
@@ -136,19 +137,15 @@ const UserPage = ({
   )
 
   // permissions
-  const [dbPermisssions, clusterPermissions, userDBPermissions] = useMemo(
+  const [
+    dbPermisssions,
+    clusterPermissions,
+    userDBPermissions,
+  ] = useMemo(
     () => [
       serverPermissions.find(x => x.scope === 'database')?.allowed || [],
       serverPermissions.find(x => x.scope === 'all')?.allowed || [],
-      user.permissions.reduce((acc, perm) => {
-        if (!isEnterprise && perm.scope !== 'database') {
-          return acc // do not include all permissions in OSS, they have separate administration
-        }
-        const dbName = perm.name || ''
-        const dbPerms = acc[dbName] || (acc[dbName] = {})
-        perm.allowed.forEach(x => (dbPerms[x] = true))
-        return acc
-      }, {}),
+      computeUserDBPermissions(user, isEnterprise),
     ],
     [serverPermissions, user, isEnterprise]
   )
