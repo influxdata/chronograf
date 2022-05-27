@@ -19,7 +19,10 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {useEffect} from 'react'
 import {useCallback} from 'react'
 import {PERMISSIONS} from 'src/shared/constants'
-import {computeUserDBPermissions} from './util/userPermissions'
+import {
+  computeUserPermissions,
+  computeUserPermissionsChange,
+} from './util/userPermissions'
 
 const FAKE_USER: User = {
   name: '',
@@ -145,7 +148,7 @@ const UserPage = ({
     () => [
       serverPermissions.find(x => x.scope === 'database')?.allowed || [],
       serverPermissions.find(x => x.scope === 'all')?.allowed || [],
-      computeUserDBPermissions(user, isEnterprise),
+      computeUserPermissions(user, isEnterprise),
     ],
     [serverPermissions, user, isEnterprise]
   )
@@ -159,30 +162,14 @@ const UserPage = ({
     () => (e: React.MouseEvent<HTMLElement>) => {
       const db = (e.target as HTMLElement).dataset.db
       const perm = (e.target as HTMLElement).dataset.perm
-      const origState = userDBPermissions[db]?.[perm]
-      const {[db]: changedDB, ...otherDBs} = changedPermissions
-      if (changedDB === undefined) {
-        setChangedPermissions({[db]: {[perm]: !origState}, ...otherDBs})
-      } else {
-        const {[perm]: changedPerm, ...otherPerms} = changedDB
-        if (changedPerm === undefined) {
-          setChangedPermissions({
-            [db]: {[perm]: !origState, ...otherPerms},
-            ...otherDBs,
-          })
-        } else if (Object.keys(otherPerms).length) {
-          // we are changing back has been already changed,
-          // adjust changed database permissions
-          setChangedPermissions({
-            [db]: otherPerms,
-            ...otherDBs,
-          })
-        } else {
-          // there is no change for the current database
-          setChangedPermissions(otherDBs)
-        }
-      }
-      return
+      setChangedPermissions(
+        computeUserPermissionsChange(
+          db,
+          perm,
+          userDBPermissions,
+          changedPermissions
+        )
+      )
     },
     [userDBPermissions, changedPermissions, setChangedPermissions]
   )

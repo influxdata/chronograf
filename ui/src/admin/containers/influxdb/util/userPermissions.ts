@@ -6,7 +6,7 @@ import {User} from 'src/types/influxAdmin'
  * @param user infludb user
  * @param isEnterprise signalize enteprise InfluxDB, where <ALL> databases is mapped to an extra `''` database.
  */
-export function computeUserDBPermissions(
+export function computeUserPermissions(
   user: User,
   isEnterprise: boolean
 ): Record<string, Record<string, boolean>> {
@@ -19,4 +19,40 @@ export function computeUserDBPermissions(
     perm.allowed.forEach(x => (dbPerms[x] = true))
     return acc
   }, {})
+}
+
+/**
+ * Computes changes in user permissions for a specific db and permission,
+ * having original permission and a set of changes, return a new set of changes.
+ */
+export function computeUserPermissionsChange(
+  db: string,
+  perm: string,
+  userPermissions: Record<string, Record<string, boolean>>,
+  changedPermissions: Record<string, Record<string, boolean>>
+): Record<string, Record<string, boolean>> | undefined {
+  const origState = userPermissions[db]?.[perm]
+  const {[db]: changedDB, ...otherDBs} = changedPermissions
+  if (changedDB === undefined) {
+    // no change for the database yet
+    return {[db]: {[perm]: !origState}, ...otherDBs}
+  }
+  const {[perm]: changedPerm, ...otherPerms} = changedDB
+  if (changedPerm === undefined) {
+    // no change for the permission yet
+    return {
+      [db]: {[perm]: !origState, ...otherPerms},
+      ...otherDBs,
+    }
+  }
+  if (Object.keys(otherPerms).length) {
+    // we are reverting what has been already changed,
+    // return other changed permissions for this database
+    return {
+      [db]: otherPerms,
+      ...otherDBs,
+    }
+  }
+  // the current database is not changed as a result
+  return otherDBs
 }
