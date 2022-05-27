@@ -1,18 +1,18 @@
 import React, {FunctionComponent} from 'react'
 
 interface Props {
-  tableName: string
+  entities: string
   colSpan?: number
   filtered?: boolean
 }
-const EmptyRow: FunctionComponent<Props> = ({tableName, colSpan, filtered}) => (
+const EmptyRow: FunctionComponent<Props> = ({entities, colSpan, filtered}) => (
   <tr className="table-empty-state">
     <th colSpan={colSpan || 5}>
       {filtered ? (
-        <p>No Matching Users</p>
+        <p>No Matching {entities}</p>
       ) : (
         <p>
-          You don't have any {tableName},<br />
+          You don't have any {entities},<br />
           why not create one?
         </p>
       )}

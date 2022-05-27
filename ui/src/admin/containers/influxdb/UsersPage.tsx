@@ -277,7 +277,7 @@ const UsersPage = ({
                   ))
                 ) : (
                   <EmptyRow
-                    tableName={'Users'}
+                    entities="Users"
                     colSpan={1 + +showRoles}
                     filtered={!!filterText}
                   />
