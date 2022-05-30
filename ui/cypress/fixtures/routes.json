@@ -3,5 +3,6 @@
   "hosts": "/hosts",
   "explorer": "/data-explorer",
   "config": "/manage-sources",
-  "adminChronograf": "/admin-chronograf"
+  "adminChronograf": "/admin-chronograf",
+  "adminInfluxDB": "/admin-influxdb"
 }
