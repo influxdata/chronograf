@@ -1,10 +1,18 @@
 import subject from 'src/admin/containers/influxdb/util/computeUsersEffectiveDBPermissions'
+import {User} from 'src/types/influxAdmin'
+const redundantUserProperties: Pick<User, 'roles' | 'links'> = {
+  roles: [],
+  links: {self: ''},
+}
+
 describe('admin/containers/influxdb/util/computeUsersEffectiveDBPermissions', () => {
   it('creates values for empty users', () => {
     expect(subject([], ['whateverdb'])).toEqual([])
   })
   it('creates values for no databases', () => {
-    expect(subject([{name: 'a', permissions: [], roles: []}], [])).toEqual([[]])
+    expect(
+      subject([{name: 'a', permissions: [], ...redundantUserProperties}], [])
+    ).toEqual([[]])
   })
   it('computes db-specific permissions', () => {
     expect(
@@ -16,7 +24,7 @@ describe('admin/containers/influxdb/util/computeUsersEffectiveDBPermissions', ()
               {scope: 'database', name: 'db1', allowed: ['A']},
               {scope: 'database', name: 'db3', allowed: ['B', 'C']},
             ],
-            roles: [],
+            ...redundantUserProperties,
           },
         ],
         ['db1', 'db2', 'db3']
@@ -30,7 +38,7 @@ describe('admin/containers/influxdb/util/computeUsersEffectiveDBPermissions', ()
           {
             name: 'a',
             permissions: [{scope: 'all', allowed: ['ALL']}],
-            roles: [],
+            ...redundantUserProperties,
           },
         ],
         ['db1', 'db2']
@@ -53,7 +61,7 @@ describe('admin/containers/influxdb/util/computeUsersEffectiveDBPermissions', ()
               {scope: 'database', name: 'db1', allowed: ['Write']},
               {scope: 'database', name: 'db2', allowed: ['Other']},
             ],
-            roles: [],
+            ...redundantUserProperties,
           },
         ],
         ['db1', 'db2']
@@ -76,7 +84,7 @@ describe('admin/containers/influxdb/util/computeUsersEffectiveDBPermissions', ()
               {scope: 'database', name: 'db1', allowed: ['Write']},
               {scope: 'all', allowed: ['Read']},
             ],
-            roles: [],
+            ...redundantUserProperties,
           },
         ],
         ['db1', 'db2', 'db3']

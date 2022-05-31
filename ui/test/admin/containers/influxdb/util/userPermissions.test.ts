@@ -3,7 +3,11 @@ import {
   computeUserPermissionsChange,
   toUserPermissions,
 } from 'src/admin/containers/influxdb/util/userPermissions'
-import {UserPermission} from 'src/types/influxAdmin'
+import {User, UserPermission} from 'src/types/influxAdmin'
+const redundantUserProperties: Pick<User, 'roles' | 'links'> = {
+  roles: [],
+  links: {self: ''},
+}
 describe('admin/containers/influxdb/util/userPermissions', () => {
   describe('computeUserDBPermissions', () => {
     it('computes no permissions', () => {
@@ -13,7 +17,7 @@ describe('admin/containers/influxdb/util/userPermissions', () => {
             {
               name: 'a',
               permissions: [],
-              roles: [],
+              ...redundantUserProperties,
             },
             isEnterprise
           )
@@ -30,7 +34,7 @@ describe('admin/containers/influxdb/util/userPermissions', () => {
               {scope: 'database', name: 'db1', allowed: ['W']},
               {scope: 'database', name: 'db2', allowed: ['R']},
             ],
-            roles: [],
+            ...redundantUserProperties,
           },
           false /* isEnterprise */
         )
@@ -46,7 +50,7 @@ describe('admin/containers/influxdb/util/userPermissions', () => {
               {scope: 'database', name: 'db1', allowed: ['W']},
               {scope: 'database', name: 'db2', allowed: ['R']},
             ],
-            roles: [],
+            ...redundantUserProperties,
           },
           true /* isEnterprise */
         )
