@@ -242,8 +242,6 @@ const UsersPage = ({
                       onEdit={editUser}
                       onSave={handleSaveUser}
                       onCancel={removeUser}
-                      isEditing={user.isEditing}
-                      isNew={user.isNew}
                     />
                   ))
                 ) : (

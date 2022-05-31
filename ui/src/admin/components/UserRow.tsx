@@ -22,8 +22,6 @@ interface Props {
   user: User
   allRoles: any[]
   hasRoles: boolean
-  isNew: boolean
-  isEditing: boolean
   page: string
   userDBPermissions: Array<Record<string, boolean>>
   showRoles: boolean
@@ -36,8 +34,6 @@ const UserRow = ({
   user,
   allRoles,
   hasRoles,
-  isNew,
-  isEditing,
   page,
   userDBPermissions,
   showRoles,
@@ -45,11 +41,10 @@ const UserRow = ({
   onSave,
   onCancel,
 }: Props) => {
-  if (isEditing) {
+  if (user.isEditing) {
     return (
       <UserRowEdit
         user={user}
-        isNew={isNew}
         onEdit={onEdit}
         onSave={onSave}
         onCancel={onCancel}

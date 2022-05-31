@@ -119,6 +119,9 @@ table > tbody > tr.admin-table--edit-row:hover,
 table.table-highlight > tbody > tr.admin-table--edit-row,
 table.table-highlight > tbody > tr.admin-table--edit-row:hover {
   background-color: $g5-pepper;
+  input {
+    width: 195px
+  }
 }
 .admin-table--change-pw {
   display: flex;

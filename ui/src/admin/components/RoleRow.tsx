@@ -1,8 +1,7 @@
 import React, {useCallback, useMemo} from 'react'
 
-import RoleEditingRow from 'src/admin/components/RoleEditingRow'
+import RoleRowEdit from 'src/admin/components/RoleRowEdit'
 import MultiSelectDropdown from 'src/shared/components/MultiSelectDropdown'
-import ConfirmOrCancel from 'src/shared/components/ConfirmOrCancel'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
 import {ROLES_TABLE} from 'src/admin/constants/tableSizing'
 import {UserPermission, UserRole, User} from 'src/types/influxAdmin'
@@ -24,7 +23,7 @@ interface Props {
 }
 
 const RoleRow = ({
-  role: {name: roleName, permissions, users = [], isNew, isEditing},
+  role: {name: roleName, permissions, users = [], isEditing},
   role,
   allUsers,
   allPermissions,
@@ -53,27 +52,13 @@ const RoleRow = ({
 
   if (isEditing) {
     return (
-      <tr className="admin-table--edit-row">
-        <RoleEditingRow
-          role={role}
-          onEdit={onEdit}
-          onSave={onSave}
-          isNew={isNew}
-        />
-        <td className="admin-table--left-offset">--</td>
-        <td className="admin-table--left-offset">--</td>
-        <td
-          className="text-right"
-          style={{width: `${ROLES_TABLE.colDelete}px`}}
-        >
-          <ConfirmOrCancel
-            item={role}
-            onConfirm={onSave}
-            onCancel={onCancel}
-            buttonSize="btn-xs"
-          />
-        </td>
-      </tr>
+      <RoleRowEdit
+        role={role}
+        onEdit={onEdit}
+        onSave={onSave}
+        onCancel={onCancel}
+        colSpan={3}
+      />
     )
   }
 
