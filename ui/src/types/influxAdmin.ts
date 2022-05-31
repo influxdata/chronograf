@@ -3,6 +3,10 @@ export interface UserRole {
   // UI markers
   isEditing?: boolean
   isNew?: boolean
+  hidden?: boolean
+  links: {
+    self: string
+  }
 }
 
 export interface UserPermission {
@@ -15,6 +19,9 @@ export interface User {
   name: string
   roles: UserRole[]
   permissions: UserPermission[]
+  links: {
+    self: string
+  }
   // UI only
   isEditing?: boolean
   password?: string
