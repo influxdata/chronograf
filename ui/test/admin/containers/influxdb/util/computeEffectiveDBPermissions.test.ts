@@ -1,11 +1,11 @@
-import subject from 'src/admin/containers/influxdb/util/computeUsersEffectiveDBPermissions'
+import subject from 'src/admin/containers/influxdb/util/computeEffectiveDBPermissions'
 import {User} from 'src/types/influxAdmin'
 const redundantUserProperties: Pick<User, 'roles' | 'links'> = {
   roles: [],
   links: {self: ''},
 }
 
-describe('admin/containers/influxdb/util/computeUsersEffectiveDBPermissions', () => {
+describe('admin/containers/influxdb/util/computeEffectiveDBPermissions', () => {
   it('creates values for empty users', () => {
     expect(subject([], ['whateverdb'])).toEqual([])
   })
