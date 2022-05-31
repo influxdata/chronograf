@@ -29,6 +29,7 @@ const FAKE_USER: User = {
   name: '',
   permissions: [],
   roles: [],
+  links: {self: ''},
 }
 
 const mapStateToProps = ({
