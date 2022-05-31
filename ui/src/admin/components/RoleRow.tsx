@@ -45,10 +45,10 @@ const RoleRow = ({
       ]),
     [role]
   )
-  const selectedPerms = useMemo(
-    () => (permissions?.[0]?.allowed || []).map(name => ({name})),
-    [permissions]
-  )
+  const selectedPerms = useMemo(() => {
+    const allPerm = permissions?.find(x => x.scope === 'all')
+    return allPerm?.allowed.map((name: string) => ({name})) || []
+  }, [permissions])
 
   if (isEditing) {
     return (
