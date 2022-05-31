@@ -81,7 +81,7 @@ const RolesPage = ({
     return globalPermissions ? globalPermissions.allowed : []
   }, [permissions])
   const handleSaveRole = useCallback(
-    async role => {
+    async (role: UserRole) => {
       if (!isValidRole(role)) {
         notify(notifyRoleNameInvalid())
         return
@@ -149,8 +149,6 @@ const RolesPage = ({
                         onDelete={deleteRole}
                         onUpdateRoleUsers={updateRoleUsers}
                         onUpdateRolePermissions={updateRolePermissions}
-                        isEditing={role.isEditing}
-                        isNew={role.isNew}
                       />
                     ))
                 ) : (

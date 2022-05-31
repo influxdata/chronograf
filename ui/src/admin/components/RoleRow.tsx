@@ -1,40 +1,55 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-
-import _ from 'lodash'
-import classnames from 'classnames'
+import React, {useCallback, useMemo} from 'react'
 
 import RoleEditingRow from 'src/admin/components/RoleEditingRow'
-import MultiSelectDropdown from 'shared/components/MultiSelectDropdown'
-import ConfirmOrCancel from 'shared/components/ConfirmOrCancel'
-import ConfirmButton from 'shared/components/ConfirmButton'
+import MultiSelectDropdown from 'src/shared/components/MultiSelectDropdown'
+import ConfirmOrCancel from 'src/shared/components/ConfirmOrCancel'
+import ConfirmButton from 'src/shared/components/ConfirmButton'
 import {ROLES_TABLE} from 'src/admin/constants/tableSizing'
+import {UserPermission, UserRole, User} from 'src/types/influxAdmin'
+import classnames from 'classnames'
+
+interface Props {
+  role: UserRole
+  allUsers: User[]
+  allPermissions: string[]
+  onCancel: (role: UserRole) => void
+  onEdit: (role: UserRole, updates: Partial<UserRole>) => void
+  onSave: (role: UserRole) => Promise<void>
+  onDelete: (role: UserRole) => Promise<void>
+  onUpdateRoleUsers: (role: UserRole, users: User[]) => void
+  onUpdateRolePermissions: (
+    role: UserRole,
+    permissions: UserPermission[]
+  ) => void
+}
 
 const RoleRow = ({
-  role: {name: roleName, permissions, users = []},
+  role: {name: roleName, permissions, users = [], isNew, isEditing},
   role,
   allUsers,
   allPermissions,
-  isNew,
-  isEditing,
   onEdit,
   onSave,
   onCancel,
   onDelete,
   onUpdateRoleUsers,
   onUpdateRolePermissions,
-}) => {
-  function handleUpdateUsers(usrs) {
-    onUpdateRoleUsers(role, usrs)
-  }
-
-  function handleUpdatePermissions(allowed) {
-    onUpdateRolePermissions(role, [
-      {scope: 'all', allowed: allowed.map(({name}) => name)},
-    ])
-  }
-
-  const perms = _.get(permissions, ['0', 'allowed'], [])
+}: Props) => {
+  const handleUpdateUsers = useCallback(
+    (usrs: User[]) => onUpdateRoleUsers(role, usrs),
+    [role]
+  )
+  const handleUpdatePermissions = useCallback(
+    (allowed: Array<{name: string}>) =>
+      onUpdateRolePermissions(role, [
+        {scope: 'all', allowed: allowed.map(({name}) => name)},
+      ]),
+    [role]
+  )
+  const selectedPerms = useMemo(
+    () => (permissions?.[0]?.allowed || []).map(name => ({name})),
+    [permissions]
+  )
 
   if (isEditing) {
     return (
@@ -73,8 +88,8 @@ const RoleRow = ({
         {allPermissions && allPermissions.length ? (
           <MultiSelectDropdown
             items={allPermissions.map(name => ({name}))}
-            selectedItems={perms.map(name => ({name}))}
-            label={perms.length ? '' : 'Select Permissions'}
+            selectedItems={selectedPerms}
+            label={selectedPerms.length ? '' : 'Select Permissions'}
             onApply={handleUpdatePermissions}
             buttonSize="btn-xs"
             buttonColor="btn-primary"
@@ -112,34 +127,6 @@ const RoleRow = ({
       </td>
     </tr>
   )
-}
-
-const {arrayOf, bool, func, shape, string} = PropTypes
-
-RoleRow.propTypes = {
-  role: shape({
-    name: string,
-    permissions: arrayOf(
-      shape({
-        name: string,
-      })
-    ),
-    users: arrayOf(
-      shape({
-        name: string,
-      })
-    ),
-  }).isRequired,
-  isNew: bool,
-  isEditing: bool,
-  onCancel: func,
-  onEdit: func,
-  onSave: func,
-  onDelete: func.isRequired,
-  allUsers: arrayOf(shape()),
-  allPermissions: arrayOf(string),
-  onUpdateRoleUsers: func.isRequired,
-  onUpdateRolePermissions: func.isRequired,
 }
 
 export default RoleRow

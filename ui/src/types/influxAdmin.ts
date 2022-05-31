@@ -1,5 +1,7 @@
 export interface UserRole {
   name: string
+  users: User[]
+  permissions: UserPermission[]
   // UI markers
   isEditing?: boolean
   isNew?: boolean
