@@ -91,6 +91,7 @@ const UsersPage = ({
     },
     [notify, source]
   )
+  const isEditing = useMemo(() => users.some(u => u.isEditing), [users])
 
   const [isEnterprise, usersPage] = useMemo(
     () => [
@@ -194,7 +195,7 @@ const UsersPage = ({
           <div className="panel-heading--right">
             <button
               className="btn btn-sm btn-primary"
-              disabled={users.some(u => u.isEditing)}
+              disabled={isEditing}
               onClick={addUser}
               data-test="create-user--button"
             >
