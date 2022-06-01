@@ -451,11 +451,7 @@ export const deleteRetentionPolicyAsync = (
 
 export const updateRoleUsersAsync = (role, users) => async dispatch => {
   try {
-    const {data} = await updateRoleAJAX(
-      role.links.self,
-      users,
-      role.permissions
-    )
+    const {data} = await updateRoleAJAX(role.links.self, {users})
     dispatch(notify(notifyRoleUsersUpdated()))
     dispatch(syncRole(role, data))
   } catch (error) {
@@ -470,11 +466,7 @@ export const updateRolePermissionsAsync = (
   permissions
 ) => async dispatch => {
   try {
-    const {data} = await updateRoleAJAX(
-      role.links.self,
-      role.users,
-      permissions
-    )
+    const {data} = await updateRoleAJAX(role.links.self, {permissions})
     dispatch(notify(notifyRolePermissionsUpdated()))
     dispatch(syncRole(role, data))
   } catch (error) {

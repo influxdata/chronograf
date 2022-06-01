@@ -123,15 +123,12 @@ export const deleteDatabase = async url => {
   }
 }
 
-export const updateRole = async (url, users, permissions) => {
+export const updateRole = async (url, updates) => {
   try {
     return await AJAX({
       method: 'PATCH',
       url,
-      data: {
-        users,
-        permissions,
-      },
+      data: updates,
     })
   } catch (error) {
     console.error(error)
