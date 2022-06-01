@@ -279,7 +279,7 @@ const UserPage = ({
               {!allUserNames.length ? (
                 <p>No users are defined.</p>
               ) : (
-                <p>
+                <div className="collection-selector">
                   {allUserNames.map((userName, i) => (
                     <div
                       key={i}
@@ -297,7 +297,7 @@ const UserPage = ({
                       {userName}
                     </div>
                   ))}
-                </p>
+                </div>
               )}
             </div>
             <div className="infludb-admin-section__header">

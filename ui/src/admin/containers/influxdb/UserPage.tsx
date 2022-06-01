@@ -370,7 +370,7 @@ const UserPage = ({
                     {!allRoleNames.length ? (
                       <p>No roles are defined.</p>
                     ) : (
-                      <p>
+                      <div className="collection-selector">
                         {allRoleNames.map((roleName, i) => (
                           <div
                             key={i}
@@ -389,7 +389,7 @@ const UserPage = ({
                             {roleName}
                           </div>
                         ))}
-                      </p>
+                      </div>
                     )}
                   </div>
                 </>

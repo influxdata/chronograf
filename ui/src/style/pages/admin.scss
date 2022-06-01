@@ -283,7 +283,7 @@ pre.admin-table--query {
     .infludb-admin-section__body{
       margin: 0 30px;
       background-color: $g1-raven;
-      p {
+      .collection-selector {
         padding: 17px;
       }
       & > * {
