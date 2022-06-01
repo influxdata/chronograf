@@ -189,6 +189,8 @@ pre.admin-table--query {
         // background-color: $c-star;
         padding: 2px;
         text-decoration: line-through;
+        text-decoration-color: $c-topaz;
+        text-decoration-style: double;
         border: 2px solid $c-pool;
       }
     }
