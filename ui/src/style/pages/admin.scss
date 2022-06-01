@@ -189,9 +189,10 @@ pre.admin-table--query {
       &.value-changed{
         // background-color: $c-star;
         padding: 2px;
-        text-decoration: line-through;
-        text-decoration-color: $c-topaz;
-        text-decoration-style: double;
+        color: $g9-mountain;
+        // text-decoration: line-through;
+        // text-decoration-color: $c-topaz;
+        // text-decoration-style: double;
         border: 2px solid $c-pool;
       }
     }
