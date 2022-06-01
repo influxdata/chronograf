@@ -300,6 +300,7 @@ const UserPage = ({
                 status={
                   running ? ComponentStatus.Disabled : ComponentStatus.Default
                 }
+                testId="change-password--button"
               />
               {!isEnterprise && (
                 <ConfirmButton
@@ -311,6 +312,7 @@ const UserPage = ({
                   confirmAction={changeAdmin}
                   disabled={running}
                   position="bottom"
+                  testId={`${isAdmin ? 'revoke' : 'grant'}-admin--button`}
                 ></ConfirmButton>
               )}
               <ConfirmButton
@@ -319,6 +321,7 @@ const UserPage = ({
                 confirmAction={deleteUser}
                 disabled={running}
                 position="bottom"
+                testId="delete-user--button"
               ></ConfirmButton>
             </div>
           )}
@@ -342,6 +345,7 @@ const UserPage = ({
                 style={{flex: '0 0 auto', width: '200px'}}
                 spellCheck={false}
                 autoComplete="false"
+                data-test="new-password--input"
               />
               <ConfirmOrCancel
                 item={user}
@@ -396,13 +400,16 @@ const UserPage = ({
               </div>
               <div className="infludb-admin-section__body">
                 {isAdmin && (
-                  <p>
+                  <p data-test="user-is-admin--text">
                     The user is an <b>admin</b>, ALL PRIVILEGES are granted
                     irrespectively of database permissions.
                   </p>
                 )}
                 <div>
-                  <table className="table v-center table-highlight permission-table">
+                  <table
+                    className="table v-center table-highlight permission-table"
+                    data-test="permission-table"
+                  >
                     <thead>
                       <tr>
                         <th style={{minWidth: '100px', whiteSpace: 'nowrap'}}>
@@ -423,6 +430,9 @@ const UserPage = ({
                               ? db
                               : 'Cluster-Wide Permissions applies to all databases'
                           }
+                          data-test={`${
+                            db ? db : 'all-databases'
+                          }-permissions--row`}
                         >
                           <td>{db || '*'}</td>
                           <td>
@@ -446,6 +456,7 @@ const UserPage = ({
                                       : ''
                                   }`}
                                   onClick={onPermissionChange}
+                                  data-test={`${db}-${perm}-permission--button`}
                                 >
                                   {perm}
                                 </div>
@@ -476,9 +487,10 @@ const UserPage = ({
               confirmText="Discard unsaved changes?"
               confirmAction={exitHandler}
               position="left"
+              testId="exit--button"
             />
           ) : (
-            <Button text="Exit" onClick={exitHandler} />
+            <Button text="Exit" onClick={exitHandler} testId="exit--button" />
           )}
           {dataChanged && (
             <Button
@@ -488,6 +500,7 @@ const UserPage = ({
               status={
                 running ? ComponentStatus.Disabled : ComponentStatus.Default
               }
+              testId="apply-changes--button"
             />
           )}
         </Page.Header.Right>

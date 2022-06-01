@@ -32,6 +32,7 @@ const DatabaseTable = ({
       className={classnames('db-manager', {
         'db-manager--edit': database.isEditing,
       })}
+      data-test={'db-manager--' + database.name}
     >
       <DatabaseTableHeader
         database={database}
@@ -48,7 +49,10 @@ const DatabaseTable = ({
         isAddRPDisabled={!!database.retentionPolicies.some(rp => rp.isNew)}
       />
       {!database.isNew && (
-        <div className="db-manager-table">
+        <div
+          className="db-manager-table"
+          data-test={'db-manager-table--' + database.name}
+        >
           <table className="table v-center table-highlight">
             <thead>
               <tr>

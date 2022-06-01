@@ -17,6 +17,7 @@ interface Props {
   customClass?: string
   position?: Position
   style?: CSSProperties
+  testId?: string
 }
 
 interface State {
@@ -44,7 +45,7 @@ class ConfirmButton extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {text, confirmText, icon, style} = this.props
+    const {text, confirmText, icon, style, testId} = this.props
 
     return (
       <ClickOutside onClickOutside={this.handleClickOutside}>
@@ -54,6 +55,7 @@ class ConfirmButton extends PureComponent<Props, State> {
           onClick={this.handleButtonClick}
           ref={r => (this.buttonDiv = r)}
           title={confirmText}
+          data-test={testId}
         >
           {icon && <span className={`icon ${icon}`} />}
           {text && text}

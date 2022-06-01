@@ -150,6 +150,7 @@ class DatabaseRow extends Component {
                 autoFocus={true}
                 spellCheck={false}
                 autoComplete="false"
+                data-test="rp-name--input"
               />
             ) : (
               name
@@ -167,6 +168,7 @@ class DatabaseRow extends Component {
               autoFocus={!isNew}
               spellCheck={false}
               autoComplete="false"
+              data-test="rp-duration--input"
             />
           </td>
           {isRFDisplayed && (
@@ -192,12 +194,14 @@ class DatabaseRow extends Component {
             <button
               className="btn btn-xs btn-info"
               onClick={isNew ? this.handleRemove : this.handleEndEdit}
+              data-test="cancel-rp--button"
             >
               Cancel
             </button>
             <button
               className="btn btn-xs btn-success"
               onClick={isNew ? this.handleCreate : this.handleUpdate}
+              data-test="save-rp--button"
             >
               Save
             </button>
@@ -207,7 +211,7 @@ class DatabaseRow extends Component {
     }
 
     return (
-      <tr>
+      <tr data-test={"retention-policy--" + name}>
         <td>
           {`${name} `}
           {isDefault ? (
@@ -229,6 +233,7 @@ class DatabaseRow extends Component {
           <button
             className="btn btn-xs btn-info table--show-on-row-hover"
             onClick={this.handleStartEdit}
+            data-test="edit-rp--button"
           >
             Edit
           </button>
@@ -239,6 +244,7 @@ class DatabaseRow extends Component {
             type="btn-danger"
             customClass="table--show-on-row-hover"
             disabled={!isDeletable}
+            testId="delete-rp--confirm-button"
           />
         </td>
       </tr>

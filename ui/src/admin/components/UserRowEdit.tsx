@@ -39,6 +39,7 @@ const UserRowEdit: FunctionComponent<UserRowEditProps> = ({
               autoFocus={true}
               spellCheck={false}
               autoComplete="false"
+              data-test="username--input"
             />
           </div>
           <div style={{padding: '0 5px 0 5px'}}>
@@ -52,6 +53,7 @@ const UserRowEdit: FunctionComponent<UserRowEditProps> = ({
               onKeyPress={onKeyPress}
               spellCheck={false}
               autoComplete="false"
+              data-test="password--input"
             />
           </div>
           <ConfirmOrCancel

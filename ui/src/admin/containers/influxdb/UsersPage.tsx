@@ -149,10 +149,11 @@ const UsersPage = ({
               placeholder={`Filter Users...`}
               value={filterText}
               onChange={changeFilterText}
+              data-test="user-filter--input"
             />
             <span className="icon search" />
           </div>
-          <div className="db-selector">
+          <div className="db-selector" data-test="db-selector">
             <MultiSelectDropdown
               onChange={changeSelectedDBs}
               selectedIDs={selectedDBs}
@@ -195,6 +196,7 @@ const UsersPage = ({
               className="btn btn-sm btn-primary"
               disabled={users.some(u => u.isEditing)}
               onClick={addUser}
+              data-test="create-user--button"
             >
               <span className="icon plus" /> Create User
             </button>
