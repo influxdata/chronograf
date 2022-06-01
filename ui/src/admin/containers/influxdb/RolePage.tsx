@@ -18,10 +18,10 @@ import {useEffect} from 'react'
 import {useCallback} from 'react'
 import {PERMISSIONS} from 'src/shared/constants'
 import {
-  computeUserPermissions,
-  computeUserPermissionsChange,
+  computePermissions,
+  computePermissionsChange,
   toUserPermissions,
-} from './util/userPermissions'
+} from './util/permissions'
 
 const FAKE_ROLE: UserRole = {
   name: '',
@@ -119,7 +119,7 @@ const UserPage = ({
     () => [
       serverPermissions.find(x => x.scope === 'database')?.allowed || [],
       serverPermissions.find(x => x.scope === 'all')?.allowed || [],
-      computeUserPermissions(role, true),
+      computePermissions(role, true),
     ],
     [serverPermissions, role]
   )
@@ -134,7 +134,7 @@ const UserPage = ({
       const db = (e.target as HTMLElement).dataset.db
       const perm = (e.target as HTMLElement).dataset.perm
       setChangedPermissions(
-        computeUserPermissionsChange(
+        computePermissionsChange(
           db,
           perm,
           roleDBPermissions,
