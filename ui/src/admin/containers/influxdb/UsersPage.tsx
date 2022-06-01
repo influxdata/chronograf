@@ -70,15 +70,6 @@ const UsersPage = ({
   removeUser,
   editUser,
 }: Props) => {
-  if (isConnectedToLDAP(source)) {
-    return (
-      <AdminInfluxDBTabbedPage activeTab="users" source={source}>
-        <div className="container-fluid">
-          Users are managed in LDAP directory.
-        </div>
-      </AdminInfluxDBTabbedPage>
-    )
-  }
   const handleSaveUser = useCallback(
     async (user: User) => {
       if (!isValidUser(user)) {
@@ -260,7 +251,19 @@ const UsersPage = ({
     </AdminInfluxDBTabbedPage>
   )
 }
+const UsersPageAvailable = (props: Props) => {
+  if (isConnectedToLDAP(props.source)) {
+    return (
+      <AdminInfluxDBTabbedPage activeTab="users" source={props.source}>
+        <div className="container-fluid">
+          Users are managed in LDAP directory.
+        </div>
+      </AdminInfluxDBTabbedPage>
+    )
+  }
+  return <UsersPage {...props} />
+}
 
 export default withSource(
-  connect(mapStateToProps, mapDispatchToProps)(UsersPage)
+  connect(mapStateToProps, mapDispatchToProps)(UsersPageAvailable)
 )
