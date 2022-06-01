@@ -1,115 +1,81 @@
-import React, {useCallback, useMemo} from 'react'
+import React from 'react'
 
 import RoleRowEdit from 'src/admin/components/RoleRowEdit'
-import MultiSelectDropdown from 'src/shared/components/MultiSelectDropdown'
-import ConfirmButton from 'src/shared/components/ConfirmButton'
 import {ROLES_TABLE} from 'src/admin/constants/tableSizing'
-import {UserPermission, UserRole, User} from 'src/types/influxAdmin'
-import classnames from 'classnames'
+import {UserRole} from 'src/types/influxAdmin'
+import {Link} from 'react-router'
+import {PERMISSIONS} from 'src/shared/constants'
 
 interface Props {
   role: UserRole
-  allUsers: User[]
-  allPermissions: string[]
+  allUsers: any[]
+  page: string
+  perDBPermissions: Array<Record<string, boolean>>
+  showUsers: boolean
   onCancel: (role: UserRole) => void
   onEdit: (role: UserRole, updates: Partial<UserRole>) => void
   onSave: (role: UserRole) => Promise<void>
-  onDelete: (role: UserRole) => Promise<void>
-  onUpdateRoleUsers: (role: UserRole, users: User[]) => void
-  onUpdateRolePermissions: (
-    role: UserRole,
-    permissions: UserPermission[]
-  ) => void
 }
 
 const RoleRow = ({
-  role: {name: roleName, permissions, users = [], isEditing},
   role,
   allUsers,
-  allPermissions,
+  page,
+  perDBPermissions,
+  showUsers,
   onEdit,
   onSave,
   onCancel,
-  onDelete,
-  onUpdateRoleUsers,
-  onUpdateRolePermissions,
 }: Props) => {
-  const handleUpdateUsers = useCallback(
-    (usrs: User[]) => onUpdateRoleUsers(role, usrs),
-    [role]
-  )
-  const handleUpdatePermissions = useCallback(
-    (allowed: Array<{name: string}>) =>
-      onUpdateRolePermissions(role, [
-        {scope: 'all', allowed: allowed.map(({name}) => name)},
-      ]),
-    [role]
-  )
-  const selectedPerms = useMemo(() => {
-    const allPerm = permissions?.find(x => x.scope === 'all')
-    return allPerm?.allowed.map((name: string) => ({name})) || []
-  }, [permissions])
-
-  if (isEditing) {
+  if (role.isEditing) {
     return (
       <RoleRowEdit
         role={role}
         onEdit={onEdit}
         onSave={onSave}
         onCancel={onCancel}
-        colSpan={3}
+        colSpan={1 + +showUsers + perDBPermissions.length}
       />
     )
   }
 
-  const wrappedDelete = () => {
-    onDelete(role)
-  }
-
   return (
-    <tr data-test={`role-${roleName}--row`}>
-      <td style={{width: `${ROLES_TABLE.colName}px`}}>{roleName}</td>
-      <td>
-        {allPermissions && allPermissions.length ? (
-          <MultiSelectDropdown
-            items={allPermissions.map(name => ({name}))}
-            selectedItems={selectedPerms}
-            label={selectedPerms.length ? '' : 'Select Permissions'}
-            onApply={handleUpdatePermissions}
-            buttonSize="btn-xs"
-            buttonColor="btn-primary"
-            customClass={classnames(`dropdown-${ROLES_TABLE.colPermissions}`, {
-              'admin-table--multi-select-empty': !permissions.length,
-            })}
-            resetStateOnReceiveProps={false}
-          />
-        ) : null}
+    <tr>
+      <td style={{width: `${ROLES_TABLE.colName}px`}}>
+        <Link to={page}>{role.name}</Link>
       </td>
-      <td>
-        {allUsers && allUsers.length ? (
-          <MultiSelectDropdown
-            items={allUsers}
-            selectedItems={users}
-            label={users.length ? '' : 'Select Users'}
-            onApply={handleUpdateUsers}
-            buttonSize="btn-xs"
-            buttonColor="btn-primary"
-            customClass={classnames(`dropdown-${ROLES_TABLE.colUsers}`, {
-              'admin-table--multi-select-empty': !users.length,
-            })}
-            resetStateOnReceiveProps={false}
-          />
-        ) : null}
-      </td>
-      <td className="text-right">
-        <ConfirmButton
-          customClass="table--show-on-row-hover"
-          size="btn-xs"
-          type="btn-danger"
-          text="Delete Role"
-          confirmAction={wrappedDelete}
-        />
-      </td>
+      {showUsers && (
+        <td
+          className="admin-table--left-offset"
+          title={!allUsers.length ? 'No users are defined' : ''}
+        >
+          {role.users.map((user, i) => (
+            <span key={i} className="user-value granted">
+              {user.name}
+            </span>
+          ))}
+        </td>
+      )}
+      {perDBPermissions.map((perms, i) => (
+        <td className="admin-table__dbperm" key={i}>
+          <span
+            className={`permission-value ${
+              perms.ReadData ? 'granted' : 'denied'
+            }`}
+            title={PERMISSIONS.ReadData.description}
+          >
+            {PERMISSIONS.ReadData.displayName}
+          </span>
+          <span
+            className={`permission-value ${
+              perms.WriteData ? 'granted' : 'denied'
+            }`}
+            title={PERMISSIONS.WriteData.description}
+          >
+            {PERMISSIONS.WriteData.displayName}
+          </span>
+        </td>
+      ))}
     </tr>
   )
 }
