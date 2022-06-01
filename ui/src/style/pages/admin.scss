@@ -156,7 +156,7 @@ pre.admin-table--query {
   .influxdb-admin--contents{
     height: calc(100%-60px);
   }
-  div.permission-value,div.role-value{
+  div.permission-value,div.role-value,div.user-value{
     @include btn-base-styles(
       $g5-pepper,
       $g6-smoke,
@@ -203,7 +203,7 @@ pre.admin-table--query {
       color: $g7-graphite;
     }
   }
-  span.role-value{
+  span.role-value, span.user-value{
     padding: 0 2px;
     display: inline-block;
     white-space: nowrap;
