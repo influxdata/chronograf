@@ -16,6 +16,11 @@ describe('Welcome Page', () => {
       cy.get('.wizard-checkbox--label').contains('Unsafe SSL').click()
     }
 
+    cy.get('[id="Meta Service Connection URL"]')
+      .clear()
+      .type(Cypress.env('metaUrl'))
+
+
     cy.get('.wizard-button-bar').within(() => {
       cy.get('button').contains('Add Connection').click()
     })
