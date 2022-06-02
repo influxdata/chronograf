@@ -1,4 +1,3 @@
-import cypress from 'cypress'
 import {addMatchImageSnapshotCommand} from 'cypress-image-snapshot/command'
 
 declare namespace Cypress {
@@ -358,3 +357,5 @@ Cypress.Commands.add('createInfluxDBUser', createInfluxDBUser)
 Cypress.Commands.add('deleteInfluxDBUser', deleteInfluxDBUser)
 Cypress.Commands.add('createInfluxDBRole', createInfluxDBRole)
 Cypress.Commands.add('deleteInfluxDBRole', deleteInfluxDBRole)
+Cypress.Commands.add('createInfluxDB', createInfluxDB)
+Cypress.Commands.add('deleteInfluxDB', deleteInfluxDB)

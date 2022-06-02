@@ -17,7 +17,9 @@ import {
   createInfluxDBUser,
   deleteInfluxDBUser,
   createInfluxDBRole,
-  deleteInfluxDBRole
+  deleteInfluxDBRole,
+  createInfluxDB,
+  deleteInfluxDB
 } from './support/commands'
 
 declare global {
@@ -40,6 +42,8 @@ declare global {
       deleteInfluxDBUser: typeof deleteInfluxDBUser
       createInfluxDBRole: typeof createInfluxDBRole
       deleteInfluxDBRole: typeof deleteInfluxDBRole
+      createInfluxDB: typeof createInfluxDB
+      deleteInfluxDB: typeof deleteInfluxDB
     }
   }
 }
