@@ -17,7 +17,7 @@ import {
 } from 'src/shared/copy/notifications'
 import {Source} from 'src/types'
 import {Database, RetentionPolicy} from 'src/types/influxAdmin'
-import AdminInfluxDBTab from './AdminInfluxDBTab'
+import AdminInfluxDBTabbedPage from './AdminInfluxDBTabbedPage'
 
 interface Props {
   source: Source
@@ -136,7 +136,7 @@ class DatabaseManagerPage extends Component<Props> {
   render() {
     const {source, databases, actions} = this.props
     return (
-      <AdminInfluxDBTab activeTab="databases" source={source}>
+      <AdminInfluxDBTabbedPage activeTab="databases" source={source}>
         <DatabaseManager
           databases={databases}
           isRFDisplayed={!!source.metaUrl}
@@ -156,7 +156,7 @@ class DatabaseManagerPage extends Component<Props> {
           onCreateRetentionPolicy={actions.createRetentionPolicyAsync}
           onUpdateRetentionPolicy={actions.updateRetentionPolicyAsync}
         />
-      </AdminInfluxDBTab>
+      </AdminInfluxDBTabbedPage>
     )
   }
 }

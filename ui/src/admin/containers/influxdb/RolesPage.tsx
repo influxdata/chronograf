@@ -3,7 +3,7 @@ import {Component} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
 import {withSource} from 'src/CheckSources'
 import {Source} from 'src/types'
-import {InfluxDBPermissions, Permission, Role, User} from 'src/types/auth'
+import {UserPermission, UserRole, User} from 'src/types/influxAdmin'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {
   addRole as addRoleActionCreator,
@@ -17,12 +17,12 @@ import {
 } from 'src/admin/actions/influxdb'
 import {notifyRoleNameInvalid} from 'src/shared/copy/notifications'
 import RolesTable from 'src/admin/components/RolesTable'
-import AdminInfluxDBTab, {
+import AdminInfluxDBTabbedPage, {
   hasRoleManagement,
   isConnectedToLDAP,
-} from './AdminInfluxDBTab'
+} from './AdminInfluxDBTabbedPage'
 
-const isValidRole = role => {
+const isValidRole = (role: UserRole): boolean => {
   const minLen = 3
   return role.name.length >= minLen
 }
@@ -50,8 +50,8 @@ interface OwnProps {
 }
 interface ConnectedProps {
   users: User[]
-  roles: Role[]
-  permissions: Permission[]
+  roles: UserRole[]
+  permissions: UserPermission[]
 }
 
 type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
@@ -59,15 +59,12 @@ type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
 type Props = OwnProps & ConnectedProps & ReduxDispatchProps
 
 class RolesPage extends Component<Props> {
-  private get allowed(): InfluxDBPermissions[] {
+  private get allowed(): string[] {
     const {permissions} = this.props
     const globalPermissions = permissions.find(p => p.scope === 'all')
     return globalPermissions ? globalPermissions.allowed : []
   }
 
-  private handleClickCreate = () => () => {
-    this.props.addRole()
-  }
   private handleEditRole = (role, updates) => {
     this.props.editRole(role, updates)
   }
@@ -102,32 +99,32 @@ class RolesPage extends Component<Props> {
     const source = this.props.source
     if (!hasRoleManagement(source)) {
       return (
-        <AdminInfluxDBTab activeTab="roles" source={source}>
+        <AdminInfluxDBTabbedPage activeTab="roles" source={source}>
           <div className="container-fluid">
             Roles management is not available for the currently selected
             InfluxDB Connection.
           </div>
-        </AdminInfluxDBTab>
+        </AdminInfluxDBTabbedPage>
       )
     }
     if (isConnectedToLDAP(source)) {
       return (
-        <AdminInfluxDBTab activeTab="roles" source={source}>
+        <AdminInfluxDBTabbedPage activeTab="roles" source={source}>
           <div className="container-fluid">
             Users are managed via LDAP, roles management is not available.
           </div>
-        </AdminInfluxDBTab>
+        </AdminInfluxDBTabbedPage>
       )
     }
-    const {users, roles, filterRoles} = this.props
+    const {users, roles, addRole, filterRoles} = this.props
     return (
-      <AdminInfluxDBTab activeTab="roles" source={source}>
+      <AdminInfluxDBTabbedPage activeTab="roles" source={source}>
         <RolesTable
           roles={roles}
           allUsers={users}
           permissions={this.allowed}
           isEditing={roles.some(r => r.isEditing)}
-          onClickCreate={this.handleClickCreate}
+          onClickCreate={addRole}
           onEdit={this.handleEditRole}
           onSave={this.handleSaveRole}
           onCancel={this.handleCancelEditRole}
@@ -136,7 +133,7 @@ class RolesPage extends Component<Props> {
           onUpdateRoleUsers={this.handleUpdateRoleUsers}
           onUpdateRolePermissions={this.handleUpdateRolePermissions}
         />
-      </AdminInfluxDBTab>
+      </AdminInfluxDBTabbedPage>
     )
   }
 }

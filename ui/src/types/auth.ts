@@ -55,9 +55,6 @@ export interface Permission {
 export interface Role {
   name: string
   organization: string
-  // UI markers
-  isEditing?: boolean
-  isNew?: boolean
 }
 
 export interface User {
@@ -68,10 +65,6 @@ export interface User {
   roles: Role[]
   scheme: string
   superAdmin: boolean
-  // UI only
-  isEditing?: boolean
-  password?: string
-  isNew?: boolean
 }
 
 export interface AuthLink {

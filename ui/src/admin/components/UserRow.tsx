@@ -1,128 +1,114 @@
-import React, {PureComponent} from 'react'
+import React from 'react'
 
-import UserPermissionsDropdown from 'src/admin/components/UserPermissionsDropdown'
-import UserRoleDropdown from 'src/admin/components/UserRoleDropdown'
-import ChangePassRow from 'src/admin/components/ChangePassRow'
-import ConfirmButton from 'src/shared/components/ConfirmButton'
 import {USERS_TABLE} from 'src/admin/constants/tableSizing'
 
 import UserRowEdit from 'src/admin/components/UserRowEdit'
-import {User, UserPermission} from 'src/types/influxAdmin'
-import {ErrorHandling} from 'src/shared/decorators/errors'
-import UserAdminDropdown from './UserAdminDropdown'
+import {User} from 'src/types/influxAdmin'
+import {Link} from 'react-router'
+import {PERMISSIONS} from 'src/shared/constants'
 
-interface UserRowProps {
+const ADMIN_STYLES = [
+  {
+    style: 'admin--not-admin',
+    text: 'No',
+  },
+  {
+    style: 'admin--is-admin',
+    text: 'Yes',
+  },
+]
+
+interface Props {
   user: User
   allRoles: any[]
-  allPermissions: string[]
   hasRoles: boolean
   isNew: boolean
   isEditing: boolean
-  onCancel: () => void
-  onEdit: () => void
-  onSave: () => void
-  onDelete: (user: User) => void
-  onUpdatePermissions: (user: User, permissions: UserPermission[]) => void
-  onUpdateRoles: (user: User, roles: any[]) => void
-  onUpdatePassword: (user: User, password: string) => void
+  page: string
+  userDBPermissions: Array<Record<string, boolean>>
+  showRoles: boolean
+  onCancel: (user: User) => void
+  onEdit: (User: User, updates: Partial<User>) => void
+  onSave: (user: User) => Promise<void>
 }
 
-@ErrorHandling
-class UserRow extends PureComponent<UserRowProps> {
-  public render() {
-    const {
-      user,
-      allRoles,
-      allPermissions,
-      hasRoles,
-      isNew,
-      isEditing,
-      onEdit,
-      onSave,
-      onCancel,
-      onUpdatePermissions,
-      onUpdateRoles,
-    } = this.props
-
-    if (isEditing) {
-      return (
-        <UserRowEdit
-          user={user}
-          isNew={isNew}
-          onEdit={onEdit}
-          onSave={onSave}
-          onCancel={onCancel}
-          hasRoles={hasRoles}
-        />
-      )
-    }
-
+const UserRow = ({
+  user,
+  allRoles,
+  hasRoles,
+  isNew,
+  isEditing,
+  page,
+  userDBPermissions,
+  showRoles,
+  onEdit,
+  onSave,
+  onCancel,
+}: Props) => {
+  if (isEditing) {
     return (
-      <tr>
-        <td style={{width: `${USERS_TABLE.colUsername}px`}}>{user.name}</td>
-        <td style={{width: `${USERS_TABLE.colPassword}px`}}>
-          <ChangePassRow
-            user={user}
-            onEdit={onEdit}
-            buttonSize="btn-xs"
-            onApply={this.handleUpdatePassword}
-          />
-        </td>
-        {hasRoles && (
-          <td>
-            <UserRoleDropdown
-              user={user}
-              allRoles={allRoles}
-              onUpdateRoles={onUpdateRoles}
-            />
-          </td>
-        )}
-        <td>
-          {this.hasPermissions ? (
-            <UserPermissionsDropdown
-              user={user}
-              allPermissions={allPermissions}
-              onUpdatePermissions={onUpdatePermissions}
-            />
-          ) : (
-            <UserAdminDropdown
-              user={user}
-              onUpdatePermissions={onUpdatePermissions}
-            />
-          )}
-        </td>
-        <td
-          className="text-right"
-          style={{width: `${USERS_TABLE.colDelete}px`}}
-        >
-          <ConfirmButton
-            size="btn-xs"
-            type="btn-danger"
-            text="Delete User"
-            confirmAction={this.handleDelete}
-            customClass="table--show-on-row-hover"
-          />
-        </td>
-      </tr>
+      <UserRowEdit
+        user={user}
+        isNew={isNew}
+        onEdit={onEdit}
+        onSave={onSave}
+        onCancel={onCancel}
+        colSpan={1 + +showRoles + userDBPermissions.length}
+      />
     )
   }
 
-  private handleDelete = (): void => {
-    const {user, onDelete} = this.props
+  const adminStyle =
+    ADMIN_STYLES[
+      +!!user.permissions.find(
+        x => x.scope === 'all' && (x.allowed || []).includes('ALL')
+      )
+    ]
 
-    onDelete(user)
-  }
-
-  private handleUpdatePassword = (): void => {
-    const {user, onUpdatePassword} = this.props
-
-    onUpdatePassword(user, user.password)
-  }
-
-  private get hasPermissions() {
-    const {allPermissions, hasRoles} = this.props
-    return hasRoles && allPermissions && !!allPermissions.length
-  }
+  return (
+    <tr>
+      <td style={{width: `${USERS_TABLE.colUsername}px`}}>
+        <Link to={page}>{user.name}</Link>
+      </td>
+      {hasRoles && showRoles && (
+        <td
+          className="admin-table--left-offset"
+          title={!allRoles.length ? 'No roles are defined' : ''}
+        >
+          {user.roles.map((role, i) => (
+            <span key={i} className="role-value granted">
+              {role.name}
+            </span>
+          ))}
+        </td>
+      )}
+      {!hasRoles && (
+        <td style={{width: `${USERS_TABLE.colAdministrator}px`}}>
+          <span className={adminStyle.style}>{adminStyle.text}</span>
+        </td>
+      )}
+      {userDBPermissions.map((perms, i) => (
+        <td className="admin-table__dbperm" key={i}>
+          <span
+            className={`permission-value ${
+              perms.READ || perms.ReadData ? 'granted' : 'denied'
+            }`}
+            title={PERMISSIONS.ReadData.description}
+          >
+            {PERMISSIONS.ReadData.displayName}
+          </span>
+          <span
+            className={`permission-value ${
+              perms.WRITE || perms.WriteData ? 'granted' : 'denied'
+            }`}
+            title={PERMISSIONS.WriteData.description}
+          >
+            {PERMISSIONS.WriteData.displayName}
+          </span>
+        </td>
+      ))}
+    </tr>
+  )
 }
 
 export default UserRow

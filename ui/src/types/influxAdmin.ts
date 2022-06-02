@@ -1,5 +1,8 @@
 export interface UserRole {
   name: string
+  // UI markers
+  isEditing?: boolean
+  isNew?: boolean
 }
 
 export interface UserPermission {
@@ -12,7 +15,11 @@ export interface User {
   name: string
   roles: UserRole[]
   permissions: UserPermission[]
-  password: string
+  // UI only
+  isEditing?: boolean
+  password?: string
+  isNew?: boolean
+  hidden?: boolean
 }
 
 export interface RetentionPolicy {

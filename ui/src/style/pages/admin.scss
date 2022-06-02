@@ -7,6 +7,30 @@
     Admin Table
     ----------------------------------------------------------------------------
 */
+.admin-table {
+  .admin--is-admin {
+    color: $g14-chromium;
+    padding-left: 7px;
+  }
+  .admin--not-admin {
+    color: $g8-storm;
+    padding-left: 7px;
+  }
+  span.permission--db{
+    padding-left: 3px;
+    &:first-child {
+      padding-left: 0px;
+    }
+  }
+  span.permission--allowed{
+    font-style: italic;
+  }
+  
+  &.admin-table--compact{
+    width: auto
+  }
+}
+
 .admin-table .dropdown-toggle {
   background-color: transparent;
   font-weight: 600;
@@ -39,6 +63,13 @@
 table > tbody > tr > td.admin-table--left-offset,
 table > thead > tr > th.admin-table--left-offset {
   padding-left: 15px;
+}
+table > thead > tr > th.admin-table__dbheader {
+  font-weight: 450;
+  padding: 8px 12px; 
+}
+table > tbody > tr > td.admin-table__dbperm {
+  min-width: 100px;
 }
 
 .admin-table > thead > tr > th.col--sort-asc,
@@ -73,6 +104,15 @@ table > thead > tr > th.admin-table--left-offset {
 .admin-table > thead > tr > th.col--sortable.col--sort-next-asc:after {
   transform: translateY(-50%) rotate(180deg);
 }
+.admin-table > tbody > tr.table-empty-state > th {
+  min-width: 250px;
+}
+.permission-table > tbody > tr {
+  border-bottom: 1px solid $g2-kevlar;
+  &.all-databases{
+    border-bottom: $ix-border solid $table--border-color;
+  }
+}
 
 table > tbody > tr.admin-table--edit-row,
 table > tbody > tr.admin-table--edit-row:hover,
@@ -105,16 +145,159 @@ pre.admin-table--query {
     margin-right: 4px;
   }
 }
-
+.influxdb-admin.page {
+  .page-header{
+    padding: 0 30px;
+    min-height: 60px;
+  }
+  .influxdb-admin--contents{
+    height: calc(100%-60px);
+  }
+  div.permission-value,div.role-value{
+    @include btn-base-styles(
+      $g5-pepper,
+      $g6-smoke,
+      $g7-graphite,
+      $g18-cloud,
+      $g20-white
+    );
+    padding: 4px;
+    margin: 0 2px 2px;
+    display: inline-block;
+    border-radius: $radius;
+    font-family: $ix-text-font;
+    white-space: nowrap;
+    font-weight: 500;
+    &:hover{
+      background-color: $g2-kevlar;
+    }
+    &.denied{
+      font-style: italic;
+      color: $g9-mountain;
+      &.value-changed{
+        // background-color: $c-star;
+        color: $g18-cloud;
+        padding: 2px;
+        border: 2px solid $c-pool;
+      }
+    }
+    &.granted{
+      &.value-changed{
+        // background-color: $c-star;
+        padding: 2px;
+        text-decoration: line-through;
+        border: 2px solid $c-pool;
+      }
+    }
+  }
+  span.permission-value{
+    padding: 0 2px;
+    display: inline-block;
+    color: $g18-cloud;
+    white-space: nowrap;
+    &.denied {
+      font-style: italic;
+      color: $g7-graphite;
+    }
+  }
+  span.role-value{
+    padding: 0 2px;
+    display: inline-block;
+    white-space: nowrap;
+    &:not(:last-child)::after{
+      content: ',';
+    }
+  }
+}
 .influxdb-admin.panel.panel-solid {
   border-radius: 0px;
   .panel-heading {
-    height: 90px;
+    height: 60px;
+    min-height: 60px;
+    padding: 0 30px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    column-gap: 5px;
+    .search-widget {
+      width: 250px;
+    }
+    .db-selector {
+      width: 150px;
+    }
+    .hide-roles-toggle {
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      color: $g13-mist;
+      font-weight: 600;
+      @include no-user-select();
+      .slide-toggle {
+        margin-right: 3px;
+      }
+    }
+    .panel-heading--right {
+      flex-grow: 1;
+      display: flex;
+      justify-content: flex-end;
+      &>* {
+        margin-left: 5px;
+        &:first-child {
+          margin-left: 0px;
+        }
+      }
+    }
   }
   .panel-body {
     border-radius: 0px;
-    height: calc(100vh - 180px);
+    height: calc(100vh - 150px);
     min-height: 10px;
+    &.influxdb-admin--detail{
+      height: calc(100vh - 120px);
+      padding: 10px 0 0;
+      background-color: $g1-raven;
+    }
+    .influxdb-admin--pwdchange{
+      display: flex;
+      padding-left: 30px;
+      justify-items: flex-start;
+      align-items: center;
+      column-gap: 10px;
+    }
+    .infludb-admin-section__header{
+      padding: 0 30px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      h4 {
+        margin: 0;
+        color: $g12-forge;
+        font-size: 16px;
+        font-family: "RobotoMono", monospace;
+        @include no-user-select();
+      }
+    }
+    .infludb-admin-section__body{
+      margin: 0 30px;
+      background-color: $g1-raven;
+      p {
+        padding: 17px;
+      }
+      & > * {
+        margin: 0 0 2px 0;
+        background-color: $g3-castle;
+        padding: 9px 11px;
+        .table-highlight > tbody > tr:hover {
+          background-color: $g4-onyx;
+        }
+      }
+      & > *:first-child{
+        border-radius: $radius $radius 0 0;        
+      }
+      & > *:last-child{
+        border-radius: 0 0 $radius $radius;        
+      }
+    }
   }
 }
 /*

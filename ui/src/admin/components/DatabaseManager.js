@@ -33,13 +33,15 @@ const DatabaseManager = ({
             ? '1 Database'
             : `${databases.length} Databases`}
         </h2>
-        <button
-          className="btn btn-sm btn-primary"
-          disabled={isAddDBDisabled}
-          onClick={addDatabase}
-        >
-          <span className="icon plus" /> Create Database
-        </button>
+        <div className="panel-heading--right">
+          <button
+            className="btn btn-sm btn-primary"
+            disabled={isAddDBDisabled}
+            onClick={addDatabase}
+          >
+            <span className="icon plus" /> Create Database
+          </button>
+        </div>
       </div>
       <div className="panel-body" style={{paddingRight: 20}}>
         <FancyScrollbar>

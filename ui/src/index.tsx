@@ -65,6 +65,7 @@ import DatabaseManagerPage from './admin/containers/influxdb/DatabaseManagerPage
 import UsersPage from './admin/containers/influxdb/UsersPage'
 import RolesPage from './admin/containers/influxdb/RolesPage'
 import QueriesPage from './admin/containers/influxdb/QueriesPage'
+import UserPage from './admin/containers/influxdb/UserPage'
 
 const errorsQueue = []
 
@@ -236,6 +237,7 @@ class Root extends PureComponent<Record<string, never>, State> {
                   <Route path="users" component={UsersPage} />
                   <Route path="roles" component={RolesPage} />
                   <Route path="queries" component={QueriesPage} />
+                  <Route path="users/:userName" component={UserPage} />
                 </Route>
                 <Route path="manage-sources" component={ManageSources} />
               </Route>

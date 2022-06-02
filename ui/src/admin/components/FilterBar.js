@@ -29,7 +29,7 @@ class FilterBar extends Component {
     })
     return (
       <div className="panel-heading">
-        <div className="search-widget" style={{width: '300px'}}>
+        <div className="search-widget" style={{width: '250px'}}>
           <input
             type="text"
             className="form-control input-sm"
@@ -39,14 +39,16 @@ class FilterBar extends Component {
           />
           <span className="icon search" />
         </div>
-        <button
-          className="btn btn-sm btn-primary"
-          disabled={isEditing}
-          onClick={onClickCreate(type)}
-        >
-          <span className="icon plus" /> Create{' '}
-          {placeholderText.substring(0, placeholderText.length - 1)}
-        </button>
+        <div className="panel-heading--right">
+          <button
+            className="btn btn-sm btn-primary"
+            disabled={isEditing}
+            onClick={onClickCreate}
+          >
+            <span className="icon plus" /> Create{' '}
+            {placeholderText.substring(0, placeholderText.length - 1)}
+          </button>
+        </div>
       </div>
     )
   }
