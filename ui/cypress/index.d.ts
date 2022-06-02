@@ -14,6 +14,10 @@ import {
   deleteUser,
   createOrg,
   deleteOrg,
+  createInfluxDBUser,
+  deleteInfluxDBUser,
+  createInfluxDBRole,
+  deleteInfluxDBRole
 } from './support/commands'
 
 declare global {
@@ -32,6 +36,10 @@ declare global {
       deleteUser: typeof deleteUser
       createOrg: typeof createOrg
       deleteOrg: typeof deleteOrg
+      createInfluxDBUser: typeof createInfluxDBUser
+      deleteInfluxDBUser: typeof deleteInfluxDBUser
+      createInfluxDBRole: typeof createInfluxDBRole
+      deleteInfluxDBRole: typeof deleteInfluxDBRole
     }
   }
 }
