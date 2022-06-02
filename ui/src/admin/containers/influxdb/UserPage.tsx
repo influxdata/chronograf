@@ -383,6 +383,7 @@ const UserPage = ({
                                 : ''
                             }`}
                             onClick={onRoleChange}
+                            data-test={`role-${roleName}--button`}
                           >
                             {roleName}
                           </div>

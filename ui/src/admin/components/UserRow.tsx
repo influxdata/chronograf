@@ -74,6 +74,7 @@ const UserRow = ({
         <td
           className="admin-table--left-offset"
           title={!allRoles.length ? 'No roles are defined' : ''}
+          data-test="roles-granted"
         >
           {user.roles.map((role, i) => (
             <span key={i} className="role-value granted">
