@@ -89,7 +89,11 @@ const UserRow = ({
         </td>
       )}
       {userDBPermissions.map((perms, i) => (
-        <td className="admin-table__dbperm" key={i} data-test="permissions--values">
+        <td
+          className="admin-table__dbperm"
+          key={i}
+          data-test="permissions--values"
+        >
           <span
             className={`permission-value ${
               perms.READ || perms.ReadData ? 'granted' : 'denied'

@@ -211,7 +211,7 @@ class DatabaseRow extends Component {
     }
 
     return (
-      <tr data-test={"retention-policy--" + name}>
+      <tr data-test={'retention-policy--' + name}>
         <td>
           {`${name} `}
           {isDefault ? (
