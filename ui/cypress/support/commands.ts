@@ -85,6 +85,7 @@ export const createConnection = (url?: string) => {
         password: Cypress.env('password'),
         name: Cypress.env('connectionName'),
         insecureSkipVerify: Cypress.env('insecureSkipVerify'),
+        metaUrl: Cypress.env('metaUrl')
       },
     })
     .then(() => {
