@@ -1,29 +1,30 @@
 describe('Use Admin tab', () => {
   let url: string
+  let sourceId: string
+
   beforeEach(() => {
     cy.OAuthLogin('test')
     cy.removeConnections()
     cy.createConnection()
-  })
-
-  describe('Chronograf', () => {
-    beforeEach(() => {
-      cy.get('@connections').then(connections => {
-        cy.fixture('routes').then(({adminChronograf}) => {
-          url = `/sources/${connections[0].id}${adminChronograf}`
-        })
-      })
+    cy.get('@connections').then(source => {
+      sourceId = source[0].id
     })
-
-    /* ADMIN TAB CHRONOGRAF */
   })
+
+  //   describe('Chronograf', () => {
+  //     beforeEach(() => {
+  //       cy.fixture('routes').then(({adminChronograf}) => {
+  //         url = `/sources/${sourceId}${adminChronograf}`
+  //       })
+  //     })
+
+  //     /* ADMIN TAB CHRONOGRAF */
+  //   })
 
   describe('InfluxDB', () => {
     beforeEach(() => {
-      cy.get('@connections').then(connections => {
-        cy.fixture('routes').then(({adminInfluxDB}) => {
-          url = `/sources/${connections[0].id}${adminInfluxDB}`
-        })
+      cy.fixture('routes').then(({adminInfluxDB}) => {
+        url = `/sources/${sourceId}${adminInfluxDB}`
       })
     })
 
@@ -32,7 +33,7 @@ describe('Use Admin tab', () => {
         cy.visit(url + '/databases')
       })
 
-      it('create InfluxDB, edit it, and delete it', () => {
+      it.only('create InfluxDB, edit it, and delete it', () => {
         const database = {
           name: 'New InfluxDB',
           retention: {
@@ -50,6 +51,7 @@ describe('Use Admin tab', () => {
         cy.getByTestID(`db-manager--${database.name}`)
           .should('exist')
           .within(() => {
+            cy.getByTestID('db-manager--header').should('contain', database.name)
             cy.getByTestID('add-retention-policy--button').click({force: true})
             cy.getByTestID('cancel-rp--button').click({force: true})
             cy.getByTestID('add-retention-policy--button').click({force: true})
@@ -87,10 +89,6 @@ describe('Use Admin tab', () => {
     })
 
     describe('Users', () => {
-      beforeEach(() => {
-        cy.visit(url + '/users')
-      })
-
       const user = {
         name: 'Smiley',
         password: 'securePassword123',
@@ -98,15 +96,22 @@ describe('Use Admin tab', () => {
       const db = {
         name: '_internal',
         permission: {
-          read: 'READ',
-          write: 'WRITE',
+          read: 'ReadData',
+          write: 'WriteData',
         },
       }
+      const role = {
+        name: 'Sunny',
+        permissions: {},
+        users: {},
+      }
+
+      beforeEach(() => {
+        cy.deleteInfluxDBUser(user.name, sourceId)
+        cy.visit(url + '/users')
+      })
 
       it('create user, edit permissions, change password, and delete user', () => {
-        cy.get('.admin-table--compact > thead > tr')
-          .find('th')
-          .should('not.have.length', 3)
         cy.get('.dropdown--selected').click({force: true})
         cy.getByTestID('dropdown-menu').within(() => {
           cy.getByTestID('dropdown--item')
@@ -116,9 +121,7 @@ describe('Use Admin tab', () => {
         cy.get('.dropdown--selected')
           .should('contain.text', db.name)
           .click({force: true})
-        cy.get('.admin-table--compact > thead > tr')
-          .find('th')
-          .should('have.length', 3)
+
         cy.getByTestID('create-user--button').click()
         cy.getByTestID('cancel').click({force: true})
         cy.getByTestID('create-user--button').click()
@@ -132,7 +135,6 @@ describe('Use Admin tab', () => {
         cy.getByTestID(`user-row--${user.name}`)
           .should('exist')
           .within(() => {
-            cy.get('.admin--not-admin').should('contain.text', 'No')
             cy.getByTestID('permissions--values').within(() => {
               cy.getByTestID('read-permission').should('have.class', 'denied')
               cy.getByTestID('write-permission').should('have.class', 'denied')
@@ -198,80 +200,53 @@ describe('Use Admin tab', () => {
         cy.getByTestID(`user-row--${user.name}`).should('not.exist')
       })
 
-      it('create user, grant admin, revoke admin, and delete user', () => {
-        cy.getByTestID('create-user--button').click()
-        cy.getByTestID('username--input').type(user.name)
-        cy.getByTestID('password--input').type(user.password)
-        cy.getByTestID('confirm').click({force: true})
+      it('create user, assign role, remove role, and delete user', () => {
+        cy.deleteInfluxDBRole(role.name, sourceId)
+        cy.createInfluxDBRole(role.name, sourceId)
+        cy.createInfluxDBUser(user.name, user.password, sourceId)
+
+        cy.get('.dropdown--selected').click({force: true})
+        cy.getByTestID('dropdown-menu').within(() => {
+          cy.getByTestID('dropdown--item')
+            .contains(db.name)
+            .click({force: true})
+        })
+
         cy.getByTestID(`user-row--${user.name}`)
           .should('exist')
           .within(() => {
-            cy.get('.admin--not-admin').should('contain.text', 'No')
-            cy.getByTestID('permissions--values')
-              .eq(0)
-              .within(() => {
-                cy.getByTestID('read-permission').should('have.class', 'denied')
-                cy.getByTestID('write-permission').should(
-                  'have.class',
-                  'denied'
-                )
-              })
-
+            cy.getByTestID('roles-granted').should(
+              'not.contain.text',
+              role.name
+            )
             cy.get('a').contains(user.name).click({force: true})
           })
-        cy.getByTestID('grant-admin--button').click({force: true})
-        cy.getByTestID('confirm-btn')
-          .contains('Grant ALL Privileges')
-          .should('be.visible')
-          .click({force: true})
-        cy.getByTestID('user-is-admin--text').should('exist')
+
+        cy.getByTestID(`role-${role.name}--button`).click({force: true})
+        cy.getByTestID(`role-${role.name}--button`).should(
+          'have.class',
+          'value-changed'
+        )
+        cy.getByTestID('apply-changes--button').click({force: true})
+        cy.getByTestID(`role-${role.name}--button`).should(
+          'not.have.class',
+          'value-changed'
+        )
         cy.getByTestID('exit--button').click({force: true})
-        cy.getByTestID(`user-row--${user.name}`).within(() => {
-          cy.get('.admin--is-admin').should('contain.text', 'Yes')
-          cy.getByTestID('permissions--values')
-            .eq(0)
-            .within(() => {
-              cy.getByTestID('read-permission').should('have.class', 'granted')
-              cy.getByTestID('write-permission').should('have.class', 'granted')
-            })
-
-          cy.get('a').contains(user.name).click({force: true})
+        cy.getByTestID('roles-granted').within(() => {
+          cy.get('.role-value').contains(role.name).should('exist')
         })
-
-        cy.getByTestID('revoke-admin--button').click({force: true})
-        cy.getByTestID('confirm-btn')
-          .contains('Revoke ALL Privileges')
-          .click({force: true})
-        cy.getByTestID('exit--button').click({force: true})
-        cy.getByTestID(`user-row--${user.name}`).within(() => {
-          cy.get('.admin--not-admin').should('contain.text', 'No')
-          cy.getByTestID('permissions--values')
-            .eq(0)
-            .within(() => {
-              cy.getByTestID('read-permission').should('have.class', 'denied')
-              cy.getByTestID('write-permission').should('have.class', 'denied')
-            })
-
-          cy.get('a').contains(user.name).click({force: true})
-        })
-
-        cy.getByTestID('delete-user--button').click({force: true})
-        cy.getByTestID('confirm-btn')
-          .contains('Confirm')
-          .should('be.visible')
-          .click({force: true})
-        cy.getByTestID(`user-row--${user.name}`).should('not.exist')
       })
     })
 
-    describe('Queries', () => {
-      beforeEach(() => {
-        cy.visit(url + '/queries')
-      })
+    // describe('Queries', () => {
+    //   beforeEach(() => {
+    //     cy.visit(url + '/queries')
+    //   })
 
-      it('test', () => {
-        cy.get('body')
-      })
-    })
+    //   it('IN PROGRESS', () => {
+    //     cy.get('body')
+    //   })
+    // })
   })
 })
