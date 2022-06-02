@@ -135,7 +135,7 @@ describe('query builder', () => {
       cy.get('.flux-query-builder--list-item').should('not.exist')
       cy.getByTestID('builder-card--menu').clear()
       cy.get('.flux-query-builder--list-item')
-        .should('have.length', 1)
+        .should('have.length.at.least', 1)
         .and('contain.text', 'internal')
     })
 
