@@ -202,7 +202,7 @@ const RolesPage = ({
                     ? visibleDBNames.map(name => (
                         <th
                           className="admin-table__dbheader"
-                          title={`effective permissions for db: ${name}`}
+                          title={`user's effective permissions for db: ${name}`}
                           key={name}
                         >
                           {name}

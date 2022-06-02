@@ -209,7 +209,7 @@ const UsersPage = ({
                     ? visibleDBNames.map(name => (
                         <th
                           className="admin-table__dbheader"
-                          title={`effective permissions for db: ${name}`}
+                          title={`role's effective permissions for db: ${name}`}
                           key={name}
                         >
                           {name}
