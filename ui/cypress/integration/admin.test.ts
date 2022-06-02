@@ -30,20 +30,21 @@ describe('Use Admin tab', () => {
     })
 
     describe('Databases', () => {
+      const database = {
+        name: 'New InfluxDB',
+        retention: {
+          name: 'New Retention',
+          duration: '1h',
+          durationChange: '1d',
+        },
+      }
+
       beforeEach(() => {
+        cy.deleteInfluxDB(database.name, sourceId)
         cy.visit(url + '/databases')
       })
 
       it.only('create InfluxDB, edit it, and delete it', () => {
-        const database = {
-          name: 'New InfluxDB',
-          retention: {
-            name: 'New Retention',
-            duration: '1h',
-            durationChange: '1d',
-          },
-        }
-
         cy.getByTestID('create-db--button').click({force: true})
         cy.getByTestID('cancel').click({force: true})
         cy.getByTestID('create-db--button').click({force: true})
@@ -52,7 +53,10 @@ describe('Use Admin tab', () => {
         cy.getByTestID(`db-manager--${database.name}`)
           .should('exist')
           .within(() => {
-            cy.getByTestID('db-manager--header').should('contain', database.name)
+            cy.getByTestID('db-manager--header').should(
+              'contain',
+              database.name
+            )
             cy.getByTestID('add-retention-policy--button').click({force: true})
             cy.getByTestID('cancel-rp--button').click({force: true})
             cy.getByTestID('add-retention-policy--button').click({force: true})
@@ -249,5 +253,9 @@ describe('Use Admin tab', () => {
     //     cy.get('body')
     //   })
     // })
+  })
+
+  after(() => {
+    cy.delete
   })
 })
