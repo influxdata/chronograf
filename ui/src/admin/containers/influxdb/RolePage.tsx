@@ -210,7 +210,7 @@ const UserPage = ({
           if (
             changedUsersRecord[userName] === true ||
             (changedUsersRecord[userName] === undefined &&
-              usersRecord[roleName])
+              usersRecord[userName])
           ) {
             acc.push(user)
           }
