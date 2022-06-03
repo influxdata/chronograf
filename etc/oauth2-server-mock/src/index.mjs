@@ -24,8 +24,6 @@ app.get("/oauth/authorize", async (req, res) => {
   const state = req.query.state;
   const redirect = req.query.redirect_uri || CONFIG.redirect_uri;
   console.info("GET /oauth/authorize: ", redirect);
-  // Wait 100ms before before being redirected
-  await new Promise(resolve => setTimeout(resolve, 100));
   res.setHeader("Location", `${redirect}?code=${encodeURIComponent(redirect + new Date().toISOString())}&state=${encodeURIComponent(state)}`);
   res.sendStatus(302);
   res.end();
