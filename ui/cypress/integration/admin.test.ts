@@ -3,12 +3,12 @@ describe('Use Admin tab', () => {
   let sourceId: string
 
   beforeEach(() => {
-    cy.OAuthLogin('test')
-    cy.wait(1000)
-    cy.removeConnections()
-    cy.createConnection()
-    cy.get('@connections').then(source => {
-      sourceId = source[0].id
+    cy.OAuthLogin('test').then(() => {
+      cy.removeConnections()
+      cy.createConnection()
+      cy.get('@connections').then(source => {
+        sourceId = source[0].id
+      })
     })
   })
 
@@ -22,7 +22,7 @@ describe('Use Admin tab', () => {
   //     /* ADMIN TAB CHRONOGRAF */
   //   })
 
-  describe('InfluxDB', () => {
+  describe.only('InfluxDB', () => {
     beforeEach(() => {
       cy.fixture('routes').then(({adminInfluxDB}) => {
         url = `/sources/${sourceId}${adminInfluxDB}`
@@ -50,6 +50,7 @@ describe('Use Admin tab', () => {
         cy.getByTestID('create-db--button').click({force: true})
         cy.getByTestID('db-name--input').type(database.name)
         cy.getByTestID('confirm').click({force: true})
+        cy.get('.db-manager--edit').should('not.exist')
         cy.getByTestID(`db-manager--${database.name}`)
           .should('exist')
           .within(() => {
@@ -253,9 +254,5 @@ describe('Use Admin tab', () => {
     //     cy.get('body')
     //   })
     // })
-  })
-
-  after(() => {
-    cy.delete
   })
 })
