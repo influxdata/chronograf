@@ -260,7 +260,7 @@ const UserPage = ({
           <div className="panel-heading--right">
             <ConfirmButton
               type="btn-danger"
-              text="Delete User"
+              text="Delete Role"
               confirmAction={deleteRole}
               disabled={running}
               position="bottom"
