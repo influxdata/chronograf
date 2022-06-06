@@ -173,7 +173,7 @@ export const createDashboardWithCell = (
     })
 }
 
-export const createUser = (
+export const createChronografUser = (
   userName: string,
   provider: string,
   scheme: string,
@@ -197,7 +197,7 @@ export const createUser = (
   })
 }
 
-export const deleteUser = (name: string) => {
+export const deleteChronografUser = (name: string) => {
   const userName = name + '@oauth2.mock'
   return cy.request('GET', '/chronograf/v1/users').then(({body: response}) => {
     response.users.forEach(user => {
