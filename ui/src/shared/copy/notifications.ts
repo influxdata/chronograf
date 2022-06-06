@@ -419,9 +419,19 @@ export const notifyDatabaseDeleteConfirmationRequired = (
   message: `Type "DELETE ${databaseName}" to confirm. This action cannot be undone.`,
 })
 
-export const notifyDBUserNamePasswordInvalid = (): Notification => ({
+export const notifyDBUserNameInvalid = (): Notification => ({
   ...defaultErrorNotification,
-  message: 'Username and/or Password too short.',
+  message: 'User name is too short.',
+})
+
+export const notifyDBPasswordInvalid = (): Notification => ({
+  ...defaultErrorNotification,
+  message: 'Password is too short.',
+})
+
+export const notifyDBUserNameExists = (): Notification => ({
+  ...defaultErrorNotification,
+  message: 'User name already exists.',
 })
 
 export const notifyRoleNameInvalid = (): Notification => ({
