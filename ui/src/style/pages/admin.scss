@@ -119,6 +119,9 @@ table > tbody > tr.admin-table--edit-row:hover,
 table.table-highlight > tbody > tr.admin-table--edit-row,
 table.table-highlight > tbody > tr.admin-table--edit-row:hover {
   background-color: $g5-pepper;
+  input {
+    width: 195px
+  }
 }
 .admin-table--change-pw {
   display: flex;
@@ -153,7 +156,7 @@ pre.admin-table--query {
   .influxdb-admin--contents{
     height: calc(100%-60px);
   }
-  div.permission-value,div.role-value{
+  div.permission-value,div.role-value,div.user-value{
     @include btn-base-styles(
       $g5-pepper,
       $g6-smoke,
@@ -161,6 +164,7 @@ pre.admin-table--query {
       $g18-cloud,
       $g20-white
     );
+    user-select: none;
     padding: 4px;
     margin: 0 2px 2px;
     display: inline-block;
@@ -185,7 +189,10 @@ pre.admin-table--query {
       &.value-changed{
         // background-color: $c-star;
         padding: 2px;
-        text-decoration: line-through;
+        color: $g9-mountain;
+        // text-decoration: line-through;
+        // text-decoration-color: $c-topaz;
+        // text-decoration-style: double;
         border: 2px solid $c-pool;
       }
     }
@@ -200,7 +207,7 @@ pre.admin-table--query {
       color: $g7-graphite;
     }
   }
-  span.role-value{
+  span.role-value, span.user-value{
     padding: 0 2px;
     display: inline-block;
     white-space: nowrap;
@@ -280,7 +287,7 @@ pre.admin-table--query {
     .infludb-admin-section__body{
       margin: 0 30px;
       background-color: $g1-raven;
-      p {
+      .collection-selector {
         padding: 17px;
       }
       & > * {

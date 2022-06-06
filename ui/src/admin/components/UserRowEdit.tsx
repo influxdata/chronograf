@@ -7,7 +7,6 @@ interface UserRowEditProps {
   onEdit: (user: User, updates: Partial<User>) => void
   onSave: (user: User) => Promise<void>
   onCancel: (user: User) => void
-  isNew: boolean
   colSpan: number
 }
 

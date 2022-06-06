@@ -1,17 +1,17 @@
-import {User, UserPermission} from 'src/types/influxAdmin'
+import {User, UserPermission, UserRole} from 'src/types/influxAdmin'
 
 /** Record with databases as keys and values being a record of granted permissions or permission changes */
-export type UserDBPermissions = Record<string, Record<string, boolean>>
+export type PerDBPermissions = Record<string, Record<string, boolean>>
 
 /**
- * ComputeUserPermissions creates a record of user's database permissions.
- * @param user infludb user
+ * ComputePermissions creates a record of permissions per database.
+ * @param entity infludb user or role
  * @param isEnterprise enteprise InfluxDB flag means that all-scoped permissions are mapped to an extra '' database.
  */
-export function computeUserPermissions(
-  user: User,
+export function computePermissions(
+  user: User | UserRole,
   isEnterprise: boolean
-): UserDBPermissions {
+): PerDBPermissions {
   return user.permissions.reduce((acc, perm) => {
     if (!isEnterprise && perm.scope !== 'database') {
       return acc // do not include all permissions in OSS, they have separate administration
@@ -24,16 +24,16 @@ export function computeUserPermissions(
 }
 
 /**
- * ComputeUserPermissionsChange computes changes in user permissions
- * for a specific db and permission, having original user permission
+ * ComputePermissionsChange computes changes in permissions
+ * after toggling a specific db and permission, having original user permission
  * and a set of already performed changes.
  */
-export function computeUserPermissionsChange(
+export function computePermissionsChange(
   db: string,
   perm: string,
-  userPermissions: UserDBPermissions,
-  changedPermissions: UserDBPermissions
-): UserDBPermissions {
+  userPermissions: PerDBPermissions,
+  changedPermissions: PerDBPermissions
+): PerDBPermissions {
   const origState = userPermissions[db]?.[perm]
   const {[db]: changedDB, ...otherDBs} = changedPermissions
   if (changedDB === undefined) {
@@ -66,8 +66,8 @@ export function computeUserPermissionsChange(
  * appended to supplied user permissions.
  */
 export function toUserPermissions(
-  userPermissions: UserDBPermissions,
-  changedPermissions: UserDBPermissions,
+  userPermissions: PerDBPermissions,
+  changedPermissions: PerDBPermissions,
   appendAfter: UserPermission[] = []
 ): UserPermission[] {
   const newUserPermisssions = {...userPermissions}

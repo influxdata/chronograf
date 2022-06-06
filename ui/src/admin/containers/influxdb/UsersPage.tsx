@@ -23,7 +23,7 @@ import useDebounce from 'src/utils/useDebounce'
 import useChangeEffect from 'src/utils/useChangeEffect'
 import MultiSelectDropdown from 'src/reusable_ui/components/dropdowns/MultiSelectDropdown'
 import {ComponentSize, SlideToggle} from 'src/reusable_ui'
-import computeUsersEffectiveDBPermissions from './util/computeUsersEffectiveDBPermissions'
+import computeEffectiveDBPermissions from './util/computeEffectiveDBPermissions'
 import allOrParticularSelection from './util/allOrParticularSelection'
 
 const isValidUser = (user: User) => {
@@ -70,15 +70,6 @@ const UsersPage = ({
   removeUser,
   editUser,
 }: Props) => {
-  if (isConnectedToLDAP(source)) {
-    return (
-      <AdminInfluxDBTabbedPage activeTab="users" source={source}>
-        <div className="container-fluid">
-          Users are managed in LDAP directory.
-        </div>
-      </AdminInfluxDBTabbedPage>
-    )
-  }
   const handleSaveUser = useCallback(
     async (user: User) => {
       if (!isValidUser(user)) {
@@ -91,6 +82,7 @@ const UsersPage = ({
     },
     [notify, source]
   )
+  const isEditing = useMemo(() => users.some(u => u.isEditing), [users])
 
   const [isEnterprise, usersPage] = useMemo(
     () => [
@@ -118,7 +110,7 @@ const UsersPage = ({
   // effective permissions
   const visibleUsers = useMemo(() => users.filter(x => !x.hidden), [users])
   const userDBPermissions = useMemo(
-    () => computeUsersEffectiveDBPermissions(visibleUsers, visibleDBNames),
+    () => computeEffectiveDBPermissions(visibleUsers, visibleDBNames),
     [visibleDBNames, visibleUsers]
   )
 
@@ -194,7 +186,7 @@ const UsersPage = ({
           <div className="panel-heading--right">
             <button
               className="btn btn-sm btn-primary"
-              disabled={users.some(u => u.isEditing)}
+              disabled={isEditing}
               onClick={addUser}
               data-test="create-user--button"
             >
@@ -217,7 +209,7 @@ const UsersPage = ({
                     ? visibleDBNames.map(name => (
                         <th
                           className="admin-table__dbheader"
-                          title={`effective permissions for db: ${name}`}
+                          title={`role's effective permissions for db: ${name}`}
                           key={name}
                         >
                           {name}
@@ -242,8 +234,6 @@ const UsersPage = ({
                       onEdit={editUser}
                       onSave={handleSaveUser}
                       onCancel={removeUser}
-                      isEditing={user.isEditing}
-                      isNew={user.isNew}
                     />
                   ))
                 ) : (
@@ -261,7 +251,19 @@ const UsersPage = ({
     </AdminInfluxDBTabbedPage>
   )
 }
+const UsersPageAvailable = (props: Props) => {
+  if (isConnectedToLDAP(props.source)) {
+    return (
+      <AdminInfluxDBTabbedPage activeTab="users" source={props.source}>
+        <div className="container-fluid">
+          Users are managed in LDAP directory.
+        </div>
+      </AdminInfluxDBTabbedPage>
+    )
+  }
+  return <UsersPage {...props} />
+}
 
 export default withSource(
-  connect(mapStateToProps, mapDispatchToProps)(UsersPage)
+  connect(mapStateToProps, mapDispatchToProps)(UsersPageAvailable)
 )

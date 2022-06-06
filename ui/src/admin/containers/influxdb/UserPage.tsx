@@ -20,15 +20,16 @@ import {useEffect} from 'react'
 import {useCallback} from 'react'
 import {PERMISSIONS} from 'src/shared/constants'
 import {
-  computeUserPermissions,
-  computeUserPermissionsChange,
+  computePermissions,
+  computePermissionsChange,
   toUserPermissions,
-} from './util/userPermissions'
+} from './util/permissions'
 
 const FAKE_USER: User = {
   name: '',
   permissions: [],
   roles: [],
+  links: {self: ''},
 }
 
 const mapStateToProps = ({
@@ -149,7 +150,7 @@ const UserPage = ({
     () => [
       serverPermissions.find(x => x.scope === 'database')?.allowed || [],
       serverPermissions.find(x => x.scope === 'all')?.allowed || [],
-      computeUserPermissions(user, isEnterprise),
+      computePermissions(user, isEnterprise),
     ],
     [serverPermissions, user, isEnterprise]
   )
@@ -164,7 +165,7 @@ const UserPage = ({
       const db = (e.target as HTMLElement).dataset.db
       const perm = (e.target as HTMLElement).dataset.perm
       setChangedPermissions(
-        computeUserPermissionsChange(
+        computePermissionsChange(
           db,
           perm,
           userDBPermissions,
@@ -369,7 +370,7 @@ const UserPage = ({
                     {!allRoleNames.length ? (
                       <p>No roles are defined.</p>
                     ) : (
-                      <p>
+                      <div className="collection-selector">
                         {allRoleNames.map((roleName, i) => (
                           <div
                             key={i}
@@ -388,7 +389,7 @@ const UserPage = ({
                             {roleName}
                           </div>
                         ))}
-                      </p>
+                      </div>
                     )}
                   </div>
                 </>

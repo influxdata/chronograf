@@ -1,19 +1,23 @@
 import {
-  computeUserPermissions,
-  computeUserPermissionsChange,
+  computePermissions,
+  computePermissionsChange,
   toUserPermissions,
-} from 'src/admin/containers/influxdb/util/userPermissions'
-import {UserPermission} from 'src/types/influxAdmin'
-describe('admin/containers/influxdb/util/userPermissions', () => {
+} from 'src/admin/containers/influxdb/util/permissions'
+import {User, UserPermission} from 'src/types/influxAdmin'
+const redundantUserProperties: Pick<User, 'roles' | 'links'> = {
+  roles: [],
+  links: {self: ''},
+}
+describe('admin/containers/influxdb/util/permissions', () => {
   describe('computeUserDBPermissions', () => {
     it('computes no permissions', () => {
       ;[true, false].forEach(isEnterprise =>
         expect(
-          computeUserPermissions(
+          computePermissions(
             {
               name: 'a',
               permissions: [],
-              roles: [],
+              ...redundantUserProperties,
             },
             isEnterprise
           )
@@ -22,7 +26,7 @@ describe('admin/containers/influxdb/util/userPermissions', () => {
     })
     it('includes only database permissions for OSS', () => {
       expect(
-        computeUserPermissions(
+        computePermissions(
           {
             name: 'a',
             permissions: [
@@ -30,7 +34,7 @@ describe('admin/containers/influxdb/util/userPermissions', () => {
               {scope: 'database', name: 'db1', allowed: ['W']},
               {scope: 'database', name: 'db2', allowed: ['R']},
             ],
-            roles: [],
+            ...redundantUserProperties,
           },
           false /* isEnterprise */
         )
@@ -38,7 +42,7 @@ describe('admin/containers/influxdb/util/userPermissions', () => {
     })
     it('includes extra database for Enterprise all-scoped permissions', () => {
       expect(
-        computeUserPermissions(
+        computePermissions(
           {
             name: 'a',
             permissions: [
@@ -46,7 +50,7 @@ describe('admin/containers/influxdb/util/userPermissions', () => {
               {scope: 'database', name: 'db1', allowed: ['W']},
               {scope: 'database', name: 'db2', allowed: ['R']},
             ],
-            roles: [],
+            ...redundantUserProperties,
           },
           true /* isEnterprise */
         )
@@ -56,66 +60,60 @@ describe('admin/containers/influxdb/util/userPermissions', () => {
   describe('computeUserPermissionsChange', () => {
     const userPerms = {db1: {Write: true}}
     it('toggles new db permission', () => {
-      expect(
-        computeUserPermissionsChange('db2', 'Read', userPerms, {})
-      ).toEqual({
+      expect(computePermissionsChange('db2', 'Read', userPerms, {})).toEqual({
         db2: {Read: true},
       })
       expect(
-        computeUserPermissionsChange('db2', 'Read', userPerms, {
+        computePermissionsChange('db2', 'Read', userPerms, {
           db2: {Read: true},
         })
       ).toEqual({})
       expect(
-        computeUserPermissionsChange('db2', 'Read', userPerms, {db3: {A: true}})
+        computePermissionsChange('db2', 'Read', userPerms, {db3: {A: true}})
       ).toEqual({
         db2: {Read: true},
         db3: {A: true},
       })
       expect(
-        computeUserPermissionsChange('db2', 'Read', userPerms, {
+        computePermissionsChange('db2', 'Read', userPerms, {
           db2: {Read: true},
           db3: {A: true},
         })
       ).toEqual({db3: {A: true}})
     })
     it('toggles existing db new permission', () => {
-      expect(
-        computeUserPermissionsChange('db1', 'Read', userPerms, {})
-      ).toEqual({
+      expect(computePermissionsChange('db1', 'Read', userPerms, {})).toEqual({
         db1: {Read: true},
       })
       expect(
-        computeUserPermissionsChange('db1', 'Read', userPerms, {
+        computePermissionsChange('db1', 'Read', userPerms, {
           db1: {Read: true},
         })
       ).toEqual({})
       expect(
-        computeUserPermissionsChange('db1', 'Read', userPerms, {db3: {A: true}})
+        computePermissionsChange('db1', 'Read', userPerms, {db3: {A: true}})
       ).toEqual({
         db1: {Read: true},
         db3: {A: true},
       })
       expect(
-        computeUserPermissionsChange('db1', 'Read', userPerms, {
+        computePermissionsChange('db1', 'Read', userPerms, {
           db1: {Read: true},
           db3: {A: true},
         })
       ).toEqual({db3: {A: true}})
     })
     it('toggles existing db existing permission', () => {
-      expect(
-        computeUserPermissionsChange('db1', 'Write', userPerms, {})
-      ).toEqual({
+      expect(computePermissionsChange('db1', 'Write', userPerms, {})).toEqual({
         db1: {Write: false},
       })
       expect(
-        computeUserPermissionsChange('db1', 'Write', userPerms, {
+        computePermissionsChange('db1', 'Write', userPerms, {
           db1: {Write: false},
         })
       ).toEqual({})
       expect(
-        computeUserPermissionsChange('db1', 'Write', userPerms, {
+        computePermissionsChange('db1', 'Write', userPerms, {
           db3: {A: true},
         })
       ).toEqual({
@@ -123,7 +121,7 @@ describe('admin/containers/influxdb/util/userPermissions', () => {
         db3: {A: true},
       })
       expect(
-        computeUserPermissionsChange('db1', 'Write', userPerms, {
+        computePermissionsChange('db1', 'Write', userPerms, {
           db1: {Write: false},
           db3: {A: true},
         })
