@@ -2,6 +2,7 @@ import React, {useCallback, useState} from 'react'
 import {
   Form,
   Input,
+  InputType,
   OverlayBody,
   OverlayContainer,
   OverlayHeading,
@@ -37,6 +38,7 @@ const CreateUserDialog = ({visible = true, setVisible, create}: Props) => {
             <Form.Element label="Password">
               <Input
                 value={password}
+                type={InputType.Password}
                 onChange={e => setPassword(e.target.value)}
               />
             </Form.Element>
