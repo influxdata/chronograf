@@ -65,6 +65,7 @@ const Header = ({
         className="btn btn-xs btn-primary"
         disabled={isAddRPDisabled}
         onClick={onAddRetentionPolicy(database)}
+        data-test="add-retention-policy--button"
       >
         <span className="icon plus" /> Add Retention Policy
       </button>
@@ -72,6 +73,7 @@ const Header = ({
         <button
           className="btn btn-xs btn-danger"
           onClick={onStartDelete(database)}
+          data-test="delete-db--button"
         >
           Delete
         </button>
@@ -88,7 +90,7 @@ const Header = ({
   }
 
   const deleteConfirmation = (
-    <div className="admin-table--delete-db">
+    <div className="admin-table--delete-db" data-test="delete-db--confirmation">
       <input
         className="form-control input-xs"
         name="name"
@@ -100,6 +102,7 @@ const Header = ({
         autoFocus={true}
         autoComplete="false"
         spellCheck={false}
+        data-test="delete-db--confirm-input"
       />
       <ConfirmOrCancel
         item={database}
@@ -113,7 +116,7 @@ const Header = ({
   // eslint-disable-next-line no-prototype-builtins
   const hasDeleteCode = database.hasOwnProperty('deleteCode')
   return (
-    <div className="db-manager-header">
+    <div className="db-manager-header" data-test="db-manager--header">
       <h4>{database.name}</h4>
       {hasDeleteCode ? deleteConfirmation : buttons}
     </div>
@@ -133,6 +136,7 @@ const EditHeader = ({database, onEdit, onKeyDown, onConfirm, onCancel}) => (
       autoFocus={true}
       spellCheck={false}
       autoComplete="false"
+      data-test="db-name--input"
     />
     <ConfirmOrCancel
       item={database}

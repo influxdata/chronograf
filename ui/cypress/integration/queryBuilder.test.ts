@@ -7,11 +7,7 @@ describe('query builder', () => {
     cy.createDashboard()
     cy.get('@connections').then(connections => {
       cy.get('@dashboards').then(dashboards => {
-        cy.fixture('routes').then(routes => {
-          cy.visit(
-            `/sources/${connections[0].id}${routes.dashboards}/${dashboards[0].id}`
-          )
-        })
+        cy.visit(`/sources/${connections[0].id}/dashboards/${dashboards[0].id}`)
       })
     })
 
@@ -130,12 +126,12 @@ describe('query builder', () => {
 
   it('use filters to search for tags, activate them and keep track of the selected tags counter', () => {
     cy.getByTestID('bucket-selector').within(() => {
-      cy.get('.flux-query-builder--list-item').should('have.length', 1)
+      cy.get('.flux-query-builder--list-item').should('have.length.at.least', 1)
       cy.getByTestID('builder-card--menu').type('Hello World')
       cy.get('.flux-query-builder--list-item').should('not.exist')
       cy.getByTestID('builder-card--menu').clear()
       cy.get('.flux-query-builder--list-item')
-        .should('have.length', 1)
+        .should('have.length.at.least', 1)
         .and('contain.text', 'internal')
     })
 

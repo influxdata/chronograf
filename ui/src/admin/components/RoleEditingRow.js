@@ -38,6 +38,7 @@ class RoleEditingRow extends Component {
           autoFocus={true}
           spellCheck={false}
           autoComplete="false"
+          data-test="role-name--input"
         />
       </td>
     )

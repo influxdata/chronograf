@@ -10,10 +10,16 @@ import {
   OAuthLogin,
   OAuthLogout,
   OAuthLoginAsDiffUser,
-  createUser,
-  deleteUser,
+  createChronografUser,
+  deleteChronografUser,
   createOrg,
   deleteOrg,
+  createInfluxDBUser,
+  deleteInfluxDBUser,
+  createInfluxDBRole,
+  deleteInfluxDBRole,
+  createInfluxDB,
+  deleteInfluxDB
 } from './support/commands'
 
 declare global {
@@ -28,10 +34,16 @@ declare global {
       OAuthLogin: typeof OAuthLogin
       OAuthLogout: typeof OAuthLogout
       OAuthLoginAsDiffUser: typeof OAuthLoginAsDiffUser
-      createUser: typeof createUser
-      deleteUser: typeof deleteUser
+      createChronografUser: typeof createChronografUser
+      deleteChronografUser: typeof deleteChronografUser
       createOrg: typeof createOrg
       deleteOrg: typeof deleteOrg
+      createInfluxDBUser: typeof createInfluxDBUser
+      deleteInfluxDBUser: typeof deleteInfluxDBUser
+      createInfluxDBRole: typeof createInfluxDBRole
+      deleteInfluxDBRole: typeof deleteInfluxDBRole
+      createInfluxDB: typeof createInfluxDB
+      deleteInfluxDB: typeof deleteInfluxDB
     }
   }
 }

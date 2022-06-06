@@ -67,7 +67,7 @@ const RoleRow = ({
   }
 
   return (
-    <tr>
+    <tr data-test={`role-${roleName}--row`}>
       <td style={{width: `${ROLES_TABLE.colName}px`}}>{roleName}</td>
       <td>
         {allPermissions && allPermissions.length ? (

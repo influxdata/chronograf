@@ -8,6 +8,7 @@
       "username": "admin",
       "password": "admin",
       "connectionName": "E1M1",
-      "insecureSkipVerify": true
+      "insecureSkipVerify": true,
+      "metaUrl": "https://localhost:8091"
     }
   }

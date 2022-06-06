@@ -5,9 +5,7 @@ describe('Use Dashboards', () => {
     cy.removeConnections()
     cy.createConnection()
     cy.get('@connections').then(connections => {
-      cy.fixture('routes').then(({dashboards}) => {
-        cy.visit(`/sources/${connections[0].id}${dashboards}`)
-      })
+      cy.visit(`/sources/${connections[0].id}/dashboards`)
     })
     cy.deleteDashboards()
     cy.createDashboard('Reader Dashboard')
@@ -27,9 +25,7 @@ describe('Use Dashboards', () => {
 
     // delete the dashboard
     cy.get('@connections').then(connections => {
-      cy.fixture('routes').then(({dashboards}) => {
-        cy.visit(`/sources/${connections[0].id}${dashboards}`)
-      })
+      cy.visit(`/sources/${connections[0].id}/dashboards`)
     })
 
     // DOM Element where the dashboard resides
@@ -43,8 +39,8 @@ describe('Use Dashboards', () => {
 
   describe('Use Dashboards as reader', () => {
     beforeEach(() => {
-      cy.deleteUser('Reader')
-      cy.createUser('Reader', 'oauth-mock', 'oauth2')
+      cy.deleteChronografUser('Reader')
+      cy.createChronografUser('Reader', 'oauth-mock', 'oauth2')
       cy.OAuthLoginAsDiffUser('Reader')
     })
 

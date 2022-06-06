@@ -38,6 +38,7 @@ const DatabaseManager = ({
             className="btn btn-sm btn-primary"
             disabled={isAddDBDisabled}
             onClick={addDatabase}
+            data-test="create-db--button"
           >
             <span className="icon plus" /> Create Database
           </button>

@@ -66,7 +66,7 @@ const UserRow = ({
     ]
 
   return (
-    <tr>
+    <tr data-test={'user-row--' + user.name}>
       <td style={{width: `${USERS_TABLE.colUsername}px`}}>
         <Link to={page}>{user.name}</Link>
       </td>
@@ -74,6 +74,7 @@ const UserRow = ({
         <td
           className="admin-table--left-offset"
           title={!allRoles.length ? 'No roles are defined' : ''}
+          data-test="roles-granted"
         >
           {user.roles.map((role, i) => (
             <span key={i} className="role-value granted">
@@ -88,12 +89,17 @@ const UserRow = ({
         </td>
       )}
       {userDBPermissions.map((perms, i) => (
-        <td className="admin-table__dbperm" key={i}>
+        <td
+          className="admin-table__dbperm"
+          key={i}
+          data-test="permissions--values"
+        >
           <span
             className={`permission-value ${
               perms.READ || perms.ReadData ? 'granted' : 'denied'
             }`}
             title={PERMISSIONS.ReadData.description}
+            data-test="read-permission"
           >
             {PERMISSIONS.ReadData.displayName}
           </span>
@@ -102,6 +108,7 @@ const UserRow = ({
               perms.WRITE || perms.WriteData ? 'granted' : 'denied'
             }`}
             title={PERMISSIONS.WriteData.description}
+            data-test="write-permission"
           >
             {PERMISSIONS.WriteData.displayName}
           </span>
