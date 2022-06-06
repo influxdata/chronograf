@@ -7,11 +7,7 @@ describe('query builder', () => {
     cy.createDashboard()
     cy.get('@connections').then(connections => {
       cy.get('@dashboards').then(dashboards => {
-        cy.fixture('routes').then(routes => {
-          cy.visit(
-            `/sources/${connections[0].id}${routes.dashboards}/${dashboards[0].id}`
-          )
-        })
+        cy.visit(`/sources/${connections[0].id}/dashboards/${dashboards[0].id}`)
       })
     })
 

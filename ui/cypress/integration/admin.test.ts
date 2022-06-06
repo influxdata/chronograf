@@ -25,9 +25,7 @@ describe('Use Admin tab', () => {
 
   describe.only('InfluxDB', () => {
     beforeEach(() => {
-      cy.fixture('routes').then(({adminInfluxDB}) => {
-        url = `/sources/${sourceId}${adminInfluxDB}`
-      })
+      url = `/sources/${sourceId}/admin-influxdb`
     })
 
     describe('Databases', () => {
