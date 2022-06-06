@@ -20,7 +20,7 @@ let CONFIG = {
   },
 };
 
-app.get("/oauth/authorize", async (req, res) => {
+app.get("/oauth/authorize", (req, res) => {
   const state = req.query.state;
   const redirect = req.query.redirect_uri || CONFIG.redirect_uri;
   console.info("GET /oauth/authorize: ", redirect);
