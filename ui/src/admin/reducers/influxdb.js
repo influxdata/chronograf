@@ -1,6 +1,5 @@
 import reject from 'lodash/reject'
 import {
-  NEW_DEFAULT_USER,
   NEW_DEFAULT_ROLE,
   NEW_DEFAULT_DATABASE,
   NEW_EMPTY_RP,
@@ -65,14 +64,6 @@ const adminInfluxDB = (state = initialState, action) => {
 
     case 'INFLUXDB_LOAD_DATABASES': {
       return {...state, ...action.payload}
-    }
-
-    case 'INFLUXDB_ADD_USER': {
-      const newUser = {...NEW_DEFAULT_USER, isEditing: true}
-      return {
-        ...state,
-        users: [newUser, ...state.users],
-      }
     }
 
     case 'INFLUXDB_ADD_ROLE': {
@@ -161,16 +152,6 @@ const adminInfluxDB = (state = initialState, action) => {
         ),
       }
 
-      return {...state, ...newState}
-    }
-
-    case 'INFLUXDB_EDIT_USER': {
-      const {user, updates} = action.payload
-      const newState = {
-        users: state.users.map(u =>
-          u.links.self === user.links.self ? {...u, ...updates} : u
-        ),
-      }
       return {...state, ...newState}
     }
 

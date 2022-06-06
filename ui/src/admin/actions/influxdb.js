@@ -84,10 +84,6 @@ export const loadDatabases = databases => ({
   },
 })
 
-export const addUser = () => ({
-  type: 'INFLUXDB_ADD_USER',
-})
-
 export const addRole = () => ({
   type: 'INFLUXDB_ADD_ROLE',
 })
@@ -133,14 +129,6 @@ export const syncRetentionPolicy = (database, stale, synced) => ({
     database,
     stale,
     synced,
-  },
-})
-
-export const editUser = (user, updates) => ({
-  type: 'INFLUXDB_EDIT_USER',
-  payload: {
-    user,
-    updates,
   },
 })
 
@@ -320,8 +308,6 @@ export const createUserAsync = (url, user) => async dispatch => {
     dispatch(syncUser(user, data))
   } catch (error) {
     dispatch(errorThrown(error, notifyDBUserCreationFailed(error.data.message)))
-    // undo optimistic update
-    setTimeout(() => dispatch(deleteUser(user)), REVERT_STATE_DELAY)
   }
 }
 

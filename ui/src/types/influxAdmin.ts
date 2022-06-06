@@ -25,9 +25,7 @@ export interface User {
     self: string
   }
   // UI only
-  isEditing?: boolean
   password?: string
-  isNew?: boolean
   hidden?: boolean
 }
 
