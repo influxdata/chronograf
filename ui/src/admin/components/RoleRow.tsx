@@ -40,7 +40,7 @@ const RoleRow = ({
   }
 
   return (
-    <tr>
+    <tr data-test={`role-${role.name}--row`}>
       <td style={{width: `${ROLES_TABLE.colName}px`}}>
         <Link to={page}>{role.name}</Link>
       </td>

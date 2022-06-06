@@ -39,6 +39,7 @@ const RoleRowEdit = ({
             autoFocus={true}
             spellCheck={false}
             autoComplete="false"
+            data-test="role-name--input"
           />
           <ConfirmOrCancel
             item={role}
