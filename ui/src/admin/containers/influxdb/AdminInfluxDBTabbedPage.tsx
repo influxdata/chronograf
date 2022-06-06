@@ -7,7 +7,7 @@ import {WrapToPage} from './AdminInfluxDBScopedPage'
 interface Props {
   source: Source
   activeTab: 'databases' | 'users' | 'roles' | 'queries'
-  children: JSX.Element
+  children: JSX.Element | JSX.Element[]
 }
 export function hasRoleManagement(source: Source) {
   return !!source?.links?.roles
