@@ -5,9 +5,6 @@ import {Source, NotificationAction} from 'src/types'
 import {UserRole, User, Database} from 'src/types/influxAdmin'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {
-  addUser as addUserActionCreator,
-  editUser as editUserActionCreator,
-  deleteUser as deleteUserActionCreator,
   createUserAsync,
   filterUsers as filterUsersAction,
 } from 'src/admin/actions/influxdb'
@@ -57,9 +54,6 @@ const mapStateToProps = ({adminInfluxDB: {databases, users, roles}}) => ({
 const mapDispatchToProps = {
   filterUsers: filterUsersAction,
   createUser: createUserAsync,
-  removeUser: deleteUserActionCreator,
-  addUser: addUserActionCreator,
-  editUser: editUserActionCreator,
   notify: notifyAction,
 }
 
@@ -84,20 +78,7 @@ const UsersPage = ({
   notify,
   createUser,
   filterUsers,
-  removeUser,
-  editUser,
 }: Props) => {
-  const handleSaveUser = useCallback(
-    async (user: User) => {
-      if (!validateUser(user, notify)) {
-        return
-      }
-      if (user.isNew) {
-        return createUser(source.links.users, user)
-      }
-    },
-    [notify, source]
-  )
   const [isEnterprise, usersPage] = useMemo(
     () => [
       hasRoleManagement(source),
@@ -270,9 +251,6 @@ const UsersPage = ({
                       allRoles={roles}
                       showRoles={showRoles}
                       hasRoles={isEnterprise}
-                      onEdit={editUser}
-                      onSave={handleSaveUser}
-                      onCancel={removeUser}
                     />
                   ))
                 ) : (

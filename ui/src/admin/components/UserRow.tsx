@@ -2,7 +2,6 @@ import React from 'react'
 
 import {USERS_TABLE} from 'src/admin/constants/tableSizing'
 
-import UserRowEdit from 'src/admin/components/UserRowEdit'
 import {User} from 'src/types/influxAdmin'
 import {Link} from 'react-router'
 import {PERMISSIONS} from 'src/shared/constants'
@@ -25,9 +24,6 @@ interface Props {
   page: string
   userDBPermissions: Array<Record<string, boolean>>
   showRoles: boolean
-  onCancel: (user: User) => void
-  onEdit: (User: User, updates: Partial<User>) => void
-  onSave: (user: User) => Promise<void>
 }
 
 const UserRow = ({
@@ -37,22 +33,7 @@ const UserRow = ({
   page,
   userDBPermissions,
   showRoles,
-  onEdit,
-  onSave,
-  onCancel,
 }: Props) => {
-  if (user.isEditing) {
-    return (
-      <UserRowEdit
-        user={user}
-        onEdit={onEdit}
-        onSave={onSave}
-        onCancel={onCancel}
-        colSpan={1 + +showRoles + userDBPermissions.length}
-      />
-    )
-  }
-
   const adminStyle =
     ADMIN_STYLES[
       +!!user.permissions.find(
