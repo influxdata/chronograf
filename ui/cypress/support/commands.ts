@@ -107,19 +107,17 @@ export const removeConnections = () => {
 }
 
 export const createDashboard = (name?: string) => {
-  return cy.fixture('routes').then(({dashboards}) => {
-    return cy
-      .request({
-        method: 'POST',
-        url: `/chronograf/v1${dashboards}`,
-        body: {
-          name: name ?? 'Default Dashboard',
-        },
-      })
-      .then(() => {
-        wrapDashboards()
-      })
-  })
+  return cy
+    .request({
+      method: 'POST',
+      url: '/chronograf/v1/dashboards',
+      body: {
+        name: name ?? 'Default Dashboard',
+      },
+    })
+    .then(() => {
+      wrapDashboards()
+    })
 }
 
 export const deleteDashboards = () => {
@@ -349,8 +347,8 @@ Cypress.Commands.add('createDashboardWithCell', createDashboardWithCell)
 Cypress.Commands.add('OAuthLogin', OAuthLogin)
 Cypress.Commands.add('OAuthLogout', OAuthLogout)
 Cypress.Commands.add('OAuthLoginAsDiffUser', OAuthLoginAsDiffUser)
-Cypress.Commands.add('createUser', createUser)
-Cypress.Commands.add('deleteUser', deleteUser)
+Cypress.Commands.add('createChronografUser', createChronografUser)
+Cypress.Commands.add('deleteChronografUser', deleteChronografUser)
 Cypress.Commands.add('createOrg', createOrg)
 Cypress.Commands.add('deleteOrg', deleteOrg)
 Cypress.Commands.add('createInfluxDBUser', createInfluxDBUser)

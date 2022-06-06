@@ -10,8 +10,8 @@ import {
   OAuthLogin,
   OAuthLogout,
   OAuthLoginAsDiffUser,
-  createUser,
-  deleteUser,
+  createChronografUser,
+  deleteChronografUser,
   createOrg,
   deleteOrg,
   createInfluxDBUser,
@@ -34,8 +34,8 @@ declare global {
       OAuthLogin: typeof OAuthLogin
       OAuthLogout: typeof OAuthLogout
       OAuthLoginAsDiffUser: typeof OAuthLoginAsDiffUser
-      createUser: typeof createUser
-      deleteUser: typeof deleteUser
+      createChronografUser: typeof createChronografUser
+      deleteChronografUser: typeof deleteChronografUser
       createOrg: typeof createOrg
       deleteOrg: typeof deleteOrg
       createInfluxDBUser: typeof createInfluxDBUser

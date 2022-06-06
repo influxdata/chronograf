@@ -39,8 +39,8 @@ describe('Use Dashboards', () => {
 
   describe('Use Dashboards as reader', () => {
     beforeEach(() => {
-      cy.deleteUser('Reader')
-      cy.createUser('Reader', 'oauth-mock', 'oauth2')
+      cy.deleteChronografUser('Reader')
+      cy.createChronografUser('Reader', 'oauth-mock', 'oauth2')
       cy.OAuthLoginAsDiffUser('Reader')
     })
 
