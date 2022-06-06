@@ -13,17 +13,7 @@ describe('Use Admin tab', () => {
     })
   })
 
-  //   describe('Chronograf', () => {
-  //     beforeEach(() => {
-  //       cy.fixture('routes').then(({adminChronograf}) => {
-  //         url = `/sources/${sourceId}${adminChronograf}`
-  //       })
-  //     })
-
-  //     /* ADMIN TAB CHRONOGRAF */
-  //   })
-
-  describe.only('InfluxDB', () => {
+  describe('InfluxDB', () => {
     beforeEach(() => {
       url = `/sources/${sourceId}/admin-influxdb`
     })
@@ -243,15 +233,5 @@ describe('Use Admin tab', () => {
         })
       })
     })
-
-    // describe('Queries', () => {
-    //   beforeEach(() => {
-    //     cy.visit(url + '/queries')
-    //   })
-
-    //   it('IN PROGRESS', () => {
-    //     cy.get('body')
-    //   })
-    // })
   })
 })
