@@ -115,11 +115,13 @@ const adminInfluxDB = (state = initialState, action) => {
 
     case 'INFLUXDB_SYNC_USER': {
       const {staleUser, syncedUser} = action.payload
-      const newState = {
-        users: state.users.map(u =>
-          u.links.self === staleUser.links.self ? {...syncedUser} : u
-        ),
-      }
+      const newState = staleUser.links
+        ? {
+            users: state.users.map(u =>
+              u.links.self === staleUser.links.self ? {...syncedUser} : u
+            ),
+          }
+        : {users: [{...syncedUser}, ...state.users]}
       return {...state, ...newState}
     }
 
@@ -237,11 +239,13 @@ const adminInfluxDB = (state = initialState, action) => {
 
     case 'INFLUXDB_DELETE_USER': {
       const {user} = action.payload
-      const newState = {
-        users: state.users.filter(u => u.links.self !== user.links.self),
+      if (user.links) {
+        const newState = {
+          users: state.users.filter(u => u.links.self !== user.links.self),
+        }
+        return {...state, ...newState}
       }
-
-      return {...state, ...newState}
+      return state
     }
 
     case 'INFLUXDB_DELETE_ROLE': {

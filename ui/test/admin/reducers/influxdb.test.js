@@ -243,6 +243,17 @@ describe('Admin.InfluxDB.Reducers', () => {
 
     expect(actual.users).toEqual(expected.users)
   })
+  it('it can sync a new user', () => {
+    const staleUser = {user: 'new-user', password: 'pwd'}
+    state = {users: [u2]}
+
+    const actual = reducer(state, syncUser(staleUser, u1))
+    const expected = {
+      users: [u1, u2],
+    }
+
+    expect(actual.users).toEqual(expected.users)
+  })
 
   it('it can edit a user', () => {
     const updates = {name: 'onecool'}
@@ -327,6 +338,18 @@ describe('Admin.InfluxDB.Reducers', () => {
     const actual = reducer(state, deleteUser(u1))
     const expected = {
       users: [],
+    }
+
+    expect(actual.users).toEqual(expected.users)
+  })
+  it('it can delete a non-existing user', () => {
+    state = {
+      users: [u1],
+    }
+
+    const actual = reducer(state, deleteUser({}))
+    const expected = {
+      users: [u1],
     }
 
     expect(actual.users).toEqual(expected.users)
