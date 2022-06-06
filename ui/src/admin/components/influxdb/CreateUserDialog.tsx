@@ -24,7 +24,7 @@ const CreateUserDialog = ({visible = true, setVisible, create}: Props) => {
   return (
     <OverlayTechnology visible={visible}>
       <OverlayContainer maxWidth={650}>
-        <OverlayHeading title="New User" onDismiss={cancel} />
+        <OverlayHeading title="Create User" onDismiss={cancel} />
         <OverlayBody>
           <Form>
             <Form.Element label="User Name">
