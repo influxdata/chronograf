@@ -5,15 +5,19 @@ type EntitiesDBPermissions = Array<Array<Record<string, boolean>>>
 /** record with database names and their permissions */
 type DBPermRecords = Record<string, Record<string, boolean>>
 
+type GetDBPermRecords<E extends User | UserRole> = (e: E) => DBPermRecords
+const getEmptyDBPermRecords: GetDBPermRecords<any> = () => ({})
+
 /**
  * ComputeDBPermRecords computes EntitiesDBPermissions for
  * a suplied user/role and database names.
  */
-export function computeDBPermRecords(
-  u: User | UserRole,
-  dbNames: string[]
+export function computeDBPermRecords<E extends User | UserRole>(
+  e: E,
+  dbNames: string[],
+  initialDBPermRecords: DBPermRecords = {}
 ): DBPermRecords {
-  return u.permissions.reduce((acc: DBPermRecords, perm: UserPermission) => {
+  return e.permissions.reduce((acc: DBPermRecords, perm: UserPermission) => {
     if (perm.scope === 'all') {
       const allowed = perm.allowed.includes('ALL')
         ? {READ: true, WRITE: true}
@@ -32,7 +36,7 @@ export function computeDBPermRecords(
       )
     }
     return acc
-  }, {} as DBPermRecords)
+  }, initialDBPermRecords)
 }
 
 /**
@@ -52,12 +56,48 @@ export function mergeDBPermRecords(...records: DBPermRecords[]): DBPermRecords {
  * ComputeEntitiesDBPermissions computes EntitiesDBPermissions for
  * suplied users/roles and database names.
  */
-export function computeEntitiesDBPermissions(
-  entities: User[] | UserRole[],
-  dbNames: string[]
+export function computeEntitiesDBPermissions<E extends User | UserRole>(
+  entities: E[],
+  dbNames: string[],
+  getInitialDBRecords: GetDBPermRecords<E> = getEmptyDBPermRecords
 ): EntitiesDBPermissions {
-  return entities.map((u: User | UserRole) => {
-    const dbPermRecords = computeDBPermRecords(u, dbNames)
+  return entities.map((e: E) => {
+    const dbPermRecords = computeDBPermRecords(
+      e,
+      dbNames,
+      getInitialDBRecords(e)
+    )
     return dbNames.map(dbName => dbPermRecords[dbName] || {})
   })
+}
+
+/**
+ * ComputeEffectiveUserDBPermissions computes effective DB permissions for all supplied
+ * users from their permissions and their roles.
+ */
+export function computeEffectiveUserDBPermissions(
+  users: User[],
+  roles: UserRole[],
+  dbNames: string[]
+): EntitiesDBPermissions {
+  const rolesDBPermRecords = roles.reduce((acc, role) => {
+    acc[role.name] = [role, undefined]
+    return acc
+  }, {} as Record<string, [UserRole, DBPermRecords | undefined]>)
+  const getInitialPermRecord: GetDBPermRecords<User> = (u: User) => {
+    if (u.roles?.length) {
+      return u.roles.reduce((acc, {name: roleName}) => {
+        const pair = rolesDBPermRecords[roleName]
+        let rolePerms = pair[1]
+        if (!rolePerms) {
+          rolePerms = computeDBPermRecords(pair[0], dbNames)
+          pair[1] = rolePerms
+        }
+        return mergeDBPermRecords(acc, rolePerms)
+      }, {} as DBPermRecords)
+    }
+    return {}
+  }
+
+  return computeEntitiesDBPermissions(users, dbNames, getInitialPermRecord)
 }
