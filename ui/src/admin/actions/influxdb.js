@@ -306,8 +306,6 @@ export const createRoleAsync = (url, role) => async dispatch => {
     dispatch(syncRole(role, data))
   } catch (error) {
     dispatch(errorThrown(error, notifyRoleCreationFailed(error.data.message)))
-    // undo optimistic update
-    setTimeout(() => dispatch(deleteRole(role)), REVERT_STATE_DELAY)
   }
 }
 

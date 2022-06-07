@@ -244,6 +244,17 @@ describe('Admin.InfluxDB.Reducers', () => {
 
     expect(actual.roles).toEqual(expected.roles)
   })
+  it('it can sync a new role', () => {
+    const staleRole = {name: 'new-role'}
+    state = {roles: [r2]}
+
+    const actual = reducer(state, syncRole(staleRole, r1))
+    const expected = {
+      roles: [r2, r1],
+    }
+
+    expect(actual.roles).toEqual(expected.roles)
+  })
 
   it('it can load the roles', () => {
     const actual = reducer(state, loadRoles({roles}))
@@ -255,6 +266,19 @@ describe('Admin.InfluxDB.Reducers', () => {
   })
 
   it('it can delete a role', () => {
+    state = {
+      roles: [r1],
+    }
+
+    const actual = reducer(state, deleteRole({}))
+    const expected = {
+      roles: [r1],
+    }
+
+    expect(actual.roles).toEqual(expected.roles)
+  })
+
+  it('it can delete a non-existing role', () => {
     state = {
       roles: [r1],
     }

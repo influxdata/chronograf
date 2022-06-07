@@ -106,11 +106,13 @@ const adminInfluxDB = (state = initialState, action) => {
 
     case 'INFLUXDB_SYNC_ROLE': {
       const {staleRole, syncedRole} = action.payload
-      const newState = {
-        roles: state.roles.map(r =>
-          r.links.self === staleRole.links.self ? {...syncedRole} : r
-        ),
-      }
+      const newState = staleRole.links
+        ? {
+            roles: state.roles.map(r =>
+              r.links.self === staleRole.links.self ? {...syncedRole} : r
+            ),
+          }
+        : {roles: [{...syncedRole}, ...state.roles]}
       return {...state, ...newState}
     }
 
@@ -209,11 +211,13 @@ const adminInfluxDB = (state = initialState, action) => {
 
     case 'INFLUXDB_DELETE_ROLE': {
       const {role} = action.payload
-      const newState = {
-        roles: state.roles.filter(r => r.links.self !== role.links.self),
+      if (role.links) {
+        const newState = {
+          roles: state.roles.filter(r => r.links.self !== role.links.self),
+        }
+        return {...state, ...newState}
       }
-
-      return {...state, ...newState}
+      return state
     }
 
     case 'INFLUXDB_REMOVE_DATABASE': {
