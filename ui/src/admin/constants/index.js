@@ -1,11 +1,3 @@
-export const NEW_DEFAULT_ROLE = {
-  name: '',
-  permissions: [],
-  users: [],
-  links: {self: ''},
-  isNew: true,
-}
-
 export const NEW_DEFAULT_RP = {
   name: 'autogen',
   duration: '0',

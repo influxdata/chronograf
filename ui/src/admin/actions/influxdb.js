@@ -84,10 +84,6 @@ export const loadDatabases = databases => ({
   },
 })
 
-export const addRole = () => ({
-  type: 'INFLUXDB_ADD_ROLE',
-})
-
 export const addDatabase = () => ({
   type: 'INFLUXDB_ADD_DATABASE',
 })
@@ -129,14 +125,6 @@ export const syncRetentionPolicy = (database, stale, synced) => ({
     database,
     stale,
     synced,
-  },
-})
-
-export const editRole = (role, updates) => ({
-  type: 'INFLUXDB_EDIT_ROLE',
-  payload: {
-    role,
-    updates,
   },
 })
 
