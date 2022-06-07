@@ -24,7 +24,7 @@ import useDebounce from 'src/utils/useDebounce'
 import useChangeEffect from 'src/utils/useChangeEffect'
 import MultiSelectDropdown from 'src/reusable_ui/components/dropdowns/MultiSelectDropdown'
 import {ComponentSize, SlideToggle} from 'src/reusable_ui'
-import {computeEntitiesDBPermissions} from './util/computeEffectiveDBPermissions'
+import {computeEffectiveUserDBPermissions} from './util/computeEffectiveDBPermissions'
 import allOrParticularSelection from './util/allOrParticularSelection'
 import CreateUserDialog, {
   validatePassword,
@@ -107,8 +107,9 @@ const UsersPage = ({
   // effective permissions
   const visibleUsers = useMemo(() => users.filter(x => !x.hidden), [users])
   const userDBPermissions = useMemo(
-    () => computeEntitiesDBPermissions(visibleUsers, visibleDBNames),
-    [visibleDBNames, visibleUsers]
+    () =>
+      computeEffectiveUserDBPermissions(visibleUsers, roles, visibleDBNames),
+    [visibleDBNames, visibleUsers, roles]
   )
 
   // filter users
@@ -231,7 +232,7 @@ const UsersPage = ({
                     ? visibleDBNames.map(name => (
                         <th
                           className="admin-table__dbheader"
-                          title={`role's effective permissions for db: ${name}`}
+                          title={`effective permissions for db: ${name}`}
                           key={name}
                         >
                           {name}
