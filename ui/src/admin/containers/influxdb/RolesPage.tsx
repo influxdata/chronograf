@@ -1,17 +1,18 @@
 import React, {useMemo, useState} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
 import {withSource} from 'src/CheckSources'
-import {Source} from 'src/types'
+import {withRouter, WithRouterProps} from 'react-router'
+import {Source, NotificationAction} from 'src/types'
 import {UserRole, User, Database} from 'src/types/influxAdmin'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {
-  addRole as addRoleActionCreator,
-  editRole as editRoleActionCreator,
-  deleteRole as deleteRoleAction,
   createRoleAsync,
   filterRoles as filterRolesAction,
 } from 'src/admin/actions/influxdb'
-import {notifyRoleNameInvalid} from 'src/shared/copy/notifications'
+import {
+  notifyRoleNameExists,
+  notifyRoleNameInvalid,
+} from 'src/shared/copy/notifications'
 import AdminInfluxDBTabbedPage, {
   hasRoleManagement,
   isConnectedToLDAP,
@@ -25,10 +26,18 @@ import computeEffectiveDBPermissions from './util/computeEffectiveDBPermissions'
 import useDebounce from 'src/utils/useDebounce'
 import useChangeEffect from 'src/utils/useChangeEffect'
 import {ComponentSize, MultiSelectDropdown, SlideToggle} from 'src/reusable_ui'
+import CreateRoleDialog from 'src/admin/components/influxdb/CreateRoleDialog'
 
-const isValidRole = (role: UserRole): boolean => {
-  const minLen = 3
-  return role.name.length >= minLen
+const minLen = 3
+const validateRole = (
+  user: Pick<UserRole, 'name'>,
+  notify: NotificationAction
+) => {
+  if (user.name.length < minLen) {
+    notify(notifyRoleNameInvalid())
+    return false
+  }
+  return true
 }
 
 const mapStateToProps = ({adminInfluxDB: {databases, users, roles}}) => ({
@@ -40,9 +49,6 @@ const mapStateToProps = ({adminInfluxDB: {databases, users, roles}}) => ({
 const mapDispatchToProps = {
   filterRoles: filterRolesAction,
   createRole: createRoleAsync,
-  removeRole: deleteRoleAction,
-  addRole: addRoleActionCreator,
-  editRole: editRoleActionCreator,
   notify: notifyAction,
 }
 
@@ -57,34 +63,18 @@ interface ConnectedProps {
 
 type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
 
-type Props = OwnProps & ConnectedProps & ReduxDispatchProps
+type Props = WithRouterProps & OwnProps & ConnectedProps & ReduxDispatchProps
 
 const RolesPage = ({
   source,
   users,
   roles,
   databases,
-  addRole,
+  router,
   filterRoles,
-  editRole,
-  removeRole,
   createRole,
   notify,
 }: Props) => {
-  const handleSaveRole = useCallback(
-    async (role: UserRole) => {
-      if (!isValidRole(role)) {
-        notify(notifyRoleNameInvalid())
-        return
-      }
-      if (role.isNew) {
-        createRole(source.links.roles, role)
-      }
-    },
-    [source, createRole]
-  )
-  const isEditing = useMemo(() => roles.some(r => r.isEditing), [roles])
-
   const rolesPage = useMemo(
     () => `/sources/${source.id}/admin-influxdb/roles`,
     [source]
@@ -129,8 +119,33 @@ const RolesPage = ({
     setShowUsers,
   ])
 
+  const [createVisible, setCreateVisible] = useState(false)
+  const createNew = useCallback(
+    async (role: {name: string}) => {
+      if (roles.some(x => x.name === role.name)) {
+        notify(notifyRoleNameExists())
+        return
+      }
+      if (!validateRole(role, notify)) {
+        return
+      }
+      await createRole(source.links.roles, role)
+      router.push(
+        `/sources/${source.id}/admin-influxdb/users/${encodeURIComponent(
+          role.name
+        )}`
+      )
+    },
+    [roles, router, source, notify]
+  )
+
   return (
     <AdminInfluxDBTabbedPage activeTab="roles" source={source}>
+      <CreateRoleDialog
+        visible={createVisible}
+        setVisible={setCreateVisible}
+        create={createNew}
+      />
       <div className="panel panel-solid influxdb-admin">
         <div className="panel-heading">
           <div className="search-widget">
@@ -182,8 +197,8 @@ const RolesPage = ({
           <div className="panel-heading--right">
             <button
               className="btn btn-sm btn-primary"
-              disabled={isEditing}
-              onClick={addRole}
+              onClick={() => setCreateVisible(true)}
+              data-test="create-role--button"
             >
               <span className="icon plus" /> Create Role
             </button>
@@ -223,9 +238,6 @@ const RolesPage = ({
                       perDBPermissions={perDBPermissions[roleIndex]}
                       allUsers={users}
                       showUsers={showUsers}
-                      onEdit={editRole}
-                      onSave={handleSaveRole}
-                      onCancel={removeRole}
                     />
                   ))
                 ) : (
@@ -268,5 +280,5 @@ const RolesPageAvailable = (props: Props) => {
 }
 
 export default withSource(
-  connect(mapStateToProps, mapDispatchToProps)(RolesPageAvailable)
+  withRouter(connect(mapStateToProps, mapDispatchToProps)(RolesPageAvailable))
 )
