@@ -1,13 +1,11 @@
 import reducer from 'src/admin/reducers/influxdb'
 
 import {
-  addUser,
   addRole,
   addDatabase,
   addRetentionPolicy,
   syncUser,
   syncRole,
-  editUser,
   editRole,
   editDatabase,
   editRetentionPolicyRequested,
@@ -26,7 +24,6 @@ import {
 } from 'src/admin/actions/influxdb'
 
 import {
-  NEW_DEFAULT_USER,
   NEW_DEFAULT_ROLE,
   NEW_DEFAULT_DATABASE,
   NEW_EMPTY_RP,
@@ -219,19 +216,6 @@ describe('Admin.InfluxDB.Reducers', () => {
     })
   })
 
-  it('it can add a user', () => {
-    state = {
-      users: [u1],
-    }
-
-    const actual = reducer(state, addUser())
-    const expected = {
-      users: [{...NEW_DEFAULT_USER, isEditing: true}, u1],
-    }
-
-    expect(actual.users).toEqual(expected.users)
-  })
-
   it('it can sync a stale user', () => {
     const staleUser = {...u1, roles: []}
     state = {users: [u2, staleUser]}
@@ -243,16 +227,13 @@ describe('Admin.InfluxDB.Reducers', () => {
 
     expect(actual.users).toEqual(expected.users)
   })
+  it('it can sync a new user', () => {
+    const staleUser = {user: 'new-user', password: 'pwd'}
+    state = {users: [u2]}
 
-  it('it can edit a user', () => {
-    const updates = {name: 'onecool'}
-    state = {
-      users: [u2, u1],
-    }
-
-    const actual = reducer(state, editUser(u2, updates))
+    const actual = reducer(state, syncUser(staleUser, u1))
     const expected = {
-      users: [{...u2, ...updates}, u1],
+      users: [u1, u2],
     }
 
     expect(actual.users).toEqual(expected.users)
@@ -327,6 +308,18 @@ describe('Admin.InfluxDB.Reducers', () => {
     const actual = reducer(state, deleteUser(u1))
     const expected = {
       users: [],
+    }
+
+    expect(actual.users).toEqual(expected.users)
+  })
+  it('it can delete a non-existing user', () => {
+    state = {
+      users: [u1],
+    }
+
+    const actual = reducer(state, deleteUser({}))
+    const expected = {
+      users: [u1],
     }
 
     expect(actual.users).toEqual(expected.users)

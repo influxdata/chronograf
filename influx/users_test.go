@@ -590,7 +590,7 @@ func TestClient_Num(t *testing.T) {
 		{
 			name:         "All Users",
 			statusUsers:  http.StatusOK,
-			showUsers:    []byte(`{"results":[{"series":[{"columns":["user","admin"],"values":[["admin",true],["docbrown",true],["reader",false]]}]}]}`),
+			showUsers:    []byte(`{"results":[{"series":[{"columns":["user","admin"],"values":[["docbrown",true],["admin",true],["reader",false]]}]}]}`),
 			statusGrants: http.StatusOK,
 			showGrants:   []byte(`{"results":[{"series":[{"columns":["database","privilege"],"values":[["mydb","ALL PRIVILEGES"]]}]}]}`),
 			args: args{

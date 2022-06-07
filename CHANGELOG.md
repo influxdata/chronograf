@@ -5,6 +5,7 @@
 1. [#5904](https://github.com/influxdata/chronograf/pull/5904): Add reader role.
 1. [#5921](https://github.com/influxdata/chronograf/pull/5921): Manage InfluxDB users including their database permissions.
 1. [#5923](https://github.com/influxdata/chronograf/pull/5923): Manage InfluxDB roles including their database permissions.
+1. [#5925](https://github.com/influxdata/chronograf/pull/5925): Improve InfluxDB user creation.
 
 ### Bug Fixes
 

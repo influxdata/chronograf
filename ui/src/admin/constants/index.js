@@ -1,12 +1,3 @@
-export const NEW_DEFAULT_USER = {
-  name: '',
-  password: '',
-  roles: [],
-  permissions: [],
-  links: {self: ''},
-  isNew: true,
-}
-
 export const NEW_DEFAULT_ROLE = {
   name: '',
   permissions: [],

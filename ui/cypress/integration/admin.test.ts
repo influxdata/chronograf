@@ -33,7 +33,7 @@ describe('Use Admin tab', () => {
         cy.visit(url + '/databases')
       })
 
-      it.only('create InfluxDB, edit it, and delete it', () => {
+      it('create InfluxDB, edit it, and delete it', () => {
         cy.getByTestID('create-db--button').click({force: true})
         cy.getByTestID('cancel').click({force: true})
         cy.getByTestID('create-db--button').click({force: true})
@@ -118,11 +118,15 @@ describe('Use Admin tab', () => {
           .click({force: true})
 
         cy.getByTestID('create-user--button').click()
-        cy.getByTestID('cancel').click({force: true})
+        cy.getByTestID('dismiss-button').click({force: true})
         cy.getByTestID('create-user--button').click()
+        cy.get('button').contains('Cancel').click({force: true})
+        cy.getByTestID('create-user--button').click()
+        cy.get('button').contains('Create').should('be.disabled')
         cy.getByTestID('username--input').type(user.name)
         cy.getByTestID('password--input').type(user.password)
-        cy.getByTestID('confirm').click({force: true})
+        cy.get('button').contains('Create').should('not.be.disabled').click({force: true})
+        cy.getByTestID('exit--button').click({force: true})
         cy.getByTestID(`user-row--${user.name}`).should('exist')
         cy.getByTestID('user-filter--input').type('Non existing user')
         cy.getByTestID(`user-row--${user.name}`).should('not.exist')
@@ -198,8 +202,12 @@ describe('Use Admin tab', () => {
       it('create user, assign role, remove role, and delete user', () => {
         cy.deleteInfluxDBRole(role.name, sourceId)
         cy.createInfluxDBRole(role.name, sourceId)
-        cy.createInfluxDBUser(user.name, user.password, sourceId)
-
+        cy.getByTestID('create-user--button').click()
+        cy.get('button').contains('Create').should('be.disabled')
+        cy.getByTestID('username--input').type(user.name)
+        cy.getByTestID('password--input').type(user.password)
+        cy.get('button').contains('Create').should('not.be.disabled').click({force: true})
+        cy.getByTestID('exit--button').click({force: true})
         cy.get('.dropdown--selected').click({force: true})
         cy.getByTestID('dropdown-menu').within(() => {
           cy.getByTestID('dropdown--item')

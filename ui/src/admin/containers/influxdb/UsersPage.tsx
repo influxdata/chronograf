@@ -1,17 +1,18 @@
 import React, {useCallback, useMemo, useState} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
 import {withSource} from 'src/CheckSources'
-import {Source} from 'src/types'
+import {Source, NotificationAction} from 'src/types'
 import {UserRole, User, Database} from 'src/types/influxAdmin'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {
-  addUser as addUserActionCreator,
-  editUser as editUserActionCreator,
-  deleteUser as deleteUserActionCreator,
   createUserAsync,
   filterUsers as filterUsersAction,
 } from 'src/admin/actions/influxdb'
-import {notifyDBUserNamePasswordInvalid} from 'src/shared/copy/notifications'
+import {
+  notifyDBUserNameInvalid,
+  notifyDBPasswordInvalid,
+  notifyDBUserNameExists,
+} from 'src/shared/copy/notifications'
 import AdminInfluxDBTabbedPage, {
   hasRoleManagement,
   isConnectedToLDAP,
@@ -25,10 +26,23 @@ import MultiSelectDropdown from 'src/reusable_ui/components/dropdowns/MultiSelec
 import {ComponentSize, SlideToggle} from 'src/reusable_ui'
 import computeEffectiveDBPermissions from './util/computeEffectiveDBPermissions'
 import allOrParticularSelection from './util/allOrParticularSelection'
+import CreateUserDialog from '../../components/influxdb/CreateUserDialog'
+import {withRouter, WithRouterProps} from 'react-router'
 
-const isValidUser = (user: User) => {
-  const minLen = 3
-  return user.name.length >= minLen && user.password.length >= minLen
+const minLen = 3
+const validateUser = (
+  user: Pick<User, 'name' | 'password'>,
+  notify: NotificationAction
+) => {
+  if (user.name.length < minLen) {
+    notify(notifyDBUserNameInvalid())
+    return false
+  }
+  if (user.password.length < minLen) {
+    notify(notifyDBPasswordInvalid())
+    return false
+  }
+  return true
 }
 
 const mapStateToProps = ({adminInfluxDB: {databases, users, roles}}) => ({
@@ -40,9 +54,6 @@ const mapStateToProps = ({adminInfluxDB: {databases, users, roles}}) => ({
 const mapDispatchToProps = {
   filterUsers: filterUsersAction,
   createUser: createUserAsync,
-  removeUser: deleteUserActionCreator,
-  addUser: addUserActionCreator,
-  editUser: editUserActionCreator,
   notify: notifyAction,
 }
 
@@ -56,9 +67,10 @@ interface ConnectedProps {
 }
 
 type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
-type Props = OwnProps & ConnectedProps & ReduxDispatchProps
+type Props = WithRouterProps & OwnProps & ConnectedProps & ReduxDispatchProps
 
 const UsersPage = ({
+  router,
   source,
   databases,
   users,
@@ -66,24 +78,7 @@ const UsersPage = ({
   notify,
   createUser,
   filterUsers,
-  addUser,
-  removeUser,
-  editUser,
 }: Props) => {
-  const handleSaveUser = useCallback(
-    async (user: User) => {
-      if (!isValidUser(user)) {
-        notify(notifyDBUserNamePasswordInvalid())
-        return
-      }
-      if (user.isNew) {
-        return createUser(source.links.users, user)
-      }
-    },
-    [notify, source]
-  )
-  const isEditing = useMemo(() => users.some(u => u.isEditing), [users])
-
   const [isEnterprise, usersPage] = useMemo(
     () => [
       hasRoleManagement(source),
@@ -130,8 +125,34 @@ const UsersPage = ({
     showRoles,
     setShowRoles,
   ])
+
+  const [createVisible, setCreateVisible] = useState(false)
+  const createNew = useCallback(
+    async (user: {name: string; password: string}) => {
+      if (users.some(x => x.name === user.name)) {
+        notify(notifyDBUserNameExists())
+        return
+      }
+      if (!validateUser(user, notify)) {
+        return
+      }
+      await createUser(source.links.users, user)
+      router.push(
+        `/sources/${source.id}/admin-influxdb/users/${encodeURIComponent(
+          user.name
+        )}`
+      )
+    },
+    [users, router, source, notify]
+  )
+
   return (
     <AdminInfluxDBTabbedPage activeTab="users" source={source}>
+      <CreateUserDialog
+        visible={createVisible}
+        setVisible={setCreateVisible}
+        create={createNew}
+      />
       <div className="panel panel-solid influxdb-admin">
         <div className="panel-heading">
           <div className="search-widget">
@@ -186,8 +207,7 @@ const UsersPage = ({
           <div className="panel-heading--right">
             <button
               className="btn btn-sm btn-primary"
-              disabled={isEditing}
-              onClick={addUser}
+              onClick={() => setCreateVisible(true)}
               data-test="create-user--button"
             >
               <span className="icon plus" /> Create User
@@ -231,9 +251,6 @@ const UsersPage = ({
                       allRoles={roles}
                       showRoles={showRoles}
                       hasRoles={isEnterprise}
-                      onEdit={editUser}
-                      onSave={handleSaveUser}
-                      onCancel={removeUser}
                     />
                   ))
                 ) : (
@@ -265,5 +282,5 @@ const UsersPageAvailable = (props: Props) => {
 }
 
 export default withSource(
-  connect(mapStateToProps, mapDispatchToProps)(UsersPageAvailable)
+  withRouter(connect(mapStateToProps, mapDispatchToProps)(UsersPageAvailable))
 )

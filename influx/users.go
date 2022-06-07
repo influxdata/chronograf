@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sort"
 
 	"github.com/influxdata/chronograf"
 )
@@ -123,6 +124,9 @@ func (c *Client) All(ctx context.Context) ([]chronograf.User, error) {
 		user.Permissions = append(user.Permissions, perms...)
 		users[i] = user
 	}
+	sort.Slice(users, func(i, j int) bool {
+		return users[i].Name < users[j].Name
+	})
 	return users, nil
 }
 

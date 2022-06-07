@@ -36,6 +36,7 @@ interface Props {
   titleText?: string
   disabledTitleText?: string
   customClass?: string
+  testId?: string
 }
 
 class Input extends Component<Props> {
@@ -65,6 +66,7 @@ class Input extends Component<Props> {
       onKeyPress,
       onKeyUp,
       onKeyDown,
+      testId,
     } = this.props
 
     return (
@@ -83,7 +85,7 @@ class Input extends Component<Props> {
           onKeyUp={onKeyUp}
           onKeyDown={onKeyDown}
           className="input-field"
-          data-test="input-field"
+          data-test={testId}
           disabled={status === ComponentStatus.Disabled}
         />
         {this.icon}
