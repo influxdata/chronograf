@@ -131,7 +131,7 @@ const RolesPage = ({
       }
       await createRole(source.links.roles, role)
       router.push(
-        `/sources/${source.id}/admin-influxdb/users/${encodeURIComponent(
+        `/sources/${source.id}/admin-influxdb/roles/${encodeURIComponent(
           role.name
         )}`
       )
