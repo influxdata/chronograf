@@ -18,7 +18,7 @@ class OverlayHeading extends PureComponent<Props> {
       <div className="overlay--heading">
         <div className="overlay--title">{title}</div>
         {onDismiss && (
-          <button className="overlay--dismiss" onClick={onDismiss} />
+          <button className="overlay--dismiss" onClick={onDismiss} data-test="dismiss-button"/>
         )}
         {children && children}
       </div>
