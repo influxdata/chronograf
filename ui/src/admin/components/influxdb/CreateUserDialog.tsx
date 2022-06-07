@@ -1,5 +1,6 @@
 import React, {useCallback, useState} from 'react'
 import {
+  ComponentStatus,
   Form,
   Input,
   InputType,
@@ -8,6 +9,12 @@ import {
   OverlayHeading,
   OverlayTechnology,
 } from 'src/reusable_ui'
+
+const minLen = 3
+export function validateUserName(name: string): boolean {
+  return name?.length >= minLen
+}
+export const validatePassword = validateUserName
 
 interface Props {
   create: (user: {name: string; password: string}) => void
@@ -32,6 +39,12 @@ const CreateUserDialog = ({visible, setVisible, create}: Props) => {
               <Input
                 value={name}
                 onChange={e => setName(e.target.value)}
+                autoFocus={true}
+                status={
+                  validateUserName(name)
+                    ? ComponentStatus.Valid
+                    : ComponentStatus.Default
+                }
                 testId="username--input"
               />
             </Form.Element>
@@ -39,7 +52,11 @@ const CreateUserDialog = ({visible, setVisible, create}: Props) => {
               <Input
                 value={password}
                 type={InputType.Password}
-                autoFocus={true}
+                status={
+                  validatePassword(password)
+                    ? ComponentStatus.Valid
+                    : ComponentStatus.Default
+                }
                 onChange={e => setPassword(e.target.value)}
                 testId="password--input"
               />
