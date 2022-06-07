@@ -26,7 +26,11 @@ const CreateRoleDialog = ({visible, setVisible, create}: Props) => {
         <OverlayBody>
           <Form>
             <Form.Element label="Role Name">
-              <Input value={name} onChange={e => setName(e.target.value)} />
+              <Input
+                value={name}
+                autoFocus={true}
+                onChange={e => setName(e.target.value)}
+              />
             </Form.Element>
             <Form.Footer>
               <div className="form-group text-center form-group-submit col-xs-12">

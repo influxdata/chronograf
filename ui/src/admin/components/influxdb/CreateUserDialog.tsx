@@ -39,6 +39,7 @@ const CreateUserDialog = ({visible, setVisible, create}: Props) => {
               <Input
                 value={password}
                 type={InputType.Password}
+                autoFocus={true}
                 onChange={e => setPassword(e.target.value)}
                 testId="password--input"
               />
