@@ -26,14 +26,15 @@ import computeEffectiveDBPermissions from './util/computeEffectiveDBPermissions'
 import useDebounce from 'src/utils/useDebounce'
 import useChangeEffect from 'src/utils/useChangeEffect'
 import {ComponentSize, MultiSelectDropdown, SlideToggle} from 'src/reusable_ui'
-import CreateRoleDialog from 'src/admin/components/influxdb/CreateRoleDialog'
+import CreateRoleDialog, {
+  validateRoleName,
+} from 'src/admin/components/influxdb/CreateRoleDialog'
 
-const minLen = 3
 const validateRole = (
-  user: Pick<UserRole, 'name'>,
+  role: Pick<UserRole, 'name'>,
   notify: NotificationAction
 ) => {
-  if (user.name.length < minLen) {
+  if (!validateRoleName(role.name)) {
     notify(notifyRoleNameInvalid())
     return false
   }

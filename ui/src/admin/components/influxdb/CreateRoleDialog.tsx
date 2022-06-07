@@ -1,5 +1,6 @@
 import React, {useCallback, useState} from 'react'
 import {
+  ComponentStatus,
   Form,
   Input,
   OverlayBody,
@@ -7,6 +8,11 @@ import {
   OverlayHeading,
   OverlayTechnology,
 } from 'src/reusable_ui'
+
+const minLen = 3
+export function validateRoleName(name: string): boolean {
+  return name?.length >= minLen
+}
 
 interface Props {
   create: (role: {name: string}) => void
@@ -30,6 +36,11 @@ const CreateRoleDialog = ({visible, setVisible, create}: Props) => {
                 value={name}
                 autoFocus={true}
                 onChange={e => setName(e.target.value)}
+                status={
+                  validateRoleName(name)
+                    ? ComponentStatus.Valid
+                    : ComponentStatus.Default
+                }
               />
             </Form.Element>
             <Form.Footer>
