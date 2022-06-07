@@ -49,7 +49,7 @@ const CreateUserDialog = ({visible, setVisible, create}: Props) => {
                   onClick={() => create({name, password})}
                 >
                   Create
-                </button>{' '}
+                </button>
               </div>
             </Form.Footer>
           </Form>
