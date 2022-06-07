@@ -249,7 +249,7 @@ const UserPage = ({
   const body =
     role === FAKE_ROLE ? (
       <div className="container-fluid">
-        User <span className="error-warning">{roleName}</span> not found!
+        Role <span className="error-warning">{roleName}</span> not found!
       </div>
     ) : (
       <div className="panel panel-solid influxdb-admin">
