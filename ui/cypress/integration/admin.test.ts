@@ -202,8 +202,12 @@ describe('Use Admin tab', () => {
       it('create user, assign role, remove role, and delete user', () => {
         cy.deleteInfluxDBRole(role.name, sourceId)
         cy.createInfluxDBRole(role.name, sourceId)
-        cy.createInfluxDBUser(user.name, user.password, sourceId)
-
+        cy.getByTestID('create-user--button').click()
+        cy.get('button').contains('Create').should('be.disabled')
+        cy.getByTestID('username--input').type(user.name)
+        cy.getByTestID('password--input').type(user.password)
+        cy.get('button').contains('Create').should('not.be.disabled').click({force: true})
+        cy.getByTestID('exit--button').click({force: true})
         cy.get('.dropdown--selected').click({force: true})
         cy.getByTestID('dropdown-menu').within(() => {
           cy.getByTestID('dropdown--item')
