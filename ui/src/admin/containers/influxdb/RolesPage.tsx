@@ -22,7 +22,7 @@ import EmptyRow from 'src/admin/components/EmptyRow'
 import RoleRow from 'src/admin/components/RoleRow'
 import {useCallback} from 'react'
 import allOrParticularSelection from './util/allOrParticularSelection'
-import computeEffectiveDBPermissions from './util/computeEffectiveDBPermissions'
+import {computeEntitiesDBPermissions} from './util/computeEffectiveDBPermissions'
 import useDebounce from 'src/utils/useDebounce'
 import useChangeEffect from 'src/utils/useChangeEffect'
 import {ComponentSize, MultiSelectDropdown, SlideToggle} from 'src/reusable_ui'
@@ -99,7 +99,7 @@ const RolesPage = ({
   // effective permissions
   const visibleRoles = useMemo(() => roles.filter(x => !x.hidden), [roles])
   const perDBPermissions = useMemo(
-    () => computeEffectiveDBPermissions(visibleRoles, visibleDBNames),
+    () => computeEntitiesDBPermissions(visibleRoles, visibleDBNames),
     [visibleDBNames, visibleRoles]
   )
 

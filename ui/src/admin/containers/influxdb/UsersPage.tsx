@@ -24,7 +24,7 @@ import useDebounce from 'src/utils/useDebounce'
 import useChangeEffect from 'src/utils/useChangeEffect'
 import MultiSelectDropdown from 'src/reusable_ui/components/dropdowns/MultiSelectDropdown'
 import {ComponentSize, SlideToggle} from 'src/reusable_ui'
-import computeEffectiveDBPermissions from './util/computeEffectiveDBPermissions'
+import {computeEntitiesDBPermissions} from './util/computeEffectiveDBPermissions'
 import allOrParticularSelection from './util/allOrParticularSelection'
 import CreateUserDialog, {
   validatePassword,
@@ -107,7 +107,7 @@ const UsersPage = ({
   // effective permissions
   const visibleUsers = useMemo(() => users.filter(x => !x.hidden), [users])
   const userDBPermissions = useMemo(
-    () => computeEffectiveDBPermissions(visibleUsers, visibleDBNames),
+    () => computeEntitiesDBPermissions(visibleUsers, visibleDBNames),
     [visibleDBNames, visibleUsers]
   )
 
