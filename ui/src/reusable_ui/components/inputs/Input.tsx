@@ -54,6 +54,7 @@ class Input extends Component<Props> {
   }
 
   private inputRef: RefObject<HTMLInputElement>
+  private timeoutHandle: ReturnType<typeof setTimeout> | undefined
 
   constructor(props: Props) {
     super(props)
@@ -62,10 +63,17 @@ class Input extends Component<Props> {
 
   public componentDidMount() {
     if (this.props.autoFocus) {
-      setTimeout(() => this.inputRef.current.focus(), 10)
+      this.timeoutHandle = setTimeout(() => {
+        this.inputRef.current.focus()
+        this.timeoutHandle = undefined
+      }, 50)
     }
   }
-
+  public componentWillUnmount() {
+    if (this.timeoutHandle) {
+      clearTimeout(this.timeoutHandle)
+    }
+  }
   public render() {
     const {
       status,
