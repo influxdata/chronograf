@@ -14,7 +14,7 @@ interface Props {
   setVisible: (visible: boolean) => void
   visible: boolean
 }
-const CreateUserDialog = ({visible = true, setVisible, create}: Props) => {
+const CreateUserDialog = ({visible, setVisible, create}: Props) => {
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const cancel = useCallback(() => {
