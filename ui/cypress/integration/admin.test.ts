@@ -83,7 +83,7 @@ describe('Use Admin tab', () => {
       })
     })
 
-    describe.only('Users', () => {
+    describe('Users', () => {
       const user = {
         name: 'Smiley',
         password: 'securePassword123',
@@ -118,11 +118,15 @@ describe('Use Admin tab', () => {
           .click({force: true})
 
         cy.getByTestID('create-user--button').click()
-        cy.getByTestID('cancel').click({force: true})
+        cy.getByTestID('dismiss-button').click({force: true})
         cy.getByTestID('create-user--button').click()
+        cy.get('button').contains('Cancel').click({force: true})
+        cy.getByTestID('create-user--button').click()
+        cy.get('button').contains('Create').should('be.disabled')
         cy.getByTestID('username--input').type(user.name)
         cy.getByTestID('password--input').type(user.password)
-        cy.getByTestID('confirm').click({force: true})
+        cy.get('button').contains('Create').should('not.be.disabled').click({force: true})
+        cy.getByTestID('exit--button').click({force: true})
         cy.getByTestID(`user-row--${user.name}`).should('exist')
         cy.getByTestID('user-filter--input').type('Non existing user')
         cy.getByTestID(`user-row--${user.name}`).should('not.exist')
