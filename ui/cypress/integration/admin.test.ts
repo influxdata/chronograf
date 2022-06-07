@@ -33,7 +33,7 @@ describe('Use Admin tab', () => {
         cy.visit(url + '/databases')
       })
 
-      it.only('create InfluxDB, edit it, and delete it', () => {
+      it('create InfluxDB, edit it, and delete it', () => {
         cy.getByTestID('create-db--button').click({force: true})
         cy.getByTestID('cancel').click({force: true})
         cy.getByTestID('create-db--button').click({force: true})
@@ -83,7 +83,7 @@ describe('Use Admin tab', () => {
       })
     })
 
-    describe('Users', () => {
+    describe.only('Users', () => {
       const user = {
         name: 'Smiley',
         password: 'securePassword123',
