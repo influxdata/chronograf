@@ -29,7 +29,11 @@ const CreateUserDialog = ({visible, setVisible, create}: Props) => {
         <OverlayBody>
           <Form>
             <Form.Element label="User Name">
-              <Input value={name} onChange={e => setName(e.target.value)} testId="username--input"/>
+              <Input
+                value={name}
+                onChange={e => setName(e.target.value)}
+                testId="username--input"
+              />
             </Form.Element>
             <Form.Element label="Password">
               <Input
