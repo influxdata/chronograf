@@ -44,6 +44,7 @@ const RoleRow = ({
               perms.ReadData ? 'granted' : 'denied'
             }`}
             title={PERMISSIONS.ReadData.description}
+            data-test="read-permission"
           >
             {PERMISSIONS.ReadData.displayName}
           </span>
@@ -52,6 +53,7 @@ const RoleRow = ({
               perms.WriteData ? 'granted' : 'denied'
             }`}
             title={PERMISSIONS.WriteData.description}
+            data-test="write-permission"
           >
             {PERMISSIONS.WriteData.displayName}
           </span>

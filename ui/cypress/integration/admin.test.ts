@@ -14,6 +14,25 @@ describe('Use Admin tab', () => {
   })
 
   describe('InfluxDB', () => {
+    const user = {
+      name: 'Smiley',
+      password: 'securePassword123',
+    }
+    const db = {
+      name: 'New InfluxDB',
+      retention: {
+        name: 'New Retention',
+        duration: '1h',
+        durationChange: '1d',
+      },
+      permissions: {read: 'ReadData', write: 'WriteData'},
+    }
+    const role = {
+      name: 'Sunny',
+      permissions: ['ReadData', 'WriteData'],
+      users: {},
+    }
+
     beforeEach(() => {
       url = `/sources/${sourceId}/admin-influxdb`
     })
@@ -84,25 +103,9 @@ describe('Use Admin tab', () => {
     })
 
     describe('Users', () => {
-      const user = {
-        name: 'Smiley',
-        password: 'securePassword123',
-      }
-      const db = {
-        name: '_internal',
-        permission: {
-          read: 'ReadData',
-          write: 'WriteData',
-        },
-      }
-      const role = {
-        name: 'Sunny',
-        permissions: {},
-        users: {},
-      }
-
       beforeEach(() => {
         cy.deleteInfluxDBUser(user.name, sourceId)
+        cy.createInfluxDB(db.name, sourceId)
         cy.visit(url + '/users')
       })
 
@@ -125,7 +128,10 @@ describe('Use Admin tab', () => {
         cy.get('button').contains('Create').should('be.disabled')
         cy.getByTestID('username--input').type(user.name)
         cy.getByTestID('password--input').type(user.password)
-        cy.get('button').contains('Create').should('not.be.disabled').click({force: true})
+        cy.get('button')
+          .contains('Create')
+          .should('not.be.disabled')
+          .click({force: true})
         cy.getByTestID('exit--button').click({force: true})
         cy.getByTestID(`user-row--${user.name}`).should('exist')
         cy.getByTestID('user-filter--input').type('Non existing user')
@@ -143,32 +149,34 @@ describe('Use Admin tab', () => {
 
         cy.getByTestID(`${db.name}-permissions--row`).within(() => {
           cy.getByTestID(
-            `${db.name}-${db.permission.read}-permission--button`
+            `${db.name}-${db.permissions.read}-permission--button`
           ).click({force: true})
           cy.getByTestID(
-            `${db.name}-${db.permission.read}-permission--button`
+            `${db.name}-${db.permissions.read}-permission--button`
           ).should('have.class', 'value-changed')
           cy.getByTestID(
-            `${db.name}-${db.permission.write}-permission--button`
+            `${db.name}-${db.permissions.write}-permission--button`
           ).click({force: true})
           cy.getByTestID(
-            `${db.name}-${db.permission.write}-permission--button`
+            `${db.name}-${db.permissions.write}-permission--button`
           ).should('have.class', 'value-changed')
         })
 
         cy.getByTestID('apply-changes--button').click({force: true})
         cy.getByTestID(`${db.name}-permissions--row`).within(() => {
-          cy.getByTestID(`${db.name}-${db.permission.read}-permission--button`)
+          cy.getByTestID(`${db.name}-${db.permissions.read}-permission--button`)
             .should('have.class', 'granted')
             .and('not.have.class', 'value-changed')
-          cy.getByTestID(`${db.name}-${db.permission.write}-permission--button`)
+          cy.getByTestID(
+            `${db.name}-${db.permissions.write}-permission--button`
+          )
             .should('have.class', 'granted')
             .and('not.have.class', 'value-changed')
         })
 
         cy.getByTestID(`${db.name}-permissions--row`).within(() => {
           cy.getByTestID(
-            `${db.name}-${db.permission.write}-permission--button`
+            `${db.name}-${db.permissions.write}-permission--button`
           ).click({force: true})
         })
 
@@ -182,7 +190,7 @@ describe('Use Admin tab', () => {
         cy.getByTestID('exit--button').click({force: true})
         cy.getByTestID(`user-row--${user.name}`).within(() => {
           cy.getByTestID('permissions--values')
-            .eq(0)
+            .eq(1)
             .within(() => {
               cy.getByTestID('read-permission').should('have.class', 'granted')
               cy.getByTestID('write-permission').should('have.class', 'denied')
@@ -206,7 +214,10 @@ describe('Use Admin tab', () => {
         cy.get('button').contains('Create').should('be.disabled')
         cy.getByTestID('username--input').type(user.name)
         cy.getByTestID('password--input').type(user.password)
-        cy.get('button').contains('Create').should('not.be.disabled').click({force: true})
+        cy.get('button')
+          .contains('Create')
+          .should('not.be.disabled')
+          .click({force: true})
         cy.getByTestID('exit--button').click({force: true})
         cy.get('.dropdown--selected').click({force: true})
         cy.getByTestID('dropdown-menu').within(() => {
@@ -239,6 +250,94 @@ describe('Use Admin tab', () => {
         cy.getByTestID('roles-granted').within(() => {
           cy.get('.role-value').contains(role.name).should('exist')
         })
+      })
+    })
+
+    describe('Roles', () => {
+      beforeEach(() => {
+        cy.deleteInfluxDBRole(role.name, sourceId)
+        cy.deleteInfluxDBUser(user.name, sourceId)
+        cy.deleteInfluxDB(db.name, sourceId)
+        cy.createInfluxDB(db.name, sourceId)
+        cy.createInfluxDBUser(user.name, user.password, sourceId)
+        cy.visit(url + '/roles')
+      })
+
+      it('create a role, edit it, assign it to a user, and delete it', () => {
+        cy.getByTestID('admin-table--head').within(() => {
+          cy.get('th').contains('Users').should('exist')
+        })
+
+        cy.getByTestID('hide-users--toggle').click()
+        cy.getByTestID('admin-table--head').within(() => {
+          cy.get('th').contains('Users').should('not.exist')
+        })
+
+        cy.getByTestID(`role-${role.name}--row`).should('not.exist')
+        cy.getByTestID('create-role--button').click({force: true})
+        cy.getByTestID('dismiss-button').click()
+        cy.getByTestID('create-role--button').click({force: true})
+        cy.getByTestID('form--cancel-role--button').click()
+        cy.getByTestID('create-role--button').click({force: true})
+        cy.getByTestID('form--create-role--button').should('be.disabled')
+        cy.getByTestID('role-name--input').type(role.name)
+        cy.getByTestID('form--create-role--button')
+          .should('not.be.disabled')
+          .click()
+        cy.getByTestID('exit--button').click({force: true})
+        cy.getByTestID(`role-${role.name}--row`)
+          .should('exist')
+          .within(() => {
+            cy.get('a').contains(role.name).click({force: true})
+          })
+
+        cy.getByTestID(`user-${user.name}--selector`)
+          .should('not.have.class', 'value-changed')
+          .click({force: true})
+          .should('have.class', 'value-changed')
+
+        cy.getByTestID(`${db.name}-db-perm--row`).within(() => {
+          role.permissions.forEach(perm => {
+            cy.getByTestID(`${perm}--value`)
+              .should('have.class', 'denied')
+              .and('not.have.class', 'value-changed')
+              .click({force: true})
+              .should('have.class', 'denied')
+              .and('have.class', 'value-changed')
+          })
+        })
+
+        cy.getByTestID('apply-changes--button').click({force: true})
+
+        cy.getByTestID(`${db.name}-db-perm--row`).within(() => {
+          role.permissions.forEach(perm => {
+            cy.getByTestID(`${perm}--value`)
+              .should('not.have.class', 'denied')
+              .and('not.have.class', 'value-changed')
+              .and('have.class', 'granted')
+          })
+        })
+
+        cy.getByTestID('exit--button').click({force: true})
+        cy.getByTestID('wizard-bucket-selected').click({force: true})
+        cy.getByTestID('dropdown-menu').within(() => {
+          cy.getByTestID('dropdown--item')
+            .contains(db.name)
+            .click({force: true})
+        })
+
+        cy.getByTestID('wizard-bucket-selected').click({force: true})
+        cy.getByTestID(`role-${role.name}--row`).within(() => {
+          cy.get('.user-value').should('contain.text', user.name)
+          cy.getByTestID('read-permission').should('have.class', 'granted')
+          cy.getByTestID('write-permission').should('have.class', 'granted')
+        })
+      })
+
+      after(() => {
+        cy.deleteInfluxDBRole(role.name, sourceId)
+        cy.deleteInfluxDBUser(user.name, sourceId)
+        cy.deleteInfluxDB(db.name, sourceId)
       })
     })
   })

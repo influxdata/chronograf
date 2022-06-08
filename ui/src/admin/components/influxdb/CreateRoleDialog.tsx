@@ -41,17 +41,23 @@ const CreateRoleDialog = ({visible, setVisible, create}: Props) => {
                     ? ComponentStatus.Valid
                     : ComponentStatus.Default
                 }
+                testId="role-name--input"
               />
             </Form.Element>
             <Form.Footer>
               <div className="form-group text-center form-group-submit col-xs-12">
-                <button className="btn btn-sm btn-default" onClick={cancel}>
+                <button
+                  className="btn btn-sm btn-default"
+                  onClick={cancel}
+                  data-test="form--cancel-role--button"
+                >
                   Cancel
                 </button>
                 <button
                   className="btn btn-sm btn-success"
                   disabled={!name}
                   onClick={() => create({name})}
+                  data-test="form--create-role--button"
                 >
                   Create
                 </button>

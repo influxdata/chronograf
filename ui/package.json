@@ -113,6 +113,7 @@
     "d3-scale": "^2.1.0",
     "dygraphs": "2.1.0",
     "encoding-down": "^5.0.4",
+    "eslint-plugin-no-only-tests": "^2.6.0",
     "fast.js": "^0.1.1",
     "he": "^1.1.1",
     "level-js": "^3.0.0",
