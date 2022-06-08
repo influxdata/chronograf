@@ -95,10 +95,10 @@ const UserPage = ({
         setRunning(true)
         try {
           await deleteUserDispatchAsync(u)
-          router.push(`/sources/${sourceID}/admin-influxdb/users`)
         } finally {
           setRunning(false)
         }
+        router.push(`/sources/${sourceID}/admin-influxdb/users`)
       },
     ]
   }, [source, users, userName])
