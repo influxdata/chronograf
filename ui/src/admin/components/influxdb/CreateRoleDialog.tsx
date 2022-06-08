@@ -30,40 +30,43 @@ const CreateRoleDialog = ({visible, setVisible, create}: Props) => {
       <OverlayContainer maxWidth={650}>
         <OverlayHeading title="Create Role" onDismiss={cancel} />
         <OverlayBody>
-          <Form>
-            <Form.Element label="Role Name">
-              <Input
-                value={name}
-                autoFocus={true}
-                onChange={e => setName(e.target.value)}
-                status={
-                  validateRoleName(name)
-                    ? ComponentStatus.Valid
-                    : ComponentStatus.Default
-                }
-                testId="role-name--input"
-              />
-            </Form.Element>
-            <Form.Footer>
-              <div className="form-group text-center form-group-submit col-xs-12">
-                <button
-                  className="btn btn-sm btn-default"
-                  onClick={cancel}
-                  data-test="form--cancel-role--button"
-                >
-                  Cancel
-                </button>
-                <button
-                  className="btn btn-sm btn-success"
-                  disabled={!name}
-                  onClick={() => create({name})}
-                  data-test="form--create-role--button"
-                >
-                  Create
-                </button>
-              </div>
-            </Form.Footer>
-          </Form>
+          <form>
+            <Form>
+              <Form.Element label="Role Name">
+                <Input
+                  value={name}
+                  autoFocus={true}
+                  autoComplete="off"
+                  onChange={e => setName(e.target.value)}
+                  status={
+                    validateRoleName(name)
+                      ? ComponentStatus.Valid
+                      : ComponentStatus.Default
+                  }
+                  testId="role-name--input"
+                />
+              </Form.Element>
+              <Form.Footer>
+                <div className="form-group text-center form-group-submit col-xs-12">
+                  <button
+                    className="btn btn-sm btn-default"
+                    onClick={cancel}
+                    data-test="form--cancel-role--button"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="btn btn-sm btn-success"
+                    disabled={!name}
+                    onClick={() => create({name})}
+                    data-test="form--create-role--button"
+                  >
+                    Create
+                  </button>
+                </div>
+              </Form.Footer>
+            </Form>
+          </form>
         </OverlayBody>
       </OverlayContainer>
     </OverlayTechnology>

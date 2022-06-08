@@ -40,6 +40,7 @@ const CreateUserDialog = ({visible, setVisible, create}: Props) => {
                 value={name}
                 onChange={e => setName(e.target.value)}
                 autoFocus={true}
+                autoComplete="off"
                 status={
                   validateUserName(name)
                     ? ComponentStatus.Valid
@@ -58,6 +59,7 @@ const CreateUserDialog = ({visible, setVisible, create}: Props) => {
                     : ComponentStatus.Default
                 }
                 onChange={e => setPassword(e.target.value)}
+                autoComplete="off"
                 testId="password--input"
               />
             </Form.Element>
