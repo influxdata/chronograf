@@ -8,7 +8,8 @@
     "react",
     "prettier",
     "@babel",
-    "jest"
+    "jest",
+    "no-only-tests"
   ],
   "settings": {
     "react": {
@@ -355,7 +356,8 @@
     ],
     "@typescript-eslint/type-annotation-spacing": "off",
     "@typescript-eslint/unbound-method": "off",
-    "@typescript-eslint/unified-signatures": "error"
+    "@typescript-eslint/unified-signatures": "error",
+    "no-only-tests/no-only-tests": "error"
   },
   "overrides": [
     {
