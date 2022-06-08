@@ -439,6 +439,11 @@ export const notifyRoleNameInvalid = (): Notification => ({
   message: 'Role name is too short.',
 })
 
+export const notifyRoleNameExists = (): Notification => ({
+  ...defaultErrorNotification,
+  message: 'Role name already exists.',
+})
+
 export const notifyDatabaseNameInvalid = (): Notification => ({
   ...defaultErrorNotification,
   message: 'Database name cannot be blank.',

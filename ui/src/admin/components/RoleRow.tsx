@@ -1,6 +1,5 @@
 import React from 'react'
 
-import RoleRowEdit from 'src/admin/components/RoleRowEdit'
 import {ROLES_TABLE} from 'src/admin/constants/tableSizing'
 import {UserRole} from 'src/types/influxAdmin'
 import {Link} from 'react-router'
@@ -12,9 +11,6 @@ interface Props {
   page: string
   perDBPermissions: Array<Record<string, boolean>>
   showUsers: boolean
-  onCancel: (role: UserRole) => void
-  onEdit: (role: UserRole, updates: Partial<UserRole>) => void
-  onSave: (role: UserRole) => Promise<void>
 }
 
 const RoleRow = ({
@@ -23,22 +19,7 @@ const RoleRow = ({
   page,
   perDBPermissions,
   showUsers,
-  onEdit,
-  onSave,
-  onCancel,
 }: Props) => {
-  if (role.isEditing) {
-    return (
-      <RoleRowEdit
-        role={role}
-        onEdit={onEdit}
-        onSave={onSave}
-        onCancel={onCancel}
-        colSpan={1 + +showUsers + perDBPermissions.length}
-      />
-    )
-  }
-
   return (
     <tr data-test={`role-${role.name}--row`}>
       <td style={{width: `${ROLES_TABLE.colName}px`}}>

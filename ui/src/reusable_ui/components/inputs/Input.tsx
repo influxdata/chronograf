@@ -4,6 +4,7 @@ import React, {
   CSSProperties,
   ChangeEvent,
   KeyboardEvent,
+  RefObject,
 } from 'react'
 import classnames from 'classnames'
 
@@ -52,6 +53,27 @@ class Input extends Component<Props> {
     type: InputType.Text,
   }
 
+  private inputRef: RefObject<HTMLInputElement>
+  private timeoutHandle: ReturnType<typeof setTimeout> | undefined
+
+  constructor(props: Props) {
+    super(props)
+    this.inputRef = React.createRef()
+  }
+
+  public componentDidMount() {
+    if (this.props.autoFocus) {
+      this.timeoutHandle = setTimeout(() => {
+        this.inputRef.current.focus()
+        this.timeoutHandle = undefined
+      }, 50)
+    }
+  }
+  public componentWillUnmount() {
+    if (this.timeoutHandle) {
+      clearTimeout(this.timeoutHandle)
+    }
+  }
   public render() {
     const {
       status,
@@ -68,7 +90,6 @@ class Input extends Component<Props> {
       onKeyDown,
       testId,
     } = this.props
-
     return (
       <div className={this.className} style={this.containerStyle}>
         <input
@@ -87,6 +108,7 @@ class Input extends Component<Props> {
           className="input-field"
           data-test={testId}
           disabled={status === ComponentStatus.Disabled}
+          ref={this.inputRef}
         />
         {this.icon}
         {this.statusIndicator}

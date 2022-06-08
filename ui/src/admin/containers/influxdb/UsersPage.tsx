@@ -26,19 +26,21 @@ import MultiSelectDropdown from 'src/reusable_ui/components/dropdowns/MultiSelec
 import {ComponentSize, SlideToggle} from 'src/reusable_ui'
 import computeEffectiveDBPermissions from './util/computeEffectiveDBPermissions'
 import allOrParticularSelection from './util/allOrParticularSelection'
-import CreateUserDialog from '../../components/influxdb/CreateUserDialog'
+import CreateUserDialog, {
+  validatePassword,
+  validateUserName,
+} from '../../components/influxdb/CreateUserDialog'
 import {withRouter, WithRouterProps} from 'react-router'
 
-const minLen = 3
 const validateUser = (
   user: Pick<User, 'name' | 'password'>,
   notify: NotificationAction
 ) => {
-  if (user.name.length < minLen) {
+  if (!validateUserName(user.name)) {
     notify(notifyDBUserNameInvalid())
     return false
   }
-  if (user.password.length < minLen) {
+  if (!validatePassword(user.password)) {
     notify(notifyDBPasswordInvalid())
     return false
   }

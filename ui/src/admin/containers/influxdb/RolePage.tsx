@@ -66,7 +66,7 @@ type Props = WithRouterProps<RouterParams> &
   ConnectedProps &
   ReduxDispatchProps
 
-const UserPage = ({
+const RolePage = ({
   users,
   databases,
   permissions: serverPermissions,
@@ -102,10 +102,10 @@ const UserPage = ({
         setRunning(true)
         try {
           await deleteAsync(r)
-          router.push(`/sources/${sourceID}/admin-influxdb/roles`)
         } finally {
           setRunning(false)
         }
+        router.push(`/sources/${sourceID}/admin-influxdb/roles`)
       },
     ]
   }, [source, roles, roleName])
@@ -249,7 +249,7 @@ const UserPage = ({
   const body =
     role === FAKE_ROLE ? (
       <div className="container-fluid">
-        User <span className="error-warning">{roleName}</span> not found!
+        Role <span className="error-warning">{roleName}</span> not found!
       </div>
     ) : (
       <div className="panel panel-solid influxdb-admin">
@@ -403,5 +403,5 @@ const UserPage = ({
 }
 
 export default withSource(
-  withRouter(connect(mapStateToProps, mapDispatchToProps)(UserPage))
+  withRouter(connect(mapStateToProps, mapDispatchToProps)(RolePage))
 )

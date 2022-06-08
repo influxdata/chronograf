@@ -1,9 +1,5 @@
 import reject from 'lodash/reject'
-import {
-  NEW_DEFAULT_ROLE,
-  NEW_DEFAULT_DATABASE,
-  NEW_EMPTY_RP,
-} from 'src/admin/constants'
+import {NEW_DEFAULT_DATABASE, NEW_EMPTY_RP} from 'src/admin/constants'
 import uuid from 'uuid'
 import {parseDuration, compareDurations} from 'src/utils/influxDuration'
 
@@ -66,14 +62,6 @@ const adminInfluxDB = (state = initialState, action) => {
       return {...state, ...action.payload}
     }
 
-    case 'INFLUXDB_ADD_ROLE': {
-      const newRole = {...NEW_DEFAULT_ROLE, isEditing: true}
-      return {
-        ...state,
-        roles: [newRole, ...state.roles],
-      }
-    }
-
     case 'INFLUXDB_ADD_DATABASE': {
       const newDatabase = {
         ...NEW_DEFAULT_DATABASE,
@@ -118,11 +106,13 @@ const adminInfluxDB = (state = initialState, action) => {
 
     case 'INFLUXDB_SYNC_ROLE': {
       const {staleRole, syncedRole} = action.payload
-      const newState = {
-        roles: state.roles.map(r =>
-          r.links.self === staleRole.links.self ? {...syncedRole} : r
-        ),
-      }
+      const newState = staleRole.links
+        ? {
+            roles: state.roles.map(r =>
+              r.links.self === staleRole.links.self ? {...syncedRole} : r
+            ),
+          }
+        : {roles: [{...syncedRole}, ...state.roles]}
       return {...state, ...newState}
     }
 
@@ -152,16 +142,6 @@ const adminInfluxDB = (state = initialState, action) => {
         ),
       }
 
-      return {...state, ...newState}
-    }
-
-    case 'INFLUXDB_EDIT_ROLE': {
-      const {role, updates} = action.payload
-      const newState = {
-        roles: state.roles.map(r =>
-          r.links.self === role.links.self ? {...r, ...updates} : r
-        ),
-      }
       return {...state, ...newState}
     }
 
@@ -231,11 +211,13 @@ const adminInfluxDB = (state = initialState, action) => {
 
     case 'INFLUXDB_DELETE_ROLE': {
       const {role} = action.payload
-      const newState = {
-        roles: state.roles.filter(r => r.links.self !== role.links.self),
+      if (role.links) {
+        const newState = {
+          roles: state.roles.filter(r => r.links.self !== role.links.self),
+        }
+        return {...state, ...newState}
       }
-
-      return {...state, ...newState}
+      return state
     }
 
     case 'INFLUXDB_REMOVE_DATABASE': {

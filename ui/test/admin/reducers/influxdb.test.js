@@ -1,12 +1,10 @@
 import reducer from 'src/admin/reducers/influxdb'
 
 import {
-  addRole,
   addDatabase,
   addRetentionPolicy,
   syncUser,
   syncRole,
-  editRole,
   editDatabase,
   editRetentionPolicyRequested,
   loadRoles,
@@ -23,11 +21,7 @@ import {
   setQueriesSort,
 } from 'src/admin/actions/influxdb'
 
-import {
-  NEW_DEFAULT_ROLE,
-  NEW_DEFAULT_DATABASE,
-  NEW_EMPTY_RP,
-} from 'src/admin/constants'
+import {NEW_DEFAULT_DATABASE, NEW_EMPTY_RP} from 'src/admin/constants'
 
 // Users
 const u1 = {
@@ -239,19 +233,6 @@ describe('Admin.InfluxDB.Reducers', () => {
     expect(actual.users).toEqual(expected.users)
   })
 
-  it('it can add a role', () => {
-    state = {
-      roles: [r1],
-    }
-
-    const actual = reducer(state, addRole())
-    const expected = {
-      roles: [{...NEW_DEFAULT_ROLE, isEditing: true}, r1],
-    }
-
-    expect(actual.roles).toEqual(expected.roles)
-  })
-
   it('it can sync a stale role', () => {
     const staleRole = {...r1, permissions: []}
     state = {roles: [r2, staleRole]}
@@ -263,16 +244,13 @@ describe('Admin.InfluxDB.Reducers', () => {
 
     expect(actual.roles).toEqual(expected.roles)
   })
+  it('it can sync a new role', () => {
+    const staleRole = {name: 'new-role'}
+    state = {roles: [r2]}
 
-  it('it can edit a role', () => {
-    const updates = {name: 'onecool'}
-    state = {
-      roles: [r2, r1],
-    }
-
-    const actual = reducer(state, editRole(r2, updates))
+    const actual = reducer(state, syncRole(staleRole, r1))
     const expected = {
-      roles: [{...r2, ...updates}, r1],
+      roles: [r1, r2],
     }
 
     expect(actual.roles).toEqual(expected.roles)
@@ -282,6 +260,19 @@ describe('Admin.InfluxDB.Reducers', () => {
     const actual = reducer(state, loadRoles({roles}))
     const expected = {
       roles,
+    }
+
+    expect(actual.roles).toEqual(expected.roles)
+  })
+
+  it('it can delete a non-existing role', () => {
+    state = {
+      roles: [r1],
+    }
+
+    const actual = reducer(state, deleteRole({}))
+    const expected = {
+      roles: [r1],
     }
 
     expect(actual.roles).toEqual(expected.roles)

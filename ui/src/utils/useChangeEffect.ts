@@ -14,7 +14,7 @@ function useChangeEffect(
       first.current = false
       return
     }
-    effect()
+    return effect()
   }, deps)
 }
 
