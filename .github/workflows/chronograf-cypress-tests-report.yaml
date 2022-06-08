@@ -15,3 +15,4 @@ jobs:
           name: Cypress Tests
           path: ui/cypress/results/results-*.xml
           reporter: java-junit
+          fail-on-error: false
