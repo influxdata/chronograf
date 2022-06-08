@@ -37,13 +37,34 @@ interface State {
   errorMessage?: string
 }
 
-export const WrapToPage = ({children}: {children: JSX.Element}) => (
+type AdminInfluxDBRefresh = () => void
+export const AdminInfluxDBRefreshContext = React.createContext<AdminInfluxDBRefresh>(
+  undefined
+)
+
+interface WrapToPageProps {
+  children: JSX.Element
+  hideRefresh?: boolean
+}
+export const WrapToPage = ({children, hideRefresh}: WrapToPageProps) => (
   <Page className="influxdb-admin">
     <Page.Header fullWidth={true}>
       <Page.Header.Left>
         <Page.Title title="InfluxDB Admin" />
       </Page.Header.Left>
-      <Page.Header.Right showSourceIndicator={true} />
+      <Page.Header.Right showSourceIndicator={true}>
+        {hideRefresh ? null : (
+          <AdminInfluxDBRefreshContext.Consumer>
+            {refresh => (
+              <span
+                className="icon refresh"
+                title="Refresh"
+                onClick={refresh}
+              />
+            )}
+          </AdminInfluxDBRefreshContext.Consumer>
+        )}
+      </Page.Header.Right>
     </Page.Header>
     <div style={{height: 'calc(100% - 60px)'}}>{children}</div>
   </Page>
@@ -101,11 +122,21 @@ export class AdminInfluxDBScopedPage extends PureComponent<Props, State> {
   }
 
   public render() {
+    return (
+      <AdminInfluxDBRefreshContext.Provider value={this.refresh}>
+        {this.content()}
+      </AdminInfluxDBRefreshContext.Provider>
+    )
+  }
+  public content() {
     const {source, children} = this.props
     const {loading, error, errorMessage} = this.state
-    if (loading === RemoteDataState.Loading) {
+    if (
+      loading === RemoteDataState.Loading ||
+      loading === RemoteDataState.NotStarted
+    ) {
       return (
-        <WrapToPage>
+        <WrapToPage hideRefresh={true}>
           <PageSpinner />
         </WrapToPage>
       )
@@ -126,7 +157,7 @@ export class AdminInfluxDBScopedPage extends PureComponent<Props, State> {
 
     if (!source.version || source.version.startsWith('2')) {
       return (
-        <WrapToPage>
+        <WrapToPage hideRefresh={true}>
           <div className="container-fluid">
             These functions are not available for the currently selected
             InfluxDB Connection.
