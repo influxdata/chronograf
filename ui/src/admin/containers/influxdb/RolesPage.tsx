@@ -192,6 +192,7 @@ const RolesPage = ({
               active={showUsers}
               onChange={changeHideUsers}
               size={ComponentSize.ExtraSmall}
+              entity="users"
             />
             Show Users
           </div>
@@ -208,7 +209,7 @@ const RolesPage = ({
         <div className="panel-body">
           <FancyScrollbar>
             <table className="table v-center admin-table table-highlight admin-table--compact">
-              <thead>
+              <thead data-test="admin-table--head">
                 <tr>
                   <th>Role</th>
                   {showUsers && (
@@ -227,7 +228,7 @@ const RolesPage = ({
                     : null}
                 </tr>
               </thead>
-              <tbody>
+              <tbody data-test="admin-table--body">
                 {visibleRoles.length ? (
                   visibleRoles.map((role, roleIndex) => (
                     <RoleRow

@@ -293,6 +293,7 @@ const RolePage = ({
                           : ''
                       }`}
                       onClick={onUserChange}
+                      data-test={`user-${userName}--selector`}
                     >
                       {userName}
                     </div>
@@ -329,6 +330,7 @@ const RolePage = ({
                             ? db
                             : 'Cluster-Wide Permissions applies to all databases'
                         }
+                        data-test={`${db || 'all'}-db-perm--row`}
                       >
                         <td>{db || '*'}</td>
                         <td>
@@ -352,6 +354,7 @@ const RolePage = ({
                                     : ''
                                 }`}
                                 onClick={onPermissionChange}
+                                data-test={`${perm}--value`}
                               >
                                 {perm}
                               </div>
@@ -381,9 +384,10 @@ const RolePage = ({
               confirmText="Discard unsaved changes?"
               confirmAction={exitHandler}
               position="left"
+              testId="discard-changes--exit--button"
             />
           ) : (
-            <Button text="Exit" onClick={exitHandler} />
+            <Button text="Exit" onClick={exitHandler} testId="exit--button" />
           )}
           {dataChanged && (
             <Button
@@ -393,6 +397,7 @@ const RolePage = ({
               status={
                 running ? ComponentStatus.Disabled : ComponentStatus.Default
               }
+              testId="apply-changes--button"
             />
           )}
         </Page.Header.Right>
