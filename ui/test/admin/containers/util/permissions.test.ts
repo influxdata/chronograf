@@ -2,13 +2,13 @@ import {
   computePermissions,
   computePermissionsChange,
   toUserPermissions,
-} from 'src/admin/containers/influxdb/util/permissions'
+} from 'src/admin/util/permissions'
 import {User, UserPermission} from 'src/types/influxAdmin'
 const redundantUserProperties: Pick<User, 'roles' | 'links'> = {
   roles: [],
   links: {self: ''},
 }
-describe('admin/containers/influxdb/util/permissions', () => {
+describe('admin/util/permissions', () => {
   describe('computeUserDBPermissions', () => {
     it('computes no permissions', () => {
       ;[true, false].forEach(isEnterprise =>

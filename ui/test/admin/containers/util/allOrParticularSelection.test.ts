@@ -1,5 +1,5 @@
-import subject from 'src/admin/containers/influxdb/util/allOrParticularSelection'
-describe('admin/containers/influxdb/util/allOrParticularSelection', () => {
+import subject from 'src/admin/util/allOrParticularSelection'
+describe('admin/util/allOrParticularSelection', () => {
   it('keeps simple changes as-is', () => {
     expect(subject([], [])).toEqual([])
     expect(subject([], ['*'])).toEqual(['*'])

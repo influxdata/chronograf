@@ -23,7 +23,7 @@ import {
   computePermissions,
   computePermissionsChange,
   toUserPermissions,
-} from './util/permissions'
+} from '../../util/permissions'
 
 const FAKE_USER: User = {
   name: '',
