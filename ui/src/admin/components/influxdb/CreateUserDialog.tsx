@@ -34,50 +34,57 @@ const CreateUserDialog = ({visible, setVisible, create}: Props) => {
       <OverlayContainer maxWidth={650}>
         <OverlayHeading title="Create User" onDismiss={cancel} />
         <OverlayBody>
-          <Form>
-            <Form.Element label="User Name">
-              <Input
-                value={name}
-                onChange={e => setName(e.target.value)}
-                autoFocus={true}
-                autoComplete="off"
-                status={
-                  validateUserName(name)
-                    ? ComponentStatus.Valid
-                    : ComponentStatus.Default
-                }
-                testId="username--input"
-              />
-            </Form.Element>
-            <Form.Element label="Password">
-              <Input
-                value={password}
-                type={InputType.Password}
-                status={
-                  validatePassword(password)
-                    ? ComponentStatus.Valid
-                    : ComponentStatus.Default
-                }
-                onChange={e => setPassword(e.target.value)}
-                autoComplete="off"
-                testId="password--input"
-              />
-            </Form.Element>
-            <Form.Footer>
-              <div className="form-group text-center form-group-submit col-xs-12">
-                <button className="btn btn-sm btn-default" onClick={cancel}>
-                  Cancel
-                </button>
-                <button
-                  className="btn btn-sm btn-success"
-                  disabled={!(name && password)}
-                  onClick={() => create({name, password})}
-                >
-                  Create
-                </button>
-              </div>
-            </Form.Footer>
-          </Form>
+          <form>
+            <Form>
+              <Form.Element label="User Name">
+                <Input
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  autoFocus={true}
+                  autoComplete="off"
+                  status={
+                    validateUserName(name)
+                      ? ComponentStatus.Valid
+                      : ComponentStatus.Default
+                  }
+                  testId="username--input"
+                />
+              </Form.Element>
+              <Form.Element label="Password">
+                <Input
+                  value={password}
+                  type={InputType.Password}
+                  status={
+                    validatePassword(password)
+                      ? ComponentStatus.Valid
+                      : ComponentStatus.Default
+                  }
+                  onChange={e => setPassword(e.target.value)}
+                  autoComplete="off"
+                  testId="password--input"
+                />
+              </Form.Element>
+              <Form.Footer>
+                <div className="form-group text-center form-group-submit col-xs-12">
+                  <button
+                    className="btn btn-sm btn-default"
+                    onClick={cancel}
+                    type="button"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="btn btn-sm btn-success"
+                    disabled={!(name && password)}
+                    type="button"
+                    onClick={() => create({name, password})}
+                  >
+                    Create
+                  </button>
+                </div>
+              </Form.Footer>
+            </Form>
+          </form>
         </OverlayBody>
       </OverlayContainer>
     </OverlayTechnology>

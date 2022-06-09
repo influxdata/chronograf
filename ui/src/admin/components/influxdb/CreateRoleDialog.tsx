@@ -51,6 +51,7 @@ const CreateRoleDialog = ({visible, setVisible, create}: Props) => {
                   <button
                     className="btn btn-sm btn-default"
                     onClick={cancel}
+                    type="button"
                     data-test="form--cancel-role--button"
                   >
                     Cancel
@@ -58,6 +59,7 @@ const CreateRoleDialog = ({visible, setVisible, create}: Props) => {
                   <button
                     className="btn btn-sm btn-success"
                     disabled={!name}
+                    type="button"
                     onClick={() => create({name})}
                     data-test="form--create-role--button"
                   >
