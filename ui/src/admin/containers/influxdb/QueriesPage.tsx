@@ -85,7 +85,7 @@ class QueriesPage extends Component<Props, State> {
         <div className="panel panel-solid influxdb-admin">
           <div className="panel-heading">
             <h2 className="panel-title">{title}</h2>
-            <div style={{float: 'right', display: 'flex'}}>
+            <div className="panel-heading--right">
               {queries && queries.length ? (
                 <div style={{marginRight: '5px'}}>
                   <Button
