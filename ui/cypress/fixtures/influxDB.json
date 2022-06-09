@@ -1,0 +1,29 @@
+{
+    "user": {
+        "name": "Smiley",
+        "password": "securePassword123",
+        "roles": ["Sunny"],
+        "permissions": [
+            {
+                "name": "New InfluxDB",
+                "permissions": [
+                    "ReadData",
+                    "WriteData"
+                ]
+            }
+        ]
+    },
+    "db": {
+        "name": "New InfluxDB",
+        "retention": {
+            "name": "New Retention",
+            "duration": "1h",
+            "durationChange": "1d"
+        }
+    },
+    "role": {
+        "name": "Sunny",
+        "permissions": ["ReadData", "WriteData"],
+        "users": ["Smiley"]
+    }
+}
