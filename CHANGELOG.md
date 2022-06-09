@@ -8,6 +8,7 @@
 1. [#5925](https://github.com/influxdata/chronograf/pull/5925): Improve InfluxDB user creation.
 1. [#5926](https://github.com/influxdata/chronograf/pull/5926): Improve InfluxDB role creation.
 1. [#5927](https://github.com/influxdata/chronograf/pull/5927): Show effective permissions on Users page.
+1. [#5929](https://github.com/influxdata/chronograf/pull/5926): Add refresh button to InfluxDB Users/Roles/Databases page.
 
 ### Bug Fixes
 

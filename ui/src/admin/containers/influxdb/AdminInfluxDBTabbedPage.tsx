@@ -44,7 +44,7 @@ const AdminInfluxDBTabbedPage = ({source, activeTab, children}: Props) => {
     ]
   }, [source])
   return (
-    <WrapToPage>
+    <WrapToPage hideRefresh={activeTab === 'queries'}>
       <SubSections
         parentUrl="admin-influxdb"
         sourceID={source.id}
