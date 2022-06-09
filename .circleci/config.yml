@@ -37,7 +37,7 @@ workflows:
 jobs:
   build:
     environment:
-      DOCKER_TAG: chronograf-20220404
+      DOCKER_TAG: chronograf-20220609
       GO111MODULE: "ON"
     machine:
       image: ubuntu-2004:202201-02
