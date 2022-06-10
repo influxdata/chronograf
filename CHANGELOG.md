@@ -23,8 +23,8 @@
 1. [#5896](https://github.com/influxdata/chronograf/pull/5896): Add cypress tests with github workflows.
 1. [#5898](https://github.com/influxdata/chronograf/pull/5898): Upgrade javascript dependencies.
 1. [#5897](https://github.com/influxdata/chronograf/pull/5897): Upgrade golang to 1.18.
-1. [#5915](https://github.com/influxdata/chronograf/pull/5915): Upgrade github.com/lestrrat-go/jwx to v2
-1. [#5933](https://github.com/influxdata/chronograf/pull/5933): fix(security): upgrade golang to 1.18.3
+1. [#5915](https://github.com/influxdata/chronograf/pull/5915): Upgrade github.com/lestrrat-go/jwx to v2.
+1. [#5933](https://github.com/influxdata/chronograf/pull/5933): Upgrade golang to 1.18.3 .
 
 ## v1.9.4 [2022-03-22]
 
