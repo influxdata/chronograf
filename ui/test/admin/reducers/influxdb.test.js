@@ -212,7 +212,7 @@ describe('Admin.InfluxDB.Reducers', () => {
 
   it('it can sync a stale user', () => {
     const staleUser = {...u1, roles: []}
-    state = {users: [u2, staleUser]}
+    state = {users: [u2, staleUser], roles: []}
 
     const actual = reducer(state, syncUser(staleUser, u1))
     const expected = {
@@ -222,20 +222,50 @@ describe('Admin.InfluxDB.Reducers', () => {
     expect(actual.users).toEqual(expected.users)
   })
   it('it can sync a new user', () => {
-    const staleUser = {user: 'new-user', password: 'pwd'}
+    const staleUser = {name: 'new-user', password: 'pwd'}
     state = {users: [u2]}
 
-    const actual = reducer(state, syncUser(staleUser, u1))
+    const syncedUser = {
+      name: 'new-user',
+      roles: [],
+      permissions: [],
+      links: {self: ''},
+    }
+    const actual = reducer(state, syncUser(staleUser, syncedUser))
     const expected = {
-      users: [u1, u2],
+      users: [syncedUser, u2],
     }
 
     expect(actual.users).toEqual(expected.users)
   })
+  it('it can sync a user with changed roles', () => {
+    const shared = {permissions: [], links: {self: 'a'}}
+    const staleUser = {...shared, name: 'u1', roles: [{name: 'r1'}]}
+    state = {
+      users: [staleUser],
+      roles: [
+        {name: 'r1', users: [{name: 'u1'}]},
+        {name: 'r2', users: []},
+      ],
+    }
+    const syncedUser = {...shared, name: 'u1', roles: [{name: 'r2'}]}
+
+    const actual = reducer(state, syncUser(staleUser, syncedUser))
+    const expected = {
+      users: [syncedUser],
+      roles: [
+        {name: 'r1', users: []},
+        {name: 'r2', users: [syncedUser]},
+      ],
+    }
+
+    expect(actual.users).toEqual(expected.users)
+    expect(actual.roles).toEqual(expected.roles)
+  })
 
   it('it can sync a stale role', () => {
     const staleRole = {...r1, permissions: []}
-    state = {roles: [r2, staleRole]}
+    state = {roles: [r2, staleRole], users: []}
 
     const actual = reducer(state, syncRole(staleRole, r1))
     const expected = {
@@ -247,13 +277,42 @@ describe('Admin.InfluxDB.Reducers', () => {
   it('it can sync a new role', () => {
     const staleRole = {name: 'new-role'}
     state = {roles: [r2]}
+    const syncedRole = {
+      name: 'new-role',
+      users: [],
+      permissions: [],
+      links: {self: ''},
+    }
 
-    const actual = reducer(state, syncRole(staleRole, r1))
+    const actual = reducer(state, syncRole(staleRole, syncedRole))
     const expected = {
-      roles: [r1, r2],
+      roles: [syncedRole, r2],
     }
 
     expect(actual.roles).toEqual(expected.roles)
+  })
+  it('it can sync a role with changed users', () => {
+    const shared = {permissions: [], links: {self: 'a'}}
+    const staleRole = {...shared, name: 'r1', users: [{name: 'u1'}]}
+    state = {
+      roles: [staleRole],
+      users: [
+        {name: 'u1', roles: [{name: 'u1'}]},
+        {name: 'u2', roles: []},
+      ],
+    }
+    const syncedRole = {...shared, name: 'u1', users: [{name: 'u2'}]}
+    const actual = reducer(state, syncRole(staleRole, syncedRole))
+    const expected = {
+      roles: [syncedRole],
+      users: [
+        {name: 'u1', roles: []},
+        {name: 'u2', roles: [syncedRole]},
+      ],
+    }
+
+    expect(actual.roles).toEqual(expected.roles)
+    expect(actual.users).toEqual(expected.users)
   })
 
   it('it can load the roles', () => {
