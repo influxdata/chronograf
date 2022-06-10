@@ -1,7 +1,6 @@
 describe('Welcome Page', () => {
   beforeEach(() => {
-    cy.OAuthLogin('test')
-    cy.removeConnections()
+    cy.flush()
     cy.OAuthLogout()
   })
 

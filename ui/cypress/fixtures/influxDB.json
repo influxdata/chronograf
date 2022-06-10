@@ -2,8 +2,10 @@
     "user": {
         "name": "Smiley",
         "password": "securePassword123",
-        "roles": ["Sunny"],
-        "permissions": [
+        "roles": [
+            "Sunny"
+        ],
+        "db": [
             {
                 "name": "New InfluxDB",
                 "permissions": [
@@ -15,15 +17,44 @@
     },
     "db": {
         "name": "New InfluxDB",
-        "retention": {
-            "name": "New Retention",
-            "duration": "1h",
-            "durationChange": "1d"
-        }
+        "retentionPolicies": [
+            {
+                "name": "New Retention Policy",
+                "duration": "1h",
+                "shardDuration": "1d"
+            }
+        ],
+        "measurements": [
+            {
+                "name": "NewMeasurementA",
+                "tagValues": [
+                    "NewTagA",
+                    "NewTagB"
+                ],
+                "fieldValues": [
+                    1
+                ]
+            },
+            {
+                "name": "NewMeasurementB",
+                "tagValues": [
+                    "NewTagC",
+                    "NewTagD"
+                ],
+                "fieldValues": [
+                    2
+                ]
+            }
+        ]
     },
     "role": {
         "name": "Sunny",
-        "permissions": ["ReadData", "WriteData"],
-        "users": ["Smiley"]
+        "permissions": [
+            "ReadData",
+            "WriteData"
+        ],
+        "users": [
+            "Smiley"
+        ]
     }
 }

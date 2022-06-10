@@ -1,13 +1,11 @@
 describe('Use Dashboards', () => {
   beforeEach(() => {
-    cy.OAuthLogin('test')
+    cy.flush()
+    cy.createInfluxDBConnection()
     cy.visit('/login')
-    cy.removeConnections()
-    cy.createConnection()
     cy.get('@connections').then(connections => {
       cy.visit(`/sources/${connections[0].id}/dashboards`)
     })
-    cy.deleteDashboards()
     cy.createDashboard('Reader Dashboard')
   })
 
