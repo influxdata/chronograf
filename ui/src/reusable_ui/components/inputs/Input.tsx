@@ -38,6 +38,7 @@ interface Props {
   disabledTitleText?: string
   customClass?: string
   testId?: string
+  autoComplete?: string
 }
 
 class Input extends Component<Props> {
@@ -82,6 +83,7 @@ class Input extends Component<Props> {
       placeholder,
       autoFocus,
       spellCheck,
+      autoComplete,
       onChange,
       onBlur,
       onFocus,
@@ -98,6 +100,7 @@ class Input extends Component<Props> {
           value={value}
           placeholder={placeholder}
           autoFocus={autoFocus}
+          autoComplete={autoComplete}
           spellCheck={spellCheck}
           onChange={onChange}
           onBlur={onBlur}
