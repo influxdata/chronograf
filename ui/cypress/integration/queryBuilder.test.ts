@@ -10,8 +10,8 @@ describe('query builder', () => {
       console.log(sources)
       cy.fixture('influxDB.json').then((influxDBData: any) => {
         influxDB = influxDBData
-        
-        cy.createInfluxDB(influxDB.db.name, sources[0].id, influxDB.db.retentionPolicies[0])
+
+        cy.createInfluxDB(influxDB.db.name, sources[0].id)
         cy.writePoints(
           sources[0].id,
           influxDB.db.name,

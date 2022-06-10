@@ -7,12 +7,12 @@ describe('Use Admin tab', () => {
     cy.createInfluxDBConnection()
     cy.get('@connections').then(source => {
       sourceId = source[0].id
-      cy.request('GET', `/chronograf/v1/sources/${sourceId}/users`)
-        .then(({body: responseBody}) => {
+      cy.request('GET', `/chronograf/v1/sources/${sourceId}/users`).then(
+        ({body: responseBody}) => {
           console.log(responseBody.users)
-        })
+        }
+      )
     })
-    
   })
 
   describe('InfluxDB', () => {
@@ -51,7 +51,9 @@ describe('Use Admin tab', () => {
             cy.getByTestID('add-retention-policy--button').click({force: true})
             cy.getByTestID('cancel-rp--button').click({force: true})
             cy.getByTestID('add-retention-policy--button').click({force: true})
-            cy.getByTestID('rp-name--input').type(influxDB.db.retentionPolicies[0].name)
+            cy.getByTestID('rp-name--input').type(
+              influxDB.db.retentionPolicies[0].name
+            )
             cy.getByTestID('rp-duration--input').type(
               influxDB.db.retentionPolicies[0].duration
             )
@@ -162,11 +164,10 @@ describe('Use Admin tab', () => {
         cy.getByTestID('confirm').click({force: true})
         cy.getByTestID('exit--button').click({force: true})
         cy.getByTestID(`user-row--${influxDB.user.name}`).within(() => {
-          cy.getByTestID('permissions--values')
-            .within(() => {
-              cy.getByTestID('read-permission').should('have.class', 'granted')
-              cy.getByTestID('write-permission').should('have.class', 'granted')
-            })
+          cy.getByTestID('permissions--values').within(() => {
+            cy.getByTestID('read-permission').should('have.class', 'granted')
+            cy.getByTestID('write-permission').should('have.class', 'granted')
+          })
 
           cy.get('a').contains(influxDB.user.name).click({force: true})
         })
@@ -228,7 +229,11 @@ describe('Use Admin tab', () => {
     describe('Roles', () => {
       beforeEach(() => {
         cy.createInfluxDB(influxDB.db.name, sourceId)
-        cy.createInfluxDBUser(influxDB.user.name, influxDB.user.password, sourceId)
+        cy.createInfluxDBUser(
+          influxDB.user.name,
+          influxDB.user.password,
+          sourceId
+        )
         cy.visit(url + '/roles')
       })
 
