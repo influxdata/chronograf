@@ -1,40 +1,41 @@
-# Cypress test suite
+# Cypress tests
 
-## Dependencies
-### Chronograf
-To run these tests, you must first start Chronograf with environmental variables that configure OAuth2. 
-The easy way is to export environmental variables found in chronograf/etc/oauth2-server-mock/oauth-for-chronograf.sh. (more on it [here](https://docs.influxdata.com/chronograf/v1.9/administration/managing-security/#configure-chronograf-to-use-any-oauth-20-provider))
-
-To do that you can simply run command
-```bash
-source ../../etc/oauth2-server-mock/oauth-for-chronograf.sh 
-```
-
-set the InfluxDB Enterprise license key environmental variable
-```bash
-export INFLUXDB_ENTERPRISE_LICENSE_KEY=yourlicensekey
-```
-
-and run.
-```bash
-. local-chronograf-influxdb-enterprise.sh
-```
+## How to run the tests
+You have to first start a mock OAuth2 server, Chronograf, and InfluxDB Enterprise before the tests can be run.
 
 ### OAuth2 Mock server
-Before the tests start the OAuth2 Mock server.
 ```bash
 yarn test:e2e:oauth-mock
 ```
-You can change OAuth2 Mock server configuration in the chronograf/etc/oauth2-server-mock/env.sh
+The default configuration of the OAuth2 server is explained in `../../etc/oauth2-server-mock/env.sh`
+
+### Chronograf
+Chronograf must be configured with OAuth2 authentication against the OAuth2 mock server:
+
+```bash
+source ../../etc/oauth2-server-mock/oauth-for-chronograf.sh 
+# build chronograf from sources 
+make
+# start it (herein with a custom file-based database for e2e tests)
+./chronograf -b chronograf-e2e.db
+```
+### InfluxDB Enteprise
+InfluxDB Enterprise is required by the tests. InfluxDB installation is automated with [kind](https://kind.sigs.k8s.io/) and [helm](https://helm.sh/). Setup InfluxDB license key and start it with:
+
+```bash
+export INFLUXDB_ENTERPRISE_LICENSE_KEY=yourlicensekey
+./local-chronograf-influxdb-enterprise.sh
+```
+
+... and wait, it takes a while
 
 ## Cypress tests
-Run Cypress e2e tests in CLI
+Run Cypress e2e tests in a headless mode using:
 
 ```bash
 yarn test:e2e
 ```
-or
+or within a browser (Chrome) using:
 ```bash
 yarn test:e2e:headed
 ```
-if you wish to start Cypress in a browser (the default browser is set to Chrome).
