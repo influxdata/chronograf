@@ -4,9 +4,10 @@ interface Named {
 type NamedChanges = Record<string, boolean>
 
 /**
- * ComputeNamedChanges computes changes between array of named instances
- * as a Record with instance name as a key and values indicated addition (true)
- * or removal (false). Undefined is returned if there are no changes detected.
+ * ComputeNamedChanges computes differences between arrays of named instances
+ * as a Record with instance name as a key and values indicating addition (true)
+ * or removal (false) of the instance. Undefined is returned if there are no
+ * changes detected, instances that were not added/removed ar enot returned.
  */
 export function computeNamedChanges<T extends Named>(
   prev: T[],
@@ -32,11 +33,12 @@ export function computeNamedChanges<T extends Named>(
 }
 
 /**
- * ChangeNamedCollection returns a collection that changes the
- * supplied named collection according to changeType. True changeType
- * inserts an element in a sorted way, false removes all elements
- * of the same name, undefined does nothing and returns the
- * supplied collection.
+ * ChangeNamedCollection inserts/removes the supplied
+ * element to the supplied named collection according to the
+ * changeType. True changeType inserts an element in a sorted way,
+ * false removes all elements of the same name, undefined does nothing
+ * and returns the supplied collection. The supplied values never
+ * change after calling this fn.
  */
 export function changeNamedCollection<T extends Named>(
   values: T[],

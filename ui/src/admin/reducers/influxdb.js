@@ -108,7 +108,7 @@ const adminInfluxDB = (state = initialState, action) => {
         syncedUser.roles || []
       )
       if (rolesChange) {
-        // update affected roles to sync this user
+        // update roles that add/remove synced user
         const newRoles = state.roles.map(r => {
           const change = rolesChange[r.name]
           if (change !== undefined) {
@@ -136,7 +136,7 @@ const adminInfluxDB = (state = initialState, action) => {
         syncedRole.users || []
       )
       if (usersChange) {
-        // update affected users to sync this role
+        // update users that add/remove synced role
         const newUsers = state.users.map(u => {
           const change = usersChange[u.name]
           if (change !== undefined) {
@@ -147,7 +147,7 @@ const adminInfluxDB = (state = initialState, action) => {
           }
           return u
         })
-        return {...state, users: newUsers, roles: newRoles}
+        return {...state, roles: newRoles, users: newUsers}
       }
 
       return {...state, roles: newRoles}
