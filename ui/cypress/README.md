@@ -10,10 +10,11 @@ yarn test:e2e:oauth-mock
 The default configuration of the OAuth2 server is explained in `../../etc/oauth2-server-mock/env.sh`
 
 ### Chronograf
-Chronograf must be configured with OAuth2 authentication against the OAuth2 mock server:
+Chronograf must be configured with authentication against the OAuth2 mock server:
 
 ```bash
-source ../../etc/oauth2-server-mock/oauth-for-chronograf.sh 
+cd ../..
+./etc/oauth2-server-mock/oauth-for-chronograf.sh 
 # build chronograf from sources 
 make
 # start it (herein with a custom file-based database for e2e tests)
