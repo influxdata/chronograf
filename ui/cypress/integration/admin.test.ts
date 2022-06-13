@@ -5,8 +5,8 @@ describe('Use Admin tab', () => {
   beforeEach(() => {
     cy.flush()
     cy.createInfluxDBConnection()
-    cy.get('@connections').then(source => {
-      sourceId = source[0].id
+    cy.get('@connections').then(sources => {
+      sourceId = sources[0].id
       cy.request('GET', `/chronograf/v1/sources/${sourceId}/users`).then(
         ({body: responseBody}) => {
           console.log(responseBody.users)

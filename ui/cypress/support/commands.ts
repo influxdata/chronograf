@@ -1,4 +1,3 @@
-import cypress from 'cypress'
 import {addMatchImageSnapshotCommand} from 'cypress-image-snapshot/command'
 
 const apiUrl = '/chronograf/v1'
@@ -245,21 +244,25 @@ export const createChronografUser = (
   organization?: string,
   role?: string
 ) => {
-  return cy.request({
-    method: 'POST',
-    url: `${apiUrl}/users`,
-    body: {
-      name: userName + '@oauth2.mock',
-      provider: provider,
-      roles: [
-        {
-          name: role ?? 'reader',
-          organization: organization ?? 'default',
-        },
-      ],
-      scheme: scheme,
-    },
-  })
+  return cy
+    .request({
+      method: 'POST',
+      url: `${apiUrl}/users`,
+      body: {
+        name: userName + '@oauth2.mock',
+        provider: provider,
+        roles: [
+          {
+            name: role ?? 'reader',
+            organization: organization ?? 'default',
+          },
+        ],
+        scheme: scheme,
+      },
+    })
+    .then(() => {
+      wrapChronografUsers()
+    })
 }
 
 /**
@@ -268,13 +271,18 @@ export const createChronografUser = (
  */
 export const deleteChronografUser = (name: string) => {
   const userName = name + '@oauth2.mock'
-  return cy.request('GET', `${apiUrl}/users`).then(({body: responseBody}) => {
-    responseBody.users.forEach((user: any) => {
-      if (userName == user.name) {
-        cy.request('DELETE', user.links.self)
-      }
+  return cy
+    .request('GET', `${apiUrl}/users`)
+    .then(({body: responseBody}) => {
+      responseBody.users.forEach((user: any) => {
+        if (userName == user.name) {
+          cy.request('DELETE', user.links.self)
+        }
+      })
     })
-  })
+    .then(() => {
+      wrapChronografUsers()
+    })
 }
 
 /**
@@ -290,6 +298,9 @@ export const deleteChronografUsers = () => {
       responseBody.users.slice(1).forEach((user: any) => {
         cy.request('DELETE', user.links.self)
       })
+    })
+    .then(() => {
+      wrapChronografUsers()
     })
 }
 
@@ -318,7 +329,9 @@ export const createOrg = (orgName: string, defaultRole: string) => {
  * @param id - Organization ID.
  */
 export const deleteOrg = (id: string) => {
-  return cy.request('DELETE', `${apiUrl}/organizations/${id}`)
+  return cy.request('DELETE', `${apiUrl}/organizations/${id}`).then(() => {
+    wrapOrgs()
+  })
 }
 
 /**
@@ -331,6 +344,9 @@ export const deleteOrgs = () => {
       responseBody.organizations.slice(1).forEach((organization: any) => {
         cy.request('DELETE', organization.links.self)
       })
+    })
+    .then(() => {
+      wrapOrgs()
     })
 }
 /**
@@ -519,6 +535,12 @@ function wrapInfluxDBRoles(sourceId: string) {
     .then(({body: response}) => {
       cy.wrap(response.roles).as('influxDBRoles')
     })
+}
+
+function wrapChronografUsers() {
+  return cy.request('GET', `${apiUrl}/users`).then(({body: response}) => {
+    cy.wrap(response.users).as('chronografUsers')
+  })
 }
 
 /**

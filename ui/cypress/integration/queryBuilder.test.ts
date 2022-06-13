@@ -5,9 +5,7 @@ describe('query builder', () => {
     cy.flush()
     cy.createInfluxDBConnection()
     cy.createDashboard()
-    cy.visit('/')
     cy.get('@connections').then((sources: any) => {
-      console.log(sources)
       cy.fixture('influxDB.json').then((influxDBData: any) => {
         influxDB = influxDBData
 
