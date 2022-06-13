@@ -2,8 +2,8 @@ import 'jest'
 
 import {
   getByTestID,
-  removeConnections,
-  createConnection,
+  removeInfluxDBConnections,
+  createInfluxDBConnection,
   createDashboard,
   deleteDashboards,
   createDashboardWithCell,
@@ -12,22 +12,29 @@ import {
   OAuthLoginAsDiffUser,
   createChronografUser,
   deleteChronografUser,
+  deleteChronografUsers,
   createOrg,
   deleteOrg,
+  deleteOrgs,
   createInfluxDBUser,
   deleteInfluxDBUser,
+  deleteInfluxDBUsers,
   createInfluxDBRole,
   deleteInfluxDBRole,
+  deleteInfluxDBRoles,
   createInfluxDB,
-  deleteInfluxDB
+  deleteInfluxDB,
+  deleteInfluxDBs,
+  toInitialState,
+  writePoints
 } from './support/commands'
 
 declare global {
   namespace Cypress {
     interface Chainable {
       getByTestID: typeof getByTestID
-      removeConnections: typeof removeConnections
-      createConnection: typeof createConnection
+      removeInfluxDBConnections: typeof removeInfluxDBConnections
+      createInfluxDBConnection: typeof createInfluxDBConnection
       createDashboard: typeof createDashboard
       deleteDashboards: typeof deleteDashboards
       createDashboardWithCell: typeof createDashboardWithCell
@@ -36,14 +43,21 @@ declare global {
       OAuthLoginAsDiffUser: typeof OAuthLoginAsDiffUser
       createChronografUser: typeof createChronografUser
       deleteChronografUser: typeof deleteChronografUser
+      deleteChronografUsers: typeof deleteChronografUsers
       createOrg: typeof createOrg
       deleteOrg: typeof deleteOrg
+      deleteOrgs: typeof deleteOrgs
       createInfluxDBUser: typeof createInfluxDBUser
       deleteInfluxDBUser: typeof deleteInfluxDBUser
+      deleteInfluxDBUsers: typeof deleteInfluxDBUsers
       createInfluxDBRole: typeof createInfluxDBRole
       deleteInfluxDBRole: typeof deleteInfluxDBRole
+      deleteInfluxDBRoles: typeof deleteInfluxDBRoles
       createInfluxDB: typeof createInfluxDB
       deleteInfluxDB: typeof deleteInfluxDB
+      deleteInfluxDBs: typeof deleteInfluxDBs
+      toInitialState: typeof toInitialState
+      writePoints: typeof writePoints
     }
   }
 }

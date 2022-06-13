@@ -1,5 +1,7 @@
 import {addMatchImageSnapshotCommand} from 'cypress-image-snapshot/command'
 
+const apiUrl = '/chronograf/v1'
+
 declare namespace Cypress {
   interface Chainable<Subject> {
     /**
@@ -39,15 +41,7 @@ export const getByTestID = (
   return cy.get(`[data-test="${dataTest}"]`, options)
 }
 
-// Function sends HTTP POST request to OAuth2 Mock server in order to change user information
 function changeUserInfo(name: string) {
-  const userData = {
-    userinfo: {
-      name: name,
-      email: name + '@oauth2.mock',
-    },
-  }
-
   cy.request({
     method: 'POST',
     url: Cypress.env('oauth2ServerURL') + '/config',
@@ -57,6 +51,32 @@ function changeUserInfo(name: string) {
         email: name + '@oauth2.mock',
       },
     },
+  })
+}
+
+/**
+ * Write a value into a database.
+ * @param sourceId - Source ID.
+ * @param db - Database name.
+ * @param measurement - Measurement name.
+ * @param tagValue -  Tags value.
+ * @param fieldValue  - Field value.
+ */
+export const writePoints = (
+  sourceId: string,
+  db: string,
+  measurement: string,
+  tagValue: string,
+  fieldValue: number
+) => {
+  console.log({sourceID: sourceId, db: db})
+  cy.request({
+    method: 'POST',
+    url: `${apiUrl}/sources/${sourceId}/write?db=${db}`,
+    headers: {
+      'Content-Type': 'text/plain',
+    },
+    body: `${measurement},tagKey=${tagValue} fieldKey=${fieldValue}`,
   })
 }
 
@@ -73,19 +93,36 @@ export const OAuthLoginAsDiffUser = (name: string) => {
   changeUserInfo(name)
   return cy.visit('/oauth/oauth-mock/logout')
 }
-// Change enviromental values in cypress.json
-export const createConnection = (url?: string) => {
+
+/**
+ * Create a new InfluxDB connection.
+ * @param url - InfluxDB URL.
+ * @param username - InfluxDB username.
+ * @param password - InfluxDB password.
+ * @param connectionName  - InfluxDB connection name.
+ * @param isUnsafeSSL - If true, allows any certificate presented by the source to be accepted.
+ * @param metaUrl - Meta server URL.
+ * @returns
+ */
+export const createInfluxDBConnection = (
+  url?: string,
+  username?: string,
+  password?: string,
+  connectionName?: string,
+  isUnsafeSSL?: boolean,
+  metaUrl?: string
+) => {
   return cy
     .request({
       method: 'POST',
-      url: '/chronograf/v1/sources',
+      url: `${apiUrl}/sources`,
       body: {
         url: url ?? Cypress.env('influxDBURL'),
-        username: Cypress.env('username'),
-        password: Cypress.env('password'),
-        name: Cypress.env('connectionName'),
-        insecureSkipVerify: Cypress.env('insecureSkipVerify'),
-        metaUrl: Cypress.env('metaUrl'),
+        username: username ?? Cypress.env('username'),
+        password: password ?? Cypress.env('password'),
+        name: connectionName ?? Cypress.env('connectionName'),
+        insecureSkipVerify: isUnsafeSSL ?? Cypress.env('insecureSkipVerify'),
+        metaUrl: metaUrl ?? Cypress.env('metaUrl'),
       },
     })
     .then(() => {
@@ -93,12 +130,15 @@ export const createConnection = (url?: string) => {
     })
 }
 
-export const removeConnections = () => {
+/**
+ * Remove all InfluxDB connections.
+ */
+export const removeInfluxDBConnections = () => {
   return cy
-    .request('GET', '/chronograf/v1/sources')
+    .request('GET', `${apiUrl}/sources`)
     .then(response => {
-      response.body.sources.forEach(connection => {
-        cy.request('DELETE', `${connection.links.self}`)
+      response.body.sources.forEach((source: any) => {
+        cy.request('DELETE', `${source.links.self}`)
       })
     })
     .then(() => {
@@ -106,11 +146,15 @@ export const removeConnections = () => {
     })
 }
 
+/**
+ * Create a new dashboard.
+ * @param name - The name of the dashboard.
+ */
 export const createDashboard = (name?: string) => {
   return cy
     .request({
       method: 'POST',
-      url: '/chronograf/v1/dashboards',
+      url: `${apiUrl}/dashboards`,
       body: {
         name: name ?? 'Default Dashboard',
       },
@@ -120,12 +164,15 @@ export const createDashboard = (name?: string) => {
     })
 }
 
+/**
+ * Delete all dashboards.
+ */
 export const deleteDashboards = () => {
   return cy
-    .request('GET', '/chronograf/v1/dashboards')
-    .then(({body: response}) => {
-      response.dashboards.forEach(dashboard => {
-        cy.request('DELETE', `${dashboard.links.self}`)
+    .request('GET', `${apiUrl}/dashboards`)
+    .then(({body: responseBody}) => {
+      responseBody.dashboards.forEach((dashboard: any) => {
+        cy.request('DELETE', dashboard.links.self)
       })
     })
     .then(() => {
@@ -133,6 +180,16 @@ export const deleteDashboards = () => {
     })
 }
 
+/**
+ * Create a new dashboard with a cell.
+ * @param query - InfluxDB query.
+ * @param dashboardName - The name of the dashboard.
+ * @param cellName  - The name of the cell.
+ * @param xPosition - Cell's X position.
+ * @param yPosition  Cell's Y position.
+ * @param cellWidth  Cell's width.
+ * @param cellHeight  Cell's height.
+ */
 export const createDashboardWithCell = (
   query?: string,
   dashboardName?: string,
@@ -145,7 +202,7 @@ export const createDashboardWithCell = (
   return cy
     .request({
       method: 'POST',
-      url: `/chronograf/v1/dashboards/`,
+      url: `${apiUrl}/dashboards/`,
       body: {
         cells: [
           {
@@ -171,6 +228,15 @@ export const createDashboardWithCell = (
     })
 }
 
+/**
+ * Create a Chronograf user.
+ * @param userName - Chronograf username.
+ * @param provider - OAuth provider used to authenticate.
+ * @param scheme - Scheme used to authenticate.
+ * @param organization - Organization name. Default value is set to 'default'.
+ * @param role - Name of the default role. Default value is set to 'reader'.
+ * @returns
+ */
 export const createChronografUser = (
   userName: string,
   provider: string,
@@ -178,39 +244,76 @@ export const createChronografUser = (
   organization?: string,
   role?: string
 ) => {
-  return cy.request({
-    method: 'POST',
-    url: '/chronograf/v1/users',
-    body: {
-      name: userName + '@oauth2.mock',
-      provider: provider,
-      roles: [
-        {
-          name: role ?? 'reader',
-          organization: organization ?? 'default',
-        },
-      ],
-      scheme: scheme,
-    },
-  })
+  return cy
+    .request({
+      method: 'POST',
+      url: `${apiUrl}/users`,
+      body: {
+        name: userName + '@oauth2.mock',
+        provider: provider,
+        roles: [
+          {
+            name: role ?? 'reader',
+            organization: organization ?? 'default',
+          },
+        ],
+        scheme: scheme,
+      },
+    })
+    .then(() => {
+      wrapChronografUsers()
+    })
 }
 
+/**
+ * Delete all Chronograf users within the current organization with the given name.
+ * @param name - The name of the user.
+ */
 export const deleteChronografUser = (name: string) => {
   const userName = name + '@oauth2.mock'
-  return cy.request('GET', '/chronograf/v1/users').then(({body: response}) => {
-    response.users.forEach(user => {
-      if (userName == user.name) {
-        cy.request('DELETE', user.links.self)
-      }
+  return cy
+    .request('GET', `${apiUrl}/users`)
+    .then(({body: responseBody}) => {
+      responseBody.users.forEach((user: any) => {
+        if (userName == user.name) {
+          cy.request('DELETE', user.links.self)
+        }
+      })
     })
-  })
+    .then(() => {
+      wrapChronografUsers()
+    })
 }
 
+/**
+ * Delete all Chronograf users within the current organization except for the first administrator.
+ */
+export const deleteChronografUsers = () => {
+  return cy
+    .request({
+      method: 'GET',
+      url: `${apiUrl}/users`,
+    })
+    .then(({body: responseBody}) => {
+      responseBody.users.slice(1).forEach((user: any) => {
+        cy.request('DELETE', user.links.self)
+      })
+    })
+    .then(() => {
+      wrapChronografUsers()
+    })
+}
+
+/**
+ * Create a new organization.
+ * @param orgName - Organization name.
+ * @param defaultRole  - Default organization role.
+ */
 export const createOrg = (orgName: string, defaultRole: string) => {
   return cy
     .request({
       method: 'POST',
-      url: '/chronograf/v1/organizations',
+      url: `${apiUrl}/organizations`,
       body: {
         defaultRole: defaultRole,
         name: orgName,
@@ -221,10 +324,37 @@ export const createOrg = (orgName: string, defaultRole: string) => {
     })
 }
 
+/**
+ * Delete an organization.
+ * @param id - Organization ID.
+ */
 export const deleteOrg = (id: string) => {
-  return cy.request('DELETE', `/chronograf/v1/organizations/${id}`)
+  return cy.request('DELETE', `${apiUrl}/organizations/${id}`).then(() => {
+    wrapOrgs()
+  })
 }
 
+/**
+ *  Delete all organizations.
+ */
+export const deleteOrgs = () => {
+  return cy
+    .request('GET', `${apiUrl}/organizations`)
+    .then(({body: responseBody}) => {
+      responseBody.organizations.slice(1).forEach((organization: any) => {
+        cy.request('DELETE', organization.links.self)
+      })
+    })
+    .then(() => {
+      wrapOrgs()
+    })
+}
+/**
+ * Create an InfluxDB user.
+ * @param name - Username.
+ * @param passwd - Password.
+ * @param sourceId - Source ID.
+ */
 export const createInfluxDBUser = (
   name: string,
   passwd: string,
@@ -233,7 +363,7 @@ export const createInfluxDBUser = (
   return cy
     .request({
       method: 'POST',
-      url: `/chronograf/v1/sources/${sourceId}/users`,
+      url: `${apiUrl}/sources/${sourceId}/users`,
       body: {
         name: name,
         password: passwd,
@@ -244,22 +374,49 @@ export const createInfluxDBUser = (
     })
 }
 
+/**
+ * Delete an InfluxDB user.
+ * @param name - Username.
+ * @param sourceId - Source ID.
+ */
 export const deleteInfluxDBUser = (name: string, sourceId: string) => {
   return cy
     .request({
       method: 'DELETE',
-      url: `/chronograf/v1/sources/${sourceId}/users/${name}`,
+      url: `${apiUrl}/sources/${sourceId}/users/${name}`,
     })
     .then(() => {
       wrapInfluxDBUsers(sourceId)
     })
 }
 
+/**
+ * Delete all users from the InfluxDB source.
+ * @param sourceId - Source ID.
+ */
+export const deleteInfluxDBUsers = (sourceId: string) => {
+  return cy
+    .request('GET', `${apiUrl}/sources/${sourceId}/users`)
+    .then(({body: responseBody}) => {
+      console.log(responseBody.users)
+      responseBody.users.forEach((user: any) => {
+        if (user.name != Cypress.env('username')) {
+          cy.request('DELETE', user.links.self)
+        }
+      })
+    })
+}
+
+/**
+ * Create a default InfluxDB role.
+ * @param name - Name of the role.
+ * @param sourceId - Source ID.
+ */
 export const createInfluxDBRole = (name: string, sourceId: string) => {
   return cy
     .request({
       method: 'POST',
-      url: `/chronograf/v1/sources/${sourceId}/roles`,
+      url: `${apiUrl}/sources/${sourceId}/roles`,
       body: {
         name: name,
       },
@@ -269,36 +426,80 @@ export const createInfluxDBRole = (name: string, sourceId: string) => {
     })
 }
 
+/**
+ * Delete a role.
+ * @param name - Name of the role.
+ * @param sourceId - Source ID.
+ * @returns
+ */
 export const deleteInfluxDBRole = (name: string, sourceId: string) => {
   return cy
     .request({
       method: 'DELETE',
-      url: `/chronograf/v1/sources/${sourceId}/roles/${name}`,
+      url: `${apiUrl}/sources/${sourceId}/roles/${name}`,
     })
     .then(() => {
       wrapInfluxDBRoles(sourceId)
     })
 }
 
+/**
+ * Delete all roles from the given source.
+ * @param sourceId - Source ID.
+ */
+export const deleteInfluxDBRoles = (sourceId: string) => {
+  return cy
+    .request('GET', `${apiUrl}/sources/${sourceId}/roles`)
+    .then(({body: responseBody}) => {
+      responseBody.roles.forEach((role: any) => {
+        cy.request('DELETE', role.links.self)
+      })
+    })
+}
+
+/**
+ * Create a new InfluxDB.
+ * @param name - Name of the database.
+ * @param sourceId - Source ID.
+ */
 export const createInfluxDB = (name: string, sourceId: string) => {
   return cy.request({
     method: 'POST',
-    url: `/chronograf/v1/sources/${sourceId}/dbs`,
+    url: `${apiUrl}/sources/${sourceId}/dbs`,
     body: {
       name: name,
     },
   })
 }
 
+/**
+ * Delete a specific InfluxDB from the given source.
+ * @param name - Name of the database.
+ * @param sourceId  - Source ID.
+ */
 export const deleteInfluxDB = (name: string, sourceId: string) => {
-  return cy.request('DELETE', `/chronograf/v1/sources/${sourceId}/dbs/${name}`)
+  return cy.request('DELETE', `${apiUrl}/sources/${sourceId}/dbs/${name}`)
+}
+
+/**
+ * Delete all InfluxDBs from the given source.
+ * @param sourceId
+ */
+export const deleteInfluxDBs = (sourceId: string) => {
+  return cy
+    .request('GET', `${apiUrl}/sources/${sourceId}/dbs`)
+    .then(({body: responseBody}) => {
+      responseBody.databases.forEach((db: any) => {
+        cy.request('DELETE', db.links.self)
+      })
+    })
 }
 
 function wrapConnections() {
   return cy
     .request({
       method: 'GET',
-      url: '/chronograf/v1/sources',
+      url: `${apiUrl}/sources`,
     })
     .then(({body: response}) => {
       const connections = response.sources
@@ -307,16 +508,14 @@ function wrapConnections() {
 }
 
 function wrapDashboards() {
-  return cy
-    .request('GET', '/chronograf/v1/dashboards')
-    .then(({body: response}) => {
-      cy.wrap(response.dashboards).as('dashboards')
-    })
+  return cy.request('GET', `${apiUrl}/dashboards`).then(({body: response}) => {
+    cy.wrap(response.dashboards).as('dashboards')
+  })
 }
 
 function wrapOrgs() {
   return cy
-    .request('GET', '/chronograf/v1/organizations')
+    .request('GET', `${apiUrl}/organizations`)
     .then(({body: response}) => {
       cy.wrap(response.organizations).as('orgs')
     })
@@ -324,7 +523,7 @@ function wrapOrgs() {
 
 function wrapInfluxDBUsers(sourceId: string) {
   return cy
-    .request('GET', `/chronograf/v1/sources/${sourceId}/users`)
+    .request('GET', `${apiUrl}/sources/${sourceId}/users`)
     .then(({body: response}) => {
       cy.wrap(response.users).as('influxDBUsers')
     })
@@ -332,15 +531,44 @@ function wrapInfluxDBUsers(sourceId: string) {
 
 function wrapInfluxDBRoles(sourceId: string) {
   return cy
-    .request('GET', `/chronograf/v1/sources/${sourceId}/roles`)
+    .request('GET', `${apiUrl}/sources/${sourceId}/roles`)
     .then(({body: response}) => {
       cy.wrap(response.roles).as('influxDBRoles')
     })
 }
 
+function wrapChronografUsers() {
+  return cy.request('GET', `${apiUrl}/users`).then(({body: response}) => {
+    cy.wrap(response.users).as('chronografUsers')
+  })
+}
+
+/**
+ * Set application to a default state.
+ */
+export function toInitialState() {
+  cy.OAuthLogin('test')
+  cy.visit('/')
+  cy.request({
+    method: 'GET',
+    url: `${apiUrl}/sources`,
+  }).then(({body: responseBody}) => {
+    responseBody.sources.forEach((source: any) => {
+      cy.deleteInfluxDBs(source.id)
+      cy.deleteInfluxDBRoles(source.id)
+      cy.deleteInfluxDBUsers(source.id)
+    })
+  })
+
+  cy.deleteDashboards()
+  cy.deleteChronografUsers()
+  cy.deleteOrgs()
+  cy.removeInfluxDBConnections()
+}
+
 Cypress.Commands.add('getByTestID', getByTestID)
-Cypress.Commands.add('createConnection', createConnection)
-Cypress.Commands.add('removeConnections', removeConnections)
+Cypress.Commands.add('createInfluxDBConnection', createInfluxDBConnection)
+Cypress.Commands.add('removeInfluxDBConnections', removeInfluxDBConnections)
 Cypress.Commands.add('createDashboard', createDashboard)
 Cypress.Commands.add('deleteDashboards', deleteDashboards)
 Cypress.Commands.add('createDashboardWithCell', createDashboardWithCell)
@@ -349,11 +577,18 @@ Cypress.Commands.add('OAuthLogout', OAuthLogout)
 Cypress.Commands.add('OAuthLoginAsDiffUser', OAuthLoginAsDiffUser)
 Cypress.Commands.add('createChronografUser', createChronografUser)
 Cypress.Commands.add('deleteChronografUser', deleteChronografUser)
+Cypress.Commands.add('deleteChronografUsers', deleteChronografUsers)
 Cypress.Commands.add('createOrg', createOrg)
 Cypress.Commands.add('deleteOrg', deleteOrg)
+Cypress.Commands.add('deleteOrgs', deleteOrgs)
 Cypress.Commands.add('createInfluxDBUser', createInfluxDBUser)
 Cypress.Commands.add('deleteInfluxDBUser', deleteInfluxDBUser)
+Cypress.Commands.add('deleteInfluxDBUsers', deleteInfluxDBUsers)
 Cypress.Commands.add('createInfluxDBRole', createInfluxDBRole)
 Cypress.Commands.add('deleteInfluxDBRole', deleteInfluxDBRole)
+Cypress.Commands.add('deleteInfluxDBRoles', deleteInfluxDBRoles)
 Cypress.Commands.add('createInfluxDB', createInfluxDB)
 Cypress.Commands.add('deleteInfluxDB', deleteInfluxDB)
+Cypress.Commands.add('deleteInfluxDBs', deleteInfluxDBs)
+Cypress.Commands.add('toInitialState', toInitialState)
+Cypress.Commands.add('writePoints', writePoints)

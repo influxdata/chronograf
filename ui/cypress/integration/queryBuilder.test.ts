@@ -1,24 +1,45 @@
 describe('query builder', () => {
+  let influxDB: any
+
   beforeEach(() => {
-    cy.OAuthLogin('test')
-    cy.deleteDashboards()
-    cy.removeConnections()
-    cy.createConnection()
+    cy.toInitialState()
+    cy.createInfluxDBConnection()
     cy.createDashboard()
-    cy.get('@connections').then(connections => {
-      cy.get('@dashboards').then(dashboards => {
-        cy.visit(`/sources/${connections[0].id}/dashboards/${dashboards[0].id}`)
+    cy.get('@connections').then((sources: any) => {
+      cy.fixture('influxDB.json').then((influxDBData: any) => {
+        influxDB = influxDBData
+
+        cy.createInfluxDB(influxDB.db.name, sources[0].id)
+        cy.writePoints(
+          sources[0].id,
+          influxDB.db.name,
+          influxDB.db.measurements[0].name,
+          influxDB.db.measurements[0].tagValues[0],
+          influxDB.db.measurements[0].fieldValues[0]
+        )
+
+        cy.writePoints(
+          sources[0].id,
+          influxDB.db.name,
+          influxDB.db.measurements[1].name,
+          influxDB.db.measurements[1].tagValues[1],
+          influxDB.db.measurements[1].fieldValues[0]
+        )
+      })
+
+      cy.get('@dashboards').then((dashboards: any) => {
+        cy.visit(`/sources/${sources[0].id}/dashboards/${dashboards[0].id}`)
       })
     })
 
     cy.get('#Line').click()
     cy.get('.dash-graph').contains('Add Data').click()
     cy.get('.source-selector').within(() => {
-      cy.get('@connections').then(connections => {
+      cy.get('@connections').then((sources: any) => {
         cy.get('.dropdown--selected').should('have.text', 'Dynamic Source')
         cy.get('.dropdown--button').click()
-        cy.get('.dropdown--menu').contains(connections[0].name).click()
-        cy.get('.dropdown--selected').should('have.text', connections[0].name)
+        cy.get('.dropdown--menu').contains(sources[0].name).click()
+        cy.get('.dropdown--selected').should('have.text', sources[0].name)
       })
 
       cy.get('button').contains('Flux').click().should('have.class', 'active')
@@ -31,25 +52,30 @@ describe('query builder', () => {
     let queryTemplate: string
 
     cy.getByTestID('bucket-selector').within(() => {
-      cy.get('.flux-query-builder--list-item').contains('internal').click()
+      cy.get('.flux-query-builder--list-item')
+        .contains(influxDB.db.name)
+        .click()
     })
 
     cy.getByTestID('builder-card')
       .eq(0)
       .within(() => {
-        cy.get('#flxts0_database').should('exist').click({force: true})
+        cy.get(`#flxts0_${influxDB.db.measurements[0].name}`)
+          .should('exist')
+          .click({force: true})
       })
 
     cy.getByTestID('builder-card')
       .eq(1)
       .within(() => {
-        cy.get('#flxts1_numSeries').should('exist').click({force: true})
+        cy.get('#flxts1_fieldKey').should('exist').click({force: true})
       })
 
     const checkQuery = (queryTemplate: string): void => {
       cy.get('.flux-query-builder--actions')
         .contains('Script Editor')
         .click({force: true})
+
       cy.get('.flux-script-wizard--bg-hint')
         .should('not.exist')
         .then(() => {
@@ -66,12 +92,12 @@ describe('query builder', () => {
       .click()
       .then(() => {
         queryTemplate =
-          'from(bucket: "_internal/monitor")' +
-          '  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)' +
-          '  |> filter(fn: (r) => r["_measurement"] == "database")' +
-          `  |> filter(fn: (r) => r["_field"] == "numSeries")` +
-          '  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)' +
-          '  |> yield(name: "mean")'
+          `from(bucket: "${influxDB.db.name}/autogen")` +
+          `  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)` +
+          `  |> filter(fn: (r) => r["_measurement"] == "${influxDB.db.measurements[0].name}")` +
+          `  |> filter(fn: (r) => r["_field"] == "fieldKey")` +
+          `  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)` +
+          `  |> yield(name: "mean")`
 
         checkQuery(queryTemplate)
       })
@@ -112,13 +138,13 @@ describe('query builder', () => {
       .click()
       .then(() => {
         queryTemplate =
-          'from(bucket: "_internal/monitor")' +
-          '  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)' +
-          '  |> filter(fn: (r) => r["_measurement"] == "database")' +
-          `  |> filter(fn: (r) => r["_field"] == "numSeries")` +
-          '  |> group(columns: ["_time"])' +
-          '  |> aggregateWindow(every: 13s, fn: max, createEmpty: true)' +
-          '  |> yield(name: "max")'
+          `from(bucket: "${influxDB.db.name}/autogen")` +
+          `  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)` +
+          `  |> filter(fn: (r) => r["_measurement"] == "${influxDB.db.measurements[0].name}")` +
+          `  |> filter(fn: (r) => r["_field"] == "fieldKey")` +
+          `  |> group(columns: ["_time"])` +
+          `  |> aggregateWindow(every: 13s, fn: max, createEmpty: true)` +
+          `  |> yield(name: "max")`
 
         checkQuery(queryTemplate)
       })
@@ -132,28 +158,28 @@ describe('query builder', () => {
       cy.getByTestID('builder-card--menu').clear()
       cy.get('.flux-query-builder--list-item')
         .should('have.length.at.least', 1)
-        .and('contain.text', 'internal')
+        .and('contain.text', influxDB.db.name)
     })
 
     cy.getByTestID('builder-card').within(() => {
       cy.get('.flux-tag-selector--count').should('not.exist')
       cy.get('.flux-query-builder--list-item')
-        .contains('database')
+        .contains(influxDB.db.measurements[0].name)
         .click({force: true})
 
       cy.get('.flux-tag-selector--count').should('have.text', 1)
       cy.get('.flux-query-builder--list-item')
-        .contains('cluster')
+        .contains(influxDB.db.measurements[1].name)
         .click({force: true})
 
       cy.get('.flux-tag-selector--count').should('have.text', 2)
       cy.get('.flux-query-builder--list-item')
-        .contains('database')
+        .contains(influxDB.db.measurements[0].name)
         .click({force: true})
 
       cy.get('.flux-tag-selector--count').should('have.text', 1)
       cy.get('.flux-query-builder--list-item')
-        .contains('cluster')
+        .contains(influxDB.db.measurements[1].name)
         .click({force: true})
 
       cy.get('.flux-tag-selector--count').should('not.exist')
