@@ -548,6 +548,7 @@ function wrapChronografUsers() {
  */
 export function flush() {
   cy.OAuthLogin('test')
+  cy.visit('/')
   cy.request({
     method: 'GET',
     url: `${apiUrl}/sources`,
