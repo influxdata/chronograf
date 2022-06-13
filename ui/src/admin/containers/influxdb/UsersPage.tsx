@@ -24,8 +24,8 @@ import useDebounce from 'src/utils/useDebounce'
 import useChangeEffect from 'src/utils/useChangeEffect'
 import MultiSelectDropdown from 'src/reusable_ui/components/dropdowns/MultiSelectDropdown'
 import {ComponentSize, SlideToggle} from 'src/reusable_ui'
-import {computeEffectiveUserDBPermissions} from './util/computeEffectiveDBPermissions'
-import allOrParticularSelection from './util/allOrParticularSelection'
+import {computeEffectiveUserDBPermissions} from '../../util/computeEffectiveDBPermissions'
+import allOrParticularSelection from '../../util/allOrParticularSelection'
 import CreateUserDialog, {
   validatePassword,
   validateUserName,

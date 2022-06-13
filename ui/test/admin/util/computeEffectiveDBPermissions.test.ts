@@ -3,7 +3,7 @@ import {
   computeEffectiveUserDBPermissions,
   computeEntitiesDBPermissions,
   mergeDBPermRecords,
-} from 'src/admin/containers/influxdb/util/computeEffectiveDBPermissions'
+} from 'src/admin/util/computeEffectiveDBPermissions'
 import {User, UserRole} from 'src/types/influxAdmin'
 const emptyUserProperties: Pick<User, 'roles' | 'links'> = {
   roles: [],
@@ -14,7 +14,7 @@ const emptyRoleProperties: Pick<UserRole, 'users' | 'links'> = {
   links: {self: ''},
 }
 
-describe('admin/containers/influxdb/util/computeEffectiveDBPermissions', () => {
+describe('admin/util/computeEffectiveDBPermissions', () => {
   describe('computeDBPermRecords', () => {
     const subject = computeDBPermRecords
     it('creates value for no databases', () => {

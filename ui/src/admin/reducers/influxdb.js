@@ -2,6 +2,10 @@ import reject from 'lodash/reject'
 import {NEW_DEFAULT_DATABASE, NEW_EMPTY_RP} from 'src/admin/constants'
 import uuid from 'uuid'
 import {parseDuration, compareDurations} from 'src/utils/influxDuration'
+import {
+  changeNamedCollection,
+  computeNamedChanges,
+} from '../util/changeNamedCollection'
 
 const querySorters = {
   '+time'(queries) {
@@ -94,26 +98,59 @@ const adminInfluxDB = (state = initialState, action) => {
 
     case 'INFLUXDB_SYNC_USER': {
       const {staleUser, syncedUser} = action.payload
-      const newState = staleUser.links
-        ? {
-            users: state.users.map(u =>
-              u.links.self === staleUser.links.self ? {...syncedUser} : u
-            ),
+      const newUsers = staleUser.links
+        ? state.users.map(u =>
+            u.links.self === staleUser.links.self ? {...syncedUser} : u
+          )
+        : [{...syncedUser}, ...state.users]
+      const rolesChange = computeNamedChanges(
+        staleUser.roles || [],
+        syncedUser.roles || []
+      )
+      if (rolesChange) {
+        // update roles that add/remove synced user
+        const newRoles = state.roles.map(r => {
+          const change = rolesChange[r.name]
+          if (change !== undefined) {
+            return {
+              ...r,
+              users: changeNamedCollection(r.users, {...syncedUser}, change),
+            }
           }
-        : {users: [{...syncedUser}, ...state.users]}
-      return {...state, ...newState}
+          return r
+        })
+        return {...state, users: newUsers, roles: newRoles}
+      }
+      return {...state, users: newUsers}
     }
 
     case 'INFLUXDB_SYNC_ROLE': {
       const {staleRole, syncedRole} = action.payload
-      const newState = staleRole.links
-        ? {
-            roles: state.roles.map(r =>
-              r.links.self === staleRole.links.self ? {...syncedRole} : r
-            ),
+      const newRoles = staleRole.links
+        ? state.roles.map(r =>
+            r.links.self === staleRole.links.self ? {...syncedRole} : r
+          )
+        : [{...syncedRole}, ...state.roles]
+      const usersChange = computeNamedChanges(
+        staleRole.users || [],
+        syncedRole.users || []
+      )
+      if (usersChange) {
+        // update users that add/remove synced role
+        const newUsers = state.users.map(u => {
+          const change = usersChange[u.name]
+          if (change !== undefined) {
+            return {
+              ...u,
+              roles: changeNamedCollection(u.roles, {...syncedRole}, change),
+            }
           }
-        : {roles: [{...syncedRole}, ...state.roles]}
-      return {...state, ...newState}
+          return u
+        })
+        return {...state, roles: newRoles, users: newUsers}
+      }
+
+      return {...state, roles: newRoles}
     }
 
     case 'INFLUXDB_SYNC_DATABASE': {
