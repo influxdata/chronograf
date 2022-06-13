@@ -546,7 +546,7 @@ function wrapChronografUsers() {
 /**
  * Set application to a default state.
  */
-export function flush() {
+export function toInitialState() {
   cy.OAuthLogin('test')
   cy.visit('/')
   cy.request({
@@ -590,5 +590,5 @@ Cypress.Commands.add('deleteInfluxDBRoles', deleteInfluxDBRoles)
 Cypress.Commands.add('createInfluxDB', createInfluxDB)
 Cypress.Commands.add('deleteInfluxDB', deleteInfluxDB)
 Cypress.Commands.add('deleteInfluxDBs', deleteInfluxDBs)
-Cypress.Commands.add('flush', flush)
+Cypress.Commands.add('toInitialState', toInitialState)
 Cypress.Commands.add('writePoints', writePoints)

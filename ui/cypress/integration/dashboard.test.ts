@@ -1,6 +1,6 @@
 describe('Use Dashboards', () => {
   beforeEach(() => {
-    cy.flush()
+    cy.toInitialState()
     cy.createInfluxDBConnection()
     cy.visit('/login')
     cy.get('@connections').then(connections => {

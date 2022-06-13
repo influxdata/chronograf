@@ -25,7 +25,7 @@ import {
   createInfluxDB,
   deleteInfluxDB,
   deleteInfluxDBs,
-  flush,
+  toInitialState,
   writePoints
 } from './support/commands'
 
@@ -56,7 +56,7 @@ declare global {
       createInfluxDB: typeof createInfluxDB
       deleteInfluxDB: typeof deleteInfluxDB
       deleteInfluxDBs: typeof deleteInfluxDBs
-      flush: typeof flush
+      toInitialState: typeof toInitialState
       writePoints: typeof writePoints
     }
   }

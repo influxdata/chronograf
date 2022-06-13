@@ -2,7 +2,7 @@ describe('query builder', () => {
   let influxDB: any
 
   beforeEach(() => {
-    cy.flush()
+    cy.toInitialState()
     cy.createInfluxDBConnection()
     cy.createDashboard()
     cy.get('@connections').then((sources: any) => {

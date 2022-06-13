@@ -3,7 +3,7 @@ describe('Use Admin tab', () => {
   let sourceId: string
 
   beforeEach(() => {
-    cy.flush()
+    cy.toInitialState()
     cy.createInfluxDBConnection()
     cy.get('@connections').then(sources => {
       sourceId = sources[0].id

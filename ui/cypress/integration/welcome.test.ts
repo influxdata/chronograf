@@ -1,6 +1,6 @@
 describe('Welcome Page', () => {
   beforeEach(() => {
-    cy.flush()
+    cy.toInitialState()
     cy.OAuthLogout()
   })
 
