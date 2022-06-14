@@ -81,7 +81,10 @@ class UsersTableRowNew extends Component {
     const preventCreate = !name || !provider
 
     return (
-      <tr className="chronograf-admin-table--new-user">
+      <tr
+        className="chronograf-admin-table--new-user"
+        data-test="new-user--table-row"
+      >
         <td>
           <input
             className="form-control input-xs"
@@ -91,6 +94,7 @@ class UsersTableRowNew extends Component {
             value={name}
             onChange={this.handleInputChange('name')}
             onKeyDown={this.handleKeyDown}
+            data-test="username--input"
           />
         </td>
         <td style={{width: colRole}}>
@@ -111,6 +115,7 @@ class UsersTableRowNew extends Component {
             value={provider}
             onChange={this.handleInputChange('provider')}
             onKeyDown={this.handleKeyDown}
+            data-test="oauth-provider--input"
           />
         </td>
         <td style={{width: colScheme}}>
@@ -120,16 +125,22 @@ class UsersTableRowNew extends Component {
             disabled={true}
             placeholder="OAuth Scheme..."
             value={scheme}
+            data-test="oauth-schema--input"
           />
         </td>
         <td className="text-right" style={{width: colActions}}>
-          <button className="btn btn-xs btn-square btn-info" onClick={onBlur}>
+          <button
+            className="btn btn-xs btn-square btn-info"
+            onClick={onBlur}
+            data-test="cancel-new-user--button"
+          >
             <span className="icon remove" />
           </button>
           <button
             className="btn btn-xs btn-square btn-success"
             disabled={preventCreate}
             onClick={this.handleConfirmCreateUser}
+            data-test="confirm-new-user--button"
           >
             <span className="icon checkmark" />
           </button>
