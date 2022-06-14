@@ -1,0 +1,8 @@
+{
+    "user": {
+        "name": "Smiley",
+        "role": ["reader", "viewer"],
+        "oauthProvider": "oauth-mock",
+        "oauth-scheme": "oauth"
+    }
+}
