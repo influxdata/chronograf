@@ -1,5 +1,3 @@
-import { createGzip } from "zlib"
-
 describe('Use Admin tab', () => {
   let url: string
   let sourceId: string
@@ -13,7 +11,7 @@ describe('Use Admin tab', () => {
     })
   })
 
-  describe.only('Chronograf', () => {
+  describe('Chronograf', () => {
     let chronograf: any
 
     before(() => {
@@ -66,7 +64,6 @@ describe('Use Admin tab', () => {
         // })
       })
     })
-
   })
 
   describe('InfluxDB', () => {
