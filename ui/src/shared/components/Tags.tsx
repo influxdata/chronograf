@@ -60,7 +60,11 @@ class Tag extends PureComponent<TagProps> {
   public render() {
     const {item, confirmText, testId} = this.props
     return (
-      <span key={uuid.v4()} className="input-tag--item" data-test={`${testId}-tag--item`}>
+      <span
+        key={uuid.v4()}
+        className="input-tag--item"
+        data-test={`${testId}-tag--item`}
+      >
         <span>{item.text || item.name || item}</span>
         <ConfirmButton
           icon="remove"
