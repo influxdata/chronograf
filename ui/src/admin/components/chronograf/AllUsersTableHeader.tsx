@@ -56,6 +56,7 @@ class AllUsersTableHeader extends Component<Props> {
             className="btn btn-primary btn-sm"
             onClick={onClickCreateUser}
             disabled={isCreatingUser || !onClickCreateUser}
+            data-test="add-user--button"
           >
             <span className="icon plus" />
             Add User

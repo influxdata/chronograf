@@ -33,7 +33,10 @@ class UsersTableRow extends PureComponent<Props> {
     const {colRole, colProvider, colScheme} = USERS_TABLE
 
     return (
-      <tr className={'chronograf-admin-table--user'}>
+      <tr
+        className={'chronograf-admin-table--user'}
+        data-test={`${user.name}--table-row`}
+      >
         <td>
           {this.isMe ? (
             <strong className="chronograf-user--me">
@@ -66,6 +69,7 @@ class UsersTableRow extends PureComponent<Props> {
             type="btn-danger"
             text="Remove"
             customClass="table--show-on-row-hover"
+            testId="remove-user--button"
           />
         </td>
       </tr>
