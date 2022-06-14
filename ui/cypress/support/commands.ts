@@ -69,7 +69,6 @@ export const writePoints = (
   tagValue: string,
   fieldValue: number
 ) => {
-  console.log({sourceID: sourceId, db: db})
   cy.request({
     method: 'POST',
     url: `${apiUrl}/sources/${sourceId}/write?db=${db}`,
@@ -398,7 +397,6 @@ export const deleteInfluxDBUsers = (sourceId: string) => {
   return cy
     .request('GET', `${apiUrl}/sources/${sourceId}/users`)
     .then(({body: responseBody}) => {
-      console.log(responseBody.users)
       responseBody.users.forEach((user: any) => {
         if (user.name != Cypress.env('username')) {
           cy.request('DELETE', user.links.self)

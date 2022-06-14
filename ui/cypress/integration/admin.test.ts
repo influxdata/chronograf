@@ -1,3 +1,5 @@
+import { createGzip } from "zlib"
+
 describe('Use Admin tab', () => {
   let url: string
   let sourceId: string
@@ -7,12 +9,64 @@ describe('Use Admin tab', () => {
     cy.createInfluxDBConnection()
     cy.get('@connections').then(sources => {
       sourceId = sources[0].id
-      cy.request('GET', `/chronograf/v1/sources/${sourceId}/users`).then(
-        ({body: responseBody}) => {
-          console.log(responseBody.users)
-        }
-      )
+      url = `/sources/${sourceId}`
     })
+  })
+
+  describe.only('Chronograf', () => {
+    let chronograf: any
+
+    before(() => {
+      cy.fixture('chronograf').then(chronografData => {
+        chronograf = chronografData
+      })
+    })
+
+    beforeEach(() => {
+      url += '/admin-chronograf'
+    })
+
+    describe('Current Org', () => {
+      beforeEach(() => {
+        cy.visit(url + '/current-organization')
+      })
+
+      it('create, edit, and delete a Chronograf user', () => {
+        cy.getByTestID('add-user--button').click()
+        cy.getByTestID('cancel-new-user--button').click()
+        cy.getByTestID('add-user--button').click()
+        cy.getByTestID('new-user--table-row').within(() => {
+          cy.getByTestID('confirm-new-user--button').should('be.disabled')
+          cy.getByTestID('username--input')
+            .type(chronograf.user.name)
+            .should('have.value', chronograf.user.name)
+          cy.getByTestID('confirm-new-user--button').should('be.disabled')
+          cy.getByTestID('dropdown-toggle').click()
+          cy.getByTestID(`${chronograf.user.role[0]}-dropdown-item`)
+            .click()
+          cy.get('.dropdown-selected').should(
+            'contain.text',
+            chronograf.user.role[0]
+          )
+          cy.getByTestID('oauth-provider--input')
+            .type(chronograf.user.oauthProvider)
+            .should('have.value', chronograf.user.oauthProvider)
+          cy.get('.dropdown-selected').should(
+            'contain.text',
+            chronograf.user.role[0]
+          )
+          cy.getByTestID('confirm-new-user--button')
+            .should('be.enabled')
+            .click()
+        })
+
+        // cy.getByTestID(`${chronograf.user.name}--table-row`).should('exist').within(() => {
+        //   cy.getByTestID('dropdown-toggle').should('be.visible').click({force: true})
+        //   cy.get('.open').should('exist')
+        // })
+      })
+    })
+
   })
 
   describe('InfluxDB', () => {
@@ -26,7 +80,7 @@ describe('Use Admin tab', () => {
 
     beforeEach(() => {
       cy.deleteInfluxDB(influxDB.db.name, sourceId)
-      url = `/sources/${sourceId}/admin-influxdb`
+      url = '/admin-influxdb'
     })
 
     describe('Databases', () => {
