@@ -65,7 +65,8 @@ func (r *responseType) Error() string {
 }
 
 func (c *Client) query(u *url.URL, q chronograf.Query) (chronograf.Response, error) {
-	u.Path = "query"
+	u = util.AppendPath(u, "/query")
+
 	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
 		return nil, err
@@ -183,7 +184,7 @@ func (c *Client) validateAuthFlux(ctx context.Context, src *chronograf.Source) e
 	if err != nil {
 		return err
 	}
-	u.Path = "api/v2/query"
+	u = util.AppendPath(u, "/api/v2/query")
 	command := "buckets()"
 	req, err := http.NewRequest("POST", u.String(), strings.NewReader(command))
 	if err != nil {
@@ -297,7 +298,7 @@ type pingResult struct {
 }
 
 func (c *Client) ping(u *url.URL) (string, string, error) {
-	u.Path = "ping"
+	u = util.AppendPath(u, "/ping")
 
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
@@ -392,7 +393,7 @@ func (c *Client) writePoint(ctx context.Context, point *chronograf.Point) error 
 }
 
 func (c *Client) write(ctx context.Context, u *url.URL, db, rp, lp string) error {
-	u.Path = "write"
+	u = util.AppendPath(u, "/write")
 	req, err := http.NewRequest("POST", u.String(), strings.NewReader(lp))
 	if err != nil {
 		return err
