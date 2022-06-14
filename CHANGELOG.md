@@ -16,6 +16,7 @@
 1. [#5913](https://github.com/influxdata/chronograf/pull/5913): Improve InfluxDB Enterprise detection. 
 1. [#5917](https://github.com/influxdata/chronograf/pull/5917): Improve InfluxDB Enterprise user creation process. 
 1. [#5917](https://github.com/influxdata/chronograf/pull/5917): Avoid stale reads in communication with InfluxDB Enterprise meta nodes. 
+1. [#5938](https://github.com/influxdata/chronograf/pull/5938): Properly detect unsupported values in Alert Rule builder.
 
 ### Other
 
