@@ -63,7 +63,7 @@ class SlideToggle extends Component<Props> {
   private get dataTest(): string {
     const {active, entity} = this.props
 
-    return active ? `hide-${entity}--toggle` : `show-${entity}--toggle`
+    return active ? `turn-off-${entity}--toggle` : `turn-on-${entity}--toggle`
   }
 }
 
