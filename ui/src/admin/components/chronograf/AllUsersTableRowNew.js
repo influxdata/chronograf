@@ -152,19 +152,25 @@ class AllUsersTableRowNew extends Component {
             disabled={true}
             placeholder="OAuth Scheme..."
             value={scheme}
+            data-test="oauth-scheme--input"
           />
         </td>
         <td style={{width: colSuperAdmin}} className="text-center">
           &mdash;
         </td>
         <td className="text-right" style={{width: colActions}}>
-          <button className="btn btn-xs btn-square btn-info" onClick={onBlur}>
+          <button
+            className="btn btn-xs btn-square btn-info"
+            onClick={onBlur}
+            data-test="cancel-new-user--button"
+          >
             <span className="icon remove" />
           </button>
           <button
             className="btn btn-xs btn-square btn-success"
             disabled={preventCreate}
             onClick={this.handleConfirmCreateUser}
+            data-test="confirm-new-user--button"
           >
             <span className="icon checkmark" />
           </button>

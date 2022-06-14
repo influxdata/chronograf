@@ -125,7 +125,7 @@ class UsersTableRowNew extends Component {
             disabled={true}
             placeholder="OAuth Scheme..."
             value={scheme}
-            data-test="oauth-schema--input"
+            data-test="oauth-scheme--input"
           />
         </td>
         <td className="text-right" style={{width: colActions}}>
