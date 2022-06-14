@@ -54,8 +54,7 @@ func (c *Client) pingTimeout(ctx context.Context) error {
 
 // FluxEnabled returns true if the server has flux querying enabled.
 func (c *Client) FluxEnabled() (bool, error) {
-	url := c.URL
-	url.Path = "/api/v2/query"
+	url := util.AppendPath(c.URL, "/api/v2/query")
 
 	req, err := http.NewRequest("POST", url.String(), nil)
 	if err != nil {
@@ -86,7 +85,7 @@ func (c *Client) FluxEnabled() (bool, error) {
 }
 
 func (c *Client) ping(u *url.URL) error {
-	u.Path = "ping"
+	u = util.AppendPath(u, "/ping")
 
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
