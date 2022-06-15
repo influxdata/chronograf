@@ -62,7 +62,10 @@ describe('Use Admin tab', () => {
           .realHover()
           .then(() => {
             cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
-              cy.getByTestID('dropdown-toggle').click()
+              cy.getByTestID('dropdown-toggle').realHover().then(() => {
+                cy.getByTestID('dropdown-toggle').click()
+              })
+              
               cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`)
                 .realHover()
                 .then(() => {
