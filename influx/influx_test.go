@@ -617,3 +617,58 @@ func Test_Influx_ValidateAuth_V2(t *testing.T) {
 		}
 	}
 }
+
+func Test_Influx_Version(t *testing.T) {
+	t.Parallel()
+	calledPath := ""
+	serverVersion := ""
+	ts := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Add("X-Influxdb-Version", serverVersion)
+		rw.WriteHeader(http.StatusNoContent)
+		calledPath = r.URL.Path
+
+	}))
+	defer ts.Close()
+	for _, urlContext := range []string{"", "/ctx"} {
+		calledPath = ""
+		client, err := NewClient(ts.URL+urlContext, log.New(log.DebugLevel))
+		if err != nil {
+			t.Fatal("Unexpected error initializing client: err:", err)
+		}
+		source := &chronograf.Source{
+			URL:      ts.URL + urlContext,
+			Type:     chronograf.InfluxDBv2,
+			Username: "my-org",
+			Password: "my-token",
+		}
+
+		client.Connect(context.Background(), source)
+
+		versions := []struct {
+			server   string
+			expected string
+		}{
+			{
+				server:   "1.8.3",
+				expected: "1.8.3",
+			},
+			{
+				server:   "v2.2.0",
+				expected: "2.2.0",
+			},
+		}
+		for _, testPair := range versions {
+			serverVersion = testPair.server
+			version, err := client.Version(context.Background())
+			if err != nil {
+				t.Fatalf("No error expected, but %v", err)
+			}
+			if version != testPair.expected {
+				t.Errorf("Version received: %v, want: %v ", version, testPair.expected)
+			}
+			if calledPath != urlContext+"/ping" {
+				t.Errorf("Path received: %v, want: %v ", calledPath, urlContext+"/ping")
+			}
+		}
+	}
+}
