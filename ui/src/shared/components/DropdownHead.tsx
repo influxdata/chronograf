@@ -28,7 +28,12 @@ const DropdownHead: FunctionComponent<Props> = ({
     style={toggleStyle}
   >
     {iconName && <span className={classnames('icon', {[iconName]: true})} />}
-    <span className="dropdown-selected" data-test={`dropdown-selected--${selected}`}>{selected}</span>
+    <span
+      className="dropdown-selected"
+      data-test={`dropdown-selected--${selected}`}
+    >
+      {selected}
+    </span>
     <span className="caret" />
   </div>
 )
