@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -661,7 +662,7 @@ func Test_Influx_Version(t *testing.T) {
 			serverVersion = testPair.server
 			version, err := client.Version(context.Background())
 			if err != nil {
-				t.Fatalf("No error expected, but %v", err)
+				t.Fatalf("No error expected, but received: %v", err)
 			}
 			if version != testPair.expected {
 				t.Errorf("Version received: %v, want: %v ", version, testPair.expected)
@@ -669,6 +670,55 @@ func Test_Influx_Version(t *testing.T) {
 			if calledPath != urlContext+"/ping" {
 				t.Errorf("Path received: %v, want: %v ", calledPath, urlContext+"/ping")
 			}
+		}
+	}
+}
+
+func Test_Write(t *testing.T) {
+	t.Parallel()
+	calledPath := ""
+	data := ""
+	ts := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		calledPath = r.URL.Path
+		content, _ := ioutil.ReadAll(r.Body)
+		data = string(content)
+		rw.WriteHeader(http.StatusNoContent)
+	}))
+	defer ts.Close()
+	for _, urlContext := range []string{"", "/ctx"} {
+		calledPath = ""
+		client, err := NewClient(ts.URL+urlContext, log.New(log.DebugLevel))
+		if err != nil {
+			t.Fatal("Unexpected error initializing client: err:", err)
+		}
+		source := &chronograf.Source{
+			URL:      ts.URL + urlContext,
+			Type:     chronograf.InfluxDBv2,
+			Username: "my-org",
+			Password: "my-token",
+		}
+
+		client.Connect(context.Background(), source)
+
+		err = client.Write(context.Background(), []chronograf.Point{
+			{
+				Database:        "mydb",
+				RetentionPolicy: "default",
+				Measurement:     "temperature",
+				Fields: map[string]interface{}{
+					"v": true,
+				},
+			},
+		})
+		if err != nil {
+			t.Fatalf("No error expected, but received: %v", err)
+		}
+		expectedLine := "temperature v=true"
+		if data != expectedLine {
+			t.Errorf("Data received: %v, want: %v ", data, expectedLine)
+		}
+		if calledPath != urlContext+"/write" {
+			t.Errorf("Path received: %v, want: %v ", calledPath, urlContext+"/write")
 		}
 	}
 }
