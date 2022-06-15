@@ -40,8 +40,7 @@ describe('Use Admin tab', () => {
             .should('have.value', chronograf.user.name)
           cy.getByTestID('confirm-new-user--button').should('be.disabled')
           cy.getByTestID('dropdown-toggle').click()
-          cy.getByTestID(`${chronograf.user.role[0]}-dropdown-item`)
-            .click()
+          cy.getByTestID(`${chronograf.user.role[0]}-dropdown-item`).click()
           cy.get('.dropdown-selected').should(
             'contain.text',
             chronograf.user.role[0]
@@ -58,10 +57,31 @@ describe('Use Admin tab', () => {
             .click()
         })
 
-        // cy.getByTestID(`${chronograf.user.name}--table-row`).should('exist').within(() => {
-        //   cy.getByTestID('dropdown-toggle').should('be.visible').click({force: true})
-        //   cy.get('.open').should('exist')
-        // })
+        cy.getByTestID(`${chronograf.user.name}--table-row`)
+          .should('exist')
+          .realHover()
+          .then(() => {
+            cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
+              cy.getByTestID('dropdown-toggle').click()
+              cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`)
+                .realHover()
+                .then(() => {
+                  cy.getByTestID(
+                    `${chronograf.user.role[1]}-dropdown-item`
+                  ).click()
+                })
+            })
+          })
+
+        cy.getByTestID(`${chronograf.user.name}--table-row`)
+          .should('exist')
+          .realHover()
+          .then(() => {
+            cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
+              cy.getByTestID('remove-user--button').should('be.visible').click()
+              cy.getByTestID('confirm-btn').click()
+            })
+          })
       })
     })
   })
@@ -77,7 +97,7 @@ describe('Use Admin tab', () => {
 
     beforeEach(() => {
       cy.deleteInfluxDB(influxDB.db.name, sourceId)
-      url = '/admin-influxdb'
+      url += '/admin-influxdb'
     })
 
     describe('Databases', () => {
