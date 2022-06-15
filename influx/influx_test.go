@@ -722,3 +722,42 @@ func Test_Write(t *testing.T) {
 		}
 	}
 }
+
+func Test_Query(t *testing.T) {
+	t.Parallel()
+	calledPath := ""
+	ts := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		calledPath = r.URL.Path
+		rw.WriteHeader(http.StatusOK)
+		rw.Write([]byte(`{"message":"hi"}`))
+	}))
+	defer ts.Close()
+
+	for _, urlContext := range []string{"", "/ctx"} {
+		calledPath = ""
+		client, err := NewClient(ts.URL+urlContext, log.New(log.DebugLevel))
+		if err != nil {
+			t.Fatal("Unexpected error initializing client: err:", err)
+		}
+		source := &chronograf.Source{
+			URL:      ts.URL + urlContext,
+			Type:     chronograf.InfluxDBv2,
+			Username: "my-org",
+			Password: "my-token",
+		}
+
+		client.Connect(context.Background(), source)
+
+		_, err = client.Query(context.Background(), chronograf.Query{
+			DB:      "mydb",
+			RP:      "default",
+			Command: "show databases",
+		})
+		if err != nil {
+			t.Fatalf("No error expected, but received: %v", err)
+		}
+		if calledPath != urlContext+"/query" {
+			t.Errorf("Path received: %v, want: %v ", calledPath, urlContext+"/query")
+		}
+	}
+}
