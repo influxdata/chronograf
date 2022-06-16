@@ -19,6 +19,8 @@ import {
   removeDatabaseDeleteCode,
   loadQueries,
   setQueriesSort,
+  loadDatabases,
+  changeSelectedDBs,
 } from 'src/admin/actions/influxdb'
 
 import {NEW_DEFAULT_DATABASE, NEW_EMPTY_RP} from 'src/admin/constants'
@@ -135,6 +137,17 @@ describe('Admin.InfluxDB.Reducers', () => {
   describe('Databases', () => {
     beforeEach(() => {
       state = {databases: [db1, db2]}
+    })
+
+    it('can load databases', () => {
+      const {databases, selectedDBs} = reducer(
+        undefined,
+        loadDatabases([{name: 'db1'}])
+      )
+      expect({databases, selectedDBs}).toEqual({
+        databases: [{name: 'db1'}],
+        selectedDBs: ['*'],
+      })
     })
 
     it('can add a database', () => {
@@ -486,6 +499,44 @@ describe('Admin.InfluxDB.Reducers', () => {
       expect(actual.queries[0].id).toEqual(3)
       expect(actual.queries[1].id).toEqual(2)
       expect(actual.queries[2].id).toEqual(1)
+    })
+  })
+  describe('filters', () => {
+    it('can change selected DBS', () => {
+      const testPairs = [
+        {
+          prev: undefined,
+          change: ['db1'],
+          next: ['db1'],
+        },
+        {
+          prev: [],
+          change: ['db1'],
+          next: ['db1'],
+        },
+        {
+          prev: ['db1'],
+          change: ['db1', '*'],
+          next: ['*'],
+        },
+        {
+          prev: ['*'],
+          change: ['db1', '*'],
+          next: ['db1'],
+        },
+        {
+          prev: ['db1'],
+          change: [],
+          next: [],
+        },
+      ]
+      testPairs.forEach(({prev, change, next}) => {
+        const {selectedDBs} = reducer(
+          {selectedDBs: prev},
+          changeSelectedDBs(change)
+        )
+        expect(selectedDBs).toEqual(next)
+      })
     })
   })
 })

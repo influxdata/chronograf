@@ -6,6 +6,7 @@ import {
   changeNamedCollection,
   computeNamedChanges,
 } from '../util/changeNamedCollection'
+import allOrParticularSelection from '../util/allOrParticularSelection'
 
 const querySorters = {
   '+time'(queries) {
@@ -37,7 +38,6 @@ const identity = x => x
 function sortQueries(queries, queriesSort) {
   return (querySorters[queriesSort] || identity)(queries)
 }
-
 const initialState = {
   users: [],
   roles: [],
@@ -46,6 +46,7 @@ const initialState = {
   queriesSort: '-time',
   queryIDToKill: null,
   databases: [],
+  selectedDBs: ['*'],
 }
 
 const adminInfluxDB = (state = initialState, action) => {
@@ -63,7 +64,9 @@ const adminInfluxDB = (state = initialState, action) => {
     }
 
     case 'INFLUXDB_LOAD_DATABASES': {
-      return {...state, ...action.payload}
+      const databases = action.payload.databases
+      const selectedDBs = initialState.selectedDBs
+      return {...state, databases, selectedDBs}
     }
 
     case 'INFLUXDB_ADD_DATABASE': {
@@ -358,6 +361,12 @@ const adminInfluxDB = (state = initialState, action) => {
 
     case 'INFLUXDB_SET_QUERY_TO_KILL': {
       return {...state, ...action.payload}
+    }
+    case 'INFLUXDB_CHANGE_SELECTED_DBS': {
+      const newDBs = action.payload.selectedDBs
+      const oldDBs = state.selectedDBs || ['*']
+      const selectedDBs = allOrParticularSelection(oldDBs, newDBs)
+      return {...state, selectedDBs}
     }
   }
 

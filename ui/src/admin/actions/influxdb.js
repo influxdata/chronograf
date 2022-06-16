@@ -473,3 +473,10 @@ export const updateUserPasswordAsync = (user, password) => async dispatch => {
     )
   }
 }
+
+export const changeSelectedDBs = (selectedDBs /* : string[] */) => ({
+  type: 'INFLUXDB_CHANGE_SELECTED_DBS',
+  payload: {
+    selectedDBs,
+  },
+})

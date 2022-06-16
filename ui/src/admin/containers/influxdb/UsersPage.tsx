@@ -46,10 +46,13 @@ const validateUser = (
   return true
 }
 
-const mapStateToProps = ({adminInfluxDB: {databases, users, roles}}) => ({
+const mapStateToProps = ({
+  adminInfluxDB: {databases, users, roles, selectedDBs},
+}) => ({
   databases,
   users,
   roles,
+  selectedDBs,
 })
 
 const mapDispatchToProps = {
@@ -65,6 +68,7 @@ interface ConnectedProps {
   databases: Database[]
   users: User[]
   roles: UserRole[]
+  selectedDBs: string[]
 }
 
 type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
@@ -76,6 +80,7 @@ const UsersPage = ({
   databases,
   users,
   roles,
+  selectedDBs,
   notify,
   createUser,
   filterUsers,
@@ -87,8 +92,7 @@ const UsersPage = ({
     ],
     [source]
   )
-  // filter databases
-  const [selectedDBs, setSelectedDBs] = useState<string[]>(['*'])
+  // database columns
   const visibleDBNames = useMemo<string[]>(() => {
     if (selectedDBs.includes('*')) {
       return databases.map(db => db.name)
@@ -161,11 +165,7 @@ const UsersPage = ({
             />
             <span className="icon search" />
           </div>
-          <MultiDBSelector
-            databases={databases}
-            selectedDBs={selectedDBs}
-            setSelectedDBs={setSelectedDBs}
-          />
+          <MultiDBSelector />
           {isEnterprise && (
             <div className="hide-roles-toggle">
               <SlideToggle

@@ -1,26 +1,27 @@
-import React, {useCallback} from 'react'
-import allOrParticularSelection from 'src/admin/util/allOrParticularSelection'
+import React from 'react'
+import {connect, ResolveThunks} from 'react-redux'
+import {changeSelectedDBs} from 'src/admin/actions/influxdb'
 import {MultiSelectDropdown} from 'src/reusable_ui'
 import {Database} from 'src/types/influxAdmin'
 
-interface Props {
+interface ConnectedProps {
   databases: Database[]
   selectedDBs: string[]
-  setSelectedDBs: (changeFn: (oldDBs: string[]) => string[]) => void
 }
+const mapStateToProps = ({adminInfluxDB: {databases, selectedDBs}}) => ({
+  databases,
+  selectedDBs,
+})
+const mapDispatchToProps = {
+  setSelectedDBs: changeSelectedDBs,
+}
+type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
+type Props = ConnectedProps & ReduxDispatchProps
 const MultiDBSelector = ({databases, selectedDBs, setSelectedDBs}: Props) => {
-  const changeSelectedDBs = useCallback(
-    (newDBs: string[]) =>
-      setSelectedDBs((oldDBs: string[]) => {
-        return allOrParticularSelection(oldDBs, newDBs)
-      }),
-    [setSelectedDBs]
-  )
-
   return (
     <div className="db-selector">
       <MultiSelectDropdown
-        onChange={changeSelectedDBs}
+        onChange={setSelectedDBs}
         selectedIDs={selectedDBs}
         emptyText="<no database>"
       >
@@ -49,4 +50,4 @@ const MultiDBSelector = ({databases, selectedDBs, setSelectedDBs}: Props) => {
   )
 }
 
-export default MultiDBSelector
+export default connect(mapStateToProps, mapDispatchToProps)(MultiDBSelector)
