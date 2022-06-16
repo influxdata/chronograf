@@ -153,6 +153,12 @@ pre.admin-table--query {
     padding: 0 30px;
     min-height: 60px;
   }
+  p.empty {
+    font-weight: 400;
+    font-size: 18px;
+    color: $g9-mountain;
+  }
+  
   .influxdb-admin--contents{
     height: calc(100%-60px);
   }
