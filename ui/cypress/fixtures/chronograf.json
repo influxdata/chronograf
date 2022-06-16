@@ -1,8 +1,21 @@
 {
     "user": {
         "name": "Smiley",
-        "role": ["reader", "viewer"],
+        "role": [
+            "reader",
+            "viewer"
+        ],
         "oauthProvider": "oauth-mock",
         "oauth-scheme": "oauth"
-    }
+    },
+    "organizations": [
+        {
+            "name": "SmallOrg",
+            "defaultRole": "reader"
+        },
+        {
+            "name": "BigOrg",
+            "defaultRole": "member"
+        }
+    ]
 }
