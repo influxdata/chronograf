@@ -47,6 +47,7 @@ const initialState = {
   queryIDToKill: null,
   databases: [],
   selectedDBs: ['*'],
+  showUsers: true,
 }
 
 const adminInfluxDB = (state = initialState, action) => {
@@ -367,6 +368,9 @@ const adminInfluxDB = (state = initialState, action) => {
       const oldDBs = state.selectedDBs || ['*']
       const selectedDBs = allOrParticularSelection(oldDBs, newDBs)
       return {...state, selectedDBs}
+    }
+    case 'INFLUXDB_CHANGE_SHOW_USERS': {
+      return {...state, showUsers: !state.showUsers}
     }
   }
 

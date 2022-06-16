@@ -480,3 +480,7 @@ export const changeSelectedDBs = (selectedDBs /* : string[] */) => ({
     selectedDBs,
   },
 })
+
+export const changeShowUsers = () => ({
+  type: 'INFLUXDB_CHANGE_SHOW_USERS',
+})
