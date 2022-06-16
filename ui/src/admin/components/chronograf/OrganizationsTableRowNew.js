@@ -73,6 +73,7 @@ class OrganizationsTableRowNew extends Component {
             placeholder="Name this Organization..."
             autoFocus={true}
             ref={r => (this.inputRef = r)}
+            data-test="new-org-name--input"
           />
         </div>
         <div className="fancytable--td orgs-table--default-role creating">

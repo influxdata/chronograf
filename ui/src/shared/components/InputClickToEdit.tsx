@@ -130,6 +130,7 @@ class InputClickToEdit extends PureComponent<Props, State> {
             onFocus={this.handleFocus}
             tabIndex={tabIndex}
             spellCheck={false}
+            data-test="rename-org--input"
           />
         ) : (
           <div
@@ -137,6 +138,7 @@ class InputClickToEdit extends PureComponent<Props, State> {
             onClick={this.handleInputClick}
             onFocus={this.handleInputClick}
             tabIndex={tabIndex}
+            data-test={`${value}-org--row`}
           >
             {value || placeholder}
             {appearAsNormalInput || (

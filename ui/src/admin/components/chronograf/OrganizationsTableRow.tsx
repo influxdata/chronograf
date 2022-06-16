@@ -48,16 +48,23 @@ class OrganizationsTableRow extends Component<Props, Record<string, never>> {
     }))
 
     return (
-      <div className="fancytable--row">
+      <div
+        className="fancytable--row"
+        data-test={`${organization.name}-org--row`}
+      >
         <div className="fancytable--td orgs-table--active">
           {organization.id === currentOrganization.id ? (
-            <button className="btn btn-sm btn-success">
+            <button
+              className="btn btn-sm btn-success"
+              data-test="current-org--button"
+            >
               <span className="icon checkmark" /> Current
             </button>
           ) : (
             <button
               className="btn btn-sm btn-default"
               onClick={this.handleChangeCurrentOrganization}
+              data-test="switch-current-org--button"
             >
               <span className="icon shuffle" /> Switch to
             </button>
@@ -83,6 +90,7 @@ class OrganizationsTableRow extends Component<Props, Record<string, never>> {
           square={true}
           icon="trash"
           disabled={organization.id === DEFAULT_ORG_ID}
+          testId="delete-org--button"
         />
       </div>
     )
