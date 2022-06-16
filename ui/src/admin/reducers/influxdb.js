@@ -48,6 +48,7 @@ const initialState = {
   databases: [],
   selectedDBs: ['*'],
   showUsers: true,
+  showRoles: true,
 }
 
 const adminInfluxDB = (state = initialState, action) => {
@@ -371,6 +372,9 @@ const adminInfluxDB = (state = initialState, action) => {
     }
     case 'INFLUXDB_CHANGE_SHOW_USERS': {
       return {...state, showUsers: !state.showUsers}
+    }
+    case 'INFLUXDB_CHANGE_SHOW_ROLES': {
+      return {...state, showRoles: !state.showRoles}
     }
   }
 

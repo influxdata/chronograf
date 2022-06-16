@@ -5,6 +5,7 @@ import {Source, NotificationAction} from 'src/types'
 import {UserRole, User, Database} from 'src/types/influxAdmin'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {
+  changeShowRoles,
   createUserAsync,
   filterUsers as filterUsersAction,
 } from 'src/admin/actions/influxdb'
@@ -47,17 +48,19 @@ const validateUser = (
 }
 
 const mapStateToProps = ({
-  adminInfluxDB: {databases, users, roles, selectedDBs},
+  adminInfluxDB: {databases, users, roles, selectedDBs, showRoles},
 }) => ({
   databases,
   users,
   roles,
   selectedDBs,
+  showRoles,
 })
 
 const mapDispatchToProps = {
   filterUsers: filterUsersAction,
   createUser: createUserAsync,
+  toggleShowRoles: changeShowRoles,
   notify: notifyAction,
 }
 
@@ -69,6 +72,7 @@ interface ConnectedProps {
   users: User[]
   roles: UserRole[]
   selectedDBs: string[]
+  showRoles: boolean
 }
 
 type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
@@ -81,9 +85,11 @@ const UsersPage = ({
   users,
   roles,
   selectedDBs,
+  showRoles,
   notify,
   createUser,
   filterUsers,
+  toggleShowRoles,
 }: Props) => {
   const [isEnterprise, usersPage] = useMemo(
     () => [
@@ -117,13 +123,6 @@ const UsersPage = ({
   useChangeEffect(() => {
     filterUsers(debouncedFilterText)
   }, [debouncedFilterText])
-
-  // hide role
-  const [showRoles, setShowRoles] = useState(true)
-  const changeHideRoles = useCallback(() => setShowRoles(!showRoles), [
-    showRoles,
-    setShowRoles,
-  ])
 
   const [createVisible, setCreateVisible] = useState(false)
   const createNew = useCallback(
@@ -170,7 +169,7 @@ const UsersPage = ({
             <div className="hide-roles-toggle">
               <SlideToggle
                 active={showRoles}
-                onChange={changeHideRoles}
+                onChange={toggleShowRoles}
                 size={ComponentSize.ExtraSmall}
               />
               Show Roles

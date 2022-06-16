@@ -484,3 +484,7 @@ export const changeSelectedDBs = (selectedDBs /* : string[] */) => ({
 export const changeShowUsers = () => ({
   type: 'INFLUXDB_CHANGE_SHOW_USERS',
 })
+
+export const changeShowRoles = () => ({
+  type: 'INFLUXDB_CHANGE_SHOW_ROLES',
+})

@@ -22,6 +22,7 @@ import {
   loadDatabases,
   changeSelectedDBs,
   changeShowUsers,
+  changeShowRoles,
 } from 'src/admin/actions/influxdb'
 
 import {NEW_DEFAULT_DATABASE, NEW_EMPTY_RP} from 'src/admin/constants'
@@ -544,6 +545,13 @@ describe('Admin.InfluxDB.Reducers', () => {
       vals.forEach(prev => {
         const {showUsers} = reducer({showUsers: prev}, changeShowUsers())
         expect(showUsers).toEqual(!prev)
+      })
+    })
+    it('can change showRoles flag', () => {
+      const vals = [undefined, true, false]
+      vals.forEach(prev => {
+        const {showRoles} = reducer({showRoles: prev}, changeShowRoles())
+        expect(showRoles).toEqual(!prev)
       })
     })
   })
