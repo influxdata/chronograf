@@ -21,14 +21,14 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import NoEntities from 'src/admin/components/influxdb/NoEntities'
 import RoleRow from 'src/admin/components/RoleRow'
 import {useCallback} from 'react'
-import allOrParticularSelection from '../../util/allOrParticularSelection'
 import {computeEntitiesDBPermissions} from '../../util/computeEffectiveDBPermissions'
 import useDebounce from 'src/utils/useDebounce'
 import useChangeEffect from 'src/utils/useChangeEffect'
-import {ComponentSize, MultiSelectDropdown, SlideToggle} from 'src/reusable_ui'
+import {ComponentSize, SlideToggle} from 'src/reusable_ui'
 import CreateRoleDialog, {
   validateRoleName,
 } from 'src/admin/components/influxdb/CreateRoleDialog'
+import MultiDBSelector from 'src/admin/components/influxdb/MultiDBSelector'
 
 const validateRole = (
   role: Pick<UserRole, 'name'>,
@@ -88,13 +88,6 @@ const RolesPage = ({
     }
     return selectedDBs
   }, [databases, selectedDBs])
-  const changeSelectedDBs = useCallback(
-    (newDBs: string[]) =>
-      setSelectedDBs((oldDBs: string[]) => {
-        return allOrParticularSelection(oldDBs, newDBs)
-      }),
-    [setSelectedDBs]
-  )
 
   // effective permissions
   const visibleRoles = useMemo(() => roles.filter(x => !x.hidden), [roles])
@@ -159,34 +152,11 @@ const RolesPage = ({
             />
             <span className="icon search" />
           </div>
-          <div className="db-selector">
-            <MultiSelectDropdown
-              onChange={changeSelectedDBs}
-              selectedIDs={selectedDBs}
-              emptyText="<no database>"
-            >
-              {databases.reduce(
-                (acc, db) => {
-                  acc.push(
-                    <MultiSelectDropdown.Item
-                      key={db.name}
-                      id={db.name}
-                      value={{id: db.name}}
-                    >
-                      {db.name}
-                    </MultiSelectDropdown.Item>
-                  )
-                  return acc
-                },
-                [
-                  <MultiSelectDropdown.Item id="*" key="*" value={{id: '*'}}>
-                    All Databases
-                  </MultiSelectDropdown.Item>,
-                  <MultiSelectDropdown.Divider id="" key="" />,
-                ]
-              )}
-            </MultiSelectDropdown>
-          </div>
+          <MultiDBSelector
+            databases={databases}
+            selectedDBs={selectedDBs}
+            setSelectedDBs={setSelectedDBs}
+          />
           <div className="hide-roles-toggle">
             <SlideToggle
               active={showUsers}
