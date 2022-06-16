@@ -138,7 +138,7 @@ class InputClickToEdit extends PureComponent<Props, State> {
             onClick={this.handleInputClick}
             onFocus={this.handleInputClick}
             tabIndex={tabIndex}
-            data-test={`${value}-org--row`}
+            data-test={`${value}-org-name`}
           >
             {value || placeholder}
             {appearAsNormalInput || (

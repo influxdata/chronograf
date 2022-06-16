@@ -60,7 +60,7 @@ class OrganizationsTableRowNew extends Component {
     }))
 
     return (
-      <div className="fancytable--row">
+      <div className="fancytable--row" data-test="new-org--row">
         <div className="fancytable--td orgs-table--active">&mdash;</div>
         <div className="fancytable--td orgs-table--name">
           <input

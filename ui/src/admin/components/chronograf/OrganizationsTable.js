@@ -69,6 +69,7 @@ class OrganizationsTable extends Component {
             className="btn btn-sm btn-primary"
             onClick={this.handleClickCreateOrganization}
             disabled={isCreatingOrganization}
+            data-test="create-new-org--button"
           >
             <span className="icon plus" /> Create Organization
           </button>
