@@ -309,8 +309,10 @@ export const deleteOrgs = () => {
   return cy
     .request('GET', `${apiUrl}/organizations`)
     .then(({body: responseBody}) => {
-      responseBody.organizations.slice(1).forEach((organization: any) => {
-        cy.request('DELETE', organization.links.self)
+      responseBody.organizations.forEach((organization: any) => {
+        if(organization.id != 'default'){
+          cy.request('DELETE', organization.links.self)
+        }
       })
     })
     .then(() => {
