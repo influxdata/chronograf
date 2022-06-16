@@ -161,7 +161,7 @@ const RolesPage = ({
               active={showUsers}
               onChange={toggleShowUsers}
               size={ComponentSize.ExtraSmall}
-              entity="users"
+              dataTest="show-users--toggle"
             />
             Show Users
           </div>
