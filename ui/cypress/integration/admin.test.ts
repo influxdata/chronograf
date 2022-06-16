@@ -60,20 +60,21 @@ describe('Use Admin tab', () => {
         cy.getByTestID(`${chronograf.user.name}--table-row`)
           .should('exist')
           .realHover()
-          .then(() => {
-            cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
-              cy.getByTestID('dropdown-toggle').realHover().then(() => {
-                cy.getByTestID('dropdown-toggle').click()
+          .within(() => {
+            cy.get('.dropdown-selected')
+              .should('exist')
+              .realHover()
+              .then(() => {
+                cy.get('.dropdown-selected').realClick()
               })
-              
-              cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`)
-                .realHover()
-                .then(() => {
-                  cy.getByTestID(
-                    `${chronograf.user.role[1]}-dropdown-item`
-                  ).click()
-                })
-            })
+
+            cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`)
+              .realHover()
+              .then(() => {
+                cy.getByTestID(
+                  `${chronograf.user.role[1]}-dropdown-item`
+                ).click()
+              })
           })
 
         cy.getByTestID(`${chronograf.user.name}--table-row`)
