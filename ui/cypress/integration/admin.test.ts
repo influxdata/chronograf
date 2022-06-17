@@ -57,35 +57,41 @@ describe('Use Admin tab', () => {
             .click()
         })
 
-        cy.getByTestID(`${chronograf.user.name}--table-row`)
-          .should('exist')
-          .realHover()
-          .within(() => {
-            cy.get('.dropdown-selected')
-              .should('exist')
-              .realHover()
-              .then(() => {
-                cy.get('.dropdown-selected').realClick()
-              })
-
-            cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`)
-              .realHover()
-              .then(() => {
-                cy.getByTestID(
-                  `${chronograf.user.role[1]}-dropdown-item`
-                ).click()
-              })
+        cy.getByTestID(`${chronograf.user.name}--table-row`).should(
+          'be.visible'
+        )
+        cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
+        cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
+          cy.get('.dropdown-selected').should('be.visible')
+          cy.get('.dropdown-selected').realHover()
+          cy.get('.dropdown-selected').then(el => {
+            cy.clickAttached(el)
           })
 
-        cy.getByTestID(`${chronograf.user.name}--table-row`)
-          .should('exist')
-          .realHover()
-          .then(() => {
-            cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
-              cy.getByTestID('remove-user--button').should('be.visible').click()
-              cy.getByTestID('confirm-btn').click()
-            })
+          cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`).realHover()
+
+          cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`).then(
+            el => {
+              cy.clickAttached(el)
+            }
+          )
+        })
+
+        cy.getByTestID(`${chronograf.user.name}--table-row`).should(
+          'be.visible'
+        )
+        cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
+        cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
+          cy.getByTestID('remove-user--button').should('be.visible')
+          cy.getByTestID('remove-user--button').then(el => {
+            cy.clickAttached(el)
           })
+
+          cy.getByTestID('confirm-btn').should('be.visible')
+          cy.getByTestID('confirm-btn').then(el => {
+            cy.clickAttached(el)
+          })
+        })
       })
     })
   })
