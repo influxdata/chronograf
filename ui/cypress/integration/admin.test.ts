@@ -45,6 +45,7 @@ describe('Use Admin tab', () => {
             'contain.text',
             chronograf.user.role[0]
           )
+
           cy.getByTestID('oauth-provider--input')
             .type(chronograf.user.oauthProvider)
             .should('have.value', chronograf.user.oauthProvider)
@@ -52,6 +53,7 @@ describe('Use Admin tab', () => {
             'contain.text',
             chronograf.user.role[0]
           )
+
           cy.getByTestID('confirm-new-user--button')
             .should('be.enabled')
             .click()
@@ -60,37 +62,28 @@ describe('Use Admin tab', () => {
         cy.getByTestID(`${chronograf.user.name}--table-row`).should(
           'be.visible'
         )
+
         cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
         cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
           cy.get('.dropdown-selected').should('be.visible')
           cy.get('.dropdown-selected').realHover()
-          cy.get('.dropdown-selected').then(el => {
-            cy.clickAttached(el)
-          })
-
+          cy.get('.dropdown-selected').clickAttached()
           cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`).realHover()
-
-          cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`).then(
-            el => {
-              cy.clickAttached(el)
-            }
-          )
+          cy.getByTestID(
+            `${chronograf.user.role[1]}-dropdown-item`
+          ).clickAttached()
         })
 
         cy.getByTestID(`${chronograf.user.name}--table-row`).should(
           'be.visible'
         )
+
         cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
         cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
           cy.getByTestID('remove-user--button').should('be.visible')
-          cy.getByTestID('remove-user--button').then(el => {
-            cy.clickAttached(el)
-          })
-
+          cy.getByTestID('remove-user--button').clickAttached()
           cy.getByTestID('confirm-btn').should('be.visible')
-          cy.getByTestID('confirm-btn').then(el => {
-            cy.clickAttached(el)
-          })
+          cy.getByTestID('confirm-btn').clickAttached()
         })
       })
     })
