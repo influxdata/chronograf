@@ -38,7 +38,7 @@ const identity = x => x
 function sortQueries(queries, queriesSort) {
   return (querySorters[queriesSort] || identity)(queries)
 }
-const initialState = {
+export const initialState = {
   users: [],
   roles: [],
   permissions: [],
