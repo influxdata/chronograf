@@ -49,16 +49,18 @@ export const initialState = {
   selectedDBs: ['*'],
   showUsers: true,
   showRoles: true,
+  usersFilter: '',
+  rolesFilter: '',
 }
 
 const adminInfluxDB = (state = initialState, action) => {
   switch (action.type) {
     case 'INFLUXDB_LOAD_USERS': {
-      return {...state, ...action.payload}
+      return {...state, ...action.payload, usersFilter: ''}
     }
 
     case 'INFLUXDB_LOAD_ROLES': {
-      return {...state, ...action.payload}
+      return {...state, ...action.payload, rolesFilter: ''}
     }
 
     case 'INFLUXDB_LOAD_PERMISSIONS': {
@@ -338,7 +340,7 @@ const adminInfluxDB = (state = initialState, action) => {
           return u
         }),
       }
-      return {...state, ...newState}
+      return {...state, ...newState, usersFilter: text}
     }
 
     case 'INFLUXDB_FILTER_ROLES': {
@@ -349,7 +351,7 @@ const adminInfluxDB = (state = initialState, action) => {
           return r
         }),
       }
-      return {...state, ...newState}
+      return {...state, ...newState, rolesFilter: text}
     }
 
     case 'INFLUXDB_KILL_QUERY': {

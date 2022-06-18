@@ -43,13 +43,14 @@ const validateRole = (
 }
 
 const mapStateToProps = ({
-  adminInfluxDB: {databases, users, roles, selectedDBs, showUsers},
+  adminInfluxDB: {databases, users, roles, selectedDBs, showUsers, rolesFilter},
 }) => ({
   databases,
   users,
   roles,
   selectedDBs,
   showUsers,
+  rolesFilter,
 })
 
 const mapDispatchToProps = {
@@ -68,6 +69,7 @@ interface ConnectedProps {
   roles: UserRole[]
   selectedDBs: string[]
   showUsers: boolean
+  rolesFilter: string
 }
 
 type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
@@ -81,6 +83,7 @@ const RolesPage = ({
   databases,
   selectedDBs,
   showUsers,
+  rolesFilter,
   router,
   filterRoles,
   createRole,
@@ -106,8 +109,8 @@ const RolesPage = ({
     [visibleDBNames, visibleRoles]
   )
 
-  // filter users
-  const [filterText, setFilterText] = useState('')
+  // filter roles
+  const [filterText, setFilterText] = useState(rolesFilter)
   const changeFilterText = useCallback(e => setFilterText(e.target.value), [])
   const debouncedFilterText = useDebounce(filterText, 200)
   useChangeEffect(() => {

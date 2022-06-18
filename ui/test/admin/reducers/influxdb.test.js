@@ -7,6 +7,7 @@ import {
   syncRole,
   editDatabase,
   editRetentionPolicyRequested,
+  loadUsers,
   loadRoles,
   loadPermissions,
   deleteRole,
@@ -224,7 +225,15 @@ describe('Admin.InfluxDB.Reducers', () => {
       expect(actual.databases).toEqual(expected)
     })
   })
+  it('it can load users', () => {
+    const {users: d, usersFilter} = reducer(state, loadUsers({users}))
+    const expected = {
+      users,
+      usersFilter: '',
+    }
 
+    expect({users: d, usersFilter}).toEqual(expected)
+  })
   it('it can sync a stale user', () => {
     const staleUser = {...u1, roles: []}
     state = {users: [u2, staleUser], roles: []}
@@ -330,13 +339,14 @@ describe('Admin.InfluxDB.Reducers', () => {
     expect(actual.users).toEqual(expected.users)
   })
 
-  it('it can load the roles', () => {
-    const actual = reducer(state, loadRoles({roles}))
+  it('it can load roles', () => {
+    const {roles: d, rolesFilter} = reducer(state, loadRoles({roles}))
     const expected = {
       roles,
+      rolesFilter: '',
     }
 
-    expect(actual.roles).toEqual(expected.roles)
+    expect({roles: d, rolesFilter}).toEqual(expected)
   })
 
   it('it can delete a non-existing role', () => {
@@ -397,15 +407,16 @@ describe('Admin.InfluxDB.Reducers', () => {
 
     const text = 'x'
 
-    const actual = reducer(state, filterRoles(text))
+    const {roles: d, rolesFilter} = reducer(state, filterRoles(text))
     const expected = {
       roles: [
         {...r1, hidden: false},
         {...r2, hidden: true},
       ],
+      rolesFilter: text,
     }
 
-    expect(actual.roles).toEqual(expected.roles)
+    expect({roles: d, rolesFilter}).toEqual(expected)
   })
 
   it('can filter users w/ "zero" text', () => {
@@ -415,15 +426,16 @@ describe('Admin.InfluxDB.Reducers', () => {
 
     const text = 'zero'
 
-    const actual = reducer(state, filterUsers(text))
+    const {users: d, usersFilter} = reducer(state, filterUsers(text))
     const expected = {
       users: [
         {...u1, hidden: true},
         {...u2, hidden: false},
       ],
+      usersFilter: text,
     }
 
-    expect(actual.users).toEqual(expected.users)
+    expect({users: d, usersFilter}).toEqual(expected)
   })
 
   // Permissions
