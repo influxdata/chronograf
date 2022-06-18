@@ -116,9 +116,7 @@ const UsersPage = ({
 
   // filter users
   const [filterText, setFilterText] = useState('')
-  const changeFilterText = useCallback(e => setFilterText(e.target.value), [
-    setFilterText,
-  ])
+  const changeFilterText = useCallback(e => setFilterText(e.target.value), [])
   const debouncedFilterText = useDebounce(filterText, 200)
   useChangeEffect(() => {
     filterUsers(debouncedFilterText)

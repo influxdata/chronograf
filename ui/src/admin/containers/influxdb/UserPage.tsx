@@ -173,7 +173,7 @@ const UserPage = ({
         )
       )
     },
-    [userDBPermissions, changedPermissions, setChangedPermissions]
+    [userDBPermissions, changedPermissions]
   )
   const permissionsChanged = !!Object.keys(changedPermissions).length
   const changePermissions = useMemo(
