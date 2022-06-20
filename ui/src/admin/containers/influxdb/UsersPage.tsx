@@ -18,7 +18,7 @@ import AdminInfluxDBTabbedPage, {
   isConnectedToLDAP,
 } from './AdminInfluxDBTabbedPage'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
-import EmptyRow from 'src/admin/components/EmptyRow'
+import NoEntities from 'src/admin/components/influxdb/NoEntities'
 import UserRow from 'src/admin/components/UserRow'
 import useDebounce from 'src/utils/useDebounce'
 import useChangeEffect from 'src/utils/useChangeEffect'
@@ -218,32 +218,32 @@ const UsersPage = ({
           </div>
         </div>
         <div className="panel-body">
-          <FancyScrollbar>
-            <table className="table v-center admin-table table-highlight admin-table--compact">
-              <thead>
-                <tr>
-                  <th>User</th>
-                  {showRoles && (
-                    <th className="admin-table--left-offset">
-                      {isEnterprise ? 'Roles' : 'Admin'}
-                    </th>
-                  )}
-                  {visibleUsers.length && visibleDBNames.length
-                    ? visibleDBNames.map(name => (
-                        <th
-                          className="admin-table__dbheader"
-                          title={`effective permissions for db: ${name}`}
-                          key={name}
-                        >
-                          {name}
-                        </th>
-                      ))
-                    : null}
-                </tr>
-              </thead>
-              <tbody>
-                {visibleUsers.length ? (
-                  visibleUsers.map((user, userIndex) => (
+          {visibleUsers.length ? (
+            <FancyScrollbar>
+              <table className="table v-center admin-table table-highlight admin-table--compact">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    {showRoles && (
+                      <th className="admin-table--left-offset">
+                        {isEnterprise ? 'Roles' : 'Admin'}
+                      </th>
+                    )}
+                    {visibleDBNames.length
+                      ? visibleDBNames.map(name => (
+                          <th
+                            className="admin-table__dbheader"
+                            title={`effective permissions for db: ${name}`}
+                            key={name}
+                          >
+                            {name}
+                          </th>
+                        ))
+                      : null}
+                  </tr>
+                </thead>
+                <tbody>
+                  {visibleUsers.map((user, userIndex) => (
                     <UserRow
                       key={user.name}
                       user={user}
@@ -255,17 +255,13 @@ const UsersPage = ({
                       showRoles={showRoles}
                       hasRoles={isEnterprise}
                     />
-                  ))
-                ) : (
-                  <EmptyRow
-                    entities="Users"
-                    colSpan={1 + +showRoles}
-                    filtered={!!filterText}
-                  />
-                )}
-              </tbody>
-            </table>
-          </FancyScrollbar>
+                  ))}
+                </tbody>
+              </table>
+            </FancyScrollbar>
+          ) : (
+            <NoEntities entities="Users" filtered={!!debouncedFilterText} />
+          )}
         </div>
       </div>
     </AdminInfluxDBTabbedPage>
