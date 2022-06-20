@@ -37,9 +37,11 @@ describe('Use Dashboards', () => {
 
   describe('Use Dashboards as reader', () => {
     beforeEach(() => {
-      cy.deleteChronografUser('Reader')
       cy.createChronografUser('Reader', 'oauth-mock', 'oauth2')
       cy.OAuthLoginAsDiffUser('Reader')
+      cy.get('@connections').then(connections => {
+        cy.visit(`/sources/${connections[0].id}/dashboards`)
+      })
     })
 
     it('ensure that all elements used to edit Chronograf are not visible', () => {
@@ -48,7 +50,7 @@ describe('Use Dashboards', () => {
       cy.getByTestID('create-dashboard-button').should('not.exist')
       cy.getByTestID('dashboard-filter--input').type('Empty')
       cy.getByTestID('dashboard-panel').should(
-        'have.text',
+        'contain.text',
         `Looks like you don’t have any dashboards`
       )
 

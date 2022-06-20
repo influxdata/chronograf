@@ -106,9 +106,8 @@ describe('query builder', () => {
       cy.getByTestID('builder-card--body').within(() => {
         cy.get('.dropdown-selected').click()
         cy.get('.dropdown-menu').within(() => {
-          cy.getByTestID('dropdown-item')
-            .contains('custom')
-            .click({force: true})
+          cy.getByTestID('custom-dropdown-item')
+            .click()
         })
         cy.get('input').type('13s{enter}')
         cy.get('.dropdown-selected').should('contain.text', '13s')

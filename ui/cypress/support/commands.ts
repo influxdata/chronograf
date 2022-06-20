@@ -1,43 +1,12 @@
-import {addMatchImageSnapshotCommand} from 'cypress-image-snapshot/command'
 
 const apiUrl = '/chronograf/v1'
-
-declare namespace Cypress {
-  interface Chainable<Subject> {
-    /**
-     * Custom command to match image snapshots.
-     * @example cy.matchImageSnapshot('greeting')
-     */
-    matchImageSnapshot(snapshotName?: string): void
-  }
-}
-
-// Set up the settings
-addMatchImageSnapshotCommand({
-  customSnapshotsDir: '../ui/cypress/snapshots',
-  failureThreshold: 0.75, // threshold for entire image
-  failureThresholdType: 'percent', // percent of image or number of pixels
-  customDiffConfig: {threshold: 0.75}, // threshold for each pixel
-  capture: 'viewport', // capture viewport in screenshot
-})
-
-Cypress.Commands.overwrite(
-  'matchImageSnapshot',
-  (originalFn, snapshotName, options) => {
-    if (Cypress.env('ALLOW_SCREENSHOT')) {
-      originalFn(snapshotName, options)
-    } else {
-      cy.log(`Screenshot comparison is disabled`)
-    }
-  }
-)
 
 export const getByTestID = (
   dataTest: string,
   options?: Partial<
     Cypress.Loggable & Cypress.Timeoutable & Cypress.Withinable & Cypress.Shadow
   >
-): globalThis.Cypress.Chainable<JQuery<HTMLElement>> => {
+): Cypress.Chainable => {
   return cy.get(`[data-test="${dataTest}"]`, options)
 }
 
@@ -69,7 +38,6 @@ export const writePoints = (
   tagValue: string,
   fieldValue: number
 ) => {
-  console.log({sourceID: sourceId, db: db})
   cy.request({
     method: 'POST',
     url: `${apiUrl}/sources/${sourceId}/write?db=${db}`,
@@ -398,7 +366,6 @@ export const deleteInfluxDBUsers = (sourceId: string) => {
   return cy
     .request('GET', `${apiUrl}/sources/${sourceId}/users`)
     .then(({body: responseBody}) => {
-      console.log(responseBody.users)
       responseBody.users.forEach((user: any) => {
         if (user.name != Cypress.env('username')) {
           cy.request('DELETE', user.links.self)
@@ -566,6 +533,18 @@ export function toInitialState() {
   cy.removeInfluxDBConnections()
 }
 
+export const clickAttached = (subject?: JQuery<HTMLElement>): void => {
+  if(!subject) {
+    console.error('no element provided to "clickAttached"')
+    return
+  }
+
+  cy.wrap(subject).should($el => {
+    expect(Cypress.dom.isDetached($el)).to.be.false
+    $el.trigger('click')
+  })
+}
+
 Cypress.Commands.add('getByTestID', getByTestID)
 Cypress.Commands.add('createInfluxDBConnection', createInfluxDBConnection)
 Cypress.Commands.add('removeInfluxDBConnections', removeInfluxDBConnections)
@@ -592,3 +571,4 @@ Cypress.Commands.add('deleteInfluxDB', deleteInfluxDB)
 Cypress.Commands.add('deleteInfluxDBs', deleteInfluxDBs)
 Cypress.Commands.add('toInitialState', toInitialState)
 Cypress.Commands.add('writePoints', writePoints)
+Cypress.Commands.add('clickAttached', {prevSubject: 'element'} ,clickAttached)

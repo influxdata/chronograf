@@ -65,7 +65,10 @@ export default class AllUsersTableRow extends Component<Props> {
     const {user, onRemoveFromOrganization, onAddToOrganization} = this.props
 
     return (
-      <tr className={'chronograf-admin-table--user'}>
+      <tr
+        className={'chronograf-admin-table--user'}
+        data-test={`${user.name}--table-row`}
+      >
         {this.userNameTableCell}
         <td style={{width: colOrganizations}}>
           <Tags

@@ -52,7 +52,7 @@ const DropdownMenuItem: FunctionComponent<ItemProps> = ({
         highlight: index === highlightedItemIndex,
         active: item.text === selected,
       })}
-      data-test="dropdown-item"
+      data-test={`${item.text}-dropdown-item`}
     >
       <a href="#" onClick={onSelection(item)} onMouseOver={onHighlight(index)}>
         {item.text}

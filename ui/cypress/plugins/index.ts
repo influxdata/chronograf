@@ -64,6 +64,4 @@ module.exports = (
       return launchOptions
     }
   )
-
-  addMatchImageSnapshotPlugin(on, config)
 }
