@@ -88,7 +88,7 @@ describe('Use Admin tab', () => {
       })
     })
 
-    describe('All Users', () => {
+    describe.only('All Users', () => {
       beforeEach(() => {
         cy.visit(url + '/all-users')
       })
@@ -134,51 +134,38 @@ describe('Use Admin tab', () => {
             })
           })
 
-        cy.getByTestID(`${chronograf.user.name}--table-row`)
-          .realHover()
-          .then(() => {
-            cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
-              cy.getByTestID(`${chronograf.user.orgs[0]}-tag--item`).should(
-                'exist'
-              )
+        cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
 
-              cy.getByTestID('delete-tag--button')
-                .click()
-                .within(() => {
-                  cy.getByTestID('confirm-btn').click()
-                })
-
-              cy.getByTestID(`${chronograf.user.orgs[0]}-tag--item`).should(
-                'not.exist'
-              )
-            })
+        cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
+          cy.getByTestID(`${chronograf.user.orgs[0]}-tag--item`).should('exist')
+          cy.getByTestID('delete-tag--button').clickAttached()
+          cy.getByTestID('delete-tag--button').within(() => {
+            cy.getByTestID('confirm-btn').click()
           })
 
-        cy.getByTestID(`${chronograf.user.name}--table-row`)
-          .realHover()
-          .then(() => {
-            cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
-              cy.get('.tags-add')
-                .click()
-                .within(() => {
-                  cy.get('.tags-add--menu-item')
-                    .contains(chronograf.user.orgs[0])
-                    .click()
-                })
-            })
-          })
+          cy.getByTestID(`${chronograf.user.orgs[0]}-tag--item`).should(
+            'not.exist'
+          )
+        })
 
-        cy.getByTestID(`${chronograf.user.name}--table-row`)
-          .realHover()
-          .then(() => {
-            cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
-              cy.getByTestID('delete-user--button')
-                .click()
-                .within(() => {
-                  cy.getByTestID('confirm-btn').click()
-                })
+        cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
+        cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
+          cy.get('.tags-add')
+            .click()
+            .within(() => {
+              cy.get('.tags-add--menu-item')
+                .contains(chronograf.user.orgs[0])
+                .clickAttached()
             })
+        })
+
+        cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
+        cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
+          cy.getByTestID('delete-user--button').clickAttached()
+          cy.getByTestID('delete-user--button').within(() => {
+            cy.getByTestID('confirm-btn').clickAttached()
           })
+        })
       })
     })
 
