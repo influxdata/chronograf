@@ -88,7 +88,7 @@ describe('Use Admin tab', () => {
       })
     })
 
-    describe.only('All Users', () => {
+    describe('All Users', () => {
       beforeEach(() => {
         cy.visit(url + '/all-users')
       })
