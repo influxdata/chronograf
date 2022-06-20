@@ -225,15 +225,6 @@ describe('InfluxDB', () => {
     })
 
     it('create a role, edit it, assign it to a user, and delete it', () => {
-      cy.getByTestID('admin-table--head').within(() => {
-        cy.get('th').contains('Users').should('exist')
-      })
-
-      cy.getByTestID('hide-users--toggle').click()
-      cy.getByTestID('admin-table--head').within(() => {
-        cy.get('th').contains('Users').should('not.exist')
-      })
-
       cy.getByTestID(`role-${influxDB.role.name}--row`).should('not.exist')
       cy.getByTestID('create-role--button').click({force: true})
       cy.getByTestID('dismiss-button').click()
@@ -292,6 +283,15 @@ describe('InfluxDB', () => {
         cy.get('.user-value').should('contain.text', influxDB.user.name)
         cy.getByTestID('read-permission').should('have.class', 'granted')
         cy.getByTestID('write-permission').should('have.class', 'granted')
+      })
+
+      cy.getByTestID('admin-table--head').within(() => {
+        cy.get('th').contains('Users').should('exist')
+      })
+
+      cy.getByTestID('hide-users--toggle').click()
+      cy.getByTestID('admin-table--head').within(() => {
+        cy.get('th').contains('Users').should('not.exist')
       })
     })
   })
