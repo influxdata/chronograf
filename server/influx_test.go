@@ -216,3 +216,69 @@ func TestService_Influx_UseCommand(t *testing.T) {
 		})
 	}
 }
+
+func TestService_Influx_Write(t *testing.T) {
+	calledPath := ""
+	ts := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		calledPath = r.URL.Path
+		rw.WriteHeader(http.StatusOK)
+		rw.Write([]byte(`{"message":"hi"}`))
+	}))
+	defer ts.Close()
+
+	testPairs := []struct {
+		version string
+		ctx     string
+		path    string
+	}{
+		{version: "1.8.3", ctx: "", path: "/write"},
+		{version: "1.8.3", ctx: "/ctx", path: "/ctx/write"},
+		{version: "2.2.0", ctx: "", path: "/api/v2/write"},
+		{version: "2.2.0", ctx: "/ctx", path: "/ctx/api/v2/write"},
+	}
+
+	for _, testPair := range testPairs {
+		calledPath = ""
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest(
+			"POST",
+			"http://any.url?v="+testPair.version,
+			ioutil.NopCloser(
+				bytes.NewReader([]byte(
+					`temperature v=1.0`,
+				)),
+			),
+		)
+		r = r.WithContext(httprouter.WithParams(
+			context.Background(),
+			httprouter.Params{
+				{
+					Key:   "id",
+					Value: "1",
+				},
+			},
+		))
+
+		h := &Service{
+			Store: &mocks.Store{
+				SourcesStore: &mocks.SourcesStore{
+					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+						return chronograf.Source{
+							ID:  1337,
+							URL: ts.URL + testPair.ctx,
+						}, nil
+					},
+				},
+			},
+			Logger: log.New(log.ErrorLevel),
+		}
+		h.Write(w, r)
+
+		resp := w.Result()
+		ioutil.ReadAll(resp.Body)
+
+		if calledPath != testPair.path {
+			t.Errorf("Path received: %v, want: %v ", calledPath, testPair.path)
+		}
+	}
+}
