@@ -136,7 +136,7 @@ class AllUsersTable extends Component {
             </thead>
             <tbody>
               {users.length ? (
-                users.map((user, i) => (
+                users.map(user => (
                   <AllUsersTableRow
                     user={user}
                     key={user.id}
