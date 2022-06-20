@@ -1,5 +1,4 @@
 import React, {PureComponent} from 'react'
-import uuid from 'uuid'
 import classnames from 'classnames'
 import {ClickOutside} from 'src/shared/components/ClickOutside'
 
@@ -71,9 +70,9 @@ class DivisionMenu extends PureComponent<Props, State> {
     const {menuItems} = this.props
     return (
       <ul className="dropdown-menu">
-        {menuItems.map(item => (
+        {menuItems.map((item, i) => (
           <li
-            key={uuid.v4()}
+            key={i}
             className="dropdown-item"
             onClick={this.handleMenuItemClick(item.action)}
           >

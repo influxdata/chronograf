@@ -1,6 +1,5 @@
 import React, {FunctionComponent} from 'react'
 import _ from 'lodash'
-import uuid from 'uuid'
 
 import ReactTooltip from 'react-tooltip'
 import {SourceContext} from 'src/CheckSources'
@@ -19,19 +18,17 @@ const getTooltipText = (source: Source, sourceOverride: Source): string => {
 }
 
 const SourceIndicator: FunctionComponent<Props> = ({sourceOverride}) => {
-  const uuidTooltip: string = uuid.v4()
-
   return (
     <SourceContext.Consumer>
       {(source: Source) => (
         <div
           className="source-indicator"
-          data-for={uuidTooltip}
+          data-for="source-indicator"
           data-tip={getTooltipText(source, sourceOverride)}
         >
           <span className="icon disks" />
           <ReactTooltip
-            id={uuidTooltip}
+            id="source-indicator"
             effect="solid"
             html={true}
             place="left"

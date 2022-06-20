@@ -1,8 +1,6 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
-import uuid from 'uuid'
-
 import AllUsersTableHeader from 'src/admin/components/chronograf/AllUsersTableHeader'
 import AllUsersTableRowNew from 'src/admin/components/chronograf/AllUsersTableRowNew'
 import AllUsersTableRow from 'src/admin/components/chronograf/AllUsersTableRow'
@@ -138,10 +136,10 @@ class AllUsersTable extends Component {
             </thead>
             <tbody>
               {users.length ? (
-                users.map(user => (
+                users.map((user,i) => (
                   <AllUsersTableRow
                     user={user}
-                    key={uuid.v4()}
+                    key={user.id}
                     organizations={organizations}
                     onAddToOrganization={this.handleAddToOrganization}
                     onRemoveFromOrganization={this.handleRemoveFromOrganization}

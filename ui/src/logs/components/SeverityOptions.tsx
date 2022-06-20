@@ -1,5 +1,4 @@
 import React, {FunctionComponent} from 'react'
-import uuid from 'uuid'
 import ColorDropdown from 'src/logs/components/ColorDropdown'
 import SeverityColumnFormat from 'src/logs/components/SeverityColumnFormat'
 
@@ -25,10 +24,10 @@ const SeverityConfig: FunctionComponent<Props> = ({
   <>
     <label className="form-label">Severity Colors</label>
     <div className="logs-options--color-list">
-      {severityLevelColors.map(lc => {
+      {severityLevelColors.map((lc, i) => {
         const color = {name: lc.color, hex: SeverityColorValues[lc.color]}
         return (
-          <div key={uuid.v4()} className="logs-options--color-row">
+          <div key={i} className="logs-options--color-row">
             <div className="logs-options--color-column">
               <div className="logs-options--color-label">{lc.level}</div>
             </div>

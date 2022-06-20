@@ -1,5 +1,4 @@
 import React, {PureComponent} from 'react'
-import uuid from 'uuid'
 
 import {ClickOutside} from 'src/shared/components/ClickOutside'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -36,9 +35,9 @@ class TagsAddButton extends PureComponent<Props, State> {
         <div className={classname} onClick={this.handleButtonClick}>
           <span className="icon plus" />
           <div className="tags-add--menu">
-            {items.map(item => (
+            {items.map((item, i) => (
               <div
-                key={uuid.v4()}
+                key={i}
                 className="tags-add--menu-item"
                 onClick={this.handleMenuClick(item)}
               >

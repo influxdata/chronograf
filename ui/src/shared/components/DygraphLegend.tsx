@@ -3,7 +3,6 @@ import React, {PureComponent, ChangeEvent} from 'react'
 import {connect} from 'react-redux'
 import _ from 'lodash'
 import classnames from 'classnames'
-import uuid from 'uuid'
 
 // Components
 import DygraphLegendSort from 'src/shared/components/DygraphLegendSort'
@@ -139,12 +138,12 @@ class DygraphLegend extends PureComponent<Props, State> {
           />
         )}
         <div className="dygraph-legend--contents">
-          {this.filtered.map(({label, color, yHTML, isHighlighted}) => {
+          {this.filtered.map(({label, color, yHTML, isHighlighted}, i) => {
             const seriesClass = isHighlighted
               ? 'dygraph-legend--row highlight'
               : 'dygraph-legend--row'
             return (
-              <div key={uuid.v4()} className={seriesClass}>
+              <div key={i} className={seriesClass}>
                 <span style={{color}}>{label}</span>
                 <figure>{yHTML || 'no value'}</figure>
               </div>

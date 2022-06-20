@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
-import uuid from 'uuid'
 import ProvidersTableRow from 'src/admin/components/chronograf/ProvidersTableRow'
 import ProvidersTableRowNew from 'src/admin/components/chronograf/ProvidersTableRowNew'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -80,9 +79,9 @@ class ProvidersTable extends Component {
               </div>
               <div className="fancytable--th provider--delete" />
             </div>
-            {mappings.map((mapping, i) => (
+            {mappings.map((mapping) => (
               <ProvidersTableRow
-                key={uuid.v4()}
+                key={mapping.id}
                 mapping={mapping}
                 organizations={organizations}
                 schemes={SCHEMES}

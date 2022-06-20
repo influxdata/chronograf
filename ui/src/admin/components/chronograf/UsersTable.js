@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
-import uuid from 'uuid'
 import _ from 'lodash'
 
 import UsersTableHeader from 'src/admin/components/chronograf/UsersTableHeader'
@@ -91,7 +90,7 @@ class UsersTable extends Component {
                 users.map(user => (
                   <UsersTableRow
                     user={user}
-                    key={uuid.v4()}
+                    key={user.id}
                     organization={organization}
                     onChangeUserRole={this.handleChangeUserRole}
                     onDelete={this.handleDeleteUser}
