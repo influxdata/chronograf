@@ -79,7 +79,7 @@ class ProvidersTable extends Component {
               </div>
               <div className="fancytable--th provider--delete" />
             </div>
-            {mappings.map((mapping) => (
+            {mappings.map(mapping => (
               <ProvidersTableRow
                 key={mapping.id}
                 mapping={mapping}
