@@ -32,7 +32,7 @@ const Tags: FunctionComponent<TagsProps> = ({
             item={item}
             onDelete={onDeleteTag}
             confirmText={confirmText}
-            testId={item.text || item.name || item}
+            testId={item.name}
           />
         )
       })}
@@ -47,7 +47,7 @@ interface TagProps {
   confirmText?: string
   item: Item
   onDelete: (item: Item) => void
-  testId?: Item
+  testId?: string
 }
 
 @ErrorHandling
@@ -60,7 +60,7 @@ class Tag extends PureComponent<TagProps> {
     const {item, confirmText, testId} = this.props
     return (
       <span className="input-tag--item">
-        <span>{item.text || item.name || item}</span>
+        <span data-test={testId}>{item.text || item.name || item}</span>
         <ConfirmButton
           icon="remove"
           size="btn-xs"

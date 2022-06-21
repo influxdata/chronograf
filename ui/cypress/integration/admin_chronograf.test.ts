@@ -66,9 +66,7 @@ describe('Chronograf', () => {
         cy.get('.dropdown-selected').realHover()
         cy.get('.dropdown-selected').click()
         cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`).realHover()
-        cy.getByTestID(
-          `${chronograf.user.role[1]}-dropdown-item`
-        ).click()
+        cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`).click()
       })
 
       cy.getByTestID(`${chronograf.user.name}--table-row`).should('be.visible')
@@ -79,6 +77,87 @@ describe('Chronograf', () => {
         cy.getByTestID('remove-user--button').click()
         cy.getByTestID('confirm-btn').should('be.visible')
         cy.getByTestID('confirm-btn').click()
+      })
+    })
+  })
+
+  describe('All Users', () => {
+    beforeEach(() => {
+      cy.visit(url + '/all-users')
+    })
+
+    it('add user, edit user, and remove it', () => {
+      cy.getByTestID('turn-on-new-users-superAdmin--toggle')
+        .click()
+        .should('have.class', 'active')
+      cy.getByTestID('add-user--button').click()
+      cy.getByTestID('new-user--table-row')
+        .should('exist')
+        .within(() => {
+          cy.getByTestID('cancel-new-user--button').click()
+        })
+      cy.getByTestID('add-user--button').click()
+      cy.getByTestID('new-user--table-row')
+        .should('exist')
+        .within(() => {
+          cy.getByTestID('username--input').type(chronograf.user.name)
+          cy.getByTestID('dropdown-toggle').click()
+          cy.getByTestID('dropdown-ul')
+            .contains(chronograf.user.orgs[0])
+            .click()
+          cy.getByTestID(
+            `dropdown-selected--${chronograf.user.orgs[0]}`
+          ).should('exist')
+          cy.getByTestID('oauth-provider--input').type(
+            chronograf.user.oauthProvider
+          )
+          cy.getByTestID('confirm-new-user--button').click()
+        })
+
+      cy.getByTestID('turn-off-new-users-superAdmin--toggle')
+        .click()
+        .should('not.have.class', 'active')
+
+      cy.getByTestID(`${chronograf.user.name}--table-row`)
+        .should('exist')
+        .realHover()
+        .then(() => {
+          cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
+            cy.getByTestID('turn-off-superAdmin--toggle').click()
+          })
+        })
+
+      cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
+
+      cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
+        cy.getByTestID(`${chronograf.user.orgs[0]}-tag--item`).should('exist')
+        cy.getByTestID('delete-tag--button').clickAttached()
+        cy.getByTestID('delete-tag--button').within(() => {
+          cy.getByTestID('confirm-btn').click()
+        })
+
+        cy.getByTestID(`${chronograf.user.orgs[0]}-tag--item`).should(
+          'not.exist'
+        )
+      })
+
+      cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
+      cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
+        cy.get('.tags-add')
+          .click()
+          .within(() => {
+            cy.get('.tags-add--menu-item')
+              .contains(chronograf.user.orgs[0])
+              .clickAttached()
+          })
+      })
+
+      cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
+      cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
+        cy.getByTestID('delete-user--button').clickAttached()
+        cy.getByTestID('delete-user--button').within(() => {
+          cy.getByTestID('confirm-btn').clickAttached()
+        })
       })
     })
   })
