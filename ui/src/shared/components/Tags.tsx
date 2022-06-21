@@ -32,7 +32,7 @@ const Tags: FunctionComponent<TagsProps> = ({
             item={item}
             onDelete={onDeleteTag}
             confirmText={confirmText}
-            testId={item.name}
+            testId={`${item.name}-org--tag`}
           />
         )
       })}
