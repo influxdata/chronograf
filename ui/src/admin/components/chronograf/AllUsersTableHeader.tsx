@@ -49,6 +49,7 @@ class AllUsersTableHeader extends Component<Props> {
               size={ComponentSize.Small}
               active={superAdminNewUsers}
               onChange={this.handleToggleClick}
+              dataTest="new-user-Admins--toggle"
             />
             <span>All new users are SuperAdmins</span>
           </div>

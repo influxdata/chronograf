@@ -87,7 +87,7 @@ describe('Chronograf', () => {
     })
 
     it('add user, edit user, and remove it', () => {
-      cy.getByTestID('turn-on-new-users-superAdmin--toggle')
+      cy.getByTestID('new-user-superAdmin--toggle')
         .click()
         .should('have.class', 'active')
       cy.getByTestID('add-user--button').click()
@@ -114,7 +114,7 @@ describe('Chronograf', () => {
           cy.getByTestID('confirm-new-user--button').click()
         })
 
-      cy.getByTestID('turn-off-new-users-superAdmin--toggle')
+      cy.getByTestID('new-user-admin--toggle')
         .click()
         .should('not.have.class', 'active')
 
@@ -123,7 +123,7 @@ describe('Chronograf', () => {
         .realHover()
         .then(() => {
           cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
-            cy.getByTestID('turn-off-superAdmin--toggle').click()
+            cy.getByTestID('superAdmin--toggle').click()
           })
         })
 
