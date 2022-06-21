@@ -1,5 +1,4 @@
 import React, {Component, ReactNode} from 'react'
-import uuid from 'uuid'
 import {withRouter, WithRouterProps} from 'react-router'
 
 import SubSectionsTab from 'src/shared/components/SubSectionsTab'
@@ -51,10 +50,10 @@ class SubSections extends Component<Props> {
         <div className={classes.nav} data-test="subsectionNav">
           <div className={classes.tabs}>
             {sections.map(
-              section =>
+              (section, i) =>
                 section.enabled && (
                   <SubSectionsTab
-                    key={uuid.v4()}
+                    key={i}
                     section={section}
                     handleClick={this.handleTabClick(section.url)}
                     activeSection={activeSection}

@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
-import uuid from 'uuid'
 import _ from 'lodash'
 
 import OrganizationsTableRow from 'src/admin/components/chronograf/OrganizationsTableRow'
@@ -90,7 +89,7 @@ class OrganizationsTable extends Component {
           ) : null}
           {organizations.map(org => (
             <OrganizationsTableRow
-              key={uuid.v4()}
+              key={org.id}
               organization={org}
               onDelete={onDeleteOrg}
               onRename={onRenameOrg}
