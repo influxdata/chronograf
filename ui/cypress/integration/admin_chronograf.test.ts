@@ -87,7 +87,7 @@ describe('Chronograf', () => {
     })
 
     it('add user, edit user, and remove it', () => {
-      cy.getByTestID('new-user-Admins--toggle')
+      cy.getByTestID('new-user-admins--toggle')
         .click()
         .should('have.class', 'active')
       cy.getByTestID('add-user--button').click()
@@ -114,7 +114,7 @@ describe('Chronograf', () => {
           cy.getByTestID('confirm-new-user--button').click()
         })
 
-      cy.getByTestID('new-user-Admins--toggle')
+      cy.getByTestID('new-user-admins--toggle')
         .click()
         .should('not.have.class', 'active')
 
