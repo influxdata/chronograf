@@ -10,6 +10,10 @@ export interface LocalStorage {
   logs: LogsState
   telegrafSystemInterval: string
   hostPageDisabled: boolean
+  adminInfluxDB: {
+    showUsers: boolean
+    showRoles: boolean
+  }
 }
 
 export type VERSION = string

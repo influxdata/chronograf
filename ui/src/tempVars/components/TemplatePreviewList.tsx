@@ -1,5 +1,4 @@
 import React, {PureComponent} from 'react'
-import uuid from 'uuid'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
@@ -27,9 +26,9 @@ class TemplatePreviewList extends PureComponent<Props> {
           autoHeight={true}
           maxHeight={this.resultsListHeight}
         >
-          {items.map(item => (
+          {items.map((item, i) => (
             <TemplatePreviewListItem
-              key={uuid.v4()}
+              key={i}
               onClick={onUpdateDefaultTemplateValue}
               item={item}
             />

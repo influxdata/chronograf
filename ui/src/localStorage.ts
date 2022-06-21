@@ -10,6 +10,7 @@ import {defaultTableData} from 'src/logs/constants'
 import {VERSION, GIT_SHA} from 'src/shared/constants'
 
 import {LocalStorage} from 'src/types/localStorage'
+import {initialState as adminInfluxDBInitialState} from './admin/reducers/influxdb'
 
 export const loadLocalStorage = (
   errorsQueue: any[]
@@ -39,7 +40,7 @@ export const loadLocalStorage = (
 
     delete state.VERSION
     delete state.GIT_SHA
-
+    state.adminInfluxDB = {...adminInfluxDBInitialState, ...state.adminInfluxDB}
     return state
   } catch (error) {
     console.error(notifyLoadLocalSettingsFailed(error).message)
@@ -55,6 +56,7 @@ export const saveToLocalStorage = ({
   dashTimeV1: {ranges, refreshes},
   logs,
   script,
+  adminInfluxDB: {showUsers, showRoles},
 }: LocalStorage): void => {
   try {
     const dashTimeV1 = {
@@ -104,6 +106,7 @@ export const saveToLocalStorage = ({
           },
           tableTime: minimalLogs.tableTime || {},
         },
+        adminInfluxDB: {showRoles, showUsers},
       })
     )
   } catch (err) {

@@ -1,6 +1,5 @@
 import React, {FunctionComponent, MouseEvent} from 'react'
 import classnames from 'classnames'
-import uuid from 'uuid'
 
 import {Handler} from 'src/types/kapacitor'
 
@@ -27,10 +26,10 @@ const HandlerTabs: FunctionComponent<Props> = ({
 }) =>
   handlersOnThisAlert.length ? (
     <ul className="endpoint-tabs">
-      {handlersOnThisAlert.map(endpoint => {
+      {handlersOnThisAlert.map((endpoint, i) => {
         return (
           <li
-            key={uuid.v4()}
+            key={i}
             className={classnames('endpoint-tab', {
               active:
                 endpoint.alias === (selectedHandler && selectedHandler.alias),

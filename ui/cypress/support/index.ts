@@ -15,7 +15,6 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands'
-import 'cypress-wait-until'
 import 'cypress-real-events/support'
 // import 'cypress-pipe'
 // import 'cypress-plugin-tab'

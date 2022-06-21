@@ -56,7 +56,7 @@ class GaugeOptions extends PureComponent<Props> {
                 isMax={index === gaugeColors.length - 1}
                 visualizationType="gauge"
                 threshold={color}
-                key={uuid.v4()}
+                key={index}
                 disableMaxColor={this.disableMaxColor}
                 onChooseColor={this.handleChooseColor}
                 onValidateColorValue={this.handleValidateColorValue}

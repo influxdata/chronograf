@@ -4,7 +4,6 @@ import {connect} from 'react-redux'
 
 // Libraries
 import _ from 'lodash'
-import uuid from 'uuid'
 import {Link} from 'react-router'
 
 // Components
@@ -210,8 +209,8 @@ class AlertsTable extends PureComponent<Props, State> {
         <InfiniteScroll
           className="alert-history-table--tbody"
           itemHeight={25}
-          items={alerts.map(alert => (
-            <div className="alert-history-table--tr" key={uuid.v4()}>
+          items={alerts.map((alert, i) => (
+            <div className="alert-history-table--tr" key={i}>
               <AlertsTableRow sourceID={id} {...alert} timeZone={timeZone} />
             </div>
           ))}

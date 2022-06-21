@@ -111,8 +111,17 @@ export class AdminInfluxDBScopedPage extends PureComponent<Props, State> {
         }
       }
       this.setState({loading: RemoteDataState.Done})
-    } catch (error) {
-      console.error(error)
+    } catch (e) {
+      console.error(e)
+      // extract error message for the UI
+      let error = e
+      if (error.message) {
+        error = error.message
+      } else if (error.data?.message) {
+        error = error.data?.message
+      } else if (error.statusText) {
+        error = error.statusText
+      }
       this.setState({
         loading: RemoteDataState.Error,
         error,

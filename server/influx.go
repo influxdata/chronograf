@@ -16,6 +16,7 @@ import (
 	"github.com/influxdata/chronograf"
 	uuid "github.com/influxdata/chronograf/id"
 	"github.com/influxdata/chronograf/influx"
+	"github.com/influxdata/chronograf/util"
 )
 
 // ValidInfluxRequest checks if queries specify a command.
@@ -124,13 +125,13 @@ func (s *Service) Write(w http.ResponseWriter, r *http.Request) {
 	version := query.Get("v")
 	query.Del("v")
 	if strings.HasPrefix(version, "2") {
-		u.Path = "/api/v2/write"
+		u = util.AppendPath(u, "/api/v2/write")
 		// v2 organization name is stored in username (org does not matter against v1)
 		query.Set("org", src.Username)
 		query.Set("bucket", query.Get("db"))
 		query.Del("db")
 	} else {
-		u.Path = "/write"
+		u = util.AppendPath(u, "/write")
 	}
 	u.RawQuery = query.Encode()
 
