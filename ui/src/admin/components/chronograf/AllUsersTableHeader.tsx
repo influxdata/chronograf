@@ -49,7 +49,6 @@ class AllUsersTableHeader extends Component<Props> {
               size={ComponentSize.Small}
               active={superAdminNewUsers}
               onChange={this.handleToggleClick}
-              entity="new-users-superAdmin"
             />
             <span>All new users are SuperAdmins</span>
           </div>
