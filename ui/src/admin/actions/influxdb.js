@@ -252,41 +252,25 @@ export const editRetentionPolicyFailed = (
 
 // async actions
 export const loadUsersAsync = url => async dispatch => {
-  try {
-    const {data} = await getUsersAJAX(url)
-    dispatch(loadUsers(data))
-  } catch (error) {
-    dispatch(errorThrown(error))
-  }
+  const {data} = await getUsersAJAX(url)
+  dispatch(loadUsers(data))
 }
 
 export const loadRolesAsync = url => async dispatch => {
-  try {
-    const {data} = await getRolesAJAX(url)
-    dispatch(loadRoles(data))
-  } catch (error) {
-    dispatch(errorThrown(error))
-  }
+  const {data} = await getRolesAJAX(url)
+  dispatch(loadRoles(data))
 }
 
 export const loadPermissionsAsync = url => async dispatch => {
-  try {
-    const {data} = await getPermissionsAJAX(url)
-    dispatch(loadPermissions(data))
-  } catch (error) {
-    dispatch(errorThrown(error))
-  }
+  const {data} = await getPermissionsAJAX(url)
+  dispatch(loadPermissions(data))
 }
 
 export const loadDBsAndRPsAsync = url => async dispatch => {
-  try {
-    const {
-      data: {databases},
-    } = await getDbsAndRpsAJAX(url)
-    dispatch(loadDatabases(_.sortBy(databases, ({name}) => name.toLowerCase())))
-  } catch (error) {
-    dispatch(errorThrown(error))
-  }
+  const {
+    data: {databases},
+  } = await getDbsAndRpsAJAX(url)
+  dispatch(loadDatabases(_.sortBy(databases, ({name}) => name.toLowerCase())))
 }
 
 export const createUserAsync = (url, user) => async dispatch => {
@@ -489,3 +473,18 @@ export const updateUserPasswordAsync = (user, password) => async dispatch => {
     )
   }
 }
+
+export const changeSelectedDBs = (selectedDBs /* : string[] */) => ({
+  type: 'INFLUXDB_CHANGE_SELECTED_DBS',
+  payload: {
+    selectedDBs,
+  },
+})
+
+export const changeShowUsers = () => ({
+  type: 'INFLUXDB_CHANGE_SHOW_USERS',
+})
+
+export const changeShowRoles = () => ({
+  type: 'INFLUXDB_CHANGE_SHOW_ROLES',
+})

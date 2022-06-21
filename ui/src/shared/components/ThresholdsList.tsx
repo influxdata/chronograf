@@ -60,9 +60,9 @@ class ThresholdsList extends PureComponent<Props> {
         >
           <span className="icon plus" /> Add Threshold
         </button>
-        {this.sortedColors.map(color =>
+        {this.sortedColors.map((color, i) =>
           color.id === THRESHOLD_TYPE_BASE ? (
-            <div className="threshold-item" key={uuid.v4()}>
+            <div className="threshold-item" key={i}>
               <div className="threshold-item--label">Base Color</div>
               <ColorDropdown
                 colors={THRESHOLD_COLORS}
@@ -75,7 +75,6 @@ class ThresholdsList extends PureComponent<Props> {
             <Threshold
               visualizationType="single-stat"
               threshold={color}
-              key={uuid.v4()}
               onChooseColor={this.handleChooseColor}
               onValidateColorValue={this.handleValidateColorValue}
               onUpdateColorValue={this.handleUpdateColorValue}

@@ -1,7 +1,6 @@
 import React, {PureComponent, FunctionComponent} from 'react'
 import TagsAddButton from 'src/shared/components/TagsAddButton'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
-import uuid from 'uuid'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Item {
@@ -26,10 +25,10 @@ const Tags: FunctionComponent<TagsProps> = ({
 }) => {
   return (
     <div className="input-tag-list">
-      {tags.map(item => {
+      {tags.map((item, i) => {
         return (
           <Tag
-            key={uuid.v4()}
+            key={i}
             item={item}
             onDelete={onDeleteTag}
             confirmText={confirmText}
@@ -60,11 +59,7 @@ class Tag extends PureComponent<TagProps> {
   public render() {
     const {item, confirmText, testId} = this.props
     return (
-      <span
-        key={uuid.v4()}
-        className="input-tag--item"
-        data-test={`${testId}-tag--item`}
-      >
+      <span className="input-tag--item">
         <span>{item.text || item.name || item}</span>
         <ConfirmButton
           icon="remove"

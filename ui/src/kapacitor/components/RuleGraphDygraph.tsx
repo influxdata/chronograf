@@ -64,7 +64,7 @@ class RuleGraphDygraph extends Component<Props, State> {
     if (!timeSeriesToDygraphResult) {
       return null
     }
-    if (timeSeriesToDygraphResult.unsupportedValue) {
+    if (timeSeriesToDygraphResult.unsupportedValue !== undefined) {
       console.error(
         'Unsupported y-axis value, cannot display data',
         timeSeriesToDygraphResult
