@@ -7,6 +7,7 @@ import {
   syncRole,
   editDatabase,
   editRetentionPolicyRequested,
+  loadUsers,
   loadRoles,
   loadPermissions,
   deleteRole,
@@ -19,6 +20,10 @@ import {
   removeDatabaseDeleteCode,
   loadQueries,
   setQueriesSort,
+  loadDatabases,
+  changeSelectedDBs,
+  changeShowUsers,
+  changeShowRoles,
 } from 'src/admin/actions/influxdb'
 
 import {NEW_DEFAULT_DATABASE, NEW_EMPTY_RP} from 'src/admin/constants'
@@ -137,6 +142,17 @@ describe('Admin.InfluxDB.Reducers', () => {
       state = {databases: [db1, db2]}
     })
 
+    it('can load databases', () => {
+      const {databases, selectedDBs} = reducer(
+        undefined,
+        loadDatabases([{name: 'db1'}])
+      )
+      expect({databases, selectedDBs}).toEqual({
+        databases: [{name: 'db1'}],
+        selectedDBs: ['*'],
+      })
+    })
+
     it('can add a database', () => {
       const actual = reducer(state, addDatabase())
       const expected = [{...NEW_DEFAULT_DATABASE, isEditing: true}, db1, db2]
@@ -209,7 +225,15 @@ describe('Admin.InfluxDB.Reducers', () => {
       expect(actual.databases).toEqual(expected)
     })
   })
+  it('it can load users', () => {
+    const {users: d, usersFilter} = reducer(state, loadUsers({users}))
+    const expected = {
+      users,
+      usersFilter: '',
+    }
 
+    expect({users: d, usersFilter}).toEqual(expected)
+  })
   it('it can sync a stale user', () => {
     const staleUser = {...u1, roles: []}
     state = {users: [u2, staleUser], roles: []}
@@ -315,13 +339,14 @@ describe('Admin.InfluxDB.Reducers', () => {
     expect(actual.users).toEqual(expected.users)
   })
 
-  it('it can load the roles', () => {
-    const actual = reducer(state, loadRoles({roles}))
+  it('it can load roles', () => {
+    const {roles: d, rolesFilter} = reducer(state, loadRoles({roles}))
     const expected = {
       roles,
+      rolesFilter: '',
     }
 
-    expect(actual.roles).toEqual(expected.roles)
+    expect({roles: d, rolesFilter}).toEqual(expected)
   })
 
   it('it can delete a non-existing role', () => {
@@ -382,15 +407,16 @@ describe('Admin.InfluxDB.Reducers', () => {
 
     const text = 'x'
 
-    const actual = reducer(state, filterRoles(text))
+    const {roles: d, rolesFilter} = reducer(state, filterRoles(text))
     const expected = {
       roles: [
         {...r1, hidden: false},
         {...r2, hidden: true},
       ],
+      rolesFilter: text,
     }
 
-    expect(actual.roles).toEqual(expected.roles)
+    expect({roles: d, rolesFilter}).toEqual(expected)
   })
 
   it('can filter users w/ "zero" text', () => {
@@ -400,15 +426,16 @@ describe('Admin.InfluxDB.Reducers', () => {
 
     const text = 'zero'
 
-    const actual = reducer(state, filterUsers(text))
+    const {users: d, usersFilter} = reducer(state, filterUsers(text))
     const expected = {
       users: [
         {...u1, hidden: true},
         {...u2, hidden: false},
       ],
+      usersFilter: text,
     }
 
-    expect(actual.users).toEqual(expected.users)
+    expect({users: d, usersFilter}).toEqual(expected)
   })
 
   // Permissions
@@ -486,6 +513,58 @@ describe('Admin.InfluxDB.Reducers', () => {
       expect(actual.queries[0].id).toEqual(3)
       expect(actual.queries[1].id).toEqual(2)
       expect(actual.queries[2].id).toEqual(1)
+    })
+  })
+  describe('filters', () => {
+    it('can change selected DBS', () => {
+      const testPairs = [
+        {
+          prev: undefined,
+          change: ['db1'],
+          next: ['db1'],
+        },
+        {
+          prev: [],
+          change: ['db1'],
+          next: ['db1'],
+        },
+        {
+          prev: ['db1'],
+          change: ['db1', '*'],
+          next: ['*'],
+        },
+        {
+          prev: ['*'],
+          change: ['db1', '*'],
+          next: ['db1'],
+        },
+        {
+          prev: ['db1'],
+          change: [],
+          next: [],
+        },
+      ]
+      testPairs.forEach(({prev, change, next}) => {
+        const {selectedDBs} = reducer(
+          {selectedDBs: prev},
+          changeSelectedDBs(change)
+        )
+        expect(selectedDBs).toEqual(next)
+      })
+    })
+    it('can change showUsers flag', () => {
+      const vals = [undefined, true, false]
+      vals.forEach(prev => {
+        const {showUsers} = reducer({showUsers: prev}, changeShowUsers())
+        expect(showUsers).toEqual(!prev)
+      })
+    })
+    it('can change showRoles flag', () => {
+      const vals = [undefined, true, false]
+      vals.forEach(prev => {
+        const {showRoles} = reducer({showRoles: prev}, changeShowRoles())
+        expect(showRoles).toEqual(!prev)
+      })
     })
   })
 })

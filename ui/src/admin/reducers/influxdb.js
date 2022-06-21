@@ -6,6 +6,7 @@ import {
   changeNamedCollection,
   computeNamedChanges,
 } from '../util/changeNamedCollection'
+import allOrParticularSelection from '../util/allOrParticularSelection'
 
 const querySorters = {
   '+time'(queries) {
@@ -37,8 +38,7 @@ const identity = x => x
 function sortQueries(queries, queriesSort) {
   return (querySorters[queriesSort] || identity)(queries)
 }
-
-const initialState = {
+export const initialState = {
   users: [],
   roles: [],
   permissions: [],
@@ -46,16 +46,21 @@ const initialState = {
   queriesSort: '-time',
   queryIDToKill: null,
   databases: [],
+  selectedDBs: ['*'],
+  showUsers: true,
+  showRoles: true,
+  usersFilter: '',
+  rolesFilter: '',
 }
 
 const adminInfluxDB = (state = initialState, action) => {
   switch (action.type) {
     case 'INFLUXDB_LOAD_USERS': {
-      return {...state, ...action.payload}
+      return {...state, ...action.payload, usersFilter: ''}
     }
 
     case 'INFLUXDB_LOAD_ROLES': {
-      return {...state, ...action.payload}
+      return {...state, ...action.payload, rolesFilter: ''}
     }
 
     case 'INFLUXDB_LOAD_PERMISSIONS': {
@@ -63,7 +68,9 @@ const adminInfluxDB = (state = initialState, action) => {
     }
 
     case 'INFLUXDB_LOAD_DATABASES': {
-      return {...state, ...action.payload}
+      const databases = action.payload.databases
+      const selectedDBs = initialState.selectedDBs
+      return {...state, databases, selectedDBs}
     }
 
     case 'INFLUXDB_ADD_DATABASE': {
@@ -333,7 +340,7 @@ const adminInfluxDB = (state = initialState, action) => {
           return u
         }),
       }
-      return {...state, ...newState}
+      return {...state, ...newState, usersFilter: text}
     }
 
     case 'INFLUXDB_FILTER_ROLES': {
@@ -344,7 +351,7 @@ const adminInfluxDB = (state = initialState, action) => {
           return r
         }),
       }
-      return {...state, ...newState}
+      return {...state, ...newState, rolesFilter: text}
     }
 
     case 'INFLUXDB_KILL_QUERY': {
@@ -358,6 +365,18 @@ const adminInfluxDB = (state = initialState, action) => {
 
     case 'INFLUXDB_SET_QUERY_TO_KILL': {
       return {...state, ...action.payload}
+    }
+    case 'INFLUXDB_CHANGE_SELECTED_DBS': {
+      const newDBs = action.payload.selectedDBs
+      const oldDBs = state.selectedDBs || ['*']
+      const selectedDBs = allOrParticularSelection(oldDBs, newDBs)
+      return {...state, selectedDBs}
+    }
+    case 'INFLUXDB_CHANGE_SHOW_USERS': {
+      return {...state, showUsers: !state.showUsers}
+    }
+    case 'INFLUXDB_CHANGE_SHOW_ROLES': {
+      return {...state, showRoles: !state.showRoles}
     }
   }
 

@@ -6,6 +6,7 @@ import {Source, NotificationAction} from 'src/types'
 import {UserRole, User, Database} from 'src/types/influxAdmin'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {
+  changeShowUsers,
   createRoleAsync,
   filterRoles as filterRolesAction,
 } from 'src/admin/actions/influxdb'
@@ -21,14 +22,14 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import NoEntities from 'src/admin/components/influxdb/NoEntities'
 import RoleRow from 'src/admin/components/RoleRow'
 import {useCallback} from 'react'
-import allOrParticularSelection from '../../util/allOrParticularSelection'
 import {computeEntitiesDBPermissions} from '../../util/computeEffectiveDBPermissions'
 import useDebounce from 'src/utils/useDebounce'
 import useChangeEffect from 'src/utils/useChangeEffect'
-import {ComponentSize, MultiSelectDropdown, SlideToggle} from 'src/reusable_ui'
+import {ComponentSize, SlideToggle} from 'src/reusable_ui'
 import CreateRoleDialog, {
   validateRoleName,
 } from 'src/admin/components/influxdb/CreateRoleDialog'
+import MultiDBSelector from 'src/admin/components/influxdb/MultiDBSelector'
 
 const validateRole = (
   role: Pick<UserRole, 'name'>,
@@ -41,16 +42,22 @@ const validateRole = (
   return true
 }
 
-const mapStateToProps = ({adminInfluxDB: {databases, users, roles}}) => ({
+const mapStateToProps = ({
+  adminInfluxDB: {databases, users, roles, selectedDBs, showUsers, rolesFilter},
+}) => ({
   databases,
   users,
   roles,
+  selectedDBs,
+  showUsers,
+  rolesFilter,
 })
 
 const mapDispatchToProps = {
   filterRoles: filterRolesAction,
   createRole: createRoleAsync,
   notify: notifyAction,
+  toggleShowUsers: changeShowUsers,
 }
 
 interface OwnProps {
@@ -60,6 +67,9 @@ interface ConnectedProps {
   databases: Database[]
   users: User[]
   roles: UserRole[]
+  selectedDBs: string[]
+  showUsers: boolean
+  rolesFilter: string
 }
 
 type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
@@ -71,30 +81,26 @@ const RolesPage = ({
   users,
   roles,
   databases,
+  selectedDBs,
+  showUsers,
+  rolesFilter,
   router,
   filterRoles,
   createRole,
+  toggleShowUsers,
   notify,
 }: Props) => {
   const rolesPage = useMemo(
     () => `/sources/${source.id}/admin-influxdb/roles`,
     [source]
   )
-  // filter databases
-  const [selectedDBs, setSelectedDBs] = useState<string[]>(['*'])
+  // database columns
   const visibleDBNames = useMemo<string[]>(() => {
     if (selectedDBs.includes('*')) {
       return databases.map(db => db.name)
     }
     return selectedDBs
   }, [databases, selectedDBs])
-  const changeSelectedDBs = useCallback(
-    (newDBs: string[]) =>
-      setSelectedDBs((oldDBs: string[]) => {
-        return allOrParticularSelection(oldDBs, newDBs)
-      }),
-    [setSelectedDBs]
-  )
 
   // effective permissions
   const visibleRoles = useMemo(() => roles.filter(x => !x.hidden), [roles])
@@ -103,22 +109,13 @@ const RolesPage = ({
     [visibleDBNames, visibleRoles]
   )
 
-  // filter users
-  const [filterText, setFilterText] = useState('')
-  const changeFilterText = useCallback(e => setFilterText(e.target.value), [
-    setFilterText,
-  ])
+  // filter roles
+  const [filterText, setFilterText] = useState(rolesFilter)
+  const changeFilterText = useCallback(e => setFilterText(e.target.value), [])
   const debouncedFilterText = useDebounce(filterText, 200)
   useChangeEffect(() => {
     filterRoles(debouncedFilterText)
   }, [debouncedFilterText])
-
-  // hide users
-  const [showUsers, setShowUsers] = useState(true)
-  const changeHideUsers = useCallback(() => setShowUsers(!showUsers), [
-    showUsers,
-    setShowUsers,
-  ])
 
   const [createVisible, setCreateVisible] = useState(false)
   const createNew = useCallback(
@@ -159,40 +156,13 @@ const RolesPage = ({
             />
             <span className="icon search" />
           </div>
-          <div className="db-selector">
-            <MultiSelectDropdown
-              onChange={changeSelectedDBs}
-              selectedIDs={selectedDBs}
-              emptyText="<no database>"
-            >
-              {databases.reduce(
-                (acc, db) => {
-                  acc.push(
-                    <MultiSelectDropdown.Item
-                      key={db.name}
-                      id={db.name}
-                      value={{id: db.name}}
-                    >
-                      {db.name}
-                    </MultiSelectDropdown.Item>
-                  )
-                  return acc
-                },
-                [
-                  <MultiSelectDropdown.Item id="*" key="*" value={{id: '*'}}>
-                    All Databases
-                  </MultiSelectDropdown.Item>,
-                  <MultiSelectDropdown.Divider id="" key="" />,
-                ]
-              )}
-            </MultiSelectDropdown>
-          </div>
+          <MultiDBSelector />
           <div className="hide-roles-toggle">
             <SlideToggle
               active={showUsers}
-              onChange={changeHideUsers}
+              onChange={toggleShowUsers}
               size={ComponentSize.ExtraSmall}
-              entity="users"
+              dataTest="show-users--toggle"
             />
             Show Users
           </div>

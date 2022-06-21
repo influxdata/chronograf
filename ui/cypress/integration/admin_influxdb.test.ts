@@ -289,10 +289,14 @@ describe('InfluxDB', () => {
         cy.get('th').contains('Users').should('exist')
       })
 
-      cy.getByTestID('hide-users--toggle').click()
+      cy.getByTestID('show-users--toggle').click()
       cy.getByTestID('admin-table--head').within(() => {
         cy.get('th').contains('Users').should('not.exist')
       })
+      cy.getByTestID('show-users--toggle').click()
+      cy.getByTestID('admin-table--head').within(() => {
+        cy.get('th').contains('Users').should('exist')
+      })      
     })
   })
 })
