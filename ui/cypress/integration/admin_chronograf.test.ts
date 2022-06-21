@@ -87,7 +87,7 @@ describe('Chronograf', () => {
     })
 
     it('add user, edit user, and remove it', () => {
-      cy.getByTestID('new-user-superAdmin--toggle')
+      cy.getByTestID('new-user-Admins--toggle')
         .click()
         .should('have.class', 'active')
       cy.getByTestID('add-user--button').click()
@@ -114,7 +114,7 @@ describe('Chronograf', () => {
           cy.getByTestID('confirm-new-user--button').click()
         })
 
-      cy.getByTestID('new-user-admin--toggle')
+      cy.getByTestID('new-user-Admins--toggle')
         .click()
         .should('not.have.class', 'active')
 
@@ -130,15 +130,16 @@ describe('Chronograf', () => {
       cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
 
       cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
-        cy.getByTestID(`${chronograf.user.orgs[0]}-tag--item`).should('exist')
+        cy.get(`.input-tag--item`)
+          .contains(chronograf.user.orgs[0])
+          .should('exist')
         cy.getByTestID('delete-tag--button').clickAttached()
         cy.getByTestID('delete-tag--button').within(() => {
           cy.getByTestID('confirm-btn').click()
         })
 
-        cy.getByTestID(`${chronograf.user.orgs[0]}-tag--item`).should(
-          'not.exist'
-        )
+        cy.get(`.input-tag--item`)
+          .should('not.exist')
       })
 
       cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
