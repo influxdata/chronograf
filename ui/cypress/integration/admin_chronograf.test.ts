@@ -66,7 +66,7 @@ describe('Chronograf', () => {
         cy.get('.dropdown-selected').realHover()
         cy.get('.dropdown-selected').click()
         cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`).realHover()
-        cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`).click()
+        cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`).clickAttached()
       })
 
       cy.getByTestID(`${chronograf.user.name}--table-row`).should('be.visible')
