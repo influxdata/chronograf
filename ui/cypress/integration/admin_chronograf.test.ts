@@ -90,12 +90,14 @@ describe('Chronograf', () => {
       cy.getByTestID('new-user-admins--toggle')
         .click()
         .should('have.class', 'active')
+
       cy.getByTestID('add-user--button').click()
       cy.getByTestID('new-user--table-row')
         .should('exist')
         .within(() => {
           cy.getByTestID('cancel-new-user--button').click()
         })
+
       cy.getByTestID('add-user--button').click()
       cy.getByTestID('new-user--table-row')
         .should('exist')
@@ -105,12 +107,15 @@ describe('Chronograf', () => {
           cy.getByTestID('dropdown-ul')
             .contains(chronograf.user.orgs[0])
             .click()
+
           cy.getByTestID(
             `dropdown-selected--${chronograf.user.orgs[0]}`
           ).should('exist')
+
           cy.getByTestID('oauth-provider--input').type(
             chronograf.user.oauthProvider
           )
+
           cy.getByTestID('confirm-new-user--button').click()
         })
 
@@ -128,14 +133,14 @@ describe('Chronograf', () => {
         })
 
       cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
-
       cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
         cy.get(`.input-tag--item`)
           .contains(chronograf.user.orgs[0])
           .should('exist')
+
         cy.getByTestID('delete-tag--button').clickAttached()
         cy.getByTestID('delete-tag--button').within(() => {
-          cy.getByTestID('confirm-btn').click()
+          cy.getByTestID('confirm-btn').clickAttached()
         })
 
         cy.get(`.input-tag--item`)
