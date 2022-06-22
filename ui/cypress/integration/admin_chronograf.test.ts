@@ -66,7 +66,9 @@ describe('Chronograf', () => {
         cy.get('.dropdown-selected').realHover()
         cy.get('.dropdown-selected').click()
         cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`).realHover()
-        cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`).clickAttached()
+        cy.getByTestID(
+          `${chronograf.user.role[1]}-dropdown-item`
+        ).clickAttached()
       })
 
       cy.getByTestID(`${chronograf.user.name}--table-row`).should('be.visible')
@@ -143,8 +145,7 @@ describe('Chronograf', () => {
           cy.getByTestID('confirm-btn').clickAttached()
         })
 
-        cy.get(`.input-tag--item`)
-          .should('not.exist')
+        cy.get(`.input-tag--item`).should('not.exist')
       })
 
       cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
