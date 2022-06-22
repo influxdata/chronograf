@@ -88,7 +88,7 @@ describe('Chronograf', () => {
       cy.visit(url + '/all-organizations')
     })
 
-    it.only('create an org, edit it, and delete it', () => {
+    it('create an org, edit it, and delete it', () => {
       cy.getByTestID('create-new-org--button').click()
       cy.getByTestID('cancel').click()
       cy.getByTestID(
