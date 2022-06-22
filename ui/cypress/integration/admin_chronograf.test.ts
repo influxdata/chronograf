@@ -64,11 +64,11 @@ describe('Chronograf', () => {
       cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
         cy.get('.dropdown-selected').should('be.visible')
         cy.get('.dropdown-selected').realHover()
-        cy.get('.dropdown-selected').click()
+        cy.get('.dropdown-selected').clickAttached()
         cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`).realHover()
         cy.getByTestID(
           `${chronograf.user.role[1]}-dropdown-item`
-        ).click()
+        ).clickAttached()
       })
 
       cy.getByTestID(`${chronograf.user.name}--table-row`).should('be.visible')
@@ -76,9 +76,9 @@ describe('Chronograf', () => {
       cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
       cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
         cy.getByTestID('remove-user--button').should('be.visible')
-        cy.getByTestID('remove-user--button').click()
+        cy.getByTestID('remove-user--button').clickAttached()
         cy.getByTestID('confirm-btn').should('be.visible')
-        cy.getByTestID('confirm-btn').click()
+        cy.getByTestID('confirm-btn').clickAttached()
       })
     })
   })
