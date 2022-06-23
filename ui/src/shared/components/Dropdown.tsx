@@ -78,7 +78,11 @@ export class Dropdown extends Component<Props, State> {
   }
 
   public handleHighlight = (itemIndex: number) => () => {
-    this.setState({highlightedItemIndex: itemIndex})
+    // setup highlighted element only in auto-complete mode,
+    // otherwise rely upon CSS :hover highlighting
+    if (this.props.useAutoComplete) {
+      this.setState({highlightedItemIndex: itemIndex})
+    }
   }
 
   public toggleMenu = (e?: MouseEvent<HTMLDivElement>) => {
@@ -158,6 +162,10 @@ export class Dropdown extends Component<Props, State> {
     })
   }
 
+  private setDropdownRef = (ref: any) => {
+    this.dropdownRef = ref
+  }
+
   public render() {
     const {
       items,
@@ -188,7 +196,7 @@ export class Dropdown extends Component<Props, State> {
           [className]: className,
         })}
         tabIndex={tabIndex}
-        ref={r => (this.dropdownRef = r)}
+        ref={this.setDropdownRef}
         data-test="dropdown-toggle"
       >
         {useAutoComplete && isOpen ? (
