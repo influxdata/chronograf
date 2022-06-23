@@ -59,26 +59,22 @@ describe('Chronograf', () => {
       })
 
       cy.getByTestID(`${chronograf.user.name}--table-row`).should('be.visible')
-
       cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
       cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
         cy.get('.dropdown-selected').should('be.visible')
         cy.get('.dropdown-selected').realHover()
-        cy.get('.dropdown-selected').clickAttached()
+        cy.get('.dropdown-selected').click()
         cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`).realHover()
-        cy.getByTestID(
-          `${chronograf.user.role[1]}-dropdown-item`
-        ).clickAttached()
+        cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`).click()
       })
 
       cy.getByTestID(`${chronograf.user.name}--table-row`).should('be.visible')
-
       cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
       cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
         cy.getByTestID('remove-user--button').should('be.visible')
-        cy.getByTestID('remove-user--button').clickAttached()
+        cy.getByTestID('remove-user--button').click()
         cy.getByTestID('confirm-btn').should('be.visible')
-        cy.getByTestID('confirm-btn').clickAttached()
+        cy.getByTestID('confirm-btn').click()
       })
     })
   })
