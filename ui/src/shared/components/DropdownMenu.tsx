@@ -108,7 +108,11 @@ const DropdownMenu: FunctionComponent<Props> = ({
         autoHeight={true}
         maxHeight={DROPDOWN_MENU_MAX_HEIGHT}
       >
-        {menuLabel ? <li className="dropdown-header">{menuLabel}</li> : null}
+        {menuLabel ? (
+          <li className="dropdown-header" key="header">
+            {menuLabel}
+          </li>
+        ) : null}
         {items.map((item, i) => (
           <DropdownMenuItem
             item={item}
