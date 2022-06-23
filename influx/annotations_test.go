@@ -40,6 +40,7 @@ func Test_toPoint(t *testing.T) {
 					"start_time":       time.Time{}.UnixNano(),
 					"modified_time_ns": int64(time.Unix(0, 0).UnixNano()),
 					"text":             "mytext",
+					"color":            "",
 				},
 			},
 		},
@@ -50,6 +51,7 @@ func Test_toPoint(t *testing.T) {
 				Text:      "mytext",
 				StartTime: time.Unix(100, 0),
 				EndTime:   time.Unix(200, 0),
+				Color:     "red",
 			},
 			now: time.Unix(0, 0),
 			want: chronograf.Point{
@@ -65,6 +67,7 @@ func Test_toPoint(t *testing.T) {
 					"start_time":       time.Unix(100, 0).UnixNano(),
 					"modified_time_ns": int64(time.Unix(0, 0).UnixNano()),
 					"text":             "mytext",
+					"color":            "red",
 				},
 			},
 		},

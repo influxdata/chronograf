@@ -162,6 +162,7 @@ func toPoint(anno *chronograf.Annotation, now time.Time) chronograf.Point {
 			"start_time":       anno.StartTime.UnixNano(),
 			"modified_time_ns": int64(now.UnixNano()),
 			"text":             anno.Text,
+			"color":            anno.Color,
 		},
 	}
 }
@@ -301,6 +302,9 @@ func (r *influxResults) Annotations() (res []chronograf.Annotation, err error) {
 				}
 				if anno.ID, err = v.String(i); err != nil {
 					return
+				}
+				if colorIndex, found := columnIndex["color"]; found {
+					anno.Color, _ = v.String(colorIndex)
 				}
 
 				anno.Tags = chronograf.AnnotationTags{}

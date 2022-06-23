@@ -28,6 +28,7 @@ type annotationResponse struct {
 	StartTime string                    `json:"startTime"` // StartTime in RFC3339 of the start of the annotation
 	EndTime   string                    `json:"endTime"`   // EndTime in RFC3339 of the end of the annotation
 	Text      string                    `json:"text"`      // Text is the associated user-facing text describing the annotation
+	Color     string                    `json:"color"`     // Optional annotation color
 	Tags      chronograf.AnnotationTags `json:"tags"`      // Tags is a collection of user defined key/value pairs that contextualize the annotation
 	Links     annotationLinks           `json:"links"`
 }
@@ -39,6 +40,7 @@ func newAnnotationResponse(src chronograf.Source, a *chronograf.Annotation) anno
 		StartTime: a.StartTime.UTC().Format(timeMilliFormat),
 		EndTime:   a.EndTime.UTC().Format(timeMilliFormat),
 		Text:      a.Text,
+		Color:     a.Color,
 		Tags:      a.Tags,
 		Links: annotationLinks{
 			Self: fmt.Sprintf("%s/%d/annotations/%s", base, src.ID, a.ID),
@@ -227,7 +229,8 @@ func (s *Service) Annotation(w http.ResponseWriter, r *http.Request) {
 type newAnnotationRequest struct {
 	StartTime time.Time
 	EndTime   time.Time
-	Text      string                    `json:"text,omitempty"` // Text is the associated user-facing text describing the annotation
+	Text      string                    `json:"text,omitempty"`  // Text is the associated user-facing text describing the annotation
+	Color     string                    `json:"color,omitempty"` // Optional annotation color
 	Tags      chronograf.AnnotationTags `json:"tags"`
 }
 
@@ -267,6 +270,7 @@ func (ar *newAnnotationRequest) Annotation() *chronograf.Annotation {
 		StartTime: ar.StartTime,
 		EndTime:   ar.EndTime,
 		Text:      ar.Text,
+		Color:     ar.Color,
 		Tags:      ar.Tags,
 	}
 }
@@ -379,6 +383,7 @@ type updateAnnotationRequest struct {
 	StartTime *time.Time                `json:"startTime,omitempty"` // StartTime is the time in rfc3339 milliseconds
 	EndTime   *time.Time                `json:"endTime,omitempty"`   // EndTime is the time in rfc3339 milliseconds
 	Text      *string                   `json:"text,omitempty"`      // Text is the associated user-facing text describing the annotation
+	Color     *string                   `json:"color,omitempty"`     // Annotation color
 	Tags      chronograf.AnnotationTags `json:"tags"`
 }
 
@@ -478,6 +483,10 @@ func (s *Service) UpdateAnnotation(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.Text != nil {
 		cur.Text = *req.Text
+	}
+
+	if req.Color != nil {
+		cur.Color = *req.Color
 	}
 	if req.Tags != nil {
 		if err = req.Tags.Valid(); err != nil {
