@@ -29,6 +29,15 @@ const CreateUserDialog = ({visible, setVisible, create}: Props) => {
     setPassword('')
     setVisible(false)
   }, [])
+  const onEnterPressed = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter' && name && password) {
+        e.stopPropagation()
+        create({name, password})
+      }
+    },
+    [name, password, create]
+  )
   return (
     <OverlayTechnology visible={visible}>
       <OverlayContainer maxWidth={650}>
@@ -42,6 +51,7 @@ const CreateUserDialog = ({visible, setVisible, create}: Props) => {
                   onChange={e => setName(e.target.value)}
                   autoFocus={true}
                   autoComplete="off"
+                  onKeyPress={onEnterPressed}
                   status={
                     validateUserName(name)
                       ? ComponentStatus.Valid
@@ -60,6 +70,7 @@ const CreateUserDialog = ({visible, setVisible, create}: Props) => {
                       : ComponentStatus.Default
                   }
                   onChange={e => setPassword(e.target.value)}
+                  onKeyPress={onEnterPressed}
                   autoComplete="off"
                   testId="password--input"
                 />
