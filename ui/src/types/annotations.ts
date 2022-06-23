@@ -3,6 +3,7 @@ export interface Annotation {
   startTime: number
   endTime: number
   text: string
+  color?: string
   tags?: AnnotationTags
   links: {self: string}
 }

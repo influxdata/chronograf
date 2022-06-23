@@ -54,7 +54,7 @@ class AnnotationPoint extends Component<Props, State> {
           onMouseEnter={this.handleMouseEnter}
           onMouseLeave={this.handleMouseLeave}
         />
-        <div className={this.flagClass} />
+        <div className={this.flagClass} style={this.flagStyle} />
         <AnnotationTooltip
           timestamp={annotation.startTime}
           annotation={annotation}
@@ -151,9 +151,17 @@ class AnnotationPoint extends Component<Props, State> {
       DYGRAPH_CONTAINER_V_MARGIN * 2
     }px)`
 
+    const backgroundColor = annotation.color || undefined
     return {
       left,
       height,
+      backgroundColor,
+    }
+  }
+
+  private get flagStyle(): CSSProperties {
+    return {
+      backgroundColor: this.props.annotation.color || undefined,
     }
   }
 
