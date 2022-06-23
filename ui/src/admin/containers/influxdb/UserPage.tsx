@@ -3,7 +3,11 @@ import {connect, ResolveThunks} from 'react-redux'
 import {withSource} from 'src/CheckSources'
 import {Source} from 'src/types'
 import {Database, User, UserPermission, UserRole} from 'src/types/influxAdmin'
-import {hasRoleManagement, isConnectedToLDAP} from './AdminInfluxDBTabbedPage'
+import {
+  AdminTabs,
+  hasRoleManagement,
+  isConnectedToLDAP,
+} from './AdminInfluxDBTabbedPage'
 import {withRouter, WithRouterProps} from 'react-router'
 import {useMemo} from 'react'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
@@ -480,7 +484,7 @@ const UserPage = ({
     <Page className="influxdb-admin">
       <Page.Header fullWidth={true}>
         <Page.Header.Left>
-          <Page.Title title="Manage User" />
+          <Page.Title title="InfluxDB User" />
         </Page.Header.Left>
         <Page.Header.Right showSourceIndicator={true}>
           {dataChanged ? (
@@ -507,7 +511,11 @@ const UserPage = ({
           )}
         </Page.Header.Right>
       </Page.Header>
-      <div className="influxdb-admin--contents">{body}</div>
+      <div className="influxdb-admin--contents">
+        <AdminTabs activeTab="users" source={source}>
+          {body}
+        </AdminTabs>
+      </div>
     </Page>
   )
 }

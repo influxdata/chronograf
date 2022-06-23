@@ -265,7 +265,7 @@ pre.admin-table--query {
     height: calc(100vh - 150px);
     min-height: 10px;
     &.influxdb-admin--detail{
-      height: calc(100vh - 120px);
+      height: calc(100vh - 150px);
       padding: 10px 0 0;
       background-color: $g1-raven;
     }
