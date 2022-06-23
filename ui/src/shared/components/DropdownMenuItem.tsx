@@ -1,4 +1,4 @@
-import React, {FunctionComponent, MouseEvent} from 'react'
+import React, {MouseEvent, useCallback} from 'react'
 
 import _ from 'lodash'
 import classnames from 'classnames'
@@ -28,7 +28,7 @@ interface ItemProps {
   onAction?: OnActionHandler
 }
 
-const DropdownMenuItem: FunctionComponent<ItemProps> = ({
+const DropdownMenuItem = ({
   item,
   highlightedItemIndex,
   onSelection,
@@ -37,7 +37,7 @@ const DropdownMenuItem: FunctionComponent<ItemProps> = ({
   onAction,
   selected,
   index,
-}) => {
+}: ItemProps) => {
   if (_.isString(item)) {
     item = {text: item}
   }
@@ -45,6 +45,14 @@ const DropdownMenuItem: FunctionComponent<ItemProps> = ({
   if (item.text === 'SEPARATOR') {
     return <li className="dropdown-divider" />
   }
+
+  const onClick = useCallback(
+    (e: MouseEvent<HTMLAnchorElement>) => {
+      e.preventDefault()
+      onSelection(item)(e)
+    },
+    [item]
+  )
 
   return (
     <li
@@ -54,7 +62,7 @@ const DropdownMenuItem: FunctionComponent<ItemProps> = ({
       })}
       data-test={`${item.text}-dropdown-item`}
     >
-      <a href="#" onClick={onSelection(item)} onMouseOver={onHighlight(index)}>
+      <a href="#" onClick={onClick} onMouseOver={onHighlight(index)}>
         {item.text}
       </a>
       {actions && !!actions.length && (
