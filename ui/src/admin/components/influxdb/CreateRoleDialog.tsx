@@ -25,6 +25,15 @@ const CreateRoleDialog = ({visible, setVisible, create}: Props) => {
     setName('')
     setVisible(false)
   }, [])
+  const onEnterPressed = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter' && name) {
+        e.stopPropagation()
+        create({name})
+      }
+    },
+    [name, create]
+  )
   return (
     <OverlayTechnology visible={visible}>
       <OverlayContainer maxWidth={650}>
@@ -38,6 +47,7 @@ const CreateRoleDialog = ({visible, setVisible, create}: Props) => {
                   autoFocus={true}
                   autoComplete="off"
                   onChange={e => setName(e.target.value)}
+                  onKeyPress={onEnterPressed}
                   status={
                     validateRoleName(name)
                       ? ComponentStatus.Valid
