@@ -6699,6 +6699,7 @@
             "startTime": "2018-07-09T18:08:15.933Z",
             "endTime": "2018-07-09T18:08:15.933Z",
             "text": "unknown event",
+            "color": "",
             "tags": {},
             "links": {
               "self": "/chronograf/v1/sources/1/annotations/50ee18e8-8115-4fac-abed-24ce89e96047"
@@ -6709,6 +6710,7 @@
             "startTime": "2018-07-09T17:48:04.23Z",
             "endTime": "2018-07-09T17:48:08.652Z",
             "text": "todo: investigate this spike",
+            "color":  "",
             "tags": {
               "repo": "influxdata/chronograf"
             },
@@ -6750,6 +6752,13 @@
             "text": "my annotation"
           }
         },
+        "color": {
+          "type": "string",
+          "description": "Annotation color",
+          "example": {
+            "text": "red"
+          }
+        },
         "tags": {
           "type": "object",
           "description": "A set of user-defined tags associated with the annotation",
@@ -6773,6 +6782,7 @@
         "startTime": "2018-07-09T17:48:04.23Z",
         "endTime": "2018-07-09T17:48:08.652Z",
         "text": "no name",
+        "color": "red",
         "tags": {
           "repo": "influxdata/chronograf"
         },
@@ -6803,6 +6813,13 @@
           "description": "A user-facing description of the annotation",
           "example": {
             "text": "my annotation"
+          }
+        },
+        "color": {
+          "type": "string",
+          "description": "Annotation color",
+          "example": {
+            "text": "red"
           }
         },
         "tags": {
