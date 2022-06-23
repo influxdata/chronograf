@@ -16,7 +16,7 @@ export function isConnectedToLDAP(source: Source) {
   return source.authentication === SourceAuthenticationMethod.LDAP
 }
 
-const AdminInfluxDBTabbedPage = ({source, activeTab, children}: Props) => {
+export const AdminTabs = ({source, activeTab, children}: Props) => {
   const sections = useMemo(() => {
     const hasRoles = hasRoleManagement(source)
     const isLDAP = isConnectedToLDAP(source)
@@ -44,16 +44,23 @@ const AdminInfluxDBTabbedPage = ({source, activeTab, children}: Props) => {
     ]
   }, [source])
   return (
+    <SubSections
+      parentUrl="admin-influxdb"
+      sourceID={source.id}
+      activeSection={activeTab}
+      sections={sections}
+      position="top"
+    >
+      {children}
+    </SubSections>
+  )
+}
+const AdminInfluxDBTabbedPage = ({source, activeTab, children}: Props) => {
+  return (
     <WrapToPage hideRefresh={activeTab === 'queries'}>
-      <SubSections
-        parentUrl="admin-influxdb"
-        sourceID={source.id}
-        activeSection={activeTab}
-        sections={sections}
-        position="top"
-      >
+      <AdminTabs source={source} activeTab={activeTab}>
         {children}
-      </SubSections>
+      </AdminTabs>
     </WrapToPage>
   )
 }
