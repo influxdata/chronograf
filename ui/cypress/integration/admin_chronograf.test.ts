@@ -86,6 +86,15 @@ describe('Chronograf', () => {
   describe('All Users', () => {
     beforeEach(() => {
       cy.visit(url + '/all-users')
+      cy.getByTestID('new-user-admins--toggle').then($el => {
+        /* 
+          The state of the toggle is remembered.
+          This ensures that toggle is not active at the beggining of each test.
+         */
+        if ($el.hasClass('active')) {
+          $el.trigger('click')
+        }
+      })
     })
 
     it('add user, edit user, and remove it', () => {
@@ -121,6 +130,7 @@ describe('Chronograf', () => {
           cy.getByTestID('confirm-new-user--button').click()
         })
 
+      cy.visit(url + '/all-users')
       cy.getByTestID('new-user-admins--toggle')
         .click()
         .should('not.have.class', 'active')
@@ -140,9 +150,9 @@ describe('Chronograf', () => {
           .contains(chronograf.user.orgs[0])
           .should('exist')
 
-        cy.getByTestID('delete-tag--button').clickAttached()
+        cy.getByTestID('delete-tag--button').click()
         cy.getByTestID('delete-tag--button').within(() => {
-          cy.getByTestID('confirm-btn').clickAttached()
+          cy.getByTestID('confirm-btn').click()
         })
 
         cy.get(`.input-tag--item`).should('not.exist')
@@ -155,15 +165,15 @@ describe('Chronograf', () => {
           .within(() => {
             cy.get('.tags-add--menu-item')
               .contains(chronograf.user.orgs[0])
-              .clickAttached()
+              .click()
           })
       })
 
       cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
       cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
-        cy.getByTestID('delete-user--button').clickAttached()
+        cy.getByTestID('delete-user--button').click()
         cy.getByTestID('delete-user--button').within(() => {
-          cy.getByTestID('confirm-btn').clickAttached()
+          cy.getByTestID('confirm-btn').click()
         })
       })
     })
