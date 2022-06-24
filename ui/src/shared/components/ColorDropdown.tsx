@@ -8,7 +8,7 @@ import {ColorNumber, ThresholdColor} from 'src/types/colors'
 import {DROPDOWN_MENU_MAX_HEIGHT} from 'src/shared/constants/index'
 
 interface Props {
-  selected: ColorNumber
+  selected: Partial<ColorNumber>
   disabled?: boolean
   stretchToFit?: boolean
   colors: ThresholdColor[]

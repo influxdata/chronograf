@@ -10,6 +10,9 @@ import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 import {BLACKLISTED_KEYS} from 'src/shared/annotations/helpers'
 
 import {Annotation} from 'src/types/annotations'
+import ColorDropdown from './ColorDropdown'
+import {THRESHOLD_COLORS, THRESHOLD_COLOR_WHITE} from '../constants/thresholds'
+import {ThresholdColor} from 'src/types/colors'
 
 const INPUT_DEBOUNCE_TIME = 600
 const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ss.SS'
@@ -37,6 +40,8 @@ interface State {
   text: string
   startTime: number
   endTime: number
+  color: ThresholdColor
+  colors: ThresholdColor[]
   tags: Array<{
     id: string
     tagKey: string
@@ -69,12 +74,24 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
       shouldAutoFocus: false,
     }))
 
+    const initColor = props.annotation.color || THRESHOLD_COLOR_WHITE.hex
+    let color = THRESHOLD_COLORS.find(x => x.hex === initColor)
+    let colors: ThresholdColor[]
+    if (color) {
+      colors = THRESHOLD_COLORS
+    } else {
+      color = {name: 'custom', hex: initColor}
+      colors = [color, ...THRESHOLD_COLORS]
+    }
+
     this.state = {
       text,
       startTime: getTime(formatDate(startTime)),
       endTime: getTime(formatDate(endTime)),
       tags,
       type,
+      color,
+      colors,
       startTimeInput: formatDate(startTime),
       startTimeError: null,
       endTimeInput: formatDate(endTime),
@@ -99,6 +116,8 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
       startTimeError,
       endTimeError,
       tagsError,
+      color,
+      colors,
     } = this.state
 
     return (
@@ -172,6 +191,17 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
               />
             </div>
           )}
+        </div>
+        <div className="row">
+          <div className="form-group col-xs-12" data-test="tags-group">
+            <label>Color</label>
+            <ColorDropdown
+              colors={colors}
+              selected={color}
+              onChoose={this.handleChangeColor}
+              stretchToFit={true}
+            />
+          </div>
         </div>
         <div className="row">
           <div className="form-group col-xs-12" data-test="tags-group">
@@ -334,6 +364,10 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
     this.setState(nextState, () => this.setDraftAnnotation())
   }
 
+  private handleChangeColor = (color: ThresholdColor): void => {
+    this.setState({color}, this.setDraftAnnotation)
+  }
+
   private handleAddTag = (): void => {
     const newTag = {
       id: uuid.v4(),
@@ -393,6 +427,7 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
       startTime,
       endTime,
       text,
+      color,
       startTimeError,
       endTimeError,
       textError,
@@ -421,6 +456,7 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
       startTime,
       endTime: type === 'window' ? endTime : startTime,
       text,
+      color: color.hex,
       tags: annotationTags,
       links: annotation.links,
     })

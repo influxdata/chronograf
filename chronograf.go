@@ -535,6 +535,7 @@ var annotationTagsBlacklist = map[string]bool{
 	"endTime":          true,
 	"modified_time_ns": true,
 	"text":             true,
+	"color":            true,
 	"type":             true,
 	"id":               true,
 }
@@ -566,6 +567,7 @@ type Annotation struct {
 	StartTime time.Time      // StartTime starts the annotation
 	EndTime   time.Time      // EndTime ends the annotation
 	Text      string         // Text is the associated user-facing text describing the annotation
+	Color     string         // Color associated with the annotation
 	Tags      AnnotationTags // Tags is a collection of user defined key/value pairs that contextualize the annotation
 }
 

@@ -13,6 +13,10 @@ export const THRESHOLD_TYPE_TEXT = 'text'
 export const THRESHOLD_TYPE_BG = 'background'
 export const THRESHOLD_TYPE_BASE = 'base'
 
+export const THRESHOLD_COLOR_WHITE = {
+  hex: '#ffffff',
+  name: 'white',
+}
 export const THRESHOLD_COLORS = [
   {
     hex: '#BF3D5E',
@@ -82,10 +86,7 @@ export const THRESHOLD_COLORS = [
     hex: '#545667',
     name: 'graphite',
   },
-  {
-    hex: '#ffffff',
-    name: 'white',
-  },
+  THRESHOLD_COLOR_WHITE,
   {
     hex: '#292933',
     name: 'castle',
