@@ -267,11 +267,14 @@ const UserPage = ({
     permissionsChanged,
     rolesChanged,
   ])
+  const exitHandler = useCallback(() => {
+    router.push(`/sources/${sourceID}/admin-influxdb/users`)
+  }, [router, source])
   const changeData = useCallback(async () => {
     if ((await changeRoles()) && (await changePermissions())) {
-      router.push(`/sources/${sourceID}/admin-influxdb/users`)
+      exitHandler()
     }
-  }, [changePermissions, changeRoles, router, source])
+  }, [changePermissions, changeRoles, exitHandler])
   const databaseNames = useMemo<string[]>(
     () =>
       databases.reduce(
@@ -485,6 +488,17 @@ const UserPage = ({
           <Page.Title title="InfluxDB User" />
         </Page.Header.Left>
         <Page.Header.Right showSourceIndicator={true}>
+          {dataChanged ? (
+            <ConfirmButton
+              text="Exit"
+              confirmText="Discard unsaved changes?"
+              confirmAction={exitHandler}
+              position="left"
+              testId="discard-changes--exit--button"
+            />
+          ) : (
+            <Button text="Exit" onClick={exitHandler} testId="exit--button" />
+          )}
           {dataChanged && (
             <Button
               text="Apply Changes"
