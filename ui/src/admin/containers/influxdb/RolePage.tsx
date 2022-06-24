@@ -3,7 +3,11 @@ import {connect, ResolveThunks} from 'react-redux'
 import {withSource} from 'src/CheckSources'
 import {Source} from 'src/types'
 import {Database, User, UserPermission, UserRole} from 'src/types/influxAdmin'
-import {hasRoleManagement, isConnectedToLDAP} from './AdminInfluxDBTabbedPage'
+import {
+  AdminTabs,
+  hasRoleManagement,
+  isConnectedToLDAP,
+} from './AdminInfluxDBTabbedPage'
 import {withRouter, WithRouterProps} from 'react-router'
 import {useMemo} from 'react'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
@@ -22,6 +26,7 @@ import {
   computePermissionsChange,
   toUserPermissions,
 } from '../../util/permissions'
+import ConfirmDiscardDialog from 'src/admin/components/influxdb/ConfirmDiscardDialog'
 
 const FAKE_ROLE: UserRole = {
   name: '',
@@ -148,7 +153,7 @@ const RolePage = ({
   const changePermissions = useMemo(
     () => async () => {
       if (Object.entries(changedPermissions).length === 0) {
-        return
+        return true
       }
       setRunning(true)
       try {
@@ -157,7 +162,7 @@ const RolePage = ({
           roleDBPermissions,
           changedPermissions
         )
-        await updatePermissionsAsync(role, permissions)
+        return await updatePermissionsAsync(role, permissions)
       } finally {
         setRunning(false)
       }
@@ -201,7 +206,7 @@ const RolePage = ({
   const changeUsers = useMemo(
     () => async () => {
       if (Object.entries(changedUsersRecord).length === 0) {
-        return
+        return true
       }
       setRunning(true)
       try {
@@ -216,7 +221,7 @@ const RolePage = ({
           }
           return acc
         }, [])
-        await updateUsersAsync(role, newUsers)
+        return await updateUsersAsync(role, newUsers)
       } finally {
         setRunning(false)
       }
@@ -228,13 +233,14 @@ const RolePage = ({
     permissionsChanged,
     usersChanged,
   ])
-  const changeData = useCallback(async () => {
-    await changeUsers()
-    await changePermissions()
-  }, [changePermissions, changeUsers])
   const exitHandler = useCallback(() => {
     router.push(`/sources/${sourceID}/admin-influxdb/roles`)
   }, [router, source])
+  const changeData = useCallback(async () => {
+    if ((await changeUsers()) && (await changePermissions())) {
+      exitHandler()
+    }
+  }, [changePermissions, changeUsers, exitHandler])
   const databaseNames = useMemo<string[]>(
     () =>
       databases.reduce(
@@ -246,6 +252,25 @@ const RolePage = ({
       ),
     [databases]
   )
+
+  const [exitUrl, setExitUrl] = useState('')
+  const onTabChange = useCallback(
+    (_section, url) => {
+      if (dataChanged) {
+        setExitUrl(url)
+        return
+      }
+      router.push(url)
+    },
+    [router, dataChanged]
+  )
+  const onExitCancel = useCallback(() => {
+    setExitUrl('')
+  }, [])
+  const onExitConfirm = useCallback(() => {
+    router.push(exitUrl)
+  }, [router, exitUrl])
+
   const body =
     role === FAKE_ROLE ? (
       <div className="container-fluid">
@@ -375,7 +400,7 @@ const RolePage = ({
     <Page className="influxdb-admin">
       <Page.Header fullWidth={true}>
         <Page.Header.Left>
-          <Page.Title title="Manage Role" />
+          <Page.Title title="InfluxDB Role" />
         </Page.Header.Left>
         <Page.Header.Right showSourceIndicator={true}>
           {dataChanged ? (
@@ -402,7 +427,16 @@ const RolePage = ({
           )}
         </Page.Header.Right>
       </Page.Header>
-      <div className="influxdb-admin--contents">{body}</div>
+      <div className="influxdb-admin--contents">
+        <AdminTabs activeTab="roles" source={source} onTabChange={onTabChange}>
+          <ConfirmDiscardDialog
+            onOK={onExitConfirm}
+            onCancel={onExitCancel}
+            visible={!!exitUrl}
+          />
+          {body}
+        </AdminTabs>
+      </div>
     </Page>
   )
 }

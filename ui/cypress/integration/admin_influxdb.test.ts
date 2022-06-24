@@ -107,7 +107,8 @@ describe('InfluxDB', () => {
         .contains('Create')
         .should('not.be.disabled')
         .click({force: true})
-      cy.getByTestID('exit--button').click({force: true})
+      cy.url().should('match', new RegExp(`${influxDB.user.name}$`))
+      cy.get('.subsection--tab.active').click({force: true})
       cy.getByTestID(`user-row--${influxDB.user.name}`).should('exist')
       cy.getByTestID('user-filter--input').type('Non existing user')
       cy.getByTestID(`user-row--${influxDB.user.name}`).should('not.exist')
@@ -133,6 +134,12 @@ describe('InfluxDB', () => {
       })
 
       cy.getByTestID('apply-changes--button').click({force: true})
+      cy.url().should('match', /users$/)
+      cy.getByTestID(`user-row--${influxDB.user.name}`)
+        .should('exist')
+        .within(() => {
+          cy.get('a').contains(influxDB.user.name).click({force: true})
+        })
       cy.getByTestID(`${influxDB.db.name}-permissions--row`).within(() => {
         influxDB.user.db[0].permissions.forEach((permission: any) => {
           cy.getByTestID(
@@ -149,7 +156,7 @@ describe('InfluxDB', () => {
       cy.getByTestID('change-password--button').click({force: true})
       cy.getByTestID('new-password--input').type(influxDB.user.password)
       cy.getByTestID('confirm').click({force: true})
-      cy.getByTestID('exit--button').click({force: true})
+      cy.get('.subsection--tab.active').click({force: true})
       cy.getByTestID(`user-row--${influxDB.user.name}`).within(() => {
         cy.getByTestID('permissions--values').within(() => {
           cy.getByTestID('read-permission').should('have.class', 'granted')
@@ -176,7 +183,8 @@ describe('InfluxDB', () => {
         .contains('Create')
         .should('not.be.disabled')
         .click({force: true})
-      cy.getByTestID('exit--button').click({force: true})
+      cy.url().should('match', new RegExp(`${influxDB.user.name}$`))
+      cy.get('.subsection--tab.active').click({force: true})
       cy.get('.dropdown--selected').click({force: true})
       cy.getByTestID('dropdown-menu').within(() => {
         cy.getByTestID('dropdown--item')
@@ -202,11 +210,17 @@ describe('InfluxDB', () => {
         'value-changed'
       )
       cy.getByTestID('apply-changes--button').click({force: true})
+      cy.url().should('match', new RegExp(`users$`))
+      cy.getByTestID(`user-row--${influxDB.user.name}`)
+        .should('exist')
+        .within(() => {
+          cy.get('a').contains(influxDB.user.name).click({force: true})
+        })
       cy.getByTestID(`role-${influxDB.role.name}--button`).should(
         'not.have.class',
         'value-changed'
       )
-      cy.getByTestID('exit--button').click({force: true})
+      cy.get('.subsection--tab.active').click({force: true})
       cy.getByTestID('roles-granted').within(() => {
         cy.get('.role-value').contains(influxDB.role.name).should('exist')
       })
@@ -236,7 +250,8 @@ describe('InfluxDB', () => {
       cy.getByTestID('form--create-role--button')
         .should('not.be.disabled')
         .click()
-      cy.getByTestID('exit--button').click({force: true})
+      cy.url().should('match', new RegExp(`${influxDB.role.name}$`))
+      cy.get('.subsection--tab.active').click({force: true})
       cy.getByTestID(`role-${influxDB.role.name}--row`)
         .should('exist')
         .within(() => {
@@ -260,6 +275,10 @@ describe('InfluxDB', () => {
       })
 
       cy.getByTestID('apply-changes--button').click({force: true})
+      cy.url().should('match',new RegExp(`roles$`))
+      cy.getByTestID(`role-${influxDB.role.name}--row`).within(() => {
+        cy.get('a').contains(influxDB.role.name).click({force: true})
+      })
 
       cy.getByTestID(`${influxDB.db.name}-db-perm--row`).within(() => {
         influxDB.role.permissions.forEach((perm: any) => {
@@ -270,7 +289,8 @@ describe('InfluxDB', () => {
         })
       })
 
-      cy.getByTestID('exit--button').click({force: true})
+      cy.get('.subsection--tab.active').click({force: true})
+      cy.url().should('match',new RegExp(`roles$`))
       cy.getByTestID('wizard-bucket-selected').click({force: true})
       cy.getByTestID('dropdown-menu').within(() => {
         cy.getByTestID('dropdown--item')
@@ -296,7 +316,7 @@ describe('InfluxDB', () => {
       cy.getByTestID('show-users--toggle').click()
       cy.getByTestID('admin-table--head').within(() => {
         cy.get('th').contains('Users').should('exist')
-      })      
+      })
     })
   })
 })
