@@ -1,8 +1,6 @@
 /*
-    In these tests you will find realHover and clickAttached functions.
-    They are used to assure that Cypress can see re-rendered elements and click on them.
+    In these tests you will find a realHover function.
     realHover is used whenever there is a need to fire a hover event, which will make certain elements visible.
-    clickAttached is used to assure that the element is attached to the DOM and then uses JQuery trigger to click on the element.
 */
 
 describe('Chronograf', () => {
@@ -66,9 +64,7 @@ describe('Chronograf', () => {
         cy.get('.dropdown-selected').realHover()
         cy.get('.dropdown-selected').click()
         cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`).realHover()
-        cy.getByTestID(
-          `${chronograf.user.role[1]}-dropdown-item`
-        ).clickAttached()
+        cy.getByTestID(`${chronograf.user.role[1]}-dropdown-item`).click()
       })
 
       cy.getByTestID(`${chronograf.user.name}--table-row`).should('be.visible')
