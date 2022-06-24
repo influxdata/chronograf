@@ -183,7 +183,7 @@ const UserPage = ({
   const changePermissions = useMemo(
     () => async () => {
       if (Object.entries(changedPermissions).length === 0) {
-        return
+        return true
       }
       setRunning(true)
       try {
@@ -193,7 +193,7 @@ const UserPage = ({
           changedPermissions,
           isEnterprise ? [] : user.permissions.filter(x => x.scope === 'all')
         )
-        await updatePermissionsAsync(user, permissions)
+        return await updatePermissionsAsync(user, permissions)
       } finally {
         setRunning(false)
       }
@@ -240,7 +240,7 @@ const UserPage = ({
   const changeRoles = useMemo(
     () => async () => {
       if (Object.entries(changedRolesRecord).length === 0) {
-        return
+        return true
       }
       setRunning(true)
       try {
@@ -255,7 +255,7 @@ const UserPage = ({
           }
           return acc
         }, [])
-        await updateRolesAsync(user, newRoles)
+        return await updateRolesAsync(user, newRoles)
       } finally {
         setRunning(false)
       }
@@ -268,12 +268,10 @@ const UserPage = ({
     rolesChanged,
   ])
   const changeData = useCallback(async () => {
-    await changeRoles()
-    await changePermissions()
-  }, [changePermissions, changeRoles])
-  const exitHandler = useCallback(() => {
-    router.push(`/sources/${sourceID}/admin-influxdb/users`)
-  }, [router, source])
+    if ((await changeRoles()) && (await changePermissions())) {
+      router.push(`/sources/${sourceID}/admin-influxdb/users`)
+    }
+  }, [changePermissions, changeRoles, router, source])
   const databaseNames = useMemo<string[]>(
     () =>
       databases.reduce(
@@ -487,17 +485,6 @@ const UserPage = ({
           <Page.Title title="InfluxDB User" />
         </Page.Header.Left>
         <Page.Header.Right showSourceIndicator={true}>
-          {dataChanged ? (
-            <ConfirmButton
-              text="Exit"
-              confirmText="Discard unsaved changes?"
-              confirmAction={exitHandler}
-              position="left"
-              testId="exit--button"
-            />
-          ) : (
-            <Button text="Exit" onClick={exitHandler} testId="exit--button" />
-          )}
           {dataChanged && (
             <Button
               text="Apply Changes"

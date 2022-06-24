@@ -152,7 +152,7 @@ const RolePage = ({
   const changePermissions = useMemo(
     () => async () => {
       if (Object.entries(changedPermissions).length === 0) {
-        return
+        return true
       }
       setRunning(true)
       try {
@@ -161,7 +161,7 @@ const RolePage = ({
           roleDBPermissions,
           changedPermissions
         )
-        await updatePermissionsAsync(role, permissions)
+        return await updatePermissionsAsync(role, permissions)
       } finally {
         setRunning(false)
       }
@@ -205,7 +205,7 @@ const RolePage = ({
   const changeUsers = useMemo(
     () => async () => {
       if (Object.entries(changedUsersRecord).length === 0) {
-        return
+        return true
       }
       setRunning(true)
       try {
@@ -220,7 +220,7 @@ const RolePage = ({
           }
           return acc
         }, [])
-        await updateUsersAsync(role, newUsers)
+        return await updateUsersAsync(role, newUsers)
       } finally {
         setRunning(false)
       }
@@ -233,12 +233,10 @@ const RolePage = ({
     usersChanged,
   ])
   const changeData = useCallback(async () => {
-    await changeUsers()
-    await changePermissions()
-  }, [changePermissions, changeUsers])
-  const exitHandler = useCallback(() => {
-    router.push(`/sources/${sourceID}/admin-influxdb/roles`)
-  }, [router, source])
+    if ((await changeUsers()) && (await changePermissions())) {
+      router.push(`/sources/${sourceID}/admin-influxdb/roles`)
+    }
+  }, [changePermissions, changeUsers, router, source])
   const databaseNames = useMemo<string[]>(
     () =>
       databases.reduce(
@@ -382,17 +380,6 @@ const RolePage = ({
           <Page.Title title="InfluxDB Role" />
         </Page.Header.Left>
         <Page.Header.Right showSourceIndicator={true}>
-          {dataChanged ? (
-            <ConfirmButton
-              text="Exit"
-              confirmText="Discard unsaved changes?"
-              confirmAction={exitHandler}
-              position="left"
-              testId="discard-changes--exit--button"
-            />
-          ) : (
-            <Button text="Exit" onClick={exitHandler} testId="exit--button" />
-          )}
           {dataChanged && (
             <Button
               text="Apply Changes"
