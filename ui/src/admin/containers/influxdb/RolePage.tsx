@@ -26,6 +26,7 @@ import {
   computePermissionsChange,
   toUserPermissions,
 } from '../../util/permissions'
+import ConfirmDiscardDialog from 'src/admin/components/influxdb/ConfirmDiscardDialog'
 
 const FAKE_ROLE: UserRole = {
   name: '',
@@ -251,6 +252,25 @@ const RolePage = ({
       ),
     [databases]
   )
+
+  const [exitUrl, setExitUrl] = useState('')
+  const onTabChange = useCallback(
+    (_section, url) => {
+      if (dataChanged) {
+        setExitUrl(url)
+        return
+      }
+      router.push(url)
+    },
+    [router, dataChanged]
+  )
+  const onExitCancel = useCallback(() => {
+    setExitUrl('')
+  }, [])
+  const onExitConfirm = useCallback(() => {
+    router.push(exitUrl)
+  }, [router, exitUrl])
+
   const body =
     role === FAKE_ROLE ? (
       <div className="container-fluid">
@@ -408,7 +428,12 @@ const RolePage = ({
         </Page.Header.Right>
       </Page.Header>
       <div className="influxdb-admin--contents">
-        <AdminTabs activeTab="roles" source={source}>
+        <AdminTabs activeTab="roles" source={source} onTabChange={onTabChange}>
+          <ConfirmDiscardDialog
+            onOK={onExitConfirm}
+            onCancel={onExitCancel}
+            visible={!!exitUrl}
+          />
           {body}
         </AdminTabs>
       </div>
