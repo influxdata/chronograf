@@ -88,7 +88,7 @@ export const PERMISSIONS = {
   },
   KapacitorConfigAPI: {
     displayName: 'Kapacitor Config API',
-    description: 'Can override the Kapacitor configuration dynamically',
+    description: 'Can override Kapacitor configuration dynamically',
   },
 }
 
