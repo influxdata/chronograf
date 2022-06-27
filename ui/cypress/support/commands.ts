@@ -539,13 +539,11 @@ function wrapChronografUsers() {
 export function toInitialState() {
   cy.OAuthLogin('test')
     .url()
-    .should('contain', '/landing')
+    .should('contain', 'redirectPath')
     .then(() => {
       cy.get('body')
         .should('be.visible')
         .then(() => {
-          cy.log('wait before using sources')
-          cy.wait(2000)
           cy.request({
             method: 'GET',
             url: `${apiUrl}/sources`,
