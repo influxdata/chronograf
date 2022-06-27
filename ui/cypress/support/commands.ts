@@ -540,7 +540,7 @@ export function toInitialState() {
     .url()
     .should('contain', '/landing')
     .then(() => {
-      cy.getByTestID('sidebar')
+      cy.get('body')
         .should('be.visible')
         .then(() => {
           cy.request({
@@ -553,7 +553,7 @@ export function toInitialState() {
               cy.deleteInfluxDBUsers(source.id)
             })
           })
-          
+
           cy.deleteDashboards()
           cy.deleteChronografUsers()
           cy.deleteOrgs()
