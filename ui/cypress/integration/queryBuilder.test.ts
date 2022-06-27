@@ -4,39 +4,33 @@ describe('query builder', () => {
   beforeEach(() => {
     cy.toInitialState()
     cy.createInfluxDBConnection().then(() => {
-      cy.getByTestID('sidebar')
-        .should('be.visible')
-        .then(() => {
-          cy.createDashboard()
-          cy.get('@connections').then((sources: any) => {
-            cy.fixture('influxDB.json').then((influxDBData: any) => {
-              influxDB = influxDBData
+      cy.createDashboard()
+      cy.get('@connections').then((sources: any) => {
+        cy.fixture('influxDB.json').then((influxDBData: any) => {
+          influxDB = influxDBData
 
-              cy.createInfluxDB(influxDB.db.name, sources[0].id)
-              cy.writePoints(
-                sources[0].id,
-                influxDB.db.name,
-                influxDB.db.measurements[0].name,
-                influxDB.db.measurements[0].tagValues[0],
-                influxDB.db.measurements[0].fieldValues[0]
-              )
+          cy.createInfluxDB(influxDB.db.name, sources[0].id)
+          cy.writePoints(
+            sources[0].id,
+            influxDB.db.name,
+            influxDB.db.measurements[0].name,
+            influxDB.db.measurements[0].tagValues[0],
+            influxDB.db.measurements[0].fieldValues[0]
+          )
 
-              cy.writePoints(
-                sources[0].id,
-                influxDB.db.name,
-                influxDB.db.measurements[1].name,
-                influxDB.db.measurements[1].tagValues[1],
-                influxDB.db.measurements[1].fieldValues[0]
-              )
-            })
-
-            cy.get('@dashboards').then((dashboards: any) => {
-              cy.visit(
-                `/sources/${sources[0].id}/dashboards/${dashboards[0].id}`
-              )
-            })
-          })
+          cy.writePoints(
+            sources[0].id,
+            influxDB.db.name,
+            influxDB.db.measurements[1].name,
+            influxDB.db.measurements[1].tagValues[1],
+            influxDB.db.measurements[1].fieldValues[0]
+          )
         })
+
+        cy.get('@dashboards').then((dashboards: any) => {
+          cy.visit(`/sources/${sources[0].id}/dashboards/${dashboards[0].id}`)
+        })
+      })
     })
 
     cy.get('#Line').click()

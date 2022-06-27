@@ -12,14 +12,10 @@ describe('InfluxDB', () => {
   beforeEach(() => {
     cy.toInitialState()
     cy.createInfluxDBConnection().then(() => {
-      cy.getByTestID('sidebar')
-        .should('be.visible')
-        .then(() => {
-          cy.get('@connections').then(sources => {
-            sourceId = sources[0].id
-            url = `/sources/${sourceId}/admin-influxdb`
-          })
-        })
+      cy.get('@connections').then(sources => {
+        sourceId = sources[0].id
+        url = `/sources/${sourceId}/admin-influxdb`
+      })
     })
   })
 

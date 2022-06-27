@@ -2,14 +2,11 @@ describe('Use Dashboards', () => {
   beforeEach(() => {
     cy.toInitialState()
     cy.createInfluxDBConnection().then(() => {
-      cy.getByTestID('sidebar')
-        .should('be.visible')
-        .then(() => {
-          cy.get('@connections').then(connections => {
-            cy.visit(`/sources/${connections[0].id}/dashboards`)
-          })
-          cy.createDashboard('Reader Dashboard')
-        })
+      cy.get('@connections').then(connections => {
+        cy.visit(`/sources/${connections[0].id}/dashboards`)
+      })
+      
+      cy.createDashboard('Reader Dashboard')
     })
   })
 

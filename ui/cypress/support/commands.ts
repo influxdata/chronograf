@@ -51,12 +51,14 @@ export const writePoints = (
 
 export const OAuthLogin = (name: string) => {
   return cy.changeUserInfo(name).then(response => {
-    return cy.log(
-      `OAuth change config - status ${response.status}, ${response.statusText}`
-    ).then(() => {
-      expect(response.status).to.be.equal(200)
-      return cy.visit('/oauth/oauth-mock/login')
-    })
+    return cy
+      .log(
+        `OAuth change config - status ${response.status}, ${response.statusText}`
+      )
+      .then(() => {
+        expect(response.status).to.be.equal(200)
+        return cy.visit('/oauth/oauth-mock/login')
+      })
   })
 }
 
@@ -66,12 +68,14 @@ export const OAuthLogout = () => {
 
 export const OAuthLoginAsDiffUser = (name: string) => {
   return cy.changeUserInfo(name).then(response => {
-    return cy.log(
-      `OAuth change config - status ${response.status}, ${response.statusText}`
-    ).then(() => {
-      expect(response.status).to.be.equal(200)
+    return cy
+      .log(
+        `OAuth change config - status ${response.status}, ${response.statusText}`
+      )
+      .then(() => {
+        expect(response.status).to.be.equal(200)
         return cy.visit('/oauth/oauth-mock/logout')
-    })
+      })
   })
 }
 
@@ -536,21 +540,25 @@ export function toInitialState() {
     .url()
     .should('contain', '/landing')
     .then(() => {
-      cy.request({
-        method: 'GET',
-        url: `${apiUrl}/sources`,
-      }).then(({body: responseBody}) => {
-        responseBody.sources.forEach((source: any) => {
-          cy.deleteInfluxDBs(source.id)
-          cy.deleteInfluxDBRoles(source.id)
-          cy.deleteInfluxDBUsers(source.id)
+      cy.getByTestID('sidebar')
+        .should('be.visible')
+        .then(() => {
+          cy.request({
+            method: 'GET',
+            url: `${apiUrl}/sources`,
+          }).then(({body: responseBody}) => {
+            responseBody.sources.forEach((source: any) => {
+              cy.deleteInfluxDBs(source.id)
+              cy.deleteInfluxDBRoles(source.id)
+              cy.deleteInfluxDBUsers(source.id)
+            })
+          })
+          
+          cy.deleteDashboards()
+          cy.deleteChronografUsers()
+          cy.deleteOrgs()
+          cy.removeInfluxDBConnections()
         })
-      })
-
-      cy.deleteDashboards()
-      cy.deleteChronografUsers()
-      cy.deleteOrgs()
-      cy.removeInfluxDBConnections()
     })
 }
 
