@@ -1,12 +1,13 @@
 describe('Use Dashboards', () => {
   beforeEach(() => {
     cy.toInitialState()
-    cy.createInfluxDBConnection()
-    cy.visit('/login')
-    cy.get('@connections').then(connections => {
-      cy.visit(`/sources/${connections[0].id}/dashboards`)
+    cy.createInfluxDBConnection().then(() => {
+      cy.get('@connections').then(connections => {
+        cy.visit(`/sources/${connections[0].id}/dashboards`)
+      })
+
+      cy.createDashboard('Reader Dashboard')
     })
-    cy.createDashboard('Reader Dashboard')
   })
 
   it('create, rename and delete a dashboard', () => {
@@ -37,11 +38,13 @@ describe('Use Dashboards', () => {
 
   describe('Use Dashboards as reader', () => {
     beforeEach(() => {
-      cy.createChronografUser('Reader', 'oauth-mock', 'oauth2')
-      cy.OAuthLoginAsDiffUser('Reader')
-      cy.get('@connections').then(connections => {
-        cy.visit(`/sources/${connections[0].id}/dashboards`)
-      })
+      cy.getByTestID('sidebar')
+        .should('be.visible')
+        .then(() => {
+          cy.createChronografUser('Reader', 'oauth-mock', 'oauth2').then(() => {
+            cy.OAuthLoginAsDiffUser('Reader')
+          })
+        })
     })
 
     it('ensure that all elements used to edit Chronograf are not visible', () => {

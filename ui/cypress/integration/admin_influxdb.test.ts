@@ -11,10 +11,11 @@ describe('InfluxDB', () => {
 
   beforeEach(() => {
     cy.toInitialState()
-    cy.createInfluxDBConnection()
-    cy.get('@connections').then(sources => {
-      sourceId = sources[0].id
-      url = `/sources/${sourceId}/admin-influxdb`
+    cy.createInfluxDBConnection().then(() => {
+      cy.get('@connections').then(sources => {
+        sourceId = sources[0].id
+        url = `/sources/${sourceId}/admin-influxdb`
+      })
     })
   })
 
@@ -275,7 +276,7 @@ describe('InfluxDB', () => {
       })
 
       cy.getByTestID('apply-changes--button').click({force: true})
-      cy.url().should('match',new RegExp(`roles$`))
+      cy.url().should('match', new RegExp(`roles$`))
       cy.getByTestID(`role-${influxDB.role.name}--row`).within(() => {
         cy.get('a').contains(influxDB.role.name).click({force: true})
       })
@@ -290,7 +291,7 @@ describe('InfluxDB', () => {
       })
 
       cy.get('.subsection--tab.active').click({force: true})
-      cy.url().should('match',new RegExp(`roles$`))
+      cy.url().should('match', new RegExp(`roles$`))
       cy.getByTestID('wizard-bucket-selected').click({force: true})
       cy.getByTestID('dropdown-menu').within(() => {
         cy.getByTestID('dropdown--item')
