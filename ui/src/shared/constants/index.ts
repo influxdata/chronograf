@@ -78,9 +78,17 @@ export const PERMISSIONS = {
     description: 'Can copy shards',
   },
   NoPermissions: {
-    id: 'ShowDatabases',
     displayName: 'Show Databases',
     description: 'Can show databases',
+  },
+  KapacitorAPI: {
+    displayName: 'Kapacitor API',
+    description:
+      'Can create, read, update and delete tasks, topics, handlers and similar Kapacitor artifacts',
+  },
+  KapacitorConfigAPI: {
+    displayName: 'Kapacitor Config API',
+    description: 'Can override Kapacitor configuration dynamically',
   },
 }
 
