@@ -2,6 +2,7 @@ import {combineReducers} from 'redux'
 
 import {
   AUTOREFRESH_DEFAULT,
+  SHOW_ANNOTATION_CONTROLS_DEFAULT,
   SHOW_TEMP_VAR_CONTROL_BAR_DEFAULT,
 } from 'src/shared/constants'
 import {ActionTypes, Action} from 'src/types/actions/app'
@@ -14,6 +15,7 @@ interface State {
   persisted: {
     autoRefresh: number
     showTemplateVariableControlBar: boolean
+    showAnnotationControls: boolean
     timeZone: TimeZones
   }
 }
@@ -25,6 +27,7 @@ const initialState: State = {
   persisted: {
     autoRefresh: AUTOREFRESH_DEFAULT,
     showTemplateVariableControlBar: SHOW_TEMP_VAR_CONTROL_BAR_DEFAULT,
+    showAnnotationControls: SHOW_ANNOTATION_CONTROLS_DEFAULT,
     timeZone: TimeZones.Local,
   },
 }
@@ -75,6 +78,14 @@ const appPersistedReducer = (
       return {
         ...state,
         showTemplateVariableControlBar: update,
+      }
+    }
+
+    case ActionTypes.ToggleShowAnnotationControls: {
+      const update = !state.showAnnotationControls
+      return {
+        ...state,
+        showAnnotationControls: update,
       }
     }
 

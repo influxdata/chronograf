@@ -5,6 +5,7 @@ import {
   setAutoRefresh,
   toggleTemplateVariableControlBar,
   setTimeZone,
+  toggleShowAnnotationControls,
 } from 'src/shared/actions/app'
 
 import {TimeZones} from 'src/types'
@@ -18,6 +19,7 @@ describe('Shared.Reducers.appReducer', () => {
       timeZone: TimeZones.Local,
       autoRefresh: 0,
       showTemplateVariableControlBar: false,
+      showAnnotationControls: false,
     },
   }
 
@@ -50,6 +52,15 @@ describe('Shared.Reducers.appReducer', () => {
     )
 
     expect(reducedState.persisted.showTemplateVariableControlBar).toBe(true)
+  })
+
+  it('should handle TOGGLE_SHOW_ANNOTATION_CONTROLS', () => {
+    const reducedState = appReducer(
+      initialState,
+      toggleShowAnnotationControls()
+    )
+
+    expect(reducedState.persisted.showAnnotationControls).toBe(true)
   })
 
   it('should handle SET_TIME_ZONE', () => {

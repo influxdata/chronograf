@@ -14,6 +14,7 @@ import {
   DelayEnablePresentationModeDispatcher,
   SetAutoRefreshActionCreator,
   SetAutoRefreshAction,
+  ToggleShowAnnotationControlsAction,
 } from 'src/types/actions/app'
 
 // ephemeral state action creators
@@ -47,6 +48,9 @@ export const setAutoRefresh: SetAutoRefreshActionCreator = (
 
 export const toggleTemplateVariableControlBar = (): ToggleTemplateVariableControlBarAction => ({
   type: ActionTypes.ToggleTemplateVariableControlBar,
+})
+export const toggleShowAnnotationControls = (): ToggleShowAnnotationControlsAction => ({
+  type: ActionTypes.ToggleShowAnnotationControls,
 })
 
 export const setTimeZone = (timeZone: TimeZones) => ({
