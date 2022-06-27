@@ -539,7 +539,7 @@ function wrapChronografUsers() {
 export function toInitialState() {
   cy.OAuthLogin('test')
     .url()
-    .should('contain', 'redirectPath')
+    .should('contain', '/sources')
     .then(() => {
       cy.get('body')
         .should('be.visible')
