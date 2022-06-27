@@ -1,4 +1,3 @@
-
 const apiUrl = '/chronograf/v1'
 
 export const getByTestID = (
@@ -10,8 +9,10 @@ export const getByTestID = (
   return cy.get(`[data-test="${dataTest}"]`, options)
 }
 
-function changeUserInfo(name: string) {
-  cy.request({
+export const changeUserInfo = (
+  name: string
+): Cypress.Chainable<Cypress.Response<any>> => {
+  return cy.request({
     method: 'POST',
     url: Cypress.env('oauth2ServerURL') + '/config',
     body: {
@@ -49,8 +50,14 @@ export const writePoints = (
 }
 
 export const OAuthLogin = (name: string) => {
-  changeUserInfo(name)
-  return cy.visit('/oauth/oauth-mock/login')
+  return cy.changeUserInfo(name).then(response => {
+    return cy.log(
+      `OAuth change config - status ${response.status}, ${response.statusText}`
+    ).then(() => {
+      expect(response.status).to.be.equal(200)
+      return cy.visit('/oauth/oauth-mock/login')
+    })
+  })
 }
 
 export const OAuthLogout = () => {
@@ -58,8 +65,14 @@ export const OAuthLogout = () => {
 }
 
 export const OAuthLoginAsDiffUser = (name: string) => {
-  changeUserInfo(name)
-  return cy.visit('/oauth/oauth-mock/logout')
+  return cy.changeUserInfo(name).then(response => {
+    return cy.log(
+      `OAuth change config - status ${response.status}, ${response.statusText}`
+    ).then(() => {
+      expect(response.status).to.be.equal(200)
+        return cy.visit('/oauth/oauth-mock/logout')
+    })
+  })
 }
 
 /**
@@ -211,7 +224,7 @@ export const createChronografUser = (
   scheme: string,
   organization?: string,
   role?: string
-) => {
+): Cypress.Chainable<Cypress.Response<any>> => {
   return cy
     .request({
       method: 'POST',
@@ -228,7 +241,10 @@ export const createChronografUser = (
         scheme: scheme,
       },
     })
-    .then(() => {
+    .then((response: Cypress.Response<any>) => {
+      cy.log(
+        `Chronograf new user - status ${response.status}, ${response.statusText}`
+      )
       wrapChronografUsers()
     })
 }
@@ -310,7 +326,7 @@ export const deleteOrgs = () => {
     .request('GET', `${apiUrl}/organizations`)
     .then(({body: responseBody}) => {
       responseBody.organizations.slice(1).forEach((organization: any) => {
-        if(organization.id != "default"){
+        if (organization.id != 'default') {
           cy.request('DELETE', organization.links.self)
         }
       })
@@ -517,26 +533,29 @@ function wrapChronografUsers() {
  */
 export function toInitialState() {
   cy.OAuthLogin('test')
-  
-  cy.request({
-    method: 'GET',
-    url: `${apiUrl}/sources`,
-  }).then(({body: responseBody}) => {
-    responseBody.sources.forEach((source: any) => {
-      cy.deleteInfluxDBs(source.id)
-      cy.deleteInfluxDBRoles(source.id)
-      cy.deleteInfluxDBUsers(source.id)
-    })
-  })
+    .url()
+    .should('contain', '/landing')
+    .then(() => {
+      cy.request({
+        method: 'GET',
+        url: `${apiUrl}/sources`,
+      }).then(({body: responseBody}) => {
+        responseBody.sources.forEach((source: any) => {
+          cy.deleteInfluxDBs(source.id)
+          cy.deleteInfluxDBRoles(source.id)
+          cy.deleteInfluxDBUsers(source.id)
+        })
+      })
 
-  cy.deleteDashboards()
-  cy.deleteChronografUsers()
-  cy.deleteOrgs()
-  cy.removeInfluxDBConnections()
+      cy.deleteDashboards()
+      cy.deleteChronografUsers()
+      cy.deleteOrgs()
+      cy.removeInfluxDBConnections()
+    })
 }
 
 export const clickAttached = (subject?: JQuery<HTMLElement>): void => {
-  if(!subject) {
+  if (!subject) {
     console.error('no element provided to "clickAttached"')
     return
   }
@@ -573,4 +592,5 @@ Cypress.Commands.add('deleteInfluxDB', deleteInfluxDB)
 Cypress.Commands.add('deleteInfluxDBs', deleteInfluxDBs)
 Cypress.Commands.add('toInitialState', toInitialState)
 Cypress.Commands.add('writePoints', writePoints)
-Cypress.Commands.add('clickAttached', {prevSubject: 'element'} ,clickAttached)
+Cypress.Commands.add('clickAttached', {prevSubject: 'element'}, clickAttached)
+Cypress.Commands.add('changeUserInfo', changeUserInfo)
