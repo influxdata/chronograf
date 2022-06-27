@@ -57,6 +57,7 @@ export const OAuthLogin = (name: string) => {
       )
       .then(() => {
         expect(response.status).to.be.equal(200)
+        cy.log('visit login page')
         return cy.visit('/oauth/oauth-mock/login')
       })
   })
@@ -543,6 +544,8 @@ export function toInitialState() {
       cy.get('body')
         .should('be.visible')
         .then(() => {
+          cy.log('wait before using sources')
+          cy.wait(2000)
           cy.request({
             method: 'GET',
             url: `${apiUrl}/sources`,
