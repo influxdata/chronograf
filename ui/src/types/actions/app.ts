@@ -1,4 +1,8 @@
 import {Dispatch} from 'redux'
+import {
+  AddingAnnotationAction,
+  SetAnnotationsDisplaySettingAction,
+} from 'src/shared/actions/annotations'
 import {TimeZones} from 'src/types'
 
 export enum ActionTypes {
@@ -22,6 +26,8 @@ export type Action =
   | SetTimeZoneAction
   | SetTelegrafSystemIntervalAction
   | SetHostPageDisplayStatusAction
+  | AddingAnnotationAction
+  | SetAnnotationsDisplaySettingAction
 
 export type EnablePresentationModeActionCreator = () => EnablePresentationModeAction
 

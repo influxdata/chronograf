@@ -7,6 +7,7 @@ import {
 } from 'src/shared/constants'
 import {ActionTypes, Action} from 'src/types/actions/app'
 import {TimeZones} from 'src/types'
+import {AnnotationsDisplaySetting} from 'src/types/annotations'
 
 interface State {
   ephemeral: {
@@ -16,6 +17,7 @@ interface State {
     autoRefresh: number
     showTemplateVariableControlBar: boolean
     showAnnotationControls: boolean
+    annotationsDisplaySetting: AnnotationsDisplaySetting
     timeZone: TimeZones
   }
 }
@@ -28,6 +30,7 @@ const initialState: State = {
     autoRefresh: AUTOREFRESH_DEFAULT,
     showTemplateVariableControlBar: SHOW_TEMP_VAR_CONTROL_BAR_DEFAULT,
     showAnnotationControls: SHOW_ANNOTATION_CONTROLS_DEFAULT,
+    annotationsDisplaySetting: AnnotationsDisplaySetting.HideAnnotations,
     timeZone: TimeZones.Local,
   },
 }
@@ -97,7 +100,19 @@ const appPersistedReducer = (
         timeZone,
       }
     }
-
+    case 'ADDING_ANNOTATION': {
+      return {
+        ...state,
+        annotationsDisplaySetting:
+          AnnotationsDisplaySetting.FilterAnnotationsByTag,
+      }
+    }
+    case 'SET_ANNOTATIONS_DISPLAY_SETTING': {
+      return {
+        ...state,
+        annotationsDisplaySetting: action.payload,
+      }
+    }
     default:
       return state
   }

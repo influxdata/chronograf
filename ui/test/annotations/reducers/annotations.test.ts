@@ -1,5 +1,5 @@
 import reducer from 'src/shared/reducers/annotations'
-import {Annotation, AnnotationsDisplaySetting} from 'src/types/annotations'
+import {Annotation} from 'src/types/annotations'
 import {AnnotationState} from 'src/shared/reducers/annotations'
 
 import {
@@ -32,7 +32,6 @@ const state: AnnotationState = {
   mode: null,
   annotations: {},
   editingAnnotation: null,
-  displaySetting: AnnotationsDisplaySetting.FilterAnnotationsByTag,
   tagKeys: null,
   tagValues: {},
   tagFilters: {},
