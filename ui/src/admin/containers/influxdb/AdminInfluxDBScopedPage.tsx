@@ -145,7 +145,16 @@ export class AdminInfluxDBScopedPage extends PureComponent<Props, State> {
         <WrapToPage hideRefresh={true}>
           <div className="container-fluid">
             These functions are not available for the currently selected
-            InfluxDB Connection.
+            InfluxDB {source.version?.startsWith('2') ? 'v2 ' : ''}connection.
+            {source.version?.startsWith('2') ? (
+              <>
+                <br />
+                {' Use InfluxDB v2 UI directly at '}
+                <a href={source.url}>{source.url}</a>
+              </>
+            ) : (
+              ''
+            )}
           </div>
         </WrapToPage>
       )

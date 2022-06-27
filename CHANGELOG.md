@@ -20,6 +20,7 @@
 1. [#5917](https://github.com/influxdata/chronograf/pull/5917): Improve InfluxDB Enterprise user creation process. 
 1. [#5917](https://github.com/influxdata/chronograf/pull/5917): Avoid stale reads in communication with InfluxDB Enterprise meta nodes. 
 1. [#5938](https://github.com/influxdata/chronograf/pull/5938): Properly detect unsupported values in Alert Rule builder.
+1. [#5965](https://github.com/influxdata/chronograf/pull/5965): Inform the user to use v2 administration.
 
 ### Other
 
