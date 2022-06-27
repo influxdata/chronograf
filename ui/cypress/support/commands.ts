@@ -310,7 +310,9 @@ export const deleteOrgs = () => {
     .request('GET', `${apiUrl}/organizations`)
     .then(({body: responseBody}) => {
       responseBody.organizations.slice(1).forEach((organization: any) => {
-        cy.request('DELETE', organization.links.self)
+        if(organization.id != "default"){
+          cy.request('DELETE', organization.links.self)
+        }
       })
     })
     .then(() => {
@@ -515,7 +517,7 @@ function wrapChronografUsers() {
  */
 export function toInitialState() {
   cy.OAuthLogin('test')
-  cy.visit('/')
+  
   cy.request({
     method: 'GET',
     url: `${apiUrl}/sources`,
