@@ -217,6 +217,7 @@ class DashboardPage extends Component<Props, State> {
       refreshRate,
       updateQueryParams,
       annotationsDisplaySetting,
+      timeRange,
     } = this.props
 
     const prevPath = getDeep(prevProps.location, 'pathname', null)
@@ -246,7 +247,8 @@ class DashboardPage extends Component<Props, State> {
 
     if (
       annotationsDisplaySetting !== AnnotationsDisplaySetting.HideAnnotations &&
-      annotationsDisplaySetting !== prevProps.annotationsDisplaySetting
+      (annotationsDisplaySetting !== prevProps.annotationsDisplaySetting ||
+        !_.isEqual(timeRange, prevProps.timeRange))
     ) {
       this.fetchAnnotations()
     }
