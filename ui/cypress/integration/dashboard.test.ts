@@ -2,11 +2,14 @@ describe('Use Dashboards', () => {
   beforeEach(() => {
     cy.toInitialState()
     cy.createInfluxDBConnection().then(() => {
-      cy.get('@connections').then(connections => {
-        cy.visit(`/sources/${connections[0].id}/dashboards`)
-      })
-
-      cy.createDashboard('Reader Dashboard')
+      cy.getByTestID('sidebar')
+        .should('be.visible')
+        .then(() => {
+          cy.get('@connections').then(connections => {
+            cy.visit(`/sources/${connections[0].id}/dashboards`)
+          })
+          cy.createDashboard('Reader Dashboard')
+        })
     })
   })
 
@@ -64,7 +67,7 @@ describe('Use Dashboards', () => {
 
       cy.get('.dashboard-empty--menu').should('not.exist')
       cy.getByTestID('add-cell').should('not.exist')
-      cy.getByTestID('show-variables--button').click()
+      cy.getByTestID('show-variables--button').should('be.visible').click()
       cy.getByTestID('add-template-variable').should('not.exist')
       cy.getByTestID('show-annotations--button').click()
       cy.getByTestID('add-annotation--button').should('not.exist')
