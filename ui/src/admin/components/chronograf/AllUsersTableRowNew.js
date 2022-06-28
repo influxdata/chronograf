@@ -152,7 +152,7 @@ class AllUsersTableRowNew extends Component {
             disabled={true}
             placeholder="OAuth Scheme..."
             value={scheme}
-            data-test="oauth-scheme--input"
+            data-test="oauth-schema--input"
           />
         </td>
         <td style={{width: colSuperAdmin}} className="text-center">
