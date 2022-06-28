@@ -1,4 +1,8 @@
 import {Dispatch} from 'redux'
+import {
+  AddingAnnotationAction,
+  SetAnnotationsDisplaySettingAction,
+} from 'src/shared/actions/annotations'
 import {TimeZones} from 'src/types'
 
 export enum ActionTypes {
@@ -6,6 +10,7 @@ export enum ActionTypes {
   DisablePresentationMode = 'DISABLE_PRESENTATION_MODE',
   SetAutoRefresh = 'SET_AUTOREFRESH',
   ToggleTemplateVariableControlBar = 'TOGGLE_TEMPLATE_VARIABLE_CONTROL_BAR',
+  ToggleShowAnnotationControls = 'TOGGLE_SHOW_ANNOTATION_CONTROLS',
   Noop = 'NOOP',
   SetTimeZone = 'SET_TIME_ZONE',
   SetTelegrafSystemInterval = 'SET_TELEGRAF_SYSTEM_INTERVAL',
@@ -17,9 +22,12 @@ export type Action =
   | DisablePresentationModeAction
   | SetAutoRefreshAction
   | ToggleTemplateVariableControlBarAction
+  | ToggleShowAnnotationControlsAction
   | SetTimeZoneAction
   | SetTelegrafSystemIntervalAction
   | SetHostPageDisplayStatusAction
+  | AddingAnnotationAction
+  | SetAnnotationsDisplaySettingAction
 
 export type EnablePresentationModeActionCreator = () => EnablePresentationModeAction
 
@@ -33,6 +41,9 @@ export interface DisablePresentationModeAction {
 
 export interface ToggleTemplateVariableControlBarAction {
   type: ActionTypes.ToggleTemplateVariableControlBar
+}
+export interface ToggleShowAnnotationControlsAction {
+  type: ActionTypes.ToggleShowAnnotationControls
 }
 
 export type DelayEnablePresentationModeDispatcher = () => DelayEnablePresentationModeThunk

@@ -12,6 +12,7 @@
 1. [#5940](https://github.com/influxdata/chronograf/pull/5940): Support InfluxDB behind proxy under subpath.
 1. [#5956](https://github.com/influxdata/chronograf/pull/5956): Add InfluxDB admin tabs to user/role detail page.
 1. [#5959](https://github.com/influxdata/chronograf/pull/5959): Allow to customize annotation color.
+1. [#5967](https://github.com/influxdata/chronograf/pull/5967): Remember whether to start with shown annotations on Dashboard page.
 
 ### Bug Fixes
 

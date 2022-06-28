@@ -420,6 +420,7 @@ export const HTTP_NOT_FOUND = 404
 export const AUTOREFRESH_DEFAULT = 0 // in milliseconds
 export const DASHBOARD_REFRESH_DEFAULT = 0 // in milliseconds
 export const SHOW_TEMP_VAR_CONTROL_BAR_DEFAULT = false
+export const SHOW_ANNOTATION_CONTROLS_DEFAULT = false
 
 export const GRAPH = 'graph'
 export const TABLE = 'table'

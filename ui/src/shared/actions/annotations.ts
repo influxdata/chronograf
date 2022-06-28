@@ -37,7 +37,6 @@ export type Action =
   | DeleteTagFilterAction
   | SetTagKeysAction
   | SetTagValuesAction
-  | SetDisplaySettingAction
 
 interface EditingAnnotationAction {
   type: 'EDITING_ANNOTATION'
@@ -55,7 +54,7 @@ export const dismissEditingAnnotation = (): DismissEditingAnnotationAction => ({
   type: 'DISMISS_EDITING_ANNOTATION',
 })
 
-interface AddingAnnotationAction {
+export interface AddingAnnotationAction {
   type: 'ADDING_ANNOTATION'
 }
 
@@ -239,15 +238,15 @@ export const setTagValues = (
   payload: {tagKey, tagValues},
 })
 
-interface SetDisplaySettingAction {
-  type: 'SET_DISPLAY_SETTING'
+export interface SetAnnotationsDisplaySettingAction {
+  type: 'SET_ANNOTATIONS_DISPLAY_SETTING'
   payload: AnnotationsDisplaySetting
 }
 
-export const setDisplaySetting = (
+export const setAnnotationsDisplaySetting = (
   setting: AnnotationsDisplaySetting
-): SetDisplaySettingAction => ({
-  type: 'SET_DISPLAY_SETTING',
+): SetAnnotationsDisplaySettingAction => ({
+  type: 'SET_ANNOTATIONS_DISPLAY_SETTING',
   payload: setting,
 })
 
@@ -268,16 +267,22 @@ export const addAnnotationAsync = (
   }
 }
 
+interface AnnotationsStateShape {
+  annotations: AnnotationState
+  app: {persisted: {annotationsDisplaySetting: string}}
+  dashTimeV1: State
+}
+
 export const getAnnotationsAsync = (
   indexUrl: string,
   dashboardID: string
 ) => async (
   dispatch: Dispatch<SetAnnotationsAction>,
-  getState: () => {annotations: AnnotationState; dashTimeV1: State}
+  getState: () => AnnotationsStateShape
 ): Promise<void> => {
-  const {displaySetting} = getState().annotations
+  const {annotationsDisplaySetting} = getState().app.persisted
 
-  if (displaySetting === AnnotationsDisplaySetting.HideAnnotations) {
+  if (annotationsDisplaySetting === AnnotationsDisplaySetting.HideAnnotations) {
     return
   }
 
@@ -324,7 +329,7 @@ export const updateTagFilterAsync = (
   tagFilter: TagFilter
 ) => async (
   dispatch: Dispatch<Action>,
-  getState: () => {annotations: AnnotationState; dashTimeV1: State}
+  getState: () => AnnotationsStateShape
 ) => {
   const state: AnnotationState = getState().annotations
   const currentTagFilter: TagFilter | null = getDeep(
@@ -354,7 +359,7 @@ export const deleteTagFilterAsync = (
   tagFilter: TagFilter
 ) => async (
   dispatch: Dispatch<Action>,
-  getState: () => {annotations: AnnotationState; dashTimeV1: State}
+  getState: () => AnnotationsStateShape
 ) => {
   try {
     dispatch(deleteTagFilter(dashboardID, tagFilter))

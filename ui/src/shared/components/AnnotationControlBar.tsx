@@ -27,7 +27,7 @@ interface ReduxStateProps {
   tagValues: {
     [tagKey: string]: string[]
   }
-  displaySetting: AnnotationsDisplaySetting
+  annotationsDisplaySetting: AnnotationsDisplaySetting
 }
 type ReduxDispatchProps = ResolveThunks<{
   onUpdateTagFilter: typeof updateTagFilter
@@ -45,13 +45,13 @@ type Props = OwnProps & ReduxStateProps & ReduxDispatchProps
 
 class AnnotationControlBar extends PureComponent<Props> {
   public render() {
-    const {tagFilters, displaySetting} = this.props
+    const {tagFilters, annotationsDisplaySetting} = this.props
 
     return (
       <div className="annotation-control-bar">
         <div className="annotation-control-bar--lhs">
           <AnnotationsDisplaySettingDropdown />
-          {displaySetting ===
+          {annotationsDisplaySetting ===
             AnnotationsDisplaySetting.FilterAnnotationsByTag && (
             <>
               {tagFilters.map(tagFilter => (
@@ -128,13 +128,21 @@ class AnnotationControlBar extends PureComponent<Props> {
 }
 
 const mstp = (
-  state: {annotations: AnnotationState},
+  state: {
+    app: {persisted: {annotationsDisplaySetting: AnnotationsDisplaySetting}}
+    annotations: AnnotationState
+  },
   ownProps: {dashboardID: string}
 ): ReduxStateProps => {
-  const {tagKeys, tagValues, displaySetting} = state.annotations
+  const {tagKeys, tagValues} = state.annotations
   const tagFilters = getTagFilters(state, ownProps.dashboardID)
 
-  return {tagFilters, tagKeys, tagValues, displaySetting}
+  return {
+    tagFilters,
+    tagKeys,
+    tagValues,
+    annotationsDisplaySetting: state.app.persisted.annotationsDisplaySetting,
+  }
 }
 
 const mdtp = {

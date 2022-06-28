@@ -2,10 +2,12 @@ import {combineReducers} from 'redux'
 
 import {
   AUTOREFRESH_DEFAULT,
+  SHOW_ANNOTATION_CONTROLS_DEFAULT,
   SHOW_TEMP_VAR_CONTROL_BAR_DEFAULT,
 } from 'src/shared/constants'
 import {ActionTypes, Action} from 'src/types/actions/app'
 import {TimeZones} from 'src/types'
+import {AnnotationsDisplaySetting} from 'src/types/annotations'
 
 interface State {
   ephemeral: {
@@ -14,6 +16,8 @@ interface State {
   persisted: {
     autoRefresh: number
     showTemplateVariableControlBar: boolean
+    showAnnotationControls: boolean
+    annotationsDisplaySetting: AnnotationsDisplaySetting
     timeZone: TimeZones
   }
 }
@@ -25,6 +29,8 @@ const initialState: State = {
   persisted: {
     autoRefresh: AUTOREFRESH_DEFAULT,
     showTemplateVariableControlBar: SHOW_TEMP_VAR_CONTROL_BAR_DEFAULT,
+    showAnnotationControls: SHOW_ANNOTATION_CONTROLS_DEFAULT,
+    annotationsDisplaySetting: AnnotationsDisplaySetting.HideAnnotations,
     timeZone: TimeZones.Local,
   },
 }
@@ -78,6 +84,14 @@ const appPersistedReducer = (
       }
     }
 
+    case ActionTypes.ToggleShowAnnotationControls: {
+      const update = !state.showAnnotationControls
+      return {
+        ...state,
+        showAnnotationControls: update,
+      }
+    }
+
     case ActionTypes.SetTimeZone: {
       const {timeZone} = action.payload
 
@@ -86,7 +100,19 @@ const appPersistedReducer = (
         timeZone,
       }
     }
-
+    case 'ADDING_ANNOTATION': {
+      return {
+        ...state,
+        annotationsDisplaySetting:
+          AnnotationsDisplaySetting.FilterAnnotationsByTag,
+      }
+    }
+    case 'SET_ANNOTATIONS_DISPLAY_SETTING': {
+      return {
+        ...state,
+        annotationsDisplaySetting: action.payload,
+      }
+    }
     default:
       return state
   }
