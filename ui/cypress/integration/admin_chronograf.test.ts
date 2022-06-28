@@ -1,3 +1,5 @@
+import {Source} from '../support/types'
+
 /*
     In these tests you will find a realHover function.
     realHover is used whenever there is a need to fire a hover event, which will make certain elements visible.
@@ -6,7 +8,7 @@
 describe('Chronograf', () => {
   let chronograf: any
   let url: string
-  let sourceId: string
+  let source: Source
 
   before(() => {
     cy.fixture('chronograf').then(chronografData => {
@@ -16,10 +18,9 @@ describe('Chronograf', () => {
 
   beforeEach(() => {
     cy.toInitialState()
-    cy.createInfluxDBConnection()
-    cy.get('@connections').then(sources => {
-      sourceId = sources[0].id
-      url = `/sources/${sourceId}/admin-chronograf`
+    cy.createInfluxDBConnection().then((src: Source) => {
+      source = src
+      url = `/sources/${source.id}/admin-chronograf`
     })
   })
 

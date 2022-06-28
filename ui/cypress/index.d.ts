@@ -27,7 +27,8 @@ import {
   deleteInfluxDBs,
   toInitialState,
   writePoints,
-  clickAttached
+  clickAttached,
+  changeUserInfo,
 } from './support/commands'
 
 declare global {
@@ -60,6 +61,7 @@ declare global {
       toInitialState: typeof toInitialState
       writePoints: typeof writePoints
       clickAttached: typeof clickAttached
+      changeUserInfo: typeof changeUserInfo
     }
   }
 }

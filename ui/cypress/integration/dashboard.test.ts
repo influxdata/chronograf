@@ -1,12 +1,16 @@
+import {Source} from '../support/types'
+
 describe('Use Dashboards', () => {
+  let source: Source
+
   beforeEach(() => {
     cy.toInitialState()
     cy.createInfluxDBConnection()
-    cy.visit('/login')
-    cy.get('@connections').then(connections => {
-      cy.visit(`/sources/${connections[0].id}/dashboards`)
-    })
-    cy.createDashboard('Reader Dashboard')
+      .then((src: Source) => {
+        source = src
+        cy.visit(`/sources/${source.id}/dashboards`)
+        cy.createDashboard('Reader Dashboard')
+      })
   })
 
   it('create, rename and delete a dashboard', () => {
@@ -22,9 +26,7 @@ describe('Use Dashboards', () => {
       .should('have.text', newName)
 
     // delete the dashboard
-    cy.get('@connections').then(connections => {
-      cy.visit(`/sources/${connections[0].id}/dashboards`)
-    })
+    cy.visit(`/sources/${source.id}/dashboards`)
 
     // DOM Element where the dashboard resides
     cy.get('.panel-body > table > tbody')
@@ -37,11 +39,13 @@ describe('Use Dashboards', () => {
 
   describe('Use Dashboards as reader', () => {
     beforeEach(() => {
-      cy.createChronografUser('Reader', 'oauth-mock', 'oauth2')
-      cy.OAuthLoginAsDiffUser('Reader')
-      cy.get('@connections').then(connections => {
-        cy.visit(`/sources/${connections[0].id}/dashboards`)
-      })
+      cy.getByTestID('sidebar')
+        .should('be.visible')
+        .then(() => {
+          cy.createChronografUser('Reader', 'oauth-mock', 'oauth2').then(() => {
+            cy.OAuthLoginAsDiffUser('Reader')
+          })
+        })
     })
 
     it('ensure that all elements used to edit Chronograf are not visible', () => {
@@ -61,7 +65,7 @@ describe('Use Dashboards', () => {
 
       cy.get('.dashboard-empty--menu').should('not.exist')
       cy.getByTestID('add-cell').should('not.exist')
-      cy.getByTestID('show-variables--button').click()
+      cy.getByTestID('show-variables--button').should('be.visible').click()
       cy.getByTestID('add-template-variable').should('not.exist')
       cy.getByTestID('show-annotations--button').click()
       cy.getByTestID('add-annotation--button').should('not.exist')

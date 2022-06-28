@@ -1,17 +1,21 @@
+import {Source} from '../support/types'
+
 describe('query builder', () => {
   let influxDB: any
+  let source: Source
 
   beforeEach(() => {
     cy.toInitialState()
-    cy.createInfluxDBConnection()
-    cy.createDashboard()
-    cy.get('@connections').then((sources: any) => {
+
+    cy.createInfluxDBConnection().then((src: Source) => {
+      cy.createDashboard()
       cy.fixture('influxDB.json').then((influxDBData: any) => {
         influxDB = influxDBData
+        source = src
 
-        cy.createInfluxDB(influxDB.db.name, sources[0].id)
+        cy.createInfluxDB(influxDB.db.name, source.id)
         cy.writePoints(
-          sources[0].id,
+          source.id,
           influxDB.db.name,
           influxDB.db.measurements[0].name,
           influxDB.db.measurements[0].tagValues[0],
@@ -19,29 +23,26 @@ describe('query builder', () => {
         )
 
         cy.writePoints(
-          sources[0].id,
+          source.id,
           influxDB.db.name,
           influxDB.db.measurements[1].name,
           influxDB.db.measurements[1].tagValues[1],
           influxDB.db.measurements[1].fieldValues[0]
         )
-      })
 
-      cy.get('@dashboards').then((dashboards: any) => {
-        cy.visit(`/sources/${sources[0].id}/dashboards/${dashboards[0].id}`)
+        cy.get('@dashboards').then((dashboards: any) => {
+          cy.visit(`/sources/${source.id}/dashboards/${dashboards[0].id}`)
+        })
       })
     })
 
     cy.get('#Line').click()
     cy.get('.dash-graph').contains('Add Data').click()
     cy.get('.source-selector').within(() => {
-      cy.get('@connections').then((sources: any) => {
-        cy.get('.dropdown--selected').should('have.text', 'Dynamic Source')
-        cy.get('.dropdown--button').click()
-        cy.get('.dropdown--menu').contains(sources[0].name).click()
-        cy.get('.dropdown--selected').should('have.text', sources[0].name)
-      })
-
+      cy.get('.dropdown--selected').should('have.text', 'Dynamic Source')
+      cy.get('.dropdown--button').click()
+      cy.get('.dropdown--menu').contains(source.name).click()
+      cy.get('.dropdown--selected').should('have.text', source.name)
       cy.get('button').contains('Flux').click().should('have.class', 'active')
     })
 
@@ -106,8 +107,7 @@ describe('query builder', () => {
       cy.getByTestID('builder-card--body').within(() => {
         cy.get('.dropdown-selected').click()
         cy.get('.dropdown-menu').within(() => {
-          cy.getByTestID('custom-dropdown-item')
-            .click()
+          cy.getByTestID('custom-dropdown-item').click()
         })
         cy.get('input').type('13s{enter}')
         cy.get('.dropdown-selected').should('contain.text', '13s')
