@@ -3,7 +3,11 @@ import {connect, ResolveThunks} from 'react-redux'
 import {withSource} from 'src/CheckSources'
 import {Source} from 'src/types'
 import {Database, User, UserPermission, UserRole} from 'src/types/influxAdmin'
-import {hasRoleManagement, isConnectedToLDAP} from './AdminInfluxDBTabbedPage'
+import {
+  AdminTabs,
+  hasRoleManagement,
+  isConnectedToLDAP,
+} from './AdminInfluxDBTabbedPage'
 import {withRouter, WithRouterProps} from 'react-router'
 import {useMemo} from 'react'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
@@ -24,6 +28,7 @@ import {
   computePermissionsChange,
   toUserPermissions,
 } from '../../util/permissions'
+import ConfirmDiscardDialog from 'src/admin/components/influxdb/ConfirmDiscardDialog'
 
 const FAKE_USER: User = {
   name: '',
@@ -179,7 +184,7 @@ const UserPage = ({
   const changePermissions = useMemo(
     () => async () => {
       if (Object.entries(changedPermissions).length === 0) {
-        return
+        return true
       }
       setRunning(true)
       try {
@@ -189,7 +194,7 @@ const UserPage = ({
           changedPermissions,
           isEnterprise ? [] : user.permissions.filter(x => x.scope === 'all')
         )
-        await updatePermissionsAsync(user, permissions)
+        return await updatePermissionsAsync(user, permissions)
       } finally {
         setRunning(false)
       }
@@ -236,7 +241,7 @@ const UserPage = ({
   const changeRoles = useMemo(
     () => async () => {
       if (Object.entries(changedRolesRecord).length === 0) {
-        return
+        return true
       }
       setRunning(true)
       try {
@@ -251,7 +256,7 @@ const UserPage = ({
           }
           return acc
         }, [])
-        await updateRolesAsync(user, newRoles)
+        return await updateRolesAsync(user, newRoles)
       } finally {
         setRunning(false)
       }
@@ -263,13 +268,14 @@ const UserPage = ({
     permissionsChanged,
     rolesChanged,
   ])
-  const changeData = useCallback(async () => {
-    await changeRoles()
-    await changePermissions()
-  }, [changePermissions, changeRoles])
   const exitHandler = useCallback(() => {
     router.push(`/sources/${sourceID}/admin-influxdb/users`)
   }, [router, source])
+  const changeData = useCallback(async () => {
+    if ((await changeRoles()) && (await changePermissions())) {
+      exitHandler()
+    }
+  }, [changePermissions, changeRoles, exitHandler])
   const databaseNames = useMemo<string[]>(
     () =>
       databases.reduce(
@@ -281,6 +287,24 @@ const UserPage = ({
       ),
     [isEnterprise, databases]
   )
+
+  const [exitUrl, setExitUrl] = useState('')
+  const onTabChange = useCallback(
+    (_section, url) => {
+      if (dataChanged) {
+        setExitUrl(url)
+        return
+      }
+      router.push(url)
+    },
+    [router, dataChanged]
+  )
+  const onExitCancel = useCallback(() => {
+    setExitUrl('')
+  }, [])
+  const onExitConfirm = useCallback(() => {
+    router.push(exitUrl)
+  }, [router, exitUrl])
   const body =
     user === FAKE_USER ? (
       <div className="container-fluid">
@@ -480,7 +504,7 @@ const UserPage = ({
     <Page className="influxdb-admin">
       <Page.Header fullWidth={true}>
         <Page.Header.Left>
-          <Page.Title title="Manage User" />
+          <Page.Title title="InfluxDB User" />
         </Page.Header.Left>
         <Page.Header.Right showSourceIndicator={true}>
           {dataChanged ? (
@@ -489,7 +513,7 @@ const UserPage = ({
               confirmText="Discard unsaved changes?"
               confirmAction={exitHandler}
               position="left"
-              testId="exit--button"
+              testId="discard-changes--exit--button"
             />
           ) : (
             <Button text="Exit" onClick={exitHandler} testId="exit--button" />
@@ -507,7 +531,16 @@ const UserPage = ({
           )}
         </Page.Header.Right>
       </Page.Header>
-      <div className="influxdb-admin--contents">{body}</div>
+      <div className="influxdb-admin--contents">
+        <AdminTabs activeTab="users" source={source} onTabChange={onTabChange}>
+          <ConfirmDiscardDialog
+            onOK={onExitConfirm}
+            onCancel={onExitCancel}
+            visible={!!exitUrl}
+          />
+          {body}
+        </AdminTabs>
+      </div>
     </Page>
   )
 }

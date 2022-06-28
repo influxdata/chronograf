@@ -5,9 +5,15 @@ import {
   setAutoRefresh,
   toggleTemplateVariableControlBar,
   setTimeZone,
+  toggleShowAnnotationControls,
 } from 'src/shared/actions/app'
 
 import {TimeZones} from 'src/types'
+import {AnnotationsDisplaySetting} from 'src/types/annotations'
+import {
+  addingAnnotation,
+  setAnnotationsDisplaySetting,
+} from 'src/shared/actions/annotations'
 
 describe('Shared.Reducers.appReducer', () => {
   const initialState = {
@@ -18,6 +24,8 @@ describe('Shared.Reducers.appReducer', () => {
       timeZone: TimeZones.Local,
       autoRefresh: 0,
       showTemplateVariableControlBar: false,
+      showAnnotationControls: false,
+      annotationsDisplaySetting: AnnotationsDisplaySetting.HideAnnotations,
     },
   }
 
@@ -52,9 +60,38 @@ describe('Shared.Reducers.appReducer', () => {
     expect(reducedState.persisted.showTemplateVariableControlBar).toBe(true)
   })
 
+  it('should handle TOGGLE_SHOW_ANNOTATION_CONTROLS', () => {
+    const reducedState = appReducer(
+      initialState,
+      toggleShowAnnotationControls()
+    )
+
+    expect(reducedState.persisted.showAnnotationControls).toBe(true)
+  })
+
   it('should handle SET_TIME_ZONE', () => {
     const state = appReducer(initialState, setTimeZone(TimeZones.UTC))
 
     expect(state.persisted.timeZone).toBe(TimeZones.UTC)
+  })
+
+  it('should handle ADDING_ANNOTATION', () => {
+    const reducedState = appReducer(initialState, addingAnnotation())
+
+    expect(reducedState.persisted.annotationsDisplaySetting).toBe(
+      AnnotationsDisplaySetting.FilterAnnotationsByTag
+    )
+  })
+  it('should handle SET_ANNOTATIONS_DISPLAY_SETTING', () => {
+    const reducedState = appReducer(
+      initialState,
+      setAnnotationsDisplaySetting(
+        AnnotationsDisplaySetting.FilterAnnotationsByTag
+      )
+    )
+
+    expect(reducedState.persisted.annotationsDisplaySetting).toBe(
+      AnnotationsDisplaySetting.FilterAnnotationsByTag
+    )
   })
 })

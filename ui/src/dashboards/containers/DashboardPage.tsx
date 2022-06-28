@@ -99,10 +99,12 @@ interface ReduxStateProps {
   inPresentationMode: boolean
   editorTimeRange: QueriesModels.TimeRange
   showTemplateVariableControlBar: boolean
+  showAnnotationControls: boolean
   annotationsDisplaySetting: AnnotationsDisplaySetting
 }
 type ReduxDispatchProps = ResolveThunks<{
   toggleTemplateVariableControlBar: typeof appActions.toggleTemplateVariableControlBar
+  toggleShowAnnotationControls: typeof appActions.toggleShowAnnotationControls
   handleClickPresentationButton: AppActions.DelayEnablePresentationModeDispatcher
   errorThrown: ErrorsActions.ErrorThrownActionCreator
   notify: NotificationAction
@@ -139,7 +141,6 @@ interface State {
   windowHeight: number
   selectedCell: DashboardsModels.Cell | DashboardsModels.NewDefaultCell | null
   dashboardLinks: DashboardsModels.DashboardSwitcherLinks
-  showAnnotationControls: boolean
   showCellEditorOverlay: boolean
 }
 
@@ -153,7 +154,6 @@ class DashboardPage extends Component<Props, State> {
       selectedCell: null,
       windowHeight: window.innerHeight,
       dashboardLinks: EMPTY_LINKS,
-      showAnnotationControls: false,
       showCellEditorOverlay: false,
     }
   }
@@ -217,6 +217,7 @@ class DashboardPage extends Component<Props, State> {
       refreshRate,
       updateQueryParams,
       annotationsDisplaySetting,
+      timeRange,
     } = this.props
 
     const prevPath = getDeep(prevProps.location, 'pathname', null)
@@ -246,7 +247,8 @@ class DashboardPage extends Component<Props, State> {
 
     if (
       annotationsDisplaySetting !== AnnotationsDisplaySetting.HideAnnotations &&
-      annotationsDisplaySetting !== prevProps.annotationsDisplaySetting
+      (annotationsDisplaySetting !== prevProps.annotationsDisplaySetting ||
+        !_.isEqual(timeRange, prevProps.timeRange))
     ) {
       this.fetchAnnotations()
     }
@@ -280,8 +282,10 @@ class DashboardPage extends Component<Props, State> {
       cellQueryStatuses,
       inPresentationMode,
       showTemplateVariableControlBar,
+      showAnnotationControls,
       handleClickPresentationButton,
       toggleTemplateVariableControlBar,
+      toggleShowAnnotationControls,
       me,
       logoutLink,
       links,
@@ -304,12 +308,7 @@ class DashboardPage extends Component<Props, State> {
       templatesIncludingDashTime = []
     }
 
-    const {
-      dashboardLinks,
-      showAnnotationControls,
-      selectedCell,
-      showCellEditorOverlay,
-    } = this.state
+    const {dashboardLinks, selectedCell, showCellEditorOverlay} = this.state
 
     return (
       <Page>
@@ -348,7 +347,7 @@ class DashboardPage extends Component<Props, State> {
           handleChooseAutoRefresh={this.handleChooseAutoRefresh}
           handleChooseTimeRange={this.handleChooseTimeRange}
           onToggleShowTempVarControls={toggleTemplateVariableControlBar}
-          onToggleShowAnnotationControls={this.toggleAnnotationControls}
+          onToggleShowAnnotationControls={toggleShowAnnotationControls}
           handleClickPresentationButton={handleClickPresentationButton}
         >
           {isUsingAuth && me.role === READER_ROLE ? (
@@ -576,10 +575,6 @@ class DashboardPage extends Component<Props, State> {
     }
   }
 
-  private toggleAnnotationControls = () => {
-    this.setState({showAnnotationControls: !this.state.showAnnotationControls})
-  }
-
   private handleZoomedTimeRange = (
     zoomedTimeRange: QueriesModels.TimeRange
   ): void => {
@@ -618,10 +613,15 @@ const mstp = (state: any, {params: {dashboardID}}) => {
   const {
     app: {
       ephemeral: {inPresentationMode},
-      persisted: {autoRefresh, showTemplateVariableControlBar, timeZone},
+      persisted: {
+        autoRefresh,
+        showTemplateVariableControlBar,
+        showAnnotationControls,
+        annotationsDisplaySetting,
+        timeZone,
+      },
     },
     links,
-    annotations: {displaySetting},
     dashboardUI: {dashboards, cellQueryStatuses, zoomedTimeRange},
     sources,
     auth: {me, isUsingAuth, logoutLink},
@@ -651,7 +651,8 @@ const mstp = (state: any, {params: {dashboardID}}) => {
     inPresentationMode,
     editorTimeRange,
     showTemplateVariableControlBar,
-    annotationsDisplaySetting: displaySetting,
+    showAnnotationControls,
+    annotationsDisplaySetting,
     logoutLink,
     me,
     links,
@@ -673,6 +674,7 @@ const mdtp = {
   deleteDashboardCellAsync: dashboardActions.deleteDashboardCellAsync,
   templateVariableLocalSelected: dashboardActions.templateVariableLocalSelected,
   toggleTemplateVariableControlBar: appActions.toggleTemplateVariableControlBar,
+  toggleShowAnnotationControls: appActions.toggleShowAnnotationControls,
   getDashboardWithTemplatesAsync:
     dashboardActions.getDashboardWithTemplatesAsync,
   rehydrateTemplatesAsync: dashboardActions.rehydrateTemplatesAsync,

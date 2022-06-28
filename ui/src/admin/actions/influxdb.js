@@ -410,11 +410,13 @@ export const updateRoleUsersAsync = (role, users) => async dispatch => {
     const {data} = await updateRoleAJAX(role.links.self, {users})
     dispatch(notify(notifyRoleUsersUpdated()))
     dispatch(syncRole(role, data))
+    return true
   } catch (error) {
     dispatch(
       errorThrown(error, notifyRoleUsersUpdateFailed(error.data.message))
     )
   }
+  return false
 }
 
 export const updateRolePermissionsAsync = (
@@ -425,11 +427,13 @@ export const updateRolePermissionsAsync = (
     const {data} = await updateRoleAJAX(role.links.self, {permissions})
     dispatch(notify(notifyRolePermissionsUpdated()))
     dispatch(syncRole(role, data))
+    return true
   } catch (error) {
     dispatch(
       errorThrown(error, notifyRolePermissionsUpdateFailed(error.data.message))
     )
   }
+  return false
 }
 
 export const updateUserPermissionsAsync = (
@@ -440,6 +444,7 @@ export const updateUserPermissionsAsync = (
     const {data} = await updateUserAJAX(user.links.self, {permissions})
     dispatch(notify(notifyDBUserPermissionsUpdated()))
     dispatch(syncUser(user, data))
+    return true
   } catch (error) {
     dispatch(
       errorThrown(
@@ -455,11 +460,13 @@ export const updateUserRolesAsync = (user, roles) => async dispatch => {
     const {data} = await updateUserAJAX(user.links.self, {roles})
     dispatch(notify(notifyDBUserRolesUpdated()))
     dispatch(syncUser(user, data))
+    return true
   } catch (error) {
     dispatch(
       errorThrown(error, notifyDBUserRolesUpdateFailed(error.data.message))
     )
   }
+  return false
 }
 
 export const updateUserPasswordAsync = (user, password) => async dispatch => {

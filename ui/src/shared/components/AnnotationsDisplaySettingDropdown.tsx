@@ -3,27 +3,26 @@ import {connect} from 'react-redux'
 
 import {Dropdown} from 'src/reusable_ui'
 
-import {setDisplaySetting} from 'src/shared/actions/annotations'
+import {setAnnotationsDisplaySetting} from 'src/shared/actions/annotations'
 
 import {AnnotationsDisplaySetting} from 'src/types/annotations'
-import {AnnotationState} from 'src/shared/reducers/annotations'
 
 interface Props {
-  displaySetting: AnnotationsDisplaySetting
+  annotationsDisplaySetting: AnnotationsDisplaySetting
   onSetDisplaySetting: (s: AnnotationsDisplaySetting) => void
 }
 
 const DROPDOWN_WIDTH = 210
 
 const AnnotationsDisplaySettingDropdown: FunctionComponent<Props> = ({
-  displaySetting,
+  annotationsDisplaySetting,
   onSetDisplaySetting,
 }) => {
   return (
     <Dropdown
       widthPixels={DROPDOWN_WIDTH}
       onChange={onSetDisplaySetting}
-      selectedID={displaySetting}
+      selectedID={annotationsDisplaySetting}
     >
       <Dropdown.Item
         id={AnnotationsDisplaySetting.HideAnnotations}
@@ -41,12 +40,14 @@ const AnnotationsDisplaySettingDropdown: FunctionComponent<Props> = ({
   )
 }
 
-const mstp = (state: {annotations: AnnotationState}) => ({
-  displaySetting: state.annotations.displaySetting,
+const mstp = (state: {
+  app: {persisted: {annotationsDisplaySetting: AnnotationsDisplaySetting}}
+}) => ({
+  annotationsDisplaySetting: state.app.persisted.annotationsDisplaySetting,
 })
 
 const mdtp = {
-  onSetDisplaySetting: setDisplaySetting,
+  onSetDisplaySetting: setAnnotationsDisplaySetting,
 }
 
 export default connect(mstp, mdtp)(AnnotationsDisplaySettingDropdown)

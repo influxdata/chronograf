@@ -1,4 +1,4 @@
-import React, {Component, MouseEvent, DragEvent} from 'react'
+import React, {Component, MouseEvent, DragEvent, CSSProperties} from 'react'
 import {connect} from 'react-redux'
 
 import {
@@ -146,6 +146,9 @@ class AnnotationSpan extends Component<Props, State> {
     const flagClass = isDragging
       ? 'annotation-span--left-flag dragging'
       : 'annotation-span--left-flag'
+    const flagStyle: CSSProperties = {
+      borderLeftColor: annotation.color || undefined,
+    }
     const markerClass = isDragging ? 'annotation dragging' : 'annotation'
     const clickClass = isEditing
       ? 'annotation--click-area editing'
@@ -159,6 +162,7 @@ class AnnotationSpan extends Component<Props, State> {
 
     const markerStyles = {
       left: `${dygraph.toDomXCoord(startTime) + DYGRAPH_CONTAINER_H_MARGIN}px`,
+      backgroundColor: annotation.color || undefined,
       height: `calc(100% - ${
         staticLegendHeight +
         DYGRAPH_CONTAINER_XLABEL_MARGIN +
@@ -185,7 +189,7 @@ class AnnotationSpan extends Component<Props, State> {
           onMouseEnter={this.handleMouseEnter('left')}
           onMouseLeave={this.handleMouseLeave}
         />
-        <div className={flagClass} />
+        <div className={flagClass} style={flagStyle} />
       </div>
     )
   }
@@ -201,6 +205,9 @@ class AnnotationSpan extends Component<Props, State> {
     const flagClass = isDragging
       ? 'annotation-span--right-flag dragging'
       : 'annotation-span--right-flag'
+    const flagStyle: CSSProperties = {
+      borderRightColor: annotation.color || undefined,
+    }
     const markerClass = isDragging ? 'annotation dragging' : 'annotation'
     const clickClass = isEditing
       ? 'annotation--click-area editing'
@@ -214,6 +221,7 @@ class AnnotationSpan extends Component<Props, State> {
 
     const markerStyles = {
       left: `${dygraph.toDomXCoord(endTime) + DYGRAPH_CONTAINER_H_MARGIN}px`,
+      backgroundColor: annotation.color || undefined,
       height: `calc(100% - ${
         staticLegendHeight +
         DYGRAPH_CONTAINER_XLABEL_MARGIN +
@@ -240,7 +248,7 @@ class AnnotationSpan extends Component<Props, State> {
           onMouseEnter={this.handleMouseEnter('right')}
           onMouseLeave={this.handleMouseLeave}
         />
-        <div className={flagClass} />
+        <div className={flagClass} style={flagStyle} />
       </div>
     )
   }

@@ -33,6 +33,7 @@ interface Props extends WithRouterProps {
   parentUrl: string
   children?: ReactNode
   position?: 'left' | 'top'
+  onTabChange?: (section: PageSection, url: string) => void
 }
 
 @ErrorHandling
@@ -55,7 +56,7 @@ class SubSections extends Component<Props> {
                   <SubSectionsTab
                     key={i}
                     section={section}
-                    handleClick={this.handleTabClick(section.url)}
+                    handleClick={this.handleTabClick(section)}
                     activeSection={activeSection}
                   />
                 )
@@ -75,9 +76,14 @@ class SubSections extends Component<Props> {
     return found?.component || children || <NotFound />
   }
 
-  public handleTabClick = (url: string) => () => {
-    const {router, sourceID, parentUrl} = this.props
-    router.push(`/sources/${sourceID}/${parentUrl}/${url}`)
+  public handleTabClick = (section: PageSection) => () => {
+    const {router, sourceID, parentUrl, onTabChange} = this.props
+    const url = `/sources/${sourceID}/${parentUrl}/${section.url}`
+    if (onTabChange) {
+      onTabChange(section, url)
+      return
+    }
+    router.push(url)
   }
 }
 

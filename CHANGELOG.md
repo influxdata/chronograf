@@ -10,6 +10,9 @@
 1. [#5927](https://github.com/influxdata/chronograf/pull/5927): Show effective permissions on Users page.
 1. [#5929](https://github.com/influxdata/chronograf/pull/5926): Add refresh button to InfluxDB Users/Roles/Databases page.
 1. [#5940](https://github.com/influxdata/chronograf/pull/5940): Support InfluxDB behind proxy under subpath.
+1. [#5956](https://github.com/influxdata/chronograf/pull/5956): Add InfluxDB admin tabs to user/role detail page.
+1. [#5959](https://github.com/influxdata/chronograf/pull/5959): Allow to customize annotation color.
+1. [#5967](https://github.com/influxdata/chronograf/pull/5967): Remember whether to start with shown annotations on Dashboard page.
 
 ### Bug Fixes
 
@@ -18,6 +21,7 @@
 1. [#5917](https://github.com/influxdata/chronograf/pull/5917): Improve InfluxDB Enterprise user creation process. 
 1. [#5917](https://github.com/influxdata/chronograf/pull/5917): Avoid stale reads in communication with InfluxDB Enterprise meta nodes. 
 1. [#5938](https://github.com/influxdata/chronograf/pull/5938): Properly detect unsupported values in Alert Rule builder.
+1. [#5965](https://github.com/influxdata/chronograf/pull/5965): Inform the user to use v2 administration.
 
 ### Other
 

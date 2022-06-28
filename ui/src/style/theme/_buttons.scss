@@ -146,15 +146,8 @@ a.btn {
   text-shadow: none;
   border-width: 0;
 
-  // Focus State
-  &:focus {
-    background-color: $bg-color;
-    color: $text-color;
-  }
-
   // Hover State
-  &:hover,
-  &:focus:hover {
+  &:hover,&:focus{
     background-color: $bg-color-hover;
     color: $text-color-hover;
     cursor: pointer;

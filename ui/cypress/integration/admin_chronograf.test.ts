@@ -56,8 +56,8 @@ describe('Chronograf', () => {
         cy.getByTestID('confirm-new-user--button').should('be.enabled').click()
       })
 
+      cy.visit(url + '/current-organization')
       cy.getByTestID(`${chronograf.user.name}--table-row`).should('be.visible')
-
       cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
       cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
         cy.get('.dropdown-selected').should('be.visible')
@@ -68,7 +68,6 @@ describe('Chronograf', () => {
       })
 
       cy.getByTestID(`${chronograf.user.name}--table-row`).should('be.visible')
-
       cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
       cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
         cy.getByTestID('remove-user--button').should('be.visible')

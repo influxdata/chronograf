@@ -78,9 +78,17 @@ export const PERMISSIONS = {
     description: 'Can copy shards',
   },
   NoPermissions: {
-    id: 'ShowDatabases',
     displayName: 'Show Databases',
     description: 'Can show databases',
+  },
+  KapacitorAPI: {
+    displayName: 'Kapacitor API',
+    description:
+      'Can create, read, update and delete tasks, topics, handlers and similar Kapacitor artifacts',
+  },
+  KapacitorConfigAPI: {
+    displayName: 'Kapacitor Config API',
+    description: 'Can override Kapacitor configuration dynamically',
   },
 }
 
@@ -412,6 +420,7 @@ export const HTTP_NOT_FOUND = 404
 export const AUTOREFRESH_DEFAULT = 0 // in milliseconds
 export const DASHBOARD_REFRESH_DEFAULT = 0 // in milliseconds
 export const SHOW_TEMP_VAR_CONTROL_BAR_DEFAULT = false
+export const SHOW_ANNOTATION_CONTROLS_DEFAULT = false
 
 export const GRAPH = 'graph'
 export const TABLE = 'table'

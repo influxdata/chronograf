@@ -153,7 +153,52 @@ func TestService_Annotations(t *testing.T) {
 			ID: "1",
 			w:  httptest.NewRecorder(),
 			r:  httptest.NewRequest("GET", "/chronograf/v1/sources/1/annotations?since=1985-04-12T23:20:50.52Z", bytes.NewReader([]byte(`howdy`))),
-			want: `{"annotations":[{"id":"ea0aa94b-969a-4cd5-912a-5db61d502268","startTime":"1970-01-01T00:00:00Z","endTime":"2018-01-25T22:42:57.345Z","text":"mytext","tags":{},"links":{"self":"/chronograf/v1/sources/1/annotations/ea0aa94b-969a-4cd5-912a-5db61d502268"}}]}
+			want: `{"annotations":[{"id":"ea0aa94b-969a-4cd5-912a-5db61d502268","startTime":"1970-01-01T00:00:00Z","endTime":"2018-01-25T22:42:57.345Z","text":"mytext","color":"","tags":{},"links":{"self":"/chronograf/v1/sources/1/annotations/ea0aa94b-969a-4cd5-912a-5db61d502268"}}]}
+`,
+		},
+		{
+			name: "returns annotations with color in store",
+			fields: fields{
+				Store: mockStore,
+				TimeSeriesClient: &mocks.TimeSeries{
+					ConnectF: func(context.Context, *chronograf.Source) error {
+						return nil
+					},
+					QueryF: func(context.Context, chronograf.Query) (chronograf.Response, error) {
+						return mocks.NewResponse(`[
+							{
+								"series": [
+									{
+										"name": "annotations",
+										"columns": [
+											"time",
+											"start_time",
+											"modified_time_ns",
+											"text",
+											"color",
+											"id"
+										],
+										"values": [
+											[
+												1516920177345000000,
+												0,
+												1516989242129417403,
+												"mytext",
+												"red",
+												"ea0aa94b-969a-4cd5-912a-5db61d502268"
+											]
+										]
+									}
+								]
+							}
+						]`, nil), nil
+					},
+				},
+			},
+			ID: "1",
+			w:  httptest.NewRecorder(),
+			r:  httptest.NewRequest("GET", "/chronograf/v1/sources/1/annotations?since=1985-04-12T23:20:50.52Z", bytes.NewReader([]byte(`howdy`))),
+			want: `{"annotations":[{"id":"ea0aa94b-969a-4cd5-912a-5db61d502268","startTime":"1970-01-01T00:00:00Z","endTime":"2018-01-25T22:42:57.345Z","text":"mytext","color":"red","tags":{},"links":{"self":"/chronograf/v1/sources/1/annotations/ea0aa94b-969a-4cd5-912a-5db61d502268"}}]}
 `,
 		},
 		{
@@ -218,6 +263,7 @@ func TestService_UpdateAnnotation(t *testing.T) {
 											"start_time",
 											"modified_time_ns",
 											"text",
+											"color",
 											"id"
 										],
 										"values": [
@@ -226,6 +272,7 @@ func TestService_UpdateAnnotation(t *testing.T) {
 												0,
 												1516989242129417403,
 												"mytext",
+												"red",
 												"1"
 											]
 										]
@@ -250,8 +297,13 @@ func TestService_UpdateAnnotation(t *testing.T) {
 		want string
 	}{
 		{
+			body: `{"id":"1","text":"newtext","color":"blue","tags":{"foo":"bar"}}`,
+			want: `{"id":"1","startTime":"1970-01-01T00:00:00Z","endTime":"2018-01-25T22:42:57.345Z","text":"newtext","color":"blue","tags":{"foo":"bar"},"links":{"self":"/chronograf/v1/sources/1/annotations/1"}}
+`,
+		},
+		{
 			body: `{"id":"1","text":"newtext","tags":{"foo":"bar"}}`,
-			want: `{"id":"1","startTime":"1970-01-01T00:00:00Z","endTime":"2018-01-25T22:42:57.345Z","text":"newtext","tags":{"foo":"bar"},"links":{"self":"/chronograf/v1/sources/1/annotations/1"}}
+			want: `{"id":"1","startTime":"1970-01-01T00:00:00Z","endTime":"2018-01-25T22:42:57.345Z","text":"newtext","color":"red","tags":{"foo":"bar"},"links":{"self":"/chronograf/v1/sources/1/annotations/1"}}
 `,
 		},
 		{

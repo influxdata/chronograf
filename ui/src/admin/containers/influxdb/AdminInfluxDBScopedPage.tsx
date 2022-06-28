@@ -139,6 +139,27 @@ export class AdminInfluxDBScopedPage extends PureComponent<Props, State> {
   }
   public content() {
     const {source, children} = this.props
+
+    if (!source.version || source.version.startsWith('2')) {
+      return (
+        <WrapToPage hideRefresh={true}>
+          <div className="container-fluid">
+            These functions are not available for the currently selected
+            InfluxDB {source.version?.startsWith('2') ? 'v2 ' : ''}connection.
+            {source.version?.startsWith('2') ? (
+              <>
+                <br />
+                {' Use InfluxDB v2 UI directly at '}
+                <a href={source.url}>{source.url}</a>
+              </>
+            ) : (
+              ''
+            )}
+          </div>
+        </WrapToPage>
+      )
+    }
+
     const {loading, error, errorMessage} = this.state
     if (
       loading === RemoteDataState.Loading ||
@@ -164,16 +185,6 @@ export class AdminInfluxDBScopedPage extends PureComponent<Props, State> {
       )
     }
 
-    if (!source.version || source.version.startsWith('2')) {
-      return (
-        <WrapToPage hideRefresh={true}>
-          <div className="container-fluid">
-            These functions are not available for the currently selected
-            InfluxDB Connection.
-          </div>
-        </WrapToPage>
-      )
-    }
     return children
   }
 }
