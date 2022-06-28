@@ -1,4 +1,4 @@
-import {Source} from '../support/types/source'
+import {Source} from '../support/types'
 
 /*
     In these tests you will find realHover and clickAttached functions.

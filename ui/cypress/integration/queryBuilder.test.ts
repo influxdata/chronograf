@@ -1,4 +1,4 @@
-import {Source} from '../support/types/source'
+import {Source} from '../support/types'
 
 describe('query builder', () => {
   let influxDB: any

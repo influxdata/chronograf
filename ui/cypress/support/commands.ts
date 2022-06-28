@@ -1,4 +1,3 @@
-import {Source} from './types/source'
 const apiUrl = '/chronograf/v1'
 
 export const getByTestID = (
