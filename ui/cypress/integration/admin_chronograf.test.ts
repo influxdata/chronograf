@@ -91,7 +91,7 @@ describe('Chronograf', () => {
         }
       })
     })
-    
+
     it('add user, edit user, and remove it', () => {
       cy.getByTestID('new-user-admins--toggle')
         .click()
