@@ -1,4 +1,3 @@
-import {Source} from '../../src/types'
 const apiUrl = '/chronograf/v1'
 
 export const getByTestID = (
@@ -261,7 +260,7 @@ export const deleteChronografUser = (name: string) => {
     .request('GET', `${apiUrl}/users`)
     .then(({body: responseBody}) => {
       responseBody.users.forEach((user: any) => {
-        if (userName == user.name) {
+        if (userName === user.name) {
           cy.request('DELETE', user.links.self)
         }
       })
@@ -328,7 +327,7 @@ export const deleteOrgs = () => {
     .request('GET', `${apiUrl}/organizations`)
     .then(({body: responseBody}) => {
       responseBody.organizations.slice(1).forEach((organization: any) => {
-        if (organization.id != 'default') {
+        if (organization.id !== 'default') {
           cy.request('DELETE', organization.links.self)
         }
       })
@@ -387,7 +386,7 @@ export const deleteInfluxDBUsers = (sourceId: string) => {
     .request('GET', `${apiUrl}/sources/${sourceId}/users`)
     .then(({body: responseBody}) => {
       responseBody.users.forEach((user: any) => {
-        if (user.name != Cypress.env('username')) {
+        if (user.name !== Cypress.env('username')) {
           cy.request('DELETE', user.links.self)
         }
       })
