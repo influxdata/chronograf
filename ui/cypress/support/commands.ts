@@ -97,7 +97,7 @@ export const createInfluxDBConnection = (
   connectionName?: string,
   isUnsafeSSL?: boolean,
   metaUrl?: string
-) => {
+): Cypress.Chainable<Cypress.Response<any>> => {
   return cy
     .request({
       method: 'POST',

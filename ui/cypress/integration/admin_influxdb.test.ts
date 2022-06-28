@@ -11,11 +11,9 @@ describe('InfluxDB', () => {
 
   beforeEach(() => {
     cy.toInitialState()
-    cy.createInfluxDBConnection().then(() => {
-      cy.get('@connections').then(sources => {
-        sourceId = sources[0].id
-        url = `/sources/${sourceId}/admin-influxdb`
-      })
+    cy.createInfluxDBConnection().then((sources: any) => {
+      sourceId = sources[0].id
+      url = `/sources/${sourceId}/admin-influxdb`
     })
   })
 

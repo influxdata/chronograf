@@ -18,11 +18,9 @@ describe('Chronograf', () => {
 
   beforeEach(() => {
     cy.toInitialState()
-    cy.createInfluxDBConnection().then(() => {
-      cy.get('@connections').then(sources => {
-        sourceId = sources[0].id
-        url = `/sources/${sourceId}/admin-chronograf`
-      })
+    cy.createInfluxDBConnection().then((sources: any) => {
+      sourceId = sources[0].id
+      url = `/sources/${sourceId}/admin-chronograf`
     })
   })
 
