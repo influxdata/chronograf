@@ -1,11 +1,16 @@
+import {Source} from '../../src/types'
+
 describe('Use Dashboards', () => {
+  let source: any
+
   beforeEach(() => {
     cy.toInitialState()
-    cy.createInfluxDBConnection().then((sources: any) => {
-      cy.visit(`/sources/${sources[0].id}/dashboards`)
-
-      cy.createDashboard('Reader Dashboard')
-    })
+    cy.createInfluxDBConnection()
+      .then((src: Cypress.Response<Source>) => {
+        source = src.body
+        cy.visit(`/sources/${source.id}/dashboards`)
+        cy.createDashboard('Reader Dashboard')
+      })
   })
 
   it('create, rename and delete a dashboard', () => {
@@ -21,9 +26,7 @@ describe('Use Dashboards', () => {
       .should('have.text', newName)
 
     // delete the dashboard
-    cy.get('@connections').then(connections => {
-      cy.visit(`/sources/${connections[0].id}/dashboards`)
-    })
+    cy.visit(`/sources/${source.id}/dashboards`)
 
     // DOM Element where the dashboard resides
     cy.get('.panel-body > table > tbody')

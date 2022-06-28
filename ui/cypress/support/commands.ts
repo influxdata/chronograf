@@ -1,3 +1,4 @@
+import {Source} from '../../src/types'
 const apiUrl = '/chronograf/v1'
 
 export const getByTestID = (
@@ -97,23 +98,19 @@ export const createInfluxDBConnection = (
   connectionName?: string,
   isUnsafeSSL?: boolean,
   metaUrl?: string
-): Cypress.Chainable<Cypress.Response<any>> => {
-  return cy
-    .request({
-      method: 'POST',
-      url: `${apiUrl}/sources`,
-      body: {
-        url: url ?? Cypress.env('influxDBURL'),
-        username: username ?? Cypress.env('username'),
-        password: password ?? Cypress.env('password'),
-        name: connectionName ?? Cypress.env('connectionName'),
-        insecureSkipVerify: isUnsafeSSL ?? Cypress.env('insecureSkipVerify'),
-        metaUrl: metaUrl ?? Cypress.env('metaUrl'),
-      },
-    })
-    .then(() => {
-      wrapConnections()
-    })
+): Cypress.Chainable<Cypress.Response<Source>> => {
+  return cy.request({
+    method: 'POST',
+    url: `${apiUrl}/sources`,
+    body: {
+      url: url ?? Cypress.env('influxDBURL'),
+      username: username ?? Cypress.env('username'),
+      password: password ?? Cypress.env('password'),
+      name: connectionName ?? Cypress.env('connectionName'),
+      insecureSkipVerify: isUnsafeSSL ?? Cypress.env('insecureSkipVerify'),
+      metaUrl: metaUrl ?? Cypress.env('metaUrl'),
+    },
+  })
 }
 
 /**

@@ -1,16 +1,21 @@
+import {Source} from '../../src/types'
+
 describe('query builder', () => {
   let influxDB: any
+  let source: any
 
   beforeEach(() => {
     cy.toInitialState()
-    cy.createInfluxDBConnection().then((sources: any) => {
+
+    cy.createInfluxDBConnection().then((src: Cypress.Response<Source>) => {
       cy.createDashboard()
       cy.fixture('influxDB.json').then((influxDBData: any) => {
         influxDB = influxDBData
+        source = src.body
 
-        cy.createInfluxDB(influxDB.db.name, sources[0].id)
+        cy.createInfluxDB(influxDB.db.name, source.id)
         cy.writePoints(
-          sources[0].id,
+          source.id,
           influxDB.db.name,
           influxDB.db.measurements[0].name,
           influxDB.db.measurements[0].tagValues[0],
@@ -18,7 +23,7 @@ describe('query builder', () => {
         )
 
         cy.writePoints(
-          sources[0].id,
+          source.id,
           influxDB.db.name,
           influxDB.db.measurements[1].name,
           influxDB.db.measurements[1].tagValues[1],
@@ -26,7 +31,7 @@ describe('query builder', () => {
         )
 
         cy.get('@dashboards').then((dashboards: any) => {
-          cy.visit(`/sources/${sources[0].id}/dashboards/${dashboards[0].id}`)
+          cy.visit(`/sources/${source.id}/dashboards/${dashboards[0].id}`)
         })
       })
     })
@@ -34,13 +39,10 @@ describe('query builder', () => {
     cy.get('#Line').click()
     cy.get('.dash-graph').contains('Add Data').click()
     cy.get('.source-selector').within(() => {
-      cy.get('@connections').then((sources: any) => {
-        cy.get('.dropdown--selected').should('have.text', 'Dynamic Source')
-        cy.get('.dropdown--button').click()
-        cy.get('.dropdown--menu').contains(sources[0].name).click()
-        cy.get('.dropdown--selected').should('have.text', sources[0].name)
-      })
-
+      cy.get('.dropdown--selected').should('have.text', 'Dynamic Source')
+      cy.get('.dropdown--button').click()
+      cy.get('.dropdown--menu').contains(source.name).click()
+      cy.get('.dropdown--selected').should('have.text', source.name)
       cy.get('button').contains('Flux').click().should('have.class', 'active')
     })
 

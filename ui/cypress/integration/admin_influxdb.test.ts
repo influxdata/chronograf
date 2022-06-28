@@ -1,7 +1,10 @@
+import {Source} from '../../src/types'
+
+
 describe('InfluxDB', () => {
   let influxDB: any
   let url: string
-  let sourceId: string
+  let source: any
 
   before(() => {
     cy.fixture('influxDB').then(influxDBData => {
@@ -11,9 +14,9 @@ describe('InfluxDB', () => {
 
   beforeEach(() => {
     cy.toInitialState()
-    cy.createInfluxDBConnection().then((sources: any) => {
-      sourceId = sources[0].id
-      url = `/sources/${sourceId}/admin-influxdb`
+    cy.createInfluxDBConnection().then((src: Cypress.Response<Source>) => {
+      source = src.body
+      url = `/sources/${source.id}/admin-influxdb`
     })
   })
 
@@ -78,8 +81,8 @@ describe('InfluxDB', () => {
 
   describe('Users', () => {
     beforeEach(() => {
-      cy.createInfluxDB(influxDB.db.name, sourceId)
-      cy.createInfluxDBRole(influxDB.role.name, sourceId)
+      cy.createInfluxDB(influxDB.db.name, source.id)
+      cy.createInfluxDBRole(influxDB.role.name, source.id)
       cy.visit(url + '/users')
     })
 
@@ -228,11 +231,11 @@ describe('InfluxDB', () => {
 
   describe('Roles', () => {
     beforeEach(() => {
-      cy.createInfluxDB(influxDB.db.name, sourceId)
+      cy.createInfluxDB(influxDB.db.name, source.id)
       cy.createInfluxDBUser(
         influxDB.user.name,
         influxDB.user.password,
-        sourceId
+        source.id
       )
       cy.visit(url + '/roles')
     })
