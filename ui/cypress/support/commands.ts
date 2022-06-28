@@ -1,3 +1,4 @@
+import {Source} from './types/source'
 const apiUrl = '/chronograf/v1'
 
 export const getByTestID = (
@@ -97,19 +98,23 @@ export const createInfluxDBConnection = (
   connectionName?: string,
   isUnsafeSSL?: boolean,
   metaUrl?: string
-): Cypress.Chainable<Cypress.Response<Source>> => {
-  return cy.request({
-    method: 'POST',
-    url: `${apiUrl}/sources`,
-    body: {
-      url: url ?? Cypress.env('influxDBURL'),
-      username: username ?? Cypress.env('username'),
-      password: password ?? Cypress.env('password'),
-      name: connectionName ?? Cypress.env('connectionName'),
-      insecureSkipVerify: isUnsafeSSL ?? Cypress.env('insecureSkipVerify'),
-      metaUrl: metaUrl ?? Cypress.env('metaUrl'),
-    },
-  })
+): Cypress.Chainable => {
+  return cy
+    .request({
+      method: 'POST',
+      url: `${apiUrl}/sources`,
+      body: {
+        url: url ?? Cypress.env('influxDBURL'),
+        username: username ?? Cypress.env('username'),
+        password: password ?? Cypress.env('password'),
+        name: connectionName ?? Cypress.env('connectionName'),
+        insecureSkipVerify: isUnsafeSSL ?? Cypress.env('insecureSkipVerify'),
+        metaUrl: metaUrl ?? Cypress.env('metaUrl'),
+      },
+    })
+    .then(({body}) => {
+      return body
+    })
 }
 
 /**
@@ -118,8 +123,8 @@ export const createInfluxDBConnection = (
 export const removeInfluxDBConnections = () => {
   return cy
     .request('GET', `${apiUrl}/sources`)
-    .then(response => {
-      response.body.sources.forEach((source: any) => {
+    .then(({body: responseBody}) => {
+      cy.wrap(responseBody.sources).each((source: any) => {
         cy.request('DELETE', `${source.links.self}`)
       })
     })
@@ -153,7 +158,7 @@ export const deleteDashboards = () => {
   return cy
     .request('GET', `${apiUrl}/dashboards`)
     .then(({body: responseBody}) => {
-      responseBody.dashboards.forEach((dashboard: any) => {
+      cy.wrap(responseBody.dashboards).each((dashboard: any) => {
         cy.request('DELETE', dashboard.links.self)
       })
     })
@@ -259,7 +264,7 @@ export const deleteChronografUser = (name: string) => {
   return cy
     .request('GET', `${apiUrl}/users`)
     .then(({body: responseBody}) => {
-      responseBody.users.forEach((user: any) => {
+      cy.wrap(responseBody.users).each((user: any) => {
         if (userName === user.name) {
           cy.request('DELETE', user.links.self)
         }
@@ -280,8 +285,10 @@ export const deleteChronografUsers = () => {
       url: `${apiUrl}/users`,
     })
     .then(({body: responseBody}) => {
-      responseBody.users.slice(1).forEach((user: any) => {
-        cy.request('DELETE', user.links.self)
+      cy.wrap(responseBody.users).each((user: any) => {
+        if (user.name !== 'test@oauth2.mock') {
+          cy.request('DELETE', user.links.self)
+        }
       })
     })
     .then(() => {
@@ -326,7 +333,7 @@ export const deleteOrgs = () => {
   return cy
     .request('GET', `${apiUrl}/organizations`)
     .then(({body: responseBody}) => {
-      responseBody.organizations.slice(1).forEach((organization: any) => {
+      cy.wrap(responseBody.organizations).each((organization: any) => {
         if (organization.id !== 'default') {
           cy.request('DELETE', organization.links.self)
         }
@@ -385,7 +392,7 @@ export const deleteInfluxDBUsers = (sourceId: string) => {
   return cy
     .request('GET', `${apiUrl}/sources/${sourceId}/users`)
     .then(({body: responseBody}) => {
-      responseBody.users.forEach((user: any) => {
+      cy.wrap(responseBody.users).each((user: any) => {
         if (user.name !== Cypress.env('username')) {
           cy.request('DELETE', user.links.self)
         }
@@ -434,13 +441,13 @@ export const deleteInfluxDBRole = (name: string, sourceId: string) => {
  * @param sourceId - Source ID.
  */
 export const deleteInfluxDBRoles = (sourceId: string) => {
-  return cy
-    .request('GET', `${apiUrl}/sources/${sourceId}/roles`)
-    .then(({body: responseBody}) => {
-      responseBody.roles.forEach((role: any) => {
+  cy.request('GET', `${apiUrl}/sources/${sourceId}/roles`).then(
+    ({body: responseBody}) => {
+      cy.wrap(responseBody.roles).each((role: any) => {
         cy.request('DELETE', role.links.self)
       })
-    })
+    }
+  )
 }
 
 /**
@@ -475,7 +482,7 @@ export const deleteInfluxDBs = (sourceId: string) => {
   return cy
     .request('GET', `${apiUrl}/sources/${sourceId}/dbs`)
     .then(({body: responseBody}) => {
-      responseBody.databases.forEach((db: any) => {
+      cy.wrap(responseBody.databases).each((db: any) => {
         cy.request('DELETE', db.links.self)
       })
     })
