@@ -1,13 +1,13 @@
-import {Source} from '../../src/types'
+import {Source} from '../support/types/source'
 
 describe('Use Dashboards', () => {
-  let source: any
+  let source: Source
 
   beforeEach(() => {
     cy.toInitialState()
     cy.createInfluxDBConnection()
-      .then((src: Cypress.Response<Source>) => {
-        source = src.body
+      .then((src: Source) => {
+        source = src
         cy.visit(`/sources/${source.id}/dashboards`)
         cy.createDashboard('Reader Dashboard')
       })

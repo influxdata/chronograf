@@ -1,4 +1,4 @@
-import {Source} from '../../src/types'
+import {Source} from '../support/types/source'
 
 /*
     In these tests you will find realHover and clickAttached functions.
@@ -10,7 +10,7 @@ import {Source} from '../../src/types'
 describe('Chronograf', () => {
   let chronograf: any
   let url: string
-  let source: any
+  let source: Source
 
   before(() => {
     cy.fixture('chronograf').then(chronografData => {
@@ -20,8 +20,8 @@ describe('Chronograf', () => {
 
   beforeEach(() => {
     cy.toInitialState()
-    cy.createInfluxDBConnection().then((src: Cypress.Response<Source>) => {
-      source = src.body
+    cy.createInfluxDBConnection().then((src: Source) => {
+      source = src
       url = `/sources/${source.id}/admin-chronograf`
     })
   })

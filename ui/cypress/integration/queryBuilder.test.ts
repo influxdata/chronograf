@@ -1,17 +1,17 @@
-import {Source} from '../../src/types'
+import {Source} from '../support/types/source'
 
 describe('query builder', () => {
   let influxDB: any
-  let source: any
+  let source: Source
 
   beforeEach(() => {
     cy.toInitialState()
 
-    cy.createInfluxDBConnection().then((src: Cypress.Response<Source>) => {
+    cy.createInfluxDBConnection().then((src: Source) => {
       cy.createDashboard()
       cy.fixture('influxDB.json').then((influxDBData: any) => {
         influxDB = influxDBData
-        source = src.body
+        source = src
 
         cy.createInfluxDB(influxDB.db.name, source.id)
         cy.writePoints(
