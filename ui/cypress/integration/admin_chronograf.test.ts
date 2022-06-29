@@ -57,6 +57,7 @@ describe('Chronograf', () => {
         cy.getByTestID('confirm-new-user--button').should('be.enabled').click()
       })
 
+      cy.reload()
       cy.getByTestID(`${chronograf.user.name}--table-row`).should('be.visible')
       cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
       cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
@@ -94,6 +95,7 @@ describe('Chronograf', () => {
 
     it('add user, edit user, and remove it', () => {
       cy.getByTestID('new-user-admins--toggle')
+        .should('not.have.class', 'active')
         .click()
         .should('have.class', 'active')
 
