@@ -43,7 +43,7 @@ describe('Use Dashboards', () => {
       })
     })
 
-    it.only('ensure that all elements used to edit Chronograf are not visible', () => {
+    it('ensure that all elements used to edit Chronograf are not visible', () => {
       cy.getByTestID('sidebar').should('not.exist')
       cy.getByTestID('import-dashboard--button').should('not.exist')
       cy.getByTestID('create-dashboard-button').should('not.exist')
@@ -65,19 +65,14 @@ describe('Use Dashboards', () => {
       cy.get('.template-control-bar').should('exist').and('be.visible')
       cy.get('.annotation-control-bar').should('not.exist')
       cy.getByTestID('show-annotations--button').should('be.visible').click()
-      cy.get('.annotation-control-bar').should('exist').and('be.visible')
-      cy.getByTestID('add-template-variable').should('not.exist')
-      cy.getByTestID('add-annotation--button').should('not.exist')
-      cy.window()
-        .its('localStorage')
-        .then(({state}) => {
-          cy.wrap(state).should(
-            'contain',
-            '"showTemplateVariableControlBar":true'
-          )
-          cy.wrap(state).should('contain', '"showAnnotationControls":true')
-        })
-        
+      cy.get('.annotation-control-bar').should('exist').and('be.visible').within(() => {
+        cy.getByTestID('add-template-variable').should('not.exist')
+        cy.getByTestID('add-annotation--button').should('not.exist')
+        cy.getByTestID('wizard-bucket-selected').click()
+        cy.getByTestID('dropdown--item').contains('Filter Annotations By Tags').click()
+        cy.getByTestID('add-annotation-filter--button').should('exist').and('be.visible')
+      })
+
       cy.reload().then(() => {
         cy.get('.page-header--title')
           .should('exist')
