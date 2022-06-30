@@ -1,12 +1,10 @@
 {
     "user": {
         "name": "Smiley",
-        "role": [
-            "reader",
-            "viewer"
-        ],
+        "role": ["reader", "viewer"],
         "oauthProvider": "oauth-mock",
-        "oauth-scheme": "oauth"
+        "oauth-schema": "oauth",
+        "orgs": ["Default"]
     },
     "organizations": [
         {
