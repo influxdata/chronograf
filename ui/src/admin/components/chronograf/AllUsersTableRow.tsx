@@ -89,6 +89,7 @@ export default class AllUsersTableRow extends Component<Props> {
             color={ComponentColor.Success}
             disabled={this.userIsMe}
             tooltipText={this.toggleTooltipText}
+            dataTest="superAdmin--toggle"
           />
         </td>
         <td style={{textAlign: 'right', width: colActions}}>
@@ -99,6 +100,7 @@ export default class AllUsersTableRow extends Component<Props> {
             type="btn-danger"
             text="Delete"
             customClass="table--show-on-row-hover"
+            testId="delete-user--button"
           />
         </td>
       </tr>

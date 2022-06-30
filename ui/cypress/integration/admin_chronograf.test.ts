@@ -1,10 +1,8 @@
 import {Source} from '../support/types'
 
 /*
-    In these tests you will find realHover and clickAttached functions.
-    They are used to assure that Cypress can see re-rendered elements and click on them.
+    In these tests you will find a realHover function.
     realHover is used whenever there is a need to fire a hover event, which will make certain elements visible.
-    clickAttached is used to assure that the element is attached to the DOM and then uses JQuery trigger to click on the element.
 */
 
 describe('Chronograf', () => {
@@ -59,7 +57,7 @@ describe('Chronograf', () => {
         cy.getByTestID('confirm-new-user--button').should('be.enabled').click()
       })
 
-      cy.visit(url + '/current-organization')
+      cy.reload()
       cy.getByTestID(`${chronograf.user.name}--table-row`).should('be.visible')
       cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
       cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
@@ -81,72 +79,165 @@ describe('Chronograf', () => {
     })
   })
 
-  describe('All Orgs', () => {
+  describe('All Users', () => {
     beforeEach(() => {
-      cy.visit(url + '/all-organizations')
+      cy.visit(url + '/all-users')
+      cy.getByTestID('new-user-admins--toggle').then($el => {
+        /* 
+          The state of the toggle is remembered.
+          This ensures that toggle is not active at the beggining of each test.
+         */
+        if ($el.hasClass('active')) {
+          $el.trigger('click')
+        }
+      })
     })
 
-    it('create an org, edit it, and delete it', () => {
-      cy.getByTestID('create-new-org--button').click()
-      cy.getByTestID('cancel').click()
-      cy.getByTestID(`${chronograf.organizations[0].name}-org--row`).should(
-        'not.exist'
-      )
-        
-      cy.intercept('GET', '/chronograf/v1/me').as('update')
-      cy.getByTestID('create-new-org--button').click()
-      cy.getByTestID('new-org--row').within(() => {
-        cy.getByTestID('new-org-name--input')
-          .clear()
-          .type(chronograf.organizations[0].name)
-
-        cy.get('.dropdown-selected').click()
-        cy.getByTestID(
-          `${chronograf.organizations[0].defaultRole}-dropdown-item`
-        ).click()
-        cy.get('.dropdown-selected').should(
-          'contain.text',
-          chronograf.organizations[0].defaultRole
-        )
-
-        cy.getByTestID('confirm').click()
-      })
-      
-      cy.wait('@update')
-      cy.getByTestID(`${chronograf.organizations[0].name}-org-name`).click()
-      cy.getByTestID('rename-org--input')
-        .clear()
-        .type(`${chronograf.organizations[1].name}{Enter}`)
-
-      cy.getByTestID(`${chronograf.organizations[1].name}-org-name`).should(
-        'contain.text',
-        chronograf.organizations[1].name
-      )
-
-      cy.getByTestID(`${chronograf.organizations[1].name}-org--row`)
-        .find('.dropdown-selected')
+    it('add user, edit user, and remove it', () => {
+      cy.getByTestID('new-user-admins--toggle')
+        .should('not.have.class', 'active')
         .click()
-      cy.getByTestID(
-        `${chronograf.organizations[1].defaultRole}-dropdown-item`
-      ).click()
+        .should('have.class', 'active')
 
-      cy.getByTestID(`${chronograf.organizations[1].name}-org--row`)
-        .find('.dropdown-selected')
-        .should('contain.text', chronograf.organizations[1].defaultRole)
-
-      cy.getByTestID(`${chronograf.organizations[1].name}-org--row`)
-        .find('[data-test="delete-org--button"]')
-        .click()
-
-      cy.getByTestID(`${chronograf.organizations[1].name}-org--row`)
-        .find('[data-test="delete-org--button"]')
+      cy.getByTestID('add-user--button').click()
+      cy.getByTestID('new-user--table-row')
+        .should('exist')
         .within(() => {
+          cy.getByTestID('cancel-new-user--button').click()
+        })
+
+      cy.getByTestID('add-user--button').click()
+      cy.getByTestID('new-user--table-row')
+        .should('exist')
+        .within(() => {
+          cy.getByTestID('username--input').type(chronograf.user.name)
+          cy.getByTestID('dropdown-toggle').click()
+          cy.getByTestID('dropdown-ul')
+            .contains(chronograf.user.orgs[0])
+            .click()
+
+          cy.getByTestID(
+            `dropdown-selected--${chronograf.user.orgs[0]}`
+          ).should('exist')
+
+          cy.getByTestID('oauth-provider--input').type(
+            chronograf.user.oauthProvider
+          )
+
+          cy.getByTestID('confirm-new-user--button').click()
+        })
+
+      cy.getByTestID('new-user-admins--toggle')
+        .click()
+        .should('not.have.class', 'active')
+
+      cy.getByTestID(`${chronograf.user.name}--table-row`)
+        .should('exist')
+        .realHover()
+        .then(() => {
+          cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
+            cy.getByTestID('superAdmin--toggle').click()
+          })
+        })
+
+      cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
+      cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
+        cy.get(`.input-tag--item`)
+          .contains(chronograf.user.orgs[0])
+          .should('exist')
+
+        cy.getByTestID('delete-tag--button').click()
+        cy.getByTestID('delete-tag--button').within(() => {
           cy.getByTestID('confirm-btn').click()
         })
 
-      cy.getByTestID(`${chronograf.organizations[1].name}-org--row`).should(
-        'not.exist'
-      )
+        cy.get(`.input-tag--item`).should('not.exist')
+      })
+
+      cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
+      cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
+        cy.get('.tags-add')
+          .click()
+          .within(() => {
+            cy.get('.tags-add--menu-item')
+              .contains(chronograf.user.orgs[0])
+              .click()
+          })
+      })
+
+      cy.getByTestID(`${chronograf.user.name}--table-row`).realHover()
+      cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
+        cy.getByTestID('delete-user--button').click()
+        cy.getByTestID('delete-user--button').within(() => {
+          cy.getByTestID('confirm-btn').click()
+        })
+      })
     })
+    describe('All Orgs', () => {
+      beforeEach(() => {
+        cy.visit(url + '/all-organizations')
+      })
+  
+      it('create an org, edit it, and delete it', () => {
+        cy.getByTestID('create-new-org--button').click()
+        cy.getByTestID('cancel').click()
+        cy.getByTestID(`${chronograf.organizations[0].name}-org--row`).should(
+          'not.exist'
+        )
+          
+        cy.intercept('GET', '/chronograf/v1/me').as('update')
+        cy.getByTestID('create-new-org--button').click()
+        cy.getByTestID('new-org--row').within(() => {
+          cy.getByTestID('new-org-name--input')
+            .clear()
+            .type(chronograf.organizations[0].name)
+  
+          cy.get('.dropdown-selected').click()
+          cy.getByTestID(
+            `${chronograf.organizations[0].defaultRole}-dropdown-item`
+          ).click()
+          cy.get('.dropdown-selected').should(
+            'contain.text',
+            chronograf.organizations[0].defaultRole
+          )
+  
+          cy.getByTestID('confirm').click()
+        })
+        
+        cy.wait('@update')
+        cy.getByTestID(`${chronograf.organizations[0].name}-org-name`).click()
+        cy.getByTestID('rename-org--input')
+          .clear()
+          .type(`${chronograf.organizations[1].name}{Enter}`)
+  
+        cy.getByTestID(`${chronograf.organizations[1].name}-org-name`).should(
+          'contain.text',
+          chronograf.organizations[1].name
+        )
+  
+        cy.getByTestID(`${chronograf.organizations[1].name}-org--row`)
+          .find('.dropdown-selected')
+          .click()
+        cy.getByTestID(
+          `${chronograf.organizations[1].defaultRole}-dropdown-item`
+        ).click()
+  
+        cy.getByTestID(`${chronograf.organizations[1].name}-org--row`)
+          .find('.dropdown-selected')
+          .should('contain.text', chronograf.organizations[1].defaultRole)
+  
+        cy.getByTestID(`${chronograf.organizations[1].name}-org--row`)
+          .find('[data-test="delete-org--button"]')
+          .click()
+  
+        cy.getByTestID(`${chronograf.organizations[1].name}-org--row`)
+          .find('[data-test="delete-org--button"]')
+          .within(() => {
+            cy.getByTestID('confirm-btn').click()
+          })
+  
+        cy.getByTestID(`${chronograf.organizations[1].name}-org--row`).should(
+          'not.exist'
+        )
   })
 })
