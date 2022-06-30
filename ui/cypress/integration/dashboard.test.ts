@@ -32,8 +32,8 @@ describe('Use Dashboards', () => {
 
   describe('Use Dashboards as reader', () => {
     beforeEach(() => {
-      cy.createDashboard('Reader Dashboard').then(() => {
-        cy.createChronografUser('Reader', 'oauth-mock', 'oauth2').then(() => {
+      cy.createChronografUser('Reader', 'oauth-mock', 'oauth2').then(() => {
+        cy.createDashboard('Reader Dashboard').then(() => {
           cy.getByTestID('dashboard-panel')
             .should('be.visible')
             .then(() => {
@@ -44,6 +44,7 @@ describe('Use Dashboards', () => {
     })
 
     it('ensure that all elements used to edit Chronograf are not visible', () => {
+      cy.url().should('match', new RegExp(`sources/${source.id}/dashboards`))
       cy.getByTestID('sidebar').should('not.exist')
       cy.getByTestID('import-dashboard--button').should('not.exist')
       cy.getByTestID('create-dashboard-button').should('not.exist')
@@ -65,13 +66,20 @@ describe('Use Dashboards', () => {
       cy.get('.template-control-bar').should('exist').and('be.visible')
       cy.get('.annotation-control-bar').should('not.exist')
       cy.getByTestID('show-annotations--button').should('be.visible').click()
-      cy.get('.annotation-control-bar').should('exist').and('be.visible').within(() => {
-        cy.getByTestID('add-template-variable').should('not.exist')
-        cy.getByTestID('add-annotation--button').should('not.exist')
-        cy.getByTestID('wizard-bucket-selected').click()
-        cy.getByTestID('dropdown--item').contains('Filter Annotations By Tags').click()
-        cy.getByTestID('add-annotation-filter--button').should('exist').and('be.visible')
-      })
+      cy.get('.annotation-control-bar')
+        .should('exist')
+        .and('be.visible')
+        .within(() => {
+          cy.getByTestID('add-template-variable').should('not.exist')
+          cy.getByTestID('add-annotation--button').should('not.exist')
+          cy.getByTestID('wizard-bucket-selected').click()
+          cy.getByTestID('dropdown--item')
+            .contains('Filter Annotations By Tags')
+            .click()
+          cy.getByTestID('add-annotation-filter--button')
+            .should('exist')
+            .and('be.visible')
+        })
 
       cy.reload().then(() => {
         cy.get('.page-header--title')
