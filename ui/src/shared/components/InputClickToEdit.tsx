@@ -117,7 +117,7 @@ class InputClickToEdit extends PureComponent<Props, State> {
         </div>
       </div>
     ) : (
-      <div className={wrapperClass} data-test="rename-org"> 
+      <div className={wrapperClass} data-test="rename-org">
         {isEditing ? (
           <input
             type="text"
