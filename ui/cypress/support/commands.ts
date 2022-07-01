@@ -568,6 +568,7 @@ export function toInitialState() {
             })
           })
 
+          cy.deleteMappings()
           cy.deleteDashboards()
           cy.deleteChronografUsers()
           cy.deleteOrgs()
