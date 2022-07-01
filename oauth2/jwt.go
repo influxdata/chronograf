@@ -110,25 +110,13 @@ func (j *JWT) ValidPrincipal(ctx context.Context, jwtToken Token, lifespan time.
 		Issuer:       token.Issuer(),
 		Organization: org,
 		Group:        grp,
-		// previous incarnation operated in local timezone
-		// semantics, whereas github.com/lestrrat-go/jwx
-		// works in UTC
-		ExpiresAt: token.Expiration().Local(),
-		IssuedAt:  token.IssuedAt().Local(),
+		ExpiresAt:    token.Expiration(),
+		IssuedAt:     token.IssuedAt(),
 	}, nil
 }
 
-func (j *JWT) initCache() {
-	// ideally this should be controlled from whatever "main"
-	// module using this component, but we are punting it by
-	// using context.TODO() here.
-	//
-	// Also, we could be using jwk.CachedSet here, but since
-	// one of the tests explicitly asked to check for invalid
-	// JWKS urls during verification time, we are simply using
-	// jwk.Cache instead
-	cache := jwk.NewCache(context.TODO())
-
+func (j *JWT) initCache(ctx context.Context) {
+	cache := jwk.NewCache(ctx)
 	// Note: by default updates are checked every 15 minutes
 	cache.Register(j.Jwksurl)
 	j.Cache = cache
@@ -136,7 +124,7 @@ func (j *JWT) initCache() {
 
 // FetchKeys implements jws.KeyProvider, and dynamically returns the
 // appropriate key to verify the token
-func (j *JWT) FetchKeys(_ context.Context, sink jws.KeySink, sig *jws.Signature, msg *jws.Message) error {
+func (j *JWT) FetchKeys(ctx context.Context, sink jws.KeySink, sig *jws.Signature, msg *jws.Message) error {
 	switch sig.ProtectedHeaders().Algorithm() {
 	case jwa.HS256:
 		sink.Key(jwa.HS256, []byte(j.Secret))
@@ -145,9 +133,11 @@ func (j *JWT) FetchKeys(_ context.Context, sink jws.KeySink, sig *jws.Signature,
 			return fmt.Errorf("JWKSURL not specified, cannot validate RS256 signature")
 		}
 
-		j.initCacheOnce.Do(j.initCache)
+		j.initCacheOnce.Do(func() {
+			j.initCache(ctx)
+		})
 
-		set, err := j.Cache.Get(context.TODO(), j.Jwksurl)
+		set, err := j.Cache.Get(ctx, j.Jwksurl)
 		if err != nil {
 			return err
 		}

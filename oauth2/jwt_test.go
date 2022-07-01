@@ -15,7 +15,7 @@ import (
 )
 
 func TestAuthenticate(t *testing.T) {
-	history := time.Unix(-446774400, 0)
+	history := time.Unix(-446774400, 0).UTC()
 	var tests = []struct {
 		Desc   string
 		Secret string
