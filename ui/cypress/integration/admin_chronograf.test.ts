@@ -208,7 +208,7 @@ describe('Chronograf', () => {
           cy.getByTestID(`${chronograf.organizations[0].name}-org-name`)
             .should('be.visible')
             .click()
-          cy.getByTestID('rename-org--input')
+          cy.getByTestID(`${chronograf.organizations[0].name}-org--input`)
             .clear()
             .type(`${chronograf.organizations[1].name}{Enter}`)
         })
