@@ -29,6 +29,7 @@ import {
   writePoints,
   clickAttached,
   changeUserInfo,
+  deleteMappings,
 } from './support/commands'
 
 declare global {
@@ -62,6 +63,7 @@ declare global {
       writePoints: typeof writePoints
       clickAttached: typeof clickAttached
       changeUserInfo: typeof changeUserInfo
+      deleteMappings: typeof deleteMappings
     }
   }
 }
