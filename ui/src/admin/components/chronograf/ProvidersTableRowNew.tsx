@@ -63,7 +63,7 @@ class ProvidersTableRowNew extends PureComponent<Props, State> {
     const preventCreate = !provider || !providerOrganization
 
     return (
-      <div className="fancytable--row">
+      <div className="fancytable--row" data-test="providers--new-row">
         <div className="fancytable--td provider--scheme">
           <Dropdown
             items={schemes}

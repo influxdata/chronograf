@@ -61,7 +61,7 @@ class ProvidersTableRow extends Component {
 
     const isDefaultMapping = DEFAULT_MAPPING_ID === mapping.id
     return (
-      <div className="fancytable--row">
+      <div className="fancytable--row" data-test="providers--row">
         <div className="fancytable--td provider--scheme">
           <Dropdown
             items={schemes}
@@ -77,6 +77,7 @@ class ProvidersTableRow extends Component {
           onBlur={this.handleChangeProvider}
           disabled={isDefaultMapping}
           tabIndex={rowIndex}
+          testId="provider--inputedit"
         />
         <InputClickToEdit
           value={providerOrganization}
@@ -84,6 +85,7 @@ class ProvidersTableRow extends Component {
           onBlur={this.handleChangeProviderOrg}
           disabled={isDefaultMapping}
           tabIndex={rowIndex}
+          testId="provider-org--inputedit"
         />
         <div className="fancytable--td provider--arrow">
           <span />
@@ -103,6 +105,7 @@ class ProvidersTableRow extends Component {
           confirmAction={this.handleDeleteMap}
           confirmText="Delete this Mapping?"
           disabled={isDefaultMapping}
+          testId="delete-mapping--confirm-button"
         />
       </div>
     )

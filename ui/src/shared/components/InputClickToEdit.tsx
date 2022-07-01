@@ -10,6 +10,7 @@ interface Props {
   tabIndex?: number
   placeholder?: string
   appearAsNormalInput?: boolean
+  testId?: string
 }
 
 interface State {
@@ -103,6 +104,7 @@ class InputClickToEdit extends PureComponent<Props, State> {
       placeholder,
       value,
       appearAsNormalInput,
+      testId,
     } = this.props
 
     const wrapperClass = `${wrapper}${
@@ -112,12 +114,12 @@ class InputClickToEdit extends PureComponent<Props, State> {
 
     return disabled ? (
       <div className={wrapperClass}>
-        <div data-test="disabled" className="input-cte__disabled">
+        <div className="input-cte__disabled" data-test={testId}>
           {value}
         </div>
       </div>
     ) : (
-      <div className={wrapperClass} data-test="rename-org">
+      <div className={wrapperClass}>
         {isEditing ? (
           <input
             type="text"
@@ -130,7 +132,7 @@ class InputClickToEdit extends PureComponent<Props, State> {
             onFocus={this.handleFocus}
             tabIndex={tabIndex}
             spellCheck={false}
-            data-test="rename-org--input"
+            data-test={testId}
           />
         ) : (
           <div
@@ -138,7 +140,7 @@ class InputClickToEdit extends PureComponent<Props, State> {
             onClick={this.handleInputClick}
             onFocus={this.handleInputClick}
             tabIndex={tabIndex}
-            data-test={`${value}-org-name`}
+            data-test={testId}
           >
             {value || placeholder}
             {appearAsNormalInput || (
