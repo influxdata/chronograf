@@ -132,7 +132,9 @@ class InputClickToEdit extends PureComponent<Props, State> {
             onFocus={this.handleFocus}
             tabIndex={tabIndex}
             spellCheck={false}
-            data-test={`${testId}--input`}
+            data-test={
+              testId ? `${testId}--input` : 'input-click-to-edit--input-field'
+            }
           />
         ) : (
           <div
@@ -140,7 +142,9 @@ class InputClickToEdit extends PureComponent<Props, State> {
             onClick={this.handleInputClick}
             onFocus={this.handleInputClick}
             tabIndex={tabIndex}
-            data-test={`${testId}-name`}
+            data-test={
+              testId ? `${testId}-name` : 'input-click-to-edit--value-field'
+            }
           >
             {value || placeholder}
             {appearAsNormalInput || (
