@@ -114,7 +114,7 @@ class InputClickToEdit extends PureComponent<Props, State> {
 
     return disabled ? (
       <div className={wrapperClass}>
-        <div className="input-cte__disabled" data-test={testId}>
+        <div data-test="disabled" className="input-cte__disabled">
           {value}
         </div>
       </div>
