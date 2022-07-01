@@ -74,6 +74,7 @@ class OrganizationsTableRow extends Component<Props, Record<string, never>> {
           value={organization.name}
           wrapperClass="fancytable--td orgs-table--name"
           onBlur={this.handleUpdateOrgName}
+          testId={`${organization.name}-org`}
         />
         <div className="fancytable--td orgs-table--default-role">
           <Dropdown
