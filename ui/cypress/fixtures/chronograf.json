@@ -5,5 +5,15 @@
         "oauthProvider": "oauth-mock",
         "oauth-schema": "oauth",
         "orgs": ["Default"]
-    }
+    },
+    "organizations": [
+        {
+            "name": "SmallOrg",
+            "defaultRole": "reader"
+        },
+        {
+            "name": "BigOrg",
+            "defaultRole": "member"
+        }
+    ]
 }
