@@ -186,13 +186,11 @@ describe('Chronograf', () => {
       cy.getByTestID(`${chronograf.organizations[0].name}-org--row`).should(
         'not.exist'
       )
-
       cy.getByTestID('create-new-org--button').click()
       cy.getByTestID('new-org--row').within(() => {
         cy.getByTestID('new-org-name--input')
           .clear()
           .type(chronograf.organizations[0].name)
-
         cy.get('.dropdown-selected').click()
         cy.getByTestID(
           `${chronograf.organizations[0].defaultRole}-dropdown-item`
@@ -201,44 +199,40 @@ describe('Chronograf', () => {
           'contain.text',
           chronograf.organizations[0].defaultRole
         )
-
         cy.getByTestID('confirm').click()
       })
-
       cy.reload()
-      cy.get('.panel-title').should('contain.text', '2 Organizations').then(() => {
-        cy.getByTestID(`${chronograf.organizations[0].name}-org-name`).should('be.visible').click()
-        cy.getByTestID('rename-org--input')
-          .clear()
-          .type(`${chronograf.organizations[1].name}{Enter}`)
-      })
-
+      cy.get('.panel-title')
+        .should('contain.text', '2 Organizations')
+        .then(() => {
+          cy.getByTestID(`${chronograf.organizations[0].name}-org-name`)
+            .should('be.visible')
+            .click()
+          cy.getByTestID('rename-org--input')
+            .clear()
+            .type(`${chronograf.organizations[1].name}{Enter}`)
+        })
       cy.getByTestID(`${chronograf.organizations[1].name}-org-name`).should(
         'contain.text',
         chronograf.organizations[1].name
       )
-
       cy.getByTestID(`${chronograf.organizations[1].name}-org--row`)
         .find('.dropdown-selected')
         .click()
       cy.getByTestID(
         `${chronograf.organizations[1].defaultRole}-dropdown-item`
       ).click()
-
       cy.getByTestID(`${chronograf.organizations[1].name}-org--row`)
         .find('.dropdown-selected')
         .should('contain.text', chronograf.organizations[1].defaultRole)
-
       cy.getByTestID(`${chronograf.organizations[1].name}-org--row`)
         .find('[data-test="delete-org--button"]')
         .click()
-
       cy.getByTestID(`${chronograf.organizations[1].name}-org--row`)
         .find('[data-test="delete-org--button"]')
         .within(() => {
           cy.getByTestID('confirm-btn').click()
         })
-
       cy.getByTestID(`${chronograf.organizations[1].name}-org--row`).should(
         'not.exist'
       )
