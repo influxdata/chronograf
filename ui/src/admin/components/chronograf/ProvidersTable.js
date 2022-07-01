@@ -61,7 +61,7 @@ class ProvidersTable extends Component {
             className="btn btn-sm btn-primary"
             onClick={this.handleClickCreateMap}
             disabled={isCreatingMap}
-            data-test="create-mapping--buttton"
+            data-test="create-mapping--button"
           >
             <span className="icon plus" /> Create Mapping
           </button>
@@ -113,7 +113,7 @@ class ProvidersTable extends Component {
                 className="btn btn-sm btn-primary"
                 onClick={this.handleClickCreateMap}
                 disabled={isCreatingMap}
-                data-test="create-mapping--buttton"
+                data-test="create-mapping--button"
               >
                 <span className="icon plus" /> Create Mapping
               </button>

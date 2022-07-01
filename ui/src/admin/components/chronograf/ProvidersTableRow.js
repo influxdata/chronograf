@@ -77,7 +77,7 @@ class ProvidersTableRow extends Component {
           onBlur={this.handleChangeProvider}
           disabled={isDefaultMapping}
           tabIndex={rowIndex}
-          testId="provider--inputedit"
+          testId="provider"
         />
         <InputClickToEdit
           value={providerOrganization}
@@ -85,7 +85,7 @@ class ProvidersTableRow extends Component {
           onBlur={this.handleChangeProviderOrg}
           disabled={isDefaultMapping}
           tabIndex={rowIndex}
-          testId="provider-org--inputedit"
+          testId="provider-org"
         />
         <div className="fancytable--td provider--arrow">
           <span />

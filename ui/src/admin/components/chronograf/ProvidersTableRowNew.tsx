@@ -79,6 +79,7 @@ class ProvidersTableRowNew extends PureComponent<Props, State> {
           onBlur={this.handleChangeProvider}
           tabIndex={rowIndex}
           placeholder="google"
+          testId="new-provider"
         />
         <InputClickToEdit
           value={providerOrganization}
@@ -87,6 +88,7 @@ class ProvidersTableRowNew extends PureComponent<Props, State> {
           onBlur={this.handleChangeProviderOrg}
           tabIndex={rowIndex}
           placeholder="*"
+          testId="new-provider-org"
         />
         <div className="fancytable--td provider--arrow">
           <span />
