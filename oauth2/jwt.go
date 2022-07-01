@@ -48,7 +48,6 @@ func parseToken(src string, options ...jwt.ParseOption) (jwt.Token, error) {
 		// Hack to make the rror messages compatible with previous incarnation
 		switch {
 		case errors.Is(err, jwt.ErrInvalidIssuedAt()):
-			// Note: error message is not technically true
 			return nil, fmt.Errorf(`Token used before issued`)
 		case errors.Is(err, jwt.ErrTokenExpired()):
 			return nil, fmt.Errorf(`Token is expired`)

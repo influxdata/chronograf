@@ -70,10 +70,8 @@ func TestAuthenticate(t *testing.T) {
 			Err: errors.New("Token is expired"),
 		},
 		{
-			Desc:   "Test jwt token not before time",
-			Secret: "secret",
-			// Note: because expiration is checked before nbf,
-			// his token must have a valid expiration time
+			Desc:     "Test jwt token not before time",
+			Secret:   "secret",
 			Token:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOi00NDY3NzE4MDAsImlhdCI6LTQ0Njc3NDQwMCwibmFtZSI6IkRvYyBCcm93biIsIm5iZiI6LTQ0Njc3NDM5OSwic3ViIjoiL2Nocm9ub2dyYWYvdjEvdXNlcnMvMSJ9.Vtr_7E46II0sqvk4MDfFUqDjMlcvtKPZC44CXhUBEGw",
 			Duration: time.Second,
 			Principal: oauth2.Principal{
@@ -84,10 +82,8 @@ func TestAuthenticate(t *testing.T) {
 			Err: errors.New("\"nbf\" not satisfied"),
 		},
 		{
-			Desc:   "Test jwt with empty subject is invalid",
-			Secret: "secret",
-			// Note: because expiration is checked before required
-			// claims, this token must have a valid expiration time
+			Desc:     "Test jwt with empty subject is invalid",
+			Secret:   "secret",
 			Token:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOi00NDY3NzE4MDAsImlhdCI6LTQ0Njc3NDQwMCwibmJmIjotNDQ2Nzc0NDAwfQ.W2KIE7OW0nWsn8_NG-URUEiP88ELfEW54lIJInG8bBs",
 			Duration: time.Second,
 			Principal: oauth2.Principal{
