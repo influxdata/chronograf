@@ -21,8 +21,8 @@
             "defaultRole": "member",
             "mapping": {
                 "scheme": "oauth2",
-                "provider": "oauth-mock",
-                "providerOrg": "default"
+                "provider": "oauth-mock-2",
+                "providerOrg": "default-2"
             }
         }
     ]
