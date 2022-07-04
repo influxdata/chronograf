@@ -238,4 +238,73 @@ describe('Chronograf', () => {
       )
     })
   })
+
+  describe('Org Mapping', () => {
+    beforeEach(() => {
+      cy.visit(url + '/organization-mappings')
+    })
+
+    it('create, edit, and remove organization mapping', () => {
+      cy.getByTestID('providers--row').should('have.length', 1)
+      cy.get('.panel-title').should('have.text', '1 Map')
+      cy.getByTestID('create-mapping--button').click()
+      cy.getByTestID('cancel').click()
+      cy.getByTestID('providers--row').should('have.length', 1)
+      cy.getByTestID('create-mapping--button').click()
+      cy.getByTestID('providers--new-row').within(() => {
+        cy.getByTestID('dropdown-selected--*')
+          .click()
+          .then(() => {
+            cy.getByTestID(
+              `${chronograf.organizations[0].mapping.scheme}-dropdown-item`
+            ).click()
+          })
+        cy.getByTestID(
+          `dropdown-selected--${chronograf.organizations[0].mapping.scheme}`
+        ).should('contain.text', chronograf.organizations[0].mapping.scheme)
+        cy.getByTestID('new-provider-name').click()
+        cy.getByTestID('new-provider--input').type(
+          chronograf.organizations[0].mapping.provider + '{Enter}'
+        )
+        cy.getByTestID('new-provider-name').should(
+          'have.text',
+          chronograf.organizations[0].mapping.provider
+        )
+        cy.getByTestID('new-provider-org-name').click()
+        cy.getByTestID('new-provider-org--input').type(
+          chronograf.organizations[0].mapping.providerOrg + '{Enter}'
+        )
+        cy.getByTestID('new-provider-org-name').should(
+          'have.text',
+          chronograf.organizations[0].mapping.providerOrg
+        )
+        cy.getByTestID('confirm').click()
+      })
+      cy.reload()
+      cy.get('.panel-title').should('have.text', '2 Maps')
+      cy.getByTestID('providers--row')
+        .should('have.length', 2)
+        .eq(0)
+        .within(() => {
+          cy.getByTestID('provider-name').click()
+          cy.getByTestID('provider--input')
+            .clear()
+            .type(chronograf.organizations[1].mapping.provider + '{Enter}')
+          cy.getByTestID('provider-name').should(
+            'have.text',
+            chronograf.organizations[1].mapping.provider
+          )
+          cy.getByTestID('provider-org-name').click()
+          cy.getByTestID('provider-org--input').type(
+            chronograf.organizations[1].mapping.providerOrg + '{Enter}'
+          )
+          cy.getByTestID('provider-org-name').should(
+            'have.text',
+            chronograf.organizations[1].mapping.providerOrg
+          )
+          cy.getByTestID('delete-mapping--confirm-button').click()
+          cy.getByTestID('confirm-btn').click()
+        })
+    })
+  })
 })

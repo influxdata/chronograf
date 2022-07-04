@@ -9,11 +9,21 @@
     "organizations": [
         {
             "name": "SmallOrg",
-            "defaultRole": "reader"
+            "defaultRole": "reader",
+            "mapping": {
+                "scheme": "oauth2",
+                "provider": "oauth-mock",
+                "providerOrg": "default"
+            }
         },
         {
             "name": "BigOrg",
-            "defaultRole": "member"
+            "defaultRole": "member",
+            "mapping": {
+                "scheme": "oauth2",
+                "provider": "oauth-mock-2",
+                "providerOrg": "default-2"
+            }
         }
     ]
 }

@@ -487,6 +487,17 @@ export const deleteInfluxDBs = (sourceId: string) => {
     })
 }
 
+export const deleteMappings = () => {
+  return cy.request('GET', `${apiUrl}/mappings`).then(({body: responseBody}) => {
+    console.log(responseBody)
+    cy.wrap(responseBody.mappings).each((map: any) => {
+      if(map.id !== 'default') {
+        cy.request('DELETE', `${apiUrl}/mappings/${map.id}`)
+      }
+    })
+  })
+}
+
 function wrapConnections() {
   return cy
     .request({
@@ -557,6 +568,7 @@ export function toInitialState() {
             })
           })
 
+          cy.deleteMappings()
           cy.deleteDashboards()
           cy.deleteChronografUsers()
           cy.deleteOrgs()
@@ -605,3 +617,4 @@ Cypress.Commands.add('toInitialState', toInitialState)
 Cypress.Commands.add('writePoints', writePoints)
 Cypress.Commands.add('clickAttached', {prevSubject: 'element'}, clickAttached)
 Cypress.Commands.add('changeUserInfo', changeUserInfo)
+Cypress.Commands.add('deleteMappings', deleteMappings)

@@ -104,7 +104,7 @@ class InputClickToEdit extends PureComponent<Props, State> {
       placeholder,
       value,
       appearAsNormalInput,
-      testId,
+      testId = 'icte',
     } = this.props
 
     const wrapperClass = `${wrapper}${

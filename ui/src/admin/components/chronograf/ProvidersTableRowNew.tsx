@@ -63,7 +63,7 @@ class ProvidersTableRowNew extends PureComponent<Props, State> {
     const preventCreate = !provider || !providerOrganization
 
     return (
-      <div className="fancytable--row">
+      <div className="fancytable--row" data-test="providers--new-row">
         <div className="fancytable--td provider--scheme">
           <Dropdown
             items={schemes}
@@ -79,6 +79,7 @@ class ProvidersTableRowNew extends PureComponent<Props, State> {
           onBlur={this.handleChangeProvider}
           tabIndex={rowIndex}
           placeholder="google"
+          testId="new-provider"
         />
         <InputClickToEdit
           value={providerOrganization}
@@ -87,6 +88,7 @@ class ProvidersTableRowNew extends PureComponent<Props, State> {
           onBlur={this.handleChangeProviderOrg}
           tabIndex={rowIndex}
           placeholder="*"
+          testId="new-provider-org"
         />
         <div className="fancytable--td provider--arrow">
           <span />
