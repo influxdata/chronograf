@@ -104,7 +104,7 @@ class InputClickToEdit extends PureComponent<Props, State> {
       placeholder,
       value,
       appearAsNormalInput,
-      testId,
+      testId = 'icte',
     } = this.props
 
     const wrapperClass = `${wrapper}${
@@ -132,9 +132,7 @@ class InputClickToEdit extends PureComponent<Props, State> {
             onFocus={this.handleFocus}
             tabIndex={tabIndex}
             spellCheck={false}
-            data-test={
-              testId ? `${testId}--input` : 'input-click-to-edit--input-field'
-            }
+            data-test={`${testId}--input`}
           />
         ) : (
           <div
@@ -142,9 +140,7 @@ class InputClickToEdit extends PureComponent<Props, State> {
             onClick={this.handleInputClick}
             onFocus={this.handleInputClick}
             tabIndex={tabIndex}
-            data-test={
-              testId ? `${testId}-name` : 'input-click-to-edit--value-field'
-            }
+            data-test={`${testId}-name`}
           >
             {value || placeholder}
             {appearAsNormalInput || (
