@@ -115,8 +115,16 @@ func (j *JWT) ValidPrincipal(ctx context.Context, jwtToken Token, lifespan time.
 	}, nil
 }
 
-func (j *JWT) initCache(ctx context.Context) {
-	cache := jwk.NewCache(ctx)
+func (j *JWT) initCache() {
+	// ideally this should be controlled from whatever "main"
+	// module using this component, but we are punting it by
+	// using context.TODO() here.
+	//
+	// Also, we could be using jwk.CachedSet here, but since
+	// one of the tests explicitly asked to check for invalid
+	// JWKS urls during verification time, we are simply using
+	// jwk.Cache instead
+	cache := jwk.NewCache(context.TODO())
 	// Note: by default updates are checked every 15 minutes
 	cache.Register(j.Jwksurl)
 	j.Cache = cache
@@ -134,7 +142,7 @@ func (j *JWT) FetchKeys(ctx context.Context, sink jws.KeySink, sig *jws.Signatur
 		}
 
 		j.initCacheOnce.Do(func() {
-			j.initCache(ctx)
+			j.initCache()
 		})
 
 		set, err := j.Cache.Get(ctx, j.Jwksurl)
