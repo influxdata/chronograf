@@ -26,6 +26,7 @@ module.exports = (
   // let's increase the browser window size when running headlessly
   // this will produce higher resolution images and videos
   // https://on.cypress.io/browser-launch-api
+  require('@cypress/code-coverage/task')(on, config)
   on(
     'before:browser:launch',
     (browser: Cypress.Browser, launchOptions: Cypress.BrowserLaunchOptions) => {
@@ -64,4 +65,6 @@ module.exports = (
       return launchOptions
     }
   )
+
+  return config
 }
