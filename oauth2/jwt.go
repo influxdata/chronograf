@@ -167,32 +167,6 @@ func (j *JWT) FetchKeys(ctx context.Context, sink jws.KeySink, sig *jws.Signatur
 	return nil
 }
 
-// For the id_token, the recommended signature algorithm is RS256, which
-// means we need to verify the token against a public key. This public key
-// is available from the key discovery service in JSON Web Key (JWK).
-// JWK is specified in RFC 7517.
-//
-// The location of the key discovery service (JWKSURL) is published in the
-// OpenID Provider Configuration Information at /.well-known/openid-configuration
-// implements rfc7517 section 4.7 "x5c" (X.509 Certificate Chain) Parameter
-
-// JWK defines a JSON Web KEy nested struct
-type JWK struct {
-	Kty string   `json:"kty"`
-	Use string   `json:"use"`
-	Alg string   `json:"alg"`
-	Kid string   `json:"kid"`
-	X5t string   `json:"x5t"`
-	N   string   `json:"n"`
-	E   string   `json:"e"`
-	X5c []string `json:"x5c"`
-}
-
-// JWKS defines a JKW[]
-type JWKS struct {
-	Keys []JWK `json:"keys"`
-}
-
 // GetClaims extracts claims from id_token
 func (j *JWT) GetClaims(tokenString string) (jwt.Token, error) {
 	token, err := parseToken(
