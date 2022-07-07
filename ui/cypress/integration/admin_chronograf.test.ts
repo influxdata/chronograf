@@ -136,7 +136,10 @@ describe('Chronograf', () => {
         .realHover()
         .then(() => {
           cy.getByTestID(`${chronograf.user.name}--table-row`).within(() => {
-            cy.getByTestID('superAdmin--toggle').click()
+            cy.getByTestID('superAdmin--toggle')
+              .should('have.class', 'active')
+              .click()
+              .should('not.have.class', 'active')
           })
         })
 
