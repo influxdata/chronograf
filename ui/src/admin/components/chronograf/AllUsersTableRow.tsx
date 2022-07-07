@@ -49,16 +49,7 @@ interface Props {
 @ErrorHandling
 export default class AllUsersTableRow extends Component<Props> {
   public shouldComponentUpdate(nextProps) {
-    if (
-      _.isEqual(
-        _.omit(nextProps.user, 'superAdmin'),
-        _.omit(this.props.user, 'superAdmin')
-      )
-    ) {
-      return false
-    }
-
-    return true
+    return !_.isEqual(nextProps.user, this.props.user)
   }
 
   public render() {
