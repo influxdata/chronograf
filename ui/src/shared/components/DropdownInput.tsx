@@ -38,7 +38,8 @@ const DropdownInput = ({
   onFilterKeyPress,
   placeholder = 'Filter items...',
 }: Props) => {
-  const renderSelected = useRef(true)
+  // show actually selected value only if search term is empty
+  const renderSelected = useRef(!searchTerm)
   const value = useMemo(() => {
     if (searchTerm) {
       return searchTerm
