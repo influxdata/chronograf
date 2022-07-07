@@ -8,6 +8,34 @@
     "type": "git",
     "url": "github:influxdata/chronograf"
   },
+  "nyc": {
+    "sourceMap": false,
+    "instrument": false,
+    "require": [
+      "@babel-register"
+    ],
+    "extension": [
+      ".js",
+      ".ts",
+      ".tsx"
+    ],
+    "parser-plugins": [
+      "jsx",
+      "asyncGenerator s",
+      "bigInt",
+      "classProperties",
+      "classPrivateProperties",
+      "dynamicImport",
+      "importMeta",
+      "objectRestSpread",
+      "optionalCatchBinding"
+    ]
+  },
+  "mocha": {
+    "require": [
+      "@babel/register"
+    ]
+  },
   "scripts": {
     "start": "GIT_SHA=$(git rev-parse HEAD) node parcel.js",
     "build": "GIT_SHA=$(git rev-parse HEAD) parcel build -d build --log-level 2 --no-source-maps --public-url '' src/index.html",
@@ -30,7 +58,7 @@
   },
   "author": "",
   "devDependencies": {
-    "@babel/core": "^7.4.0",
+    "@babel/core": "^7.0.0-0",
     "@babel/eslint-parser": "^7.17.0",
     "@babel/eslint-plugin": "^7.17.7",
     "@babel/plugin-proposal-class-properties": "^7.1.0",
@@ -39,6 +67,8 @@
     "@babel/plugin-transform-runtime": "^7.1.0",
     "@babel/preset-env": "^7.13.9",
     "@babel/preset-react": "^7.0.0",
+    "@babel/preset-typescript": "^7.18.6",
+    "@istanbuljs/schema": "^0.1.3",
     "@types/chroma-js": "^1.3.4",
     "@types/codemirror": "^0.0.56",
     "@types/d3-color": "^1.2.1",
@@ -67,6 +97,7 @@
     "babel-core": "^7.0.0-bridge",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^23.6.0",
+    "babel-plugin-istanbul": "^6.1.1",
     "babel-plugin-lodash": "^3.3.4",
     "babel-plugin-module-resolver": "^4.1.0",
     "enzyme": "^3.6.0",

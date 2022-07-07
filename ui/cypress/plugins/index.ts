@@ -27,6 +27,7 @@ module.exports = (
   // this will produce higher resolution images and videos
   // https://on.cypress.io/browser-launch-api
   require('@cypress/code-coverage/task')(on, config)
+  on('file:preprocessor', require('@cypress/code-coverage/use-babelrc'))
   on(
     'before:browser:launch',
     (browser: Cypress.Browser, launchOptions: Cypress.BrowserLaunchOptions) => {
