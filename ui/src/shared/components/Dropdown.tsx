@@ -204,6 +204,7 @@ export class Dropdown extends Component<Props, State> {
             searchTerm={searchTerm}
             buttonSize={buttonSize}
             buttonColor={buttonColor}
+            selectedValue={selected}
             toggleStyle={toggleStyle}
             disabled={disabled}
             onFilterChange={this.handleFilterChange}
