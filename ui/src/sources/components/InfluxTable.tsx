@@ -54,6 +54,7 @@ class InfluxTable extends PureComponent<Props> {
                     deleteKapacitor={deleteKapacitor}
                     setActiveKapacitor={setActiveKapacitor}
                     toggleWizard={toggleWizard}
+                    testId="connection-row"
                   />
                 )
               })}

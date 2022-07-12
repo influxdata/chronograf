@@ -10,6 +10,7 @@ interface Props {
   lastStep?: boolean
   onClickPrevious: () => void
   onClickNext: () => void
+  testId?: {previousLabel: string; nextLabel: string}
 }
 
 @ErrorHandling
@@ -26,17 +27,23 @@ class WizardButtonBar extends PureComponent<Props> {
       nextLabel,
       onClickPrevious,
       onClickNext,
+      testId,
     } = this.props
     return (
       <div className="wizard-button-bar">
         {decrement && (
-          <button className="btn btn-md btn-default" onClick={onClickPrevious}>
+          <button
+            className="btn btn-md btn-default"
+            onClick={onClickPrevious}
+            data-test={testId.previousLabel}
+          >
             {previousLabel}
           </button>
         )}
         <button
           className={`btn btn-md ${this.buttonColor}`}
           onClick={onClickNext}
+          data-test={testId.nextLabel}
         >
           {nextLabel}
         </button>

@@ -18,6 +18,7 @@ interface Props {
   setActiveKapacitor: (kapacitor: Kapacitor) => void
   deleteKapacitor: (kapacitor: Kapacitor) => void
   toggleWizard: ToggleWizard
+  testId?: string
 }
 
 class InfluxTableRow extends PureComponent<Props & WithRouterProps> {
@@ -36,10 +37,11 @@ class InfluxTableRow extends PureComponent<Props & WithRouterProps> {
       setActiveKapacitor,
       deleteKapacitor,
       toggleWizard,
+      testId,
     } = this.props
 
     return (
-      <tr className={this.className}>
+      <tr className={this.className} data-test={testId}>
         <td>{this.connectButton}</td>
         <td>
           <ConnectionLink
