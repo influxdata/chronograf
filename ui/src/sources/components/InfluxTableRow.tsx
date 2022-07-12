@@ -58,6 +58,7 @@ class InfluxTableRow extends PureComponent<Props & WithRouterProps> {
               text="Delete Connection"
               confirmAction={this.handleDeleteSource}
               customClass="delete-source table--show-on-row-hover"
+              testId="delete-connection--button"
             />
           </Authorized>
         </td>

@@ -9,12 +9,13 @@ interface Props {
   subtext?: string
   onChange: (isChecked: boolean) => void
   halfWidth?: boolean
+  testId?: string
 }
 
 @ErrorHandling
 class WizardCheckbox extends PureComponent<Props> {
   public render() {
-    const {text, isChecked, subtext, halfWidth} = this.props
+    const {text, isChecked, subtext, halfWidth, testId} = this.props
 
     return (
       <div className={'form-group ' + (halfWidth ? 'col-xs-6' : 'col-xs-12')}>
@@ -25,6 +26,7 @@ class WizardCheckbox extends PureComponent<Props> {
             active={isChecked}
             onChange={this.onChangeSlideToggle}
             tooltipText={text}
+            dataTest={testId}
           />
           <span
             className="wizard-checkbox--label"

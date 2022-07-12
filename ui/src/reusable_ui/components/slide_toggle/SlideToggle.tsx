@@ -14,7 +14,7 @@ interface Props {
   color?: ComponentColor
   disabled?: boolean
   tooltipText?: string
-  dataTest?: string
+  test?: string
 }
 
 @ErrorHandling
@@ -27,14 +27,14 @@ class SlideToggle extends Component<Props> {
   }
 
   public render() {
-    const {tooltipText, dataTest} = this.props
+    const {tooltipText, testId} = this.props
 
     return (
       <div
         className={this.className}
         onClick={this.handleClick}
         title={tooltipText}
-        data-test={dataTest}
+        data-test={testId}
       >
         <div className="slide-toggle--knob" />
       </div>
