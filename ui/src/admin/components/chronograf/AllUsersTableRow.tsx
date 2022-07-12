@@ -80,7 +80,7 @@ export default class AllUsersTableRow extends Component<Props> {
             color={ComponentColor.Success}
             disabled={this.userIsMe}
             tooltipText={this.toggleTooltipText}
-            dataTest="superAdmin--toggle"
+            testId="superAdmin--toggle"
           />
         </td>
         <td style={{textAlign: 'right', width: colActions}}>

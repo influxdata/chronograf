@@ -162,7 +162,7 @@ const RolesPage = ({
               active={showUsers}
               onChange={toggleShowUsers}
               size={ComponentSize.ExtraSmall}
-              dataTest="show-users--toggle"
+              testId="show-users--toggle"
             />
             Show Users
           </div>
