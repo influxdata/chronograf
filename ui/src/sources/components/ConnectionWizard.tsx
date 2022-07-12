@@ -95,7 +95,9 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           previousLabel="Cancel"
           testId={{
             previousLabel: 'cancel--button',
-            nextLabel: source ? 'update-connection--button' : 'add-connection--button',
+            nextLabel: source
+              ? 'update-connection--button'
+              : 'add-connection--button',
           }}
         >
           <SourceStep

@@ -19,7 +19,11 @@ class InfluxTableHeader extends PureComponent<Props> {
       <div className="panel-heading">
         <h2 className="panel-title">{this.title}</h2>
         <Authorized requiredRole={EDITOR_ROLE}>
-          <div onClick={toggleWizard(true)} className="btn btn-sm btn-primary" data-test="add-connection--button">
+          <div
+            onClick={toggleWizard(true)}
+            className="btn btn-sm btn-primary"
+            data-test="add-connection--button"
+          >
             <span className="icon plus" /> Add Connection
           </div>
         </Authorized>
