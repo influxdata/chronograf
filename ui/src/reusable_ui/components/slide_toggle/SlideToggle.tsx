@@ -14,7 +14,7 @@ interface Props {
   color?: ComponentColor
   disabled?: boolean
   tooltipText?: string
-  test?: string
+  testId?: string
 }
 
 @ErrorHandling
