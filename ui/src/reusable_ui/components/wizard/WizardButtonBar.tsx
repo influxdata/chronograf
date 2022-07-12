@@ -27,7 +27,10 @@ class WizardButtonBar extends PureComponent<Props> {
       nextLabel,
       onClickPrevious,
       onClickNext,
-      testId,
+      testId = {
+        previousLabel: 'previous--button',
+        nextLabel: 'next--button',
+      },
     } = this.props
     return (
       <div className="wizard-button-bar">
