@@ -1,4 +1,12 @@
 describe('Welcome Page', () => {
+  let srcCredentials: any
+
+  before(() => {
+    cy.fixture('source').then(sourceCredentials => {
+      srcCredentials = sourceCredentials
+    })
+  })
+
   beforeEach(() => {
     cy.toInitialState()
     cy.OAuthLogout()
@@ -6,19 +14,28 @@ describe('Welcome Page', () => {
 
   it('set up InfluxDB connection', () => {
     cy.get('button').contains('Get Started').click()
-    cy.get('[id="Connection URL"]').clear().type(Cypress.env('influxDBURL'))
-    cy.get('[id="Connection Name"]').clear().type(Cypress.env('connectionName'))
-    cy.get('[id="Username"]').clear().type(Cypress.env('username'))
-    cy.get('[id="Password"]').clear().type(Cypress.env('password'))
-
-    if (Cypress.env('influxDBURL').startsWith('https')) {
-      cy.get('.wizard-checkbox--label').contains('Unsafe SSL').click()
-    }
-
-    cy.get('[id="Meta Service Connection URL"]')
+    cy.getByTestID('connection-url--input')
       .clear()
-      .type(Cypress.env('metaUrl'))
+      .type(srcCredentials.influxDBURL)
+    cy.getByTestID('connection-name--input')
+      .clear()
+      .type(srcCredentials.connectionName)
+    cy.getByTestID('connection-username--input')
+      .clear()
+      .type(srcCredentials.username)
+    cy.getByTestID('connection-password--input')
+      .clear()
+      .type(srcCredentials.password)
+      .then(() => {
+        if (srcCredentials.influxDBURL.startsWith('https')) {
+          cy.getByTestID('unsafe-ssl--checkbox').click()
+        }
+      })
 
+    cy.getByTestID('meta-service-connection-url--input')
+      .clear()
+      .type(srcCredentials.metaUrl)
+      .then(() => {})
 
     cy.get('.wizard-button-bar').within(() => {
       cy.get('button').contains('Add Connection').click()
