@@ -43,7 +43,7 @@ describe('Use Dashboards', () => {
       })
     })
 
-    it.only('ensure that all elements used to edit Chronograf are not visible', () => {
+    it('ensure that all elements used to edit Chronograf are not visible', () => {
       cy.url().should('match', new RegExp(`sources/${source.id}/dashboards`))
       cy.getByTestID('sidebar').should('not.exist')
       cy.getByTestID('import-dashboard--button').should('not.exist')
