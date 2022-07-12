@@ -1,5 +1,3 @@
-import {Source} from '../support/types'
-
 describe('Configuration', () => {
   let srcCredentials: any
 
