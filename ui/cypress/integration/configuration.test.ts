@@ -21,7 +21,6 @@ describe('Configuration', () => {
     cy.getByTestID('dismiss-button').click()
     cy.get('.overlay--container').should('not.exist')
     cy.getByTestID('add-connection--button').click()
-
     cy.getByTestID('connection-url--input')
       .clear()
       .type(srcCredentials.influxDBURL)
@@ -34,11 +33,7 @@ describe('Configuration', () => {
     cy.getByTestID('connection-password--input')
       .clear()
       .type(srcCredentials.password)
-      .then(() => {
-        if (srcCredentials.influxDBURL.startsWith('https')) {
-          cy.getByTestID('unsafe-ssl--checkbox').click()
-        }
-      })
+    cy.getByTestID('unsafe-ssl--checkbox').click()
     cy.getByTestID('meta-service-connection-url--input')
       .clear()
       .type(srcCredentials.metaUrl)

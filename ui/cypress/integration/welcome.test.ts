@@ -26,11 +26,7 @@ describe('Welcome Page', () => {
     cy.getByTestID('connection-password--input')
       .clear()
       .type(srcCredentials.password)
-      .then(() => {
-        if (srcCredentials.influxDBURL.startsWith('https')) {
-          cy.getByTestID('unsafe-ssl--checkbox').click()
-        }
-      })
+    cy.getByTestID('unsafe-ssl--checkbox').click()
 
     cy.getByTestID('meta-service-connection-url--input')
       .clear()
