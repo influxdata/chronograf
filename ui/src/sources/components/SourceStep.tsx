@@ -144,7 +144,6 @@ class SourceStep extends PureComponent<Props, State> {
           value={source.telegraf}
           label="Telegraf Database Name"
           onChange={this.onChangeInput('telegraf')}
-          testId="connection-"
         />
         <WizardTextInput
           value={source.defaultRP}
