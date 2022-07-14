@@ -26,10 +26,6 @@ export interface WizardStepProps {
   nextLabel?: string
   previousLabel?: string
   lastStep?: boolean
-  testId?: {
-    previousLabel: string
-    nextLabel: string
-  }
 }
 
 @ErrorHandling
@@ -48,10 +44,6 @@ class WizardStep extends PureComponent<WizardStepProps> {
       nextLabel,
       previousLabel,
       lastStep,
-      testId = {
-        previousLabel: 'previous-label--button',
-        nextLabel: 'next-label--button',
-      },
     } = this.props
 
     return (
@@ -73,7 +65,6 @@ class WizardStep extends PureComponent<WizardStepProps> {
           onClickPrevious={this.handleClickPrevious}
           onClickNext={this.handleClickNext}
           lastStep={lastStep}
-          testId={testId}
         />
       </>
     )

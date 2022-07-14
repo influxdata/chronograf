@@ -93,12 +93,6 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           onNext={this.handleSourceNext}
           nextLabel={source ? 'Update Connection' : 'Add Connection'}
           previousLabel="Cancel"
-          testId={{
-            previousLabel: 'cancel--button',
-            nextLabel: source
-              ? 'update-connection--button'
-              : 'add-connection--button',
-          }}
         >
           <SourceStep
             ref={c => (this.sourceStepRef = c)}
@@ -115,7 +109,6 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           nextLabel={this.dashboardNextLabel}
           onNext={this.handleDashboardNext}
           previousLabel="Go Back"
-          testId={{previousLabel: 'go-back--button', nextLabel: 'next--button'}}
         >
           <DashboardStep
             ref={c => (this.dashboardStepRef = c)}
@@ -134,10 +127,6 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           onPrevious={this.handleKapacitorPrev}
           nextLabel="Continue"
           previousLabel="Go Back"
-          testId={{
-            previousLabel: 'go-back--button',
-            nextLabel: 'continue--button',
-          }}
         >
           <KapacitorStep
             ref={c => (this.kapacitorStepRef = c)}
@@ -158,10 +147,6 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           onPrevious={this.handleCompletionPrev}
           nextLabel="Finish"
           previousLabel="Go Back"
-          testId={{
-            previousLabel: 'go-back--button',
-            nextLabel: 'finish--button',
-          }}
         >
           <CompletionStep ref={c => (this.completionStepRef = c)} />
         </WizardStep>
