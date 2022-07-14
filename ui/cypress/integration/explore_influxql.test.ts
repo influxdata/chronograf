@@ -122,7 +122,9 @@ describe('InfluxQL', () => {
       cy.get('.dropdown').contains('Metaquery Templates').click()
       cy.getByTestID('dropdown--item').contains('Create Database').click()
       cy.get('button').contains('Submit Query').click()
+      cy.intercept('chronograf/v1/sources').as('sources')
       cy.reload()
+      cy.wait('@sources')
     })
 
     cy.contains('.query-builder--column', 'DB.RetentionPolicy').within(() => {
