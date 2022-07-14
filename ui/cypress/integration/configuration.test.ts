@@ -38,13 +38,17 @@ describe('Configuration', () => {
       .then(() => {})
     cy.get('.wizard-button-bar').within(() => {
       cy.get('button').contains('Add Connection').click()
+      cy.get('button').contains('Add Connection').click()
+      cy.get('button').contains('Go Back').click()
+      cy.get('button')
+        .should('contain.text', 'Go Back')
+        .contains('Go Back')
+        .click()
+      cy.get('button').contains('Update Connection').click()
+      cy.get('button').contains('Next').click()
+      cy.document().its('body').find('[data-test="skip-button"]').click()
+      cy.get('button').contains('Finish').click()
     })
-    cy.get('button').contains('Go Back').click()
-    cy.get('button').contains('Update Connection').click()
-    cy.get('button').contains('Next').click()
-
-    cy.getByTestID('skip-button').click()
-    cy.get('button').contains('Finish').click()
 
     cy.getByTestID('connection-row')
       .should('have.length', 2)
