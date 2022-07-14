@@ -31,10 +31,7 @@ class WizardButtonBar extends PureComponent<Props> {
     return (
       <div className="wizard-button-bar">
         {decrement && (
-          <button
-            className="btn btn-md btn-default"
-            onClick={onClickPrevious}
-          >
+          <button className="btn btn-md btn-default" onClick={onClickPrevious}>
             {previousLabel}
           </button>
         )}
