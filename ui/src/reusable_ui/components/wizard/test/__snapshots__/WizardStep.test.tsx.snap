@@ -27,12 +27,6 @@ exports[`WizardStep matches snapshot 1`] = `
     onClickNext={[Function]}
     onClickPrevious={[Function]}
     previousLabel="Previous"
-    testId={
-      Object {
-        "nextLabel": "next-label--button",
-        "previousLabel": "previous-label--button",
-      }
-    }
   />
 </Fragment>
 `;
