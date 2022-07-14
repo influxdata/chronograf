@@ -21,9 +21,7 @@ describe('Configuration', () => {
     cy.getByTestID('dismiss-button').click()
     cy.get('.overlay--container').should('not.exist')
     cy.getByTestID('add-connection--button').click()
-    cy.getByTestID('connection-url--input')
-      .clear()
-      .type(srcConfig.influxDBURL)
+    cy.getByTestID('connection-url--input').clear().type(srcConfig.influxDBURL)
     cy.getByTestID('connection-name--input')
       .clear()
       .type(srcConfig.connectionName)
@@ -41,11 +39,13 @@ describe('Configuration', () => {
     cy.get('.wizard-button-bar').within(() => {
       cy.get('button').contains('Add Connection').click()
     })
-    cy.getByTestID('go-back--button').click()
-    cy.getByTestID('update-connection--button').click()
-    cy.getByTestID('next--button').click()
+    cy.get('button').contains('Go Back').click()
+    cy.get('button').contains('Update Connection').click()
+    cy.get('button').contains('Next').click()
+
     cy.getByTestID('skip-button').click()
-    cy.getByTestID('finish--button').click()
+    cy.get('button').contains('Finish').click()
+
     cy.getByTestID('connection-row')
       .should('have.length', 2)
       .eq(1)
