@@ -10,6 +10,7 @@ interface Props {
   lastStep?: boolean
   onClickPrevious: () => void
   onClickNext: () => void
+  testId?: string
 }
 
 @ErrorHandling

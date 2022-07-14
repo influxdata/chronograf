@@ -17,6 +17,7 @@ interface Props {
   placeholder?: string
   autoFocus?: boolean
   type?: string
+  testId?: string
 }
 
 interface State {
@@ -55,6 +56,7 @@ class WizardTextInput extends PureComponent<Props, State> {
       autoFocus,
       label,
       type,
+      testId,
     } = this.props
 
     let inputClass = ''
@@ -81,6 +83,7 @@ class WizardTextInput extends PureComponent<Props, State> {
           autoFocus={autoFocus}
           spellCheck={false}
           autoComplete={'off'}
+          data-test={testId}
         />
         {errorText}
       </div>

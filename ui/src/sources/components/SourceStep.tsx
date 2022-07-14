@@ -116,17 +116,20 @@ class SourceStep extends PureComponent<Props, State> {
           onChange={this.onChangeInput('url')}
           valueModifier={this.URLModifier}
           onSubmit={this.handleSubmitUrl}
+          testId="connection-url--input"
         />
         <WizardTextInput
           value={source.name}
           label="Connection Name"
           onChange={this.onChangeInput('name')}
+          testId="connection-name--input"
         />
         <WizardTextInput
           value={source.username}
           label={sourceIsV2 ? 'Organization' : 'Username'}
           onChange={this.onChangeInput('username')}
           onSubmit={this.handleSubmitUsername}
+          testId="connection-username--input"
         />
         <WizardTextInput
           value={source.password}
@@ -135,6 +138,7 @@ class SourceStep extends PureComponent<Props, State> {
           type="password"
           onChange={this.onChangeInput('password')}
           onSubmit={this.handleSubmitPassword}
+          testId="connection-password--input"
         />
         <WizardTextInput
           value={source.telegraf}
@@ -151,6 +155,7 @@ class SourceStep extends PureComponent<Props, State> {
             value={source.metaUrl}
             label="Meta Service Connection URL"
             onChange={this.onChangeInput('metaUrl')}
+            testId="meta-service-connection-url--input"
           />
         )}
         {!onBoarding && (
@@ -159,6 +164,7 @@ class SourceStep extends PureComponent<Props, State> {
             isChecked={source.default}
             text={'Default connection'}
             onChange={this.onChangeInput('default')}
+            testId="default-connection--checkbox"
           />
         )}
         <WizardCheckbox
@@ -174,6 +180,7 @@ class SourceStep extends PureComponent<Props, State> {
             text={`Unsafe SSL`}
             onChange={this.onChangeInput('insecureSkipVerify')}
             subtext={insecureSkipVerifyText}
+            testId="unsafe-ssl--checkbox"
           />
         )}
       </>

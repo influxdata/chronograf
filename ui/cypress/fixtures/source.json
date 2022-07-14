@@ -1,0 +1,8 @@
+{
+    "influxDBURL": "https://localhost:8086",
+    "username": "admin",
+    "password": "admin",
+    "connectionName": "E1M1",
+    "insecureSkipVerify": true,
+    "metaUrl": "https://localhost:8091"
+}

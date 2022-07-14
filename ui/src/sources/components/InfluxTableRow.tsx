@@ -39,7 +39,7 @@ class InfluxTableRow extends PureComponent<Props & WithRouterProps> {
     } = this.props
 
     return (
-      <tr className={this.className}>
+      <tr className={this.className} data-test="connection-row">
         <td>{this.connectButton}</td>
         <td>
           <ConnectionLink
@@ -58,6 +58,7 @@ class InfluxTableRow extends PureComponent<Props & WithRouterProps> {
               text="Delete Connection"
               confirmAction={this.handleDeleteSource}
               customClass="delete-source table--show-on-row-hover"
+              testId="delete-connection--button"
             />
           </Authorized>
         </td>
