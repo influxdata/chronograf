@@ -1,9 +1,9 @@
 describe('Configuration', () => {
-  let srcCredentials: any
+  let srcConfig: any
 
   before(() => {
     cy.fixture('source').then(sourceCredentials => {
-      srcCredentials = sourceCredentials
+      srcConfig = sourceCredentials
     })
   })
 
@@ -23,20 +23,20 @@ describe('Configuration', () => {
     cy.getByTestID('add-connection--button').click()
     cy.getByTestID('connection-url--input')
       .clear()
-      .type(srcCredentials.influxDBURL)
+      .type(srcConfig.influxDBURL)
     cy.getByTestID('connection-name--input')
       .clear()
-      .type(srcCredentials.connectionName)
+      .type(srcConfig.connectionName)
     cy.getByTestID('connection-username--input')
       .clear()
-      .type(srcCredentials.username)
+      .type(srcConfig.username)
     cy.getByTestID('connection-password--input')
       .clear()
-      .type(srcCredentials.password)
+      .type(srcConfig.password)
     cy.getByTestID('unsafe-ssl--checkbox').click()
     cy.getByTestID('meta-service-connection-url--input')
       .clear()
-      .type(srcCredentials.metaUrl)
+      .type(srcConfig.metaUrl)
       .then(() => {})
     cy.get('.wizard-button-bar').within(() => {
       cy.get('button').contains('Add Connection').click()
