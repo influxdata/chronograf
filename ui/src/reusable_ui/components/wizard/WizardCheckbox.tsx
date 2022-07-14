@@ -26,7 +26,7 @@ class WizardCheckbox extends PureComponent<Props> {
             active={isChecked}
             onChange={this.onChangeSlideToggle}
             tooltipText={text}
-            testId={testId}
+            dataTest={testId}
           />
           <span
             className="wizard-checkbox--label"
