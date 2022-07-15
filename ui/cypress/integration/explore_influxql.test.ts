@@ -1,5 +1,8 @@
+import { Source } from '../support/types'
+
 describe('InfluxQL', () => {
   let db: any
+  let source: Source
 
   before(() => {
     cy.fixture('influxDB').then(({db: database}) => {
@@ -9,7 +12,8 @@ describe('InfluxQL', () => {
 
   beforeEach(() => {
     cy.toInitialState()
-    cy.createInfluxDBConnection().then(source => {
+    cy.createInfluxDBConnection().then((src: Source) => {
+      source = src
       cy.visit(`/sources/${source.id}/chronograf/data-explorer`)
       cy.url().should(
         'match',
@@ -118,30 +122,29 @@ describe('InfluxQL', () => {
   })
 
   it('create and delete a database with use of metaquery templates', () => {
+    cy.intercept(`chronograf/v1/sources/${source.id}/queries`).as('postQuery')
     cy.get('.query-editor--status-actions').within(() => {
       cy.get('.dropdown').contains('Metaquery Templates').click()
       cy.getByTestID('dropdown--item').contains('Create Database').click()
       cy.get('button').contains('Submit Query').click()
-      cy.intercept('chronograf/v1/sources').as('sources')
+      cy.wait('@postQuery')
       cy.reload()
-      cy.wait('@sources')
     })
 
     cy.contains('.query-builder--column', 'DB.RetentionPolicy').within(() => {
-      cy.get('.query-builder--list-item').should(
-        'contain.text',
-        'db_name.autogen'
+      cy.contains('.query-builder--list-item', 'db_name.autogen').should(
+        'exist'
       )
     })
     cy.get('.query-editor--status-actions').within(() => {
       cy.get('.dropdown').contains('Metaquery Templates').click()
       cy.getByTestID('dropdown--item').contains('Drop Database').click()
       cy.get('button').contains('Submit Query').click()
+      cy.wait('@postQuery')
     })
     cy.contains('.query-builder--column', 'DB.RetentionPolicy').within(() => {
-      cy.get('.query-builder--list-item').should(
-        'not.contain.text',
-        'db_name.autogen'
+      cy.contains('.query-builder--list-item', 'db_name.autogen').should(
+        'not.exist'
       )
     })
   })
