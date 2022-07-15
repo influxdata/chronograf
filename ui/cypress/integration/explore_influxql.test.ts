@@ -1,4 +1,4 @@
-import { Source } from '../support/types'
+import {Source} from '../support/types'
 
 describe('InfluxQL', () => {
   let db: any
@@ -14,6 +14,7 @@ describe('InfluxQL', () => {
     cy.toInitialState()
     cy.createInfluxDBConnection().then((src: Source) => {
       source = src
+
       cy.visit(`/sources/${source.id}/chronograf/data-explorer`)
       cy.url().should(
         'match',
@@ -36,6 +37,7 @@ describe('InfluxQL', () => {
         )
       })
     })
+
     cy.getByTestID('sidebar').should('exist')
   })
 
@@ -53,17 +55,14 @@ describe('InfluxQL', () => {
       .find('.query-builder--list-empty')
       .should('exist')
       .and('contain.text', 'No Database selected')
-
     cy.contains('.query-builder--column', 'Fields')
       .find('.query-builder--list-empty')
       .should('exist')
       .and('contain.text', 'No Measurement selected')
     cy.get('.query-builder--list-item').contains(db.name).click()
-
     cy.contains('.query-builder--column', 'Measurements & Tags')
       .find('.query-builder--list-empty')
       .should('not.exist')
-
     cy.contains('.query-builder--column', 'Measurements & Tags').within(() => {
       cy.get('.query-builder--list')
         .find('.query-builder--list-item')
