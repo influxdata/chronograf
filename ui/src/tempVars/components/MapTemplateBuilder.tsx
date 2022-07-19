@@ -10,7 +10,7 @@ import {
   notifyInvalidMapType,
 } from 'src/shared/copy/notifications'
 
-import {TemplateBuilderProps} from 'src/types'
+import type {TemplateBuilderProps} from 'src/types'
 
 interface State {
   templateValuesString: string
