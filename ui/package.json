@@ -23,7 +23,8 @@
   },
   "scripts": {
     "start": "GIT_SHA=$(git rev-parse HEAD) node parcel.js",
-    "build": "GIT_SHA=$(git rev-parse HEAD) parcel build --log-level verbose --no-optimize",
+    "build": "GIT_SHA=$(git rev-parse HEAD) parcel build --log-level error",
+    "build:inspect": "GIT_SHA=$(git rev-parse HEAD) parcel build --log-level verbose --no-optimize",
     "clean": "rm -rf ./build/* && rm -rf ./.cache ../.parcel-cache",
     "test": "jest",
     "test:watch": "jest --watch",
