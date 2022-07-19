@@ -6,6 +6,8 @@ vendor/
 .vscode/
 .idea/
 node_modules/
+.parcel-cache/
+
 
 # Binaries
 /chronograf

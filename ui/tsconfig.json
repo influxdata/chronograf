@@ -13,7 +13,7 @@
       "react-dnd-html5-backend"
     ],
     "target": "es6",
-    "module": "es2015",
+    "module": "es2020",
     "moduleResolution": "node",
     "lib": ["es6", "es2017", "dom", "webworker","ES2020.Promise"],
     "skipLibCheck": true,

@@ -7,11 +7,10 @@
       "root": ["./src"],
       "alias": {
         "src": "./src",
-	"shared": "./src/shared",
-	"style": "./src/style",
-	"utils": "./src/utils"
+	      "shared": "./src/shared",
+	      "style": "./src/style",
+	      "utils": "./src/utils"
       }
     }]
-  ],
-  "presets": ["@babel/preset-env", "@babel/preset-react"]
+  ]
 }
