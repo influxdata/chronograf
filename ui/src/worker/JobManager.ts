@@ -27,8 +27,11 @@ class JobManager {
   private jobs: {[key: string]: Deferred} = {}
 
   constructor() {
+    const url = new URL('./worker.ts', import.meta.url)
     _.times(workerCount, () => {
-      const worker = new Worker('./worker.ts')
+      const worker = new Worker(url, {
+        type: 'module',
+      })
 
       worker.onmessage = this.handleMessage
       worker.onerror = this.handleError
