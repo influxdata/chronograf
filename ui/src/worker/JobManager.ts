@@ -27,9 +27,8 @@ class JobManager {
   private jobs: {[key: string]: Deferred} = {}
 
   constructor() {
-    const url = new URL('./worker.ts', import.meta.url)
     _.times(workerCount, () => {
-      const worker = new Worker(url, {
+      const worker = new Worker(new URL('./worker.ts', import.meta.url), {
         type: 'module',
       })
 
