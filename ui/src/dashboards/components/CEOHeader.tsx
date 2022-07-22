@@ -22,7 +22,6 @@ interface Props {
   isSaveable: boolean
 }
 
-@ErrorHandling
 class CEOHeader extends Component<Props> {
   public render() {
     const {
@@ -76,4 +75,4 @@ class CEOHeader extends Component<Props> {
   }
 }
 
-export default CEOHeader
+export default ErrorHandling(CEOHeader)

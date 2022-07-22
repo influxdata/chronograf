@@ -20,7 +20,6 @@ interface State {
   enabled: boolean
 }
 
-@ErrorHandling
 class ZenossConfig extends PureComponent<Props, State> {
   private url: HTMLInputElement
   private username: HTMLInputElement
@@ -276,4 +275,4 @@ class ZenossConfig extends PureComponent<Props, State> {
   }
 }
 
-export default ZenossConfig
+export default ErrorHandling(ZenossConfig)

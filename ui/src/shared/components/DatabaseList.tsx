@@ -25,7 +25,6 @@ interface DatabaseListState {
 
 const {shape} = PropTypes
 
-@ErrorHandling
 class DatabaseList extends Component<DatabaseListProps, DatabaseListState> {
   public static contextTypes = {
     source: shape({
@@ -114,4 +113,4 @@ class DatabaseList extends Component<DatabaseListProps, DatabaseListState> {
   }
 }
 
-export default DatabaseList
+export default ErrorHandling(DatabaseList)

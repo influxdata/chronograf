@@ -22,8 +22,7 @@ interface State {
   expanded: boolean
 }
 
-@ErrorHandling
-export default class MenuTooltipButton extends Component<Props, State> {
+class MenuTooltipButton extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     theme: 'default',
   }
@@ -115,3 +114,5 @@ export default class MenuTooltipButton extends Component<Props, State> {
     )
   }
 }
+
+export default ErrorHandling(MenuTooltipButton)

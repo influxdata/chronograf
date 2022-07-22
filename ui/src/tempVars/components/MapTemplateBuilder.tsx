@@ -16,7 +16,6 @@ interface State {
   templateValuesString: string
 }
 
-@ErrorHandling
 class MapTemplateBuilder extends PureComponent<TemplateBuilderProps, State> {
   public constructor(props: TemplateBuilderProps) {
     super(props)
@@ -124,4 +123,4 @@ class MapTemplateBuilder extends PureComponent<TemplateBuilderProps, State> {
   }
 }
 
-export default MapTemplateBuilder
+export default ErrorHandling(MapTemplateBuilder)

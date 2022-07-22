@@ -17,7 +17,6 @@ interface State {
   templateValuesString: string
 }
 
-@ErrorHandling
 class CSVTemplateBuilder extends PureComponent<TemplateBuilderProps, State> {
   public constructor(props: TemplateBuilderProps) {
     super(props)
@@ -136,4 +135,4 @@ class CSVTemplateBuilder extends PureComponent<TemplateBuilderProps, State> {
   }
 }
 
-export default CSVTemplateBuilder
+export default ErrorHandling(CSVTemplateBuilder)

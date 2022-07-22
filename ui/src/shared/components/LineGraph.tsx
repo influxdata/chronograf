@@ -62,7 +62,6 @@ interface State {
   timeSeries?: TimeSeriesToDyGraphReturnType
 }
 
-@ErrorHandlingWith(InvalidData)
 class LineGraph extends PureComponent<LineGraphProps, State> {
   public static defaultProps: Partial<LineGraphProps> = {
     staticLegend: false,
@@ -283,4 +282,4 @@ const GraphLoadingDots = () => (
   </div>
 )
 
-export default withRouter<Props>(LineGraph)
+export default withRouter<Props>(ErrorHandlingWith(InvalidData)(LineGraph))

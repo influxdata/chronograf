@@ -26,7 +26,6 @@ interface State {
   clickStatus: boolean
 }
 
-@ErrorHandling
 class StaticLegend extends Component<Props, State> {
   private staticLegendRef: React.RefObject<HTMLDivElement>
 
@@ -128,4 +127,4 @@ class StaticLegend extends Component<Props, State> {
   }
 }
 
-export default StaticLegend
+export default ErrorHandling(StaticLegend)

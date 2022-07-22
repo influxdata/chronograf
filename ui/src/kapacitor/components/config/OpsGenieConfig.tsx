@@ -36,7 +36,6 @@ interface State {
   enabled: boolean
 }
 
-@ErrorHandling
 class OpsGenieConfig extends PureComponent<Props, State> {
   private apiKey: HTMLInputElement
   private recoveryActionNotes: HTMLInputElement
@@ -227,4 +226,4 @@ class OpsGenieConfig extends PureComponent<Props, State> {
   private handleApiKeyRef = r => (this.apiKey = r)
 }
 
-export default OpsGenieConfig
+export default ErrorHandling(OpsGenieConfig)

@@ -18,7 +18,6 @@ interface State {
   fluxScriptWarning?: string
 }
 
-@ErrorHandling
 class FluxQueryTemplateBuilder extends PureComponent<
   TemplateBuilderProps,
   State
@@ -146,4 +145,4 @@ class FluxQueryTemplateBuilder extends PureComponent<
   }
 }
 
-export default FluxQueryTemplateBuilder
+export default ErrorHandling(FluxQueryTemplateBuilder)

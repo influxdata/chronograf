@@ -46,7 +46,6 @@ interface State {
   rowHeight: number
 }
 
-@ErrorHandling
 class LayoutRenderer extends Component<Props, State> {
   constructor(props) {
     super(props)
@@ -179,4 +178,4 @@ class LayoutRenderer extends Component<Props, State> {
   }
 }
 
-export default LayoutRenderer
+export default ErrorHandling(LayoutRenderer)

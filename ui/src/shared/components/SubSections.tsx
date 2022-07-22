@@ -36,7 +36,6 @@ interface Props extends WithRouterProps {
   onTabChange?: (section: PageSection, url: string) => void
 }
 
-@ErrorHandling
 class SubSections extends Component<Props> {
   constructor(props: Props) {
     super(props)
@@ -87,4 +86,4 @@ class SubSections extends Component<Props> {
   }
 }
 
-export default withRouter(SubSections)
+export default withRouter(ErrorHandling(SubSections))

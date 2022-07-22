@@ -30,7 +30,6 @@ interface Props {
   header?: boolean
 }
 
-@ErrorHandling
 class UserNavBlock extends PureComponent<Props> {
   public render() {
     const {logoutLink, me, links, meChangeOrg, header} = this.props
@@ -117,4 +116,4 @@ const mdtp = {
   meChangeOrg: meChangeOrganizationAsync,
 }
 
-export default connect(null, mdtp)(UserNavBlock)
+export default connect(null, mdtp)(ErrorHandling(UserNavBlock))

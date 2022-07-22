@@ -34,7 +34,6 @@ interface State {
   databases: string[]
 }
 
-@ErrorHandling
 class DatabaseList extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
@@ -88,4 +87,4 @@ class DatabaseList extends PureComponent<Props, State> {
   }
 }
 
-export default DatabaseList
+export default ErrorHandling(DatabaseList)

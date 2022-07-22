@@ -33,7 +33,6 @@ interface State {
   selectedDashboards: number
 }
 
-@ErrorHandling
 class OnboardingWizard extends PureComponent<Props, State> {
   public sourceStepRef: any
   public kapacitorStepRef: any
@@ -270,4 +269,4 @@ class OnboardingWizard extends PureComponent<Props, State> {
 
 const mstp = ({auth: {isUsingAuth, me}}) => ({isUsingAuth, me})
 
-export default connect(mstp, null)(withRouter(OnboardingWizard))
+export default connect(mstp, null)(withRouter(ErrorHandling(OnboardingWizard)))

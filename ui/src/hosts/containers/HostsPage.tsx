@@ -61,8 +61,7 @@ interface State {
   layouts: Layout[]
 }
 
-@ErrorHandling
-export class HostsPage extends PureComponent<Props, State> {
+class HostsPageEH extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     manualRefresh: 0,
   }
@@ -206,6 +205,8 @@ export class HostsPage extends PureComponent<Props, State> {
     }
   }
 }
+
+export const HostsPage = ErrorHandling(HostsPageEH)
 
 const mstp = state => {
   const {

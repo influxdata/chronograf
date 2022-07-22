@@ -32,7 +32,6 @@ interface State {
 
 const {shape} = PropTypes
 
-@ErrorHandling
 class MeasurementList extends PureComponent<Props, State> {
   public static contextTypes = {
     source: shape({
@@ -194,4 +193,4 @@ class MeasurementList extends PureComponent<Props, State> {
   }
 }
 
-export default MeasurementList
+export default ErrorHandling(MeasurementList)

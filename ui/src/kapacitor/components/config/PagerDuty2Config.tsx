@@ -25,7 +25,6 @@ interface State {
   enabled: boolean
 }
 
-@ErrorHandling
 class PagerDuty2Config extends PureComponent<Props, State> {
   private routingKey: HTMLInputElement
   private url: HTMLInputElement
@@ -133,4 +132,4 @@ class PagerDuty2Config extends PureComponent<Props, State> {
   }
 }
 
-export default PagerDuty2Config
+export default ErrorHandling(PagerDuty2Config)

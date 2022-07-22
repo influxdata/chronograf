@@ -14,7 +14,6 @@ interface Props {
   onUpdateDefaultTemplateValue: (item: TemplateValue) => void
 }
 
-@ErrorHandling
 class TemplatePreviewList extends PureComponent<Props> {
   public render() {
     const {items, onUpdateDefaultTemplateValue} = this.props
@@ -46,4 +45,4 @@ class TemplatePreviewList extends PureComponent<Props> {
   }
 }
 
-export default TemplatePreviewList
+export default ErrorHandling(TemplatePreviewList)

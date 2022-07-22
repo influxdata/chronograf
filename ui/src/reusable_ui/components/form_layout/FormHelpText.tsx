@@ -7,7 +7,6 @@ interface Props {
   text: string
 }
 
-@ErrorHandling
 class FormHelpText extends Component<Props> {
   public render() {
     const {text} = this.props
@@ -16,4 +15,4 @@ class FormHelpText extends Component<Props> {
   }
 }
 
-export default FormHelpText
+export default ErrorHandling(FormHelpText)

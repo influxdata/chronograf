@@ -16,7 +16,6 @@ interface Props {
   onApplyTimeRange: (tr: TimeRange) => void
 }
 
-@ErrorHandling
 class CustomTimeRangeDropdown extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
@@ -90,4 +89,4 @@ class CustomTimeRangeDropdown extends PureComponent<Props, State> {
   }
 }
 
-export default CustomTimeRangeDropdown
+export default ErrorHandling(CustomTimeRangeDropdown)

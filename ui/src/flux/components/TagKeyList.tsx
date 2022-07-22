@@ -27,7 +27,6 @@ interface State {
 
 const excludedTagKeys = ['_measurement', '_field', '_start', '_stop']
 
-@ErrorHandling
 class TagKeyList extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -90,4 +89,4 @@ class TagKeyList extends PureComponent<Props, State> {
   }
 }
 
-export default TagKeyList
+export default ErrorHandling(TagKeyList)

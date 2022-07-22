@@ -91,7 +91,6 @@ interface State {
   draftCellName: string
 }
 
-@ErrorHandling
 class CellEditorOverlay extends Component<Props, State> {
   private overlayRef: React.RefObject<HTMLDivElement> = React.createRef()
 
@@ -336,6 +335,7 @@ class CellEditorOverlay extends Component<Props, State> {
     }
   }
 }
+const CellEditorOverlayEH = ErrorHandling(CellEditorOverlay)
 
 const ConnectedCellEditorOverlay = (props: PassedProps) => {
   return (
@@ -343,7 +343,7 @@ const ConnectedCellEditorOverlay = (props: PassedProps) => {
       {(container: TimeMachineContainer) => {
         const {state} = container
         return (
-          <CellEditorOverlay
+          <CellEditorOverlayEH
             {...props}
             queryType={state.queryType}
             queryDrafts={state.queryDrafts}

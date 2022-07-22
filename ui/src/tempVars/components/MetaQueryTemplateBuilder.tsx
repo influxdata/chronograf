@@ -18,7 +18,6 @@ interface State {
   metaQueryResultsStatus: RemoteDataState
 }
 
-@ErrorHandling
 class CustomMetaQueryTemplateBuilder extends PureComponent<
   TemplateBuilderProps,
   State
@@ -146,4 +145,4 @@ class CustomMetaQueryTemplateBuilder extends PureComponent<
   }
 }
 
-export default CustomMetaQueryTemplateBuilder
+export default ErrorHandling(CustomMetaQueryTemplateBuilder)

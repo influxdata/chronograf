@@ -26,7 +26,6 @@ interface Props {
   meID: string
 }
 
-@ErrorHandling
 class UsersTableRow extends PureComponent<Props> {
   public render() {
     const {user, onChangeUserRole} = this.props
@@ -106,4 +105,4 @@ class UsersTableRow extends PureComponent<Props> {
   }
 }
 
-export default UsersTableRow
+export default ErrorHandling(UsersTableRow)

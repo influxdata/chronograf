@@ -31,7 +31,6 @@ export interface CategoryTree {
   fieldsLoading: RemoteDataState
 }
 
-@ErrorHandling
 class SchemaExplorerTree extends PureComponent<Props> {
   public render() {
     const {source, timeRange, bucket} = this.props
@@ -102,4 +101,4 @@ class SchemaExplorerTree extends PureComponent<Props> {
   }
 }
 
-export default SchemaExplorerTree
+export default ErrorHandling(SchemaExplorerTree)

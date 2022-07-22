@@ -43,7 +43,6 @@ const timeRange = STATUS_PAGE_TIME_RANGE
 
 type Props = StateProps & OwnProps
 
-@ErrorHandling
 class StatusPage extends Component<Props> {
   public render() {
     const {source, onSetTimeZone, timeZone} = this.props
@@ -125,4 +124,4 @@ const mdtp = {
   onSetTimeZone: appActions.setTimeZone,
 }
 
-export default withSource(connect(mstp, mdtp)(StatusPage))
+export default withSource(connect(mstp, mdtp)(ErrorHandling(StatusPage)))

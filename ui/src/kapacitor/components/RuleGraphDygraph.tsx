@@ -37,7 +37,6 @@ interface State {
   timeSeriesToDygraphResult: TimeSeriesToDyGraphReturnType | null
 }
 
-@ErrorHandling
 class RuleGraphDygraph extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -132,4 +131,4 @@ class RuleGraphDygraph extends Component<Props, State> {
   }
 }
 
-export default RuleGraphDygraph
+export default ErrorHandling(RuleGraphDygraph)

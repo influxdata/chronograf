@@ -60,7 +60,6 @@ interface State {
   kapacitor: Kapacitor | Record<string, never>
 }
 
-@ErrorHandling
 class KapacitorRulePage extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -184,5 +183,5 @@ const mapDispatchToProps = dispatch => ({
 })
 
 export default withSource(
-  connect(mapStateToProps, mapDispatchToProps)(KapacitorRulePage)
+  connect(mapStateToProps, mapDispatchToProps)(ErrorHandling(KapacitorRulePage))
 )

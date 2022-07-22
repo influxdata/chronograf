@@ -74,7 +74,6 @@ const NOOP = () => {}
 
 const TEMPLATE_TYPES = ['temp-system', 'temp-var']
 
-@ErrorHandling
 class ReactCodeMirror extends PureComponent<Props, State> {
   private editor?: CMEditor
 
@@ -393,4 +392,4 @@ class ReactCodeMirror extends PureComponent<Props, State> {
   }
 }
 
-export default ReactCodeMirror
+export default ErrorHandling(ReactCodeMirror)

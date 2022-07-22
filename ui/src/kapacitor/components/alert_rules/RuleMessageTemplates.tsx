@@ -17,7 +17,6 @@ interface Props {
 }
 
 // needs to be React Component for CodeData click handler to work
-@ErrorHandling
 class RuleMessageTemplates extends Component<Props> {
   constructor(props) {
     super(props)
@@ -51,4 +50,4 @@ class RuleMessageTemplates extends Component<Props> {
   }
 }
 
-export default RuleMessageTemplates
+export default ErrorHandling(RuleMessageTemplates)

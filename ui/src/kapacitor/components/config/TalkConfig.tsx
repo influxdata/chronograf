@@ -26,7 +26,6 @@ interface Props {
   enabled: boolean
 }
 
-@ErrorHandling
 class TalkConfig extends PureComponent<Props, State> {
   private url: HTMLInputElement
   private author: HTMLInputElement
@@ -129,4 +128,4 @@ class TalkConfig extends PureComponent<Props, State> {
   private handleUrlRef = r => (this.url = r)
 }
 
-export default TalkConfig
+export default ErrorHandling(TalkConfig)

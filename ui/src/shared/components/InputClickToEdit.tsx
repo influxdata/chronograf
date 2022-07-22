@@ -18,7 +18,6 @@ interface State {
   initialValue: string
 }
 
-@ErrorHandling
 class InputClickToEdit extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     tabIndex: 0,
@@ -153,4 +152,4 @@ class InputClickToEdit extends PureComponent<Props, State> {
   }
 }
 
-export default InputClickToEdit
+export default ErrorHandling(InputClickToEdit)

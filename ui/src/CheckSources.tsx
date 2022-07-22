@@ -68,8 +68,7 @@ export function withSource<P>(
 // Acts as a 'router middleware'. The main `App` component is responsible for
 // getting the list of data sources, but not every page requires them to function.
 // Routes that do require data sources can be nested under this component.
-@ErrorHandling
-export class CheckSources extends Component<Props, State> {
+class CheckSourcesEH extends Component<Props, State> {
   public static childContextTypes = {
     source: PropTypes.shape({
       links: PropTypes.shape({
@@ -233,6 +232,7 @@ export class CheckSources extends Component<Props, State> {
     )
   }
 }
+export const CheckSources = ErrorHandling(CheckSourcesEH)
 
 const mapStateToProps = ({sources, auth}) => ({
   sources,

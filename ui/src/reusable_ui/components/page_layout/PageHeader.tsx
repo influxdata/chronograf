@@ -16,7 +16,6 @@ interface Props {
   inPresentationMode?: boolean
 }
 
-@ErrorHandling
 class PageHeader extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     fullWidth: false,
@@ -130,4 +129,4 @@ class PageHeader extends Component<Props> {
   }
 }
 
-export default PageHeader
+export default ErrorHandling(PageHeader)

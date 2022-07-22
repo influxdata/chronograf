@@ -21,7 +21,6 @@ interface State {
   enabled: boolean
 }
 
-@ErrorHandling
 class TeamsConfig extends PureComponent<Props, State> {
   private channelURL: HTMLInputElement
 
@@ -109,4 +108,4 @@ class TeamsConfig extends PureComponent<Props, State> {
   }
 }
 
-export default TeamsConfig
+export default ErrorHandling(TeamsConfig)

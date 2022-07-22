@@ -14,7 +14,6 @@ interface Props {
   children: JSX.Element[]
 }
 
-@ErrorHandling
 class Form extends Component<Props> {
   public static Element = FormElement
   public static Label = FormLabel
@@ -64,4 +63,4 @@ class Form extends Component<Props> {
     _.includes(Form.ValidChildTypes, child.type)
 }
 
-export default Form
+export default ErrorHandling(Form)

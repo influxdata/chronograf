@@ -16,7 +16,6 @@ interface State {
   searchTerm: string
 }
 
-@ErrorHandling
 class SearchBar extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     width: 260,
@@ -60,4 +59,4 @@ class SearchBar extends PureComponent<Props, State> {
   }
 }
 
-export default SearchBar
+export default ErrorHandling(SearchBar)

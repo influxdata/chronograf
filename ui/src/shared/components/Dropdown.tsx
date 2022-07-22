@@ -44,7 +44,6 @@ interface State {
   highlightedItemIndex: number
 }
 
-@ErrorHandling
 export class Dropdown extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     actions: [],
@@ -259,4 +258,4 @@ export class Dropdown extends Component<Props, State> {
   }
 }
 
-export default OnClickOutside(Dropdown)
+export default OnClickOutside(ErrorHandling(Dropdown))

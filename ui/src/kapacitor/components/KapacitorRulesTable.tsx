@@ -66,8 +66,7 @@ const KapacitorRulesTable: FunctionComponent<KapacitorRulesTableProps> = ({
   </table>
 )
 
-@ErrorHandling
-export class RuleRow extends PureComponent<RuleRowProps> {
+export class RuleRowEH extends PureComponent<RuleRowProps> {
   constructor(props) {
     super(props)
 
@@ -131,5 +130,6 @@ export class RuleRow extends PureComponent<RuleRowProps> {
     )
   }
 }
+export const RuleRow = ErrorHandling(RuleRowEH)
 
 export default KapacitorRulesTable

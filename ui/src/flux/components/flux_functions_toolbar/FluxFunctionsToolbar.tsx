@@ -35,7 +35,6 @@ interface State {
   searchTerm: string
 }
 
-@ErrorHandling
 class FluxFunctionsToolbar extends PureComponent<Props, State> {
   public constructor(props: Props) {
     super(props)
@@ -83,10 +82,11 @@ class FluxFunctionsToolbar extends PureComponent<Props, State> {
   }
 }
 
+const FluxFunctionsToolbarEH = ErrorHandling(FluxFunctionsToolbar)
 const ConnectedFluxFunctionsToolbar = (props: PassedProps) => (
   <TimeMachineContextConsumer>
     {(container: TimeMachineContainer) => (
-      <FluxFunctionsToolbar
+      <FluxFunctionsToolbarEH
         {...props}
         script={container.state.draftScript}
         onUpdateScript={container.handleUpdateDraftScript}

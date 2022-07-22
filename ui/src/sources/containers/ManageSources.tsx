@@ -44,7 +44,6 @@ type Props = OwnProps & ReduxStateProps & ReduxDispatchProps
 
 const VERSION = process.env.npm_package_version
 
-@ErrorHandling
 class ManageSources extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -158,4 +157,4 @@ const mdtp = {
   deleteKapacitor: sourcesActions.deleteKapacitorAsync,
 }
 
-export default withSource(connect(mstp, mdtp)(ManageSources))
+export default withSource(connect(mstp, mdtp)(ErrorHandling(ManageSources)))

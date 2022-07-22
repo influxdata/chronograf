@@ -14,7 +14,6 @@ interface Props {
   className?: string
 }
 
-@ErrorHandling
 class Page extends Component<Props> {
   public static Header = PageHeader
   public static Title = PageTitle
@@ -33,4 +32,4 @@ class Page extends Component<Props> {
   }
 }
 
-export default Page
+export default ErrorHandling(Page)

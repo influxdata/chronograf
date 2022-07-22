@@ -34,7 +34,6 @@ interface State {
   tags: {}
 }
 
-@ErrorHandling
 class TagList extends PureComponent<Props, State> {
   public static contextTypes = {
     source: shape({
@@ -143,4 +142,4 @@ class TagList extends PureComponent<Props, State> {
   }
 }
 
-export default TagList
+export default ErrorHandling(TagList)

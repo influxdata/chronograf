@@ -13,7 +13,6 @@ interface State {
   showChildren: boolean
 }
 
-@ErrorHandling
 class OverlayTechnology extends Component<Props, State> {
   public static getDerivedStateFromProps(props) {
     if (props.visible) {
@@ -75,4 +74,4 @@ class OverlayTechnology extends Component<Props, State> {
   }
 }
 
-export default OverlayTechnology
+export default ErrorHandling(OverlayTechnology)

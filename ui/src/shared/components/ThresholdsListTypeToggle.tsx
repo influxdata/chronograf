@@ -22,7 +22,6 @@ interface Props {
   onUpdateThresholdsListType: (newType: ThresholdType) => void
 }
 
-@ErrorHandling
 class ThresholdsListTypeToggle extends Component<Props> {
   public render() {
     const {
@@ -59,4 +58,4 @@ class ThresholdsListTypeToggle extends Component<Props> {
   }
 }
 
-export default ThresholdsListTypeToggle
+export default ErrorHandling(ThresholdsListTypeToggle)

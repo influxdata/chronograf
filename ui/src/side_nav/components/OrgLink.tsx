@@ -19,7 +19,6 @@ interface Props {
   onMeChangeOrg: (meLink: string, orgID: OrgID) => Promise<void>
 }
 
-@ErrorHandling
 class OrgLink extends PureComponent<Props & WithRouterProps> {
   public render() {
     const {role} = this.props
@@ -64,4 +63,4 @@ class OrgLink extends PureComponent<Props & WithRouterProps> {
   }
 }
 
-export default withRouter<Props>(OrgLink)
+export default withRouter<Props>(ErrorHandling(OrgLink))

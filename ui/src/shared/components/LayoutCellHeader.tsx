@@ -13,7 +13,6 @@ interface Props {
   cellTextColor: string
 }
 
-@ErrorHandling
 class LayoutCellHeader extends Component<Props> {
   public render() {
     return (
@@ -83,4 +82,4 @@ class LayoutCellHeader extends Component<Props> {
   }
 }
 
-export default LayoutCellHeader
+export default ErrorHandling(LayoutCellHeader)

@@ -36,7 +36,6 @@ interface State {
   keysStatus: RemoteDataState
 }
 
-@ErrorHandling
 class KeysTemplateBuilder extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
@@ -250,4 +249,4 @@ class KeysTemplateBuilder extends PureComponent<Props, State> {
   }
 }
 
-export default KeysTemplateBuilder
+export default ErrorHandling(KeysTemplateBuilder)

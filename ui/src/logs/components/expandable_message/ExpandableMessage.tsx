@@ -30,8 +30,7 @@ const MIN_MESSAGE_WIDTH = 200
 const MAX_MESSAGE_HEIGHT = 200
 const SCROLL_MARGIN = 80
 
-@ErrorHandling
-export class ExpandableMessage extends Component<Props, State> {
+class ExpandableMessageEH extends Component<Props, State> {
   private containerRef: React.RefObject<HTMLDivElement>
 
   constructor(props: Props) {
@@ -122,4 +121,5 @@ export class ExpandableMessage extends Component<Props, State> {
   }
 }
 
+export const ExpandableMessage = ErrorHandling(ExpandableMessageEH)
 export default ExpandableMessage

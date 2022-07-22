@@ -13,7 +13,6 @@ interface Props {
   onRejectUpdate: () => void
 }
 
-@ErrorHandling
 class AnnotationInput extends Component<Props, State> {
   public state = {
     isEditing: false,
@@ -76,4 +75,4 @@ class AnnotationInput extends Component<Props, State> {
   }
 }
 
-export default onClickOutside(AnnotationInput)
+export default onClickOutside(ErrorHandling(AnnotationInput))

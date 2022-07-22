@@ -50,7 +50,6 @@ interface State {
 
 type Props = OwnProps & StateProps
 
-@ErrorHandling
 class AlertsTable extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
@@ -258,4 +257,4 @@ const mstp = ({app}) => ({
   timeZone: app.persisted.timeZone,
 })
 
-export default connect(mstp, null)(AlertsTable)
+export default connect(mstp, null)(ErrorHandling(AlertsTable))

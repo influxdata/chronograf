@@ -12,8 +12,7 @@ interface Props {
   children: JSX.Element[] | JSX.Element
 }
 
-@ErrorHandling
-export default class Spinner extends Component<Props> {
+class Spinner extends Component<Props> {
   public render() {
     return this.children
   }
@@ -31,3 +30,5 @@ export default class Spinner extends Component<Props> {
     return children
   }
 }
+
+export default ErrorHandling(Spinner)

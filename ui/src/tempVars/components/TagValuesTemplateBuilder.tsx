@@ -31,7 +31,6 @@ interface State {
   tagValuesStatus: RemoteDataState
 }
 
-@ErrorHandling
 class KeysTemplateBuilder extends PureComponent<TemplateBuilderProps, State> {
   constructor(props) {
     super(props)
@@ -314,4 +313,4 @@ class KeysTemplateBuilder extends PureComponent<TemplateBuilderProps, State> {
   }
 }
 
-export default KeysTemplateBuilder
+export default ErrorHandling(KeysTemplateBuilder)

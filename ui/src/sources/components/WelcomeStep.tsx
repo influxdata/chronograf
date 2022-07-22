@@ -12,7 +12,6 @@ interface Props {
   notify: typeof notifyAction
 }
 
-@ErrorHandling
 class SourceStep extends PureComponent<Props> {
   constructor(props: Props) {
     super(props)
@@ -37,4 +36,6 @@ const mdtp = {
   notify: notifyAction,
 }
 
-export default connect(null, mdtp, null, {forwardRef: true})(SourceStep)
+export default connect(null, mdtp, null, {forwardRef: true})(
+  ErrorHandling(SourceStep)
+)

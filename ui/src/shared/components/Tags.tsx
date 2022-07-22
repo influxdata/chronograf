@@ -27,7 +27,7 @@ const Tags: FunctionComponent<TagsProps> = ({
     <div className="input-tag-list">
       {tags.map((item, i) => {
         return (
-          <Tag
+          <TagEH
             key={i}
             item={item}
             onDelete={onDeleteTag}
@@ -50,7 +50,6 @@ interface TagProps {
   testId?: string
 }
 
-@ErrorHandling
 class Tag extends PureComponent<TagProps> {
   public static defaultProps: Partial<TagProps> = {
     confirmText: 'Delete',
@@ -78,5 +77,6 @@ class Tag extends PureComponent<TagProps> {
     this.props.onDelete(item)
   }
 }
+const TagEH = ErrorHandling(Tag)
 
 export default Tags

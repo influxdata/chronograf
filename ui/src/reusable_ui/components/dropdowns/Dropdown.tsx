@@ -47,7 +47,6 @@ interface State {
   expanded: boolean
 }
 
-@ErrorHandling
 class Dropdown extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     buttonColor: ComponentColor.Default,
@@ -265,4 +264,4 @@ class Dropdown extends Component<Props, State> {
     child.type === DropdownItem || child.type === DropdownDivider
 }
 
-export default Dropdown
+export default ErrorHandling(Dropdown)

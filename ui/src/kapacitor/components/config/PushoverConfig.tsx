@@ -29,7 +29,6 @@ interface State {
   enabled: boolean
 }
 
-@ErrorHandling
 class PushoverConfig extends PureComponent<Props, State> {
   private token: HTMLInputElement
   private url: HTMLInputElement
@@ -161,4 +160,4 @@ class PushoverConfig extends PureComponent<Props, State> {
   private handleTokenRef = r => (this.token = r)
 }
 
-export default PushoverConfig
+export default ErrorHandling(PushoverConfig)

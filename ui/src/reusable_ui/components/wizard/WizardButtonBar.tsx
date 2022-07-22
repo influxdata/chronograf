@@ -13,7 +13,6 @@ interface Props {
   testId?: string
 }
 
-@ErrorHandling
 class WizardButtonBar extends PureComponent<Props> {
   public static defaultProps: Partial<Props> = {
     nextLabel: 'Next',
@@ -56,4 +55,4 @@ class WizardButtonBar extends PureComponent<Props> {
   }
 }
 
-export default WizardButtonBar
+export default ErrorHandling(WizardButtonBar)

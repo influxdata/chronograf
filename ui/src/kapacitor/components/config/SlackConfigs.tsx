@@ -34,7 +34,6 @@ interface State {
   configs: Config[]
 }
 
-@ErrorHandling
 class SlackConfigs extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
@@ -159,4 +158,4 @@ class SlackConfigs extends PureComponent<Props, State> {
   }
 }
 
-export default SlackConfigs
+export default ErrorHandling(SlackConfigs)

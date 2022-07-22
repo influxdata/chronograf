@@ -27,7 +27,6 @@ interface Props {
   handleMouseLeaveTempAnnotation: () => void
 }
 
-@ErrorHandling
 class Annotations extends Component<Props> {
   public render() {
     const {
@@ -93,4 +92,4 @@ const mstp = (state, props) => {
   }
 }
 
-export default connect(mstp)(Annotations)
+export default connect(mstp)(ErrorHandling(Annotations))

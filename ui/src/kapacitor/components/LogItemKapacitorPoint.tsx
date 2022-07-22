@@ -9,7 +9,6 @@ interface Props {
   logItem: LogItem
 }
 
-@ErrorHandling
 class LogItemKapacitorPoint extends PureComponent<Props> {
   public render() {
     const {logItem} = this.props
@@ -52,4 +51,4 @@ class LogItemKapacitorPoint extends PureComponent<Props> {
   }
 }
 
-export default LogItemKapacitorPoint
+export default ErrorHandling(LogItemKapacitorPoint)

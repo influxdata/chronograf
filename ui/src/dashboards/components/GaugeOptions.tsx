@@ -32,7 +32,6 @@ interface Props {
   onUpdateGaugeColors: (g: ColorNumber[]) => void
 }
 
-@ErrorHandling
 class GaugeOptions extends PureComponent<Props> {
   public render() {
     const {gaugeColors, axes, decimalPlaces} = this.props
@@ -240,4 +239,4 @@ class GaugeOptions extends PureComponent<Props> {
   }
 }
 
-export default GaugeOptions
+export default ErrorHandling(GaugeOptions)

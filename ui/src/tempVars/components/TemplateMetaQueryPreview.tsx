@@ -11,7 +11,6 @@ interface Props {
   onUpdateDefaultTemplateValue: (item: TemplateValue) => void
 }
 
-@ErrorHandling
 class TemplateMetaQueryPreview extends PureComponent<Props> {
   public render() {
     const {items, loadingStatus, onUpdateDefaultTemplateValue} = this.props
@@ -66,4 +65,4 @@ class TemplateMetaQueryPreview extends PureComponent<Props> {
   }
 }
 
-export default TemplateMetaQueryPreview
+export default ErrorHandling(TemplateMetaQueryPreview)

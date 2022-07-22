@@ -44,8 +44,7 @@ interface State {
   opened: OpenState
 }
 
-@ErrorHandling
-class SchemaItemCategory extends PureComponent<
+class SchemaItemCategoryEH extends PureComponent<
   PassedProps & ConnectedProps,
   State
 > {
@@ -163,6 +162,7 @@ class SchemaItemCategory extends PureComponent<
   }
 }
 
+const SchemaItemCategory = ErrorHandling(SchemaItemCategoryEH)
 const ConnectedSchemaItemCategory = (props: PassedProps) => {
   return (
     <TimeMachineContextConsumer>

@@ -29,7 +29,6 @@ interface State {
   organizationId: string
 }
 
-@ErrorHandling
 class ProvidersTableRowNew extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
@@ -132,4 +131,4 @@ class ProvidersTableRowNew extends PureComponent<Props, State> {
   }
 }
 
-export default ProvidersTableRowNew
+export default ErrorHandling(ProvidersTableRowNew)

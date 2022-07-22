@@ -61,8 +61,7 @@ interface State {
   dashboardsStatus: RemoteDataState
 }
 
-@ErrorHandling
-export class DashboardsPage extends PureComponent<Props, State> {
+class DashboardsPageEH extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
 
@@ -234,6 +233,7 @@ const mapDispatchToProps = {
   retainDashRefresh: retainDashRefreshAction,
 }
 
+export const DashboardsPage = ErrorHandling(DashboardsPageEH)
 export default withSource(
   connect(mapStateToProps, mapDispatchToProps)(withRouter(DashboardsPage))
 )

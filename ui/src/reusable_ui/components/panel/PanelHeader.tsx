@@ -8,7 +8,6 @@ interface Props {
   title: string
 }
 
-@ErrorHandling
 class PanelHeader extends Component<Props> {
   public render() {
     const {children, title} = this.props
@@ -22,4 +21,4 @@ class PanelHeader extends Component<Props> {
   }
 }
 
-export default PanelHeader
+export default ErrorHandling(PanelHeader)

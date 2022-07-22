@@ -111,7 +111,6 @@ interface State {
   services: Service[]
 }
 
-@ErrorHandling
 class AlertTabs extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
@@ -649,4 +648,4 @@ class AlertTabs extends PureComponent<Props, State> {
   }
 }
 
-export default AlertTabs
+export default ErrorHandling(AlertTabs)

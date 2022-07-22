@@ -15,7 +15,6 @@ interface Props {
 const STREAM = 'stream'
 const BATCH = 'batch'
 
-@ErrorHandling
 class TickscriptType extends PureComponent<Props> {
   public render() {
     const {onChangeType, type} = this.props
@@ -45,4 +44,4 @@ class TickscriptType extends PureComponent<Props> {
   }
 }
 
-export default TickscriptType
+export default ErrorHandling(TickscriptType)

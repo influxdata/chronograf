@@ -18,7 +18,6 @@ interface Props {
   scrollLeft?: number
 }
 
-@ErrorHandling
 class FancyScrollbar extends Component<Props & Partial<DefaultProps>> {
   public static defaultProps = {
     autoHide: true,
@@ -95,4 +94,4 @@ class FancyScrollbar extends Component<Props & Partial<DefaultProps>> {
   }
 }
 
-export default FancyScrollbar
+export default ErrorHandling(FancyScrollbar)

@@ -12,7 +12,6 @@ interface Props {
   testId?: string
 }
 
-@ErrorHandling
 class WizardCheckbox extends PureComponent<Props> {
   public render() {
     const {text, isChecked, subtext, halfWidth, testId} = this.props
@@ -48,4 +47,4 @@ class WizardCheckbox extends PureComponent<Props> {
   }
 }
 
-export default WizardCheckbox
+export default ErrorHandling(WizardCheckbox)

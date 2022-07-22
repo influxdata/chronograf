@@ -14,7 +14,6 @@ interface State {
   localSelectedItems: string[]
 }
 
-@ErrorHandling
 class FunctionSelector extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
@@ -114,4 +113,4 @@ class FunctionSelector extends PureComponent<Props, State> {
   }
 }
 
-export default FunctionSelector
+export default ErrorHandling(FunctionSelector)

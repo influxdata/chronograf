@@ -18,7 +18,6 @@ interface Props {
   statusFeedURL: string
 }
 
-@ErrorHandling
 class NewsFeed extends Component<Props> {
   public render() {
     const {hasCompletedFetchOnce, isFetching, isFailed, data} = this.props
@@ -80,4 +79,4 @@ const mdtp = {
   fetchJSONFeed: fetchJSONFeedAsync,
 }
 
-export default connect(mstp, mdtp)(NewsFeed)
+export default connect(mstp, mdtp)(ErrorHandling(NewsFeed))

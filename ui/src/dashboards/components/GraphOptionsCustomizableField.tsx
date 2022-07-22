@@ -100,20 +100,7 @@ function MyDragSource(dragv1, dragv2, dragfunc1) {
   return target => DragSource(dragv1, dragv2, dragfunc1)(target) as any
 }
 
-@ErrorHandling
-@MyDropTarget(fieldType, fieldTarget, (connect: DropTargetConnector) => ({
-  connectDropTarget: connect.dropTarget(),
-}))
-@MyDragSource(
-  fieldType,
-  fieldSource,
-  (connect: DragSourceConnector, monitor: DragSourceMonitor) => ({
-    connectDragSource: connect.dragSource(),
-    connectDragPreview: connect.dragPreview(),
-    isDragging: monitor.isDragging(),
-  })
-)
-export default class GraphOptionsCustomizableField extends Component<Props> {
+class GraphOptionsCustomizableFieldEH extends Component<Props> {
   constructor(props) {
     super(props)
 
@@ -186,3 +173,19 @@ export default class GraphOptionsCustomizableField extends Component<Props> {
     onFieldUpdate({internalName, displayName, visible: !visible})
   }
 }
+
+export default ErrorHandling(
+  MyDropTarget(fieldType, fieldTarget, (connect: DropTargetConnector) => ({
+    connectDropTarget: connect.dropTarget(),
+  }))(
+    MyDragSource(
+      fieldType,
+      fieldSource,
+      (connect: DragSourceConnector, monitor: DragSourceMonitor) => ({
+        connectDragSource: connect.dragSource(),
+        connectDragPreview: connect.dragPreview(),
+        isDragging: monitor.isDragging(),
+      })
+    )(GraphOptionsCustomizableFieldEH)
+  )
+)

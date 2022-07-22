@@ -21,8 +21,7 @@ interface State {
   expanded: boolean
 }
 
-@ErrorHandling
-export default class ColorDropdown extends Component<Props, State> {
+class ColorDropdown extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     stretchToFit: false,
     disabled: false,
@@ -138,3 +137,5 @@ export default class ColorDropdown extends Component<Props, State> {
     this.setState({expanded: false})
   }
 }
+
+export default ErrorHandling(ColorDropdown)

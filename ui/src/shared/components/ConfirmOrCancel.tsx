@@ -75,7 +75,6 @@ export const Cancel: FunctionComponent<CancelProps> = ({
   </button>
 )
 
-@ErrorHandling
 class ConfirmOrCancel extends PureComponent<
   ConfirmOrCancelProps,
   Record<string, never>
@@ -134,4 +133,4 @@ class ConfirmOrCancel extends PureComponent<
   }
 }
 
-export default OnClickOutside(ConfirmOrCancel)
+export default OnClickOutside(ErrorHandling(ConfirmOrCancel))

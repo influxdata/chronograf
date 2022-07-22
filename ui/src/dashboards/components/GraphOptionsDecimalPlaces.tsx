@@ -12,7 +12,6 @@ interface Props extends DecimalPlaces {
 const fixedValueString = 'fixed'
 const defaultPlaceholder = 'unlimited'
 
-@ErrorHandling
 class GraphOptionsDecimalPlaces extends PureComponent<Props> {
   constructor(props: Props) {
     super(props)
@@ -75,4 +74,4 @@ class GraphOptionsDecimalPlaces extends PureComponent<Props> {
   }
 }
 
-export default GraphOptionsDecimalPlaces
+export default ErrorHandling(GraphOptionsDecimalPlaces)

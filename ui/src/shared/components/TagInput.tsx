@@ -17,7 +17,6 @@ interface Props {
   inputID?: string
 }
 
-@ErrorHandling
 class TagInput extends PureComponent<Props> {
   private input: HTMLInputElement
 
@@ -66,4 +65,4 @@ class TagInput extends PureComponent<Props> {
   }
 }
 
-export default TagInput
+export default ErrorHandling(TagInput)

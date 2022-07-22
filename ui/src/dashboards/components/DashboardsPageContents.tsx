@@ -33,7 +33,6 @@ interface State {
   isOverlayVisible: boolean
 }
 
-@ErrorHandling
 class DashboardsPageContents extends Component<Props, State> {
   constructor(props) {
     super(props)
@@ -156,4 +155,4 @@ class DashboardsPageContents extends Component<Props, State> {
   }
 }
 
-export default DashboardsPageContents
+export default ErrorHandling(DashboardsPageContents)

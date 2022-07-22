@@ -20,7 +20,6 @@ interface Props {
   onChangeInput: (key: string) => (value: string | boolean) => void
 }
 
-@ErrorHandling
 class KapacitorForm extends PureComponent<Props> {
   public render() {
     const {kapacitor, onChangeInput} = this.props
@@ -74,4 +73,4 @@ class KapacitorForm extends PureComponent<Props> {
   }
 }
 
-export default KapacitorForm
+export default ErrorHandling(KapacitorForm)

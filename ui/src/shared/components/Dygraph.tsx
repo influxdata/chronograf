@@ -106,7 +106,6 @@ interface State {
   isMouseInLegend: boolean
 }
 
-@ErrorHandling
 class Dygraph extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     axes: {
@@ -520,4 +519,4 @@ const mstp = ({annotations: {mode}, app}) => ({
   timeZone: app.persisted.timeZone,
 })
 
-export default connect(mstp, null)(Dygraph)
+export default connect(mstp, null)(ErrorHandling(Dygraph))

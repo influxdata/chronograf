@@ -14,8 +14,7 @@ interface Props {
   onSelect: (id: string) => void
 }
 
-@ErrorHandling
-export default class TableSidebarItem extends PureComponent<Props> {
+class TableSidebarItem extends PureComponent<Props> {
   public render() {
     return (
       <div
@@ -54,3 +53,4 @@ export default class TableSidebarItem extends PureComponent<Props> {
     this.props.onSelect(this.props.name)
   }
 }
+export default ErrorHandling(TableSidebarItem)

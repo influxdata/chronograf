@@ -117,8 +117,7 @@ interface State {
   activeQueryIndex: number
 }
 
-@ErrorHandling
-export class DataExplorer extends PureComponent<Props, State> {
+class DataExplorerEH extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
 
@@ -431,6 +430,7 @@ export class DataExplorer extends PureComponent<Props, State> {
     return
   }
 }
+export const DataExplorer = ErrorHandling(DataExplorerEH)
 
 const ConnectedDataExplorer = (
   props: PassedProps & WithRouterProps & ReduxStateProps & ReduxDispatchProps

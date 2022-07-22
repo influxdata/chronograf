@@ -28,7 +28,6 @@ interface State {
   editorIsFocused: boolean
 }
 
-@ErrorHandling
 class CellNoteEditor extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -119,4 +118,4 @@ class CellNoteEditor extends Component<Props, State> {
   }
 }
 
-export default CellNoteEditor
+export default ErrorHandling(CellNoteEditor)

@@ -14,7 +14,6 @@ interface State {
   isEditing: boolean
 }
 
-@ErrorHandling
 class VisualizationName extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -89,4 +88,4 @@ class VisualizationName extends Component<Props, State> {
   }
 }
 
-export default VisualizationName
+export default ErrorHandling(VisualizationName)

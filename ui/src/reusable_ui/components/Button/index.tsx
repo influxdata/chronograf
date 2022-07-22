@@ -28,7 +28,6 @@ interface Props {
   testId?: string
 }
 
-@ErrorHandling
 class Button extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     color: ComponentColor.Default,
@@ -109,4 +108,4 @@ class Button extends Component<Props> {
   }
 }
 
-export default Button
+export default ErrorHandling(Button)

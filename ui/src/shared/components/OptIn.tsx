@@ -25,8 +25,7 @@ interface State {
   useCustomValue: boolean
 }
 
-@ErrorHandling
-export default class OptIn extends Component<Props, State> {
+class OptIn extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     min: '',
     fixedValue: '',
@@ -192,3 +191,4 @@ export default class OptIn extends Component<Props, State> {
   private handleInputRef = (el: HTMLInputElement) =>
     (this.customValueInput = el)
 }
+export default ErrorHandling(OptIn)

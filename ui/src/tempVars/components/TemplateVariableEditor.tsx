@@ -99,7 +99,6 @@ const DEFAULT_TEMPLATE = DEFAULT_TEMPLATES[TemplateType.Databases]
 
 const DYNAMIC_SOURCE_DATABASE_ID = 'dynamic'
 
-@ErrorHandling
 class TemplateVariableEditor extends PureComponent<Props, State> {
   // See comment in source changing handler functions at the bottom of the file
   private key: number = +new Date()
@@ -520,4 +519,7 @@ const mstp = state => {
   }
 }
 
-export default connect(mstp, mdtp)(withRouter(TemplateVariableEditor))
+export default connect(
+  mstp,
+  mdtp
+)(withRouter(ErrorHandling(TemplateVariableEditor)))

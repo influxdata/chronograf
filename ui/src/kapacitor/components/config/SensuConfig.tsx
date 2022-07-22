@@ -23,7 +23,6 @@ interface State {
   enabled: boolean
 }
 
-@ErrorHandling
 class SensuConfig extends PureComponent<Props, State> {
   private source: HTMLInputElement
   private addr: HTMLInputElement
@@ -125,4 +124,4 @@ class SensuConfig extends PureComponent<Props, State> {
   }
 }
 
-export default SensuConfig
+export default ErrorHandling(SensuConfig)

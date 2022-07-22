@@ -25,7 +25,6 @@ interface Props {
   isJumpingAllowed: boolean
 }
 
-@ErrorHandling
 class WizardOverlay extends PureComponent<Props> {
   public static defaultProps: Partial<Props> = {
     maxWidth: 800,
@@ -72,4 +71,4 @@ class WizardOverlay extends PureComponent<Props> {
   }
 }
 
-export default WizardOverlay
+export default ErrorHandling(WizardOverlay)

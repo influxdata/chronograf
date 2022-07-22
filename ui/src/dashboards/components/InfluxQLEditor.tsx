@@ -61,7 +61,6 @@ const BLURRED_EDITOR_STATE = {
 
 const TEMPLATE_VAR = /[:]\w+[:]/g
 
-@ErrorHandling
 class InfluxQLEditor extends Component<Props, State> {
   public static getDerivedStateFromProps(nextProps: Props, prevState: State) {
     const {isSubmitted, editedQueryText} = prevState
@@ -452,4 +451,4 @@ class InfluxQLEditor extends Component<Props, State> {
   }
 }
 
-export default InfluxQLEditor
+export default ErrorHandling(InfluxQLEditor)

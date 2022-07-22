@@ -17,7 +17,6 @@ interface Props {
   testId?: string
 }
 
-@ErrorHandling
 class SlideToggle extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     size: ComponentSize.Small,
@@ -61,4 +60,4 @@ class SlideToggle extends Component<Props> {
   }
 }
 
-export default SlideToggle
+export default ErrorHandling(SlideToggle)

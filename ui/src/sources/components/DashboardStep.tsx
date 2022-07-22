@@ -53,7 +53,6 @@ interface Props {
   countSelected: (selectedDashboards: number) => void
 }
 
-@ErrorHandling
 class DashboardStep extends Component<Props, State> {
   private isComponentMounted: boolean
 
@@ -312,4 +311,6 @@ const mdtp = {
   notify: notifyAction,
 }
 
-export default connect(null, mdtp, null, {forwardRef: true})(DashboardStep)
+export default connect(null, mdtp, null, {forwardRef: true})(
+  ErrorHandling(DashboardStep)
+)

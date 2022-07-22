@@ -21,8 +21,7 @@ interface State {
   expanded: boolean
 }
 
-@ErrorHandling
-export default class ColorScaleDropdown extends Component<Props, State> {
+class ColorScaleDropdown extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     disabled: false,
     stretchToFit: false,
@@ -131,3 +130,5 @@ export default class ColorScaleDropdown extends Component<Props, State> {
     background: `linear-gradient(to right, ${colors[0].hex} 0%,${colors[1].hex} 50%,${colors[2].hex} 100%)`,
   })
 }
+
+export default ErrorHandling(ColorScaleDropdown)

@@ -44,7 +44,6 @@ interface State {
   precision: string
 }
 
-@ErrorHandling
 class WriteDataForm extends PureComponent<Props, State> {
   private fileInput: HTMLInputElement
 
@@ -220,4 +219,4 @@ class WriteDataForm extends PureComponent<Props, State> {
   private handleFileInputRef = (r: HTMLInputElement) => (this.fileInput = r)
 }
 
-export default OnClickOutside(WriteDataForm)
+export default OnClickOutside(ErrorHandling(WriteDataForm))

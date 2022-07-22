@@ -97,20 +97,7 @@ function ColumnDragSource(dragColumnType, dragColumnSource, dragHandler) {
     DragSource(dragColumnType, dragColumnSource, dragHandler)(target) as any
 }
 
-@ErrorHandling
-@ColumnDropTarget(columnType, columnTarget, (connect: DropTargetConnector) => ({
-  connectDropTarget: connect.dropTarget(),
-}))
-@ColumnDragSource(
-  columnType,
-  columnSource,
-  (connect: DragSourceConnector, monitor: DragSourceMonitor) => ({
-    connectDragSource: connect.dragSource(),
-    connectDragPreview: connect.dragPreview(),
-    isDragging: monitor.isDragging(),
-  })
-)
-export default class DraggableColumn extends Component<Props> {
+class DraggableColumn extends Component<Props> {
   constructor(props) {
     super(props)
 
@@ -215,3 +202,23 @@ export default class DraggableColumn extends Component<Props> {
     onUpdateColumn({internalName, displayName, visible: !visible})
   }
 }
+
+export default ErrorHandling(
+  ColumnDropTarget(
+    columnType,
+    columnTarget,
+    (connect: DropTargetConnector) => ({
+      connectDropTarget: connect.dropTarget(),
+    })
+  )(
+    ColumnDragSource(
+      columnType,
+      columnSource,
+      (connect: DragSourceConnector, monitor: DragSourceMonitor) => ({
+        connectDragSource: connect.dragSource(),
+        connectDragPreview: connect.dragPreview(),
+        isDragging: monitor.isDragging(),
+      })
+    )(DraggableColumn)
+  )
+)

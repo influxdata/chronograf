@@ -31,7 +31,6 @@ interface State {
   isOpen: boolean
 }
 
-@ErrorHandling
 class MeasurementListItem extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
@@ -124,4 +123,4 @@ class MeasurementListItem extends PureComponent<Props, State> {
   }
 }
 
-export default MeasurementListItem
+export default ErrorHandling(MeasurementListItem)

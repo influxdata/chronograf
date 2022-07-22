@@ -28,7 +28,6 @@ export interface WizardStepProps {
   lastStep?: boolean
 }
 
-@ErrorHandling
 class WizardStep extends PureComponent<WizardStepProps> {
   public static defaultProps: Partial<WizardStepProps> = {
     isSkippableStep: true,
@@ -97,4 +96,4 @@ class WizardStep extends PureComponent<WizardStepProps> {
   }
 }
 
-export default WizardStep
+export default ErrorHandling(WizardStep)

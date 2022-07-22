@@ -27,7 +27,6 @@ interface Props {
   offsetLG?: Columns
 }
 
-@ErrorHandling
 class FormElement extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     label: '',
@@ -97,4 +96,4 @@ class FormElement extends Component<Props> {
   }
 }
 
-export default FormElement
+export default ErrorHandling(FormElement)

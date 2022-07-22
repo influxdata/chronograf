@@ -8,7 +8,6 @@ interface Props {
   example: string
 }
 
-@ErrorHandling
 class TooltipExample extends PureComponent<Props> {
   public render() {
     const {example} = this.props
@@ -22,4 +21,4 @@ class TooltipExample extends PureComponent<Props> {
   }
 }
 
-export default TooltipExample
+export default ErrorHandling(TooltipExample)

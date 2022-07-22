@@ -33,7 +33,6 @@ interface Props extends WithRouterProps {
   router: InjectedRouter
 }
 
-@ErrorHandling
 class OrganizationsTableRow extends Component<Props, Record<string, never>> {
   public shouldComponentUpdate(nextProps) {
     return !_.isEqual(this.props, nextProps)
@@ -132,4 +131,4 @@ const mapStateToProps = ({links}) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withRouter(OrganizationsTableRow))
+)(withRouter(ErrorHandling(OrganizationsTableRow)))

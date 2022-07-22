@@ -21,7 +21,6 @@ interface State {
   isOpen: boolean
 }
 
-@ErrorHandling
 class FieldListItem extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
@@ -131,4 +130,4 @@ class FieldListItem extends PureComponent<Props, State> {
   })
 }
 
-export default FieldListItem
+export default ErrorHandling(FieldListItem)

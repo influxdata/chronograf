@@ -46,8 +46,7 @@ interface State {
   exists: boolean
 }
 
-@ErrorHandling
-export class KapacitorPage extends PureComponent<Props, State> {
+class KapacitorPageEH extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
     this.state = {
@@ -212,6 +211,7 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
+export const KapacitorPage = ErrorHandling(KapacitorPageEH)
 export default withSource(
   connect(null, mapDispatchToProps)(withRouter(KapacitorPage))
 )

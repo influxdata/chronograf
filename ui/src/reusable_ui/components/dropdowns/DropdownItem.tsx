@@ -16,7 +16,6 @@ interface Props {
   onClick?: (value: any) => void
 }
 
-@ErrorHandling
 class DropdownItem extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     checkbox: false,
@@ -73,4 +72,4 @@ class DropdownItem extends Component<Props> {
   }
 }
 
-export default DropdownItem
+export default ErrorHandling(DropdownItem)

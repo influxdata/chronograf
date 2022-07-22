@@ -19,7 +19,6 @@ interface State {
   isOpen: boolean
 }
 
-@ErrorHandling
 class DashboardSwitcher extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
@@ -86,4 +85,4 @@ class DashboardSwitcher extends PureComponent<Props, State> {
   }
 }
 
-export default OnClickOutside(DashboardSwitcher)
+export default OnClickOutside(ErrorHandling(DashboardSwitcher))

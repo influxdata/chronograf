@@ -73,7 +73,6 @@ const syncHostnames = (source: Source, kapacitor: Kapacitor) => {
   return kapacitor
 }
 
-@ErrorHandling
 class KapacitorStep extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     onBoarding: false,
@@ -234,4 +233,6 @@ const mdtp = {
   fetchKapacitors: sourcesActions.fetchKapacitorsAsyncNoNotify,
 }
 
-export default connect(mstp, mdtp, null, {forwardRef: true})(KapacitorStep)
+export default connect(mstp, mdtp, null, {forwardRef: true})(
+  ErrorHandling(KapacitorStep)
+)
