@@ -1,16 +1,28 @@
 {
   "plugins": [
     "@babel/plugin-transform-runtime",
+    [
+      "@babel/plugin-proposal-decorators",
+      {"version": "2018-09", "decoratorsBeforeExport": true}
+    ],
     "@babel/plugin-proposal-class-properties",
     "babel-plugin-lodash",
-    ["babel-plugin-module-resolver", {
-      "root": ["./src"],
-      "alias": {
-        "src": "./src",
-	      "shared": "./src/shared",
-	      "style": "./src/style",
-	      "utils": "./src/utils"
+    [
+      "babel-plugin-module-resolver",
+      {
+        "root": ["./src"],
+        "alias": {
+          "src": "./src",
+          "shared": "./src/shared",
+          "style": "./src/style",
+          "utils": "./src/utils"
+        }
       }
-    }]
+    ]
+  ],
+  "presets": [
+    "@babel/preset-env",
+    "@babel/preset-typescript",
+    "@babel/preset-react"
   ]
 }
