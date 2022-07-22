@@ -1,5 +1,6 @@
-export const getSyslogMeasurement = jest.fn()
+import {getSyslogMeasurement} from 'src/logs/api'
 
 jest.mock('src/logs/api', () => ({
-  getSyslogMeasurement,
+  getSyslogMeasurement: jest.fn(),
 }))
+export {getSyslogMeasurement}
