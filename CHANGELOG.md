@@ -34,6 +34,7 @@
 1. [#5915](https://github.com/influxdata/chronograf/pull/5915): Upgrade github.com/lestrrat-go/jwx to v2.
 1. [#5933](https://github.com/influxdata/chronograf/pull/5933): Upgrade golang to 1.18.3 .
 1. [#5947](https://github.com/influxdata/chronograf/pull/5947): Use stable component keys.
+1. [#5990](https://github.com/influxdata/chronograf/pull/5990): Upgrade golang to 1.18.4 .
 
 ## v1.9.4 [2022-03-22]
 
