@@ -1,6 +1,6 @@
 import AJAX from 'src/utils/ajax'
 import _ from 'lodash'
-import {buildInfluxUrl, proxy} from 'utils/queryUrlGenerator'
+import {proxy} from 'utils/queryUrlGenerator'
 import uuid from 'uuid'
 
 export const showDatabases = async source => {
@@ -102,29 +102,6 @@ export function showShards() {
   return AJAX({
     url: '/api/int/v1/show-shards',
   })
-}
-
-export function createRetentionPolicy({
-  host,
-  database,
-  rpName,
-  duration,
-  replicationFactor,
-  clusterID,
-}) {
-  const statement = `CREATE RETENTION POLICY "${rpName}" ON "${_.escape(
-    database
-  )}" DURATION ${duration} REPLICATION ${replicationFactor}`
-  const url = buildInfluxUrl({host, statement})
-
-  return proxy(url, clusterID)
-}
-
-export function dropShard(host, shard, clusterID) {
-  const statement = `DROP SHARD ${shard.shardId}`
-  const url = buildInfluxUrl({host, statement})
-
-  return proxy(url, clusterID)
 }
 
 export const showFieldKeys = async (source, db, measurement, rp) => {
