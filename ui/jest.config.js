@@ -1,6 +1,12 @@
 module.exports = {
   projects: [
     {
+      globals: {
+        'ts-jest': {
+          babelConfig: './.babelrc.jest',
+          tsconfig: './tsconfig.test.json',
+        },
+      },
       displayName: 'test',
       testPathIgnorePatterns: [
         'build',
@@ -12,7 +18,7 @@ module.exports = {
       setupFiles: ['<rootDir>/test/setup.js'],
       transform: {
         '^.+\\.tsx?$': 'ts-jest',
-        '^.+\\.js$': 'babel-jest',
+        '^.+\\.js$': ['babel-jest', {configFile: './.babelrc.jest'}],
       },
       testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
       moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],

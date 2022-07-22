@@ -24,6 +24,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@parcel/core": "^2.6.2",
     "@parcel/transformer-sass": "^2.6.2",
     "assert": "^2.0.0",
     "events": "^3.3.0",
