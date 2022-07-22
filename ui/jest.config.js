@@ -7,6 +7,7 @@ module.exports = {
           tsconfig: './tsconfig.test.json',
         },
       },
+      testEnvironment: 'jsdom',
       displayName: 'test',
       testPathIgnorePatterns: [
         'build',
