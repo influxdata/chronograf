@@ -44,7 +44,7 @@ interface State {
   highlightedItemIndex: number
 }
 
-export class Dropdown extends Component<Props, State> {
+class Dropdown extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     actions: [],
     buttonSize: 'btn-sm',
@@ -257,5 +257,6 @@ export class Dropdown extends Component<Props, State> {
     }
   }
 }
-
-export default OnClickOutside(ErrorHandling(Dropdown))
+const DropdownEH = ErrorHandling(Dropdown)
+export {DropdownEH as Dropdown}
+export default OnClickOutside(DropdownEH)
