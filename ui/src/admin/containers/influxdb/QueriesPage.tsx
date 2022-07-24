@@ -1,6 +1,5 @@
 import React, {Component} from 'react'
-import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
+import {connect, ResolveThunks} from 'react-redux'
 import {withSource} from 'src/CheckSources'
 
 import flatten from 'lodash/flatten'
@@ -31,18 +30,17 @@ import {QueryStat} from 'src/types/influxAdmin'
 import AdminInfluxDBTabbedPage from './AdminInfluxDBTabbedPage'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
-interface Props {
+interface OwnProps {
   source: Source
+}
+interface ConnectedProps {
   queriesSort: string
   queryIDToKill?: string
   queries: QueryStat[]
-
-  loadQueries: (queries: QueryStat[]) => void
-  changeSort: (sort: string) => void
-  killQuery: (proxyURL: string, query: QueryStat) => Promise<void>
-  setQueryToKill: (queryIDToKill: number) => void
-  notify: typeof notifyAction
 }
+
+type ReduxDispatchProps = ResolveThunks<typeof mapDispatchToProps>
+type Props = OwnProps & ConnectedProps & ReduxDispatchProps
 
 interface State {
   updateInterval: number
@@ -232,13 +230,13 @@ const mapStateToProps = ({
   queryIDToKill,
 })
 
-const mapDispatchToProps = dispatch => ({
-  loadQueries: bindActionCreators(loadQueriesAction, dispatch),
-  setQueryToKill: bindActionCreators(setQueryToKillAction, dispatch),
-  changeSort: bindActionCreators(setQueriesSortAction, dispatch),
-  killQuery: bindActionCreators(killQueryAsync, dispatch),
-  notify: bindActionCreators(notifyAction, dispatch),
-})
+const mapDispatchToProps = {
+  loadQueries: loadQueriesAction,
+  setQueryToKill: setQueryToKillAction,
+  changeSort: setQueriesSortAction,
+  killQuery: killQueryAsync,
+  notify: notifyAction,
+}
 
 export default withSource(
   connect(mapStateToProps, mapDispatchToProps)(ErrorHandling(QueriesPage))
