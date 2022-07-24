@@ -85,7 +85,7 @@ class InfluxQLEditor extends Component<Props, State> {
     return null
   }
 
-  private codeMirrorRef: React.RefObject<ReactCodeMirror>
+  private codeMirrorRef: React.RefObject<InstanceType<typeof ReactCodeMirror>>
   private pendingUpdates: Array<WrappedCancelablePromise<void>>
 
   constructor(props: Props) {

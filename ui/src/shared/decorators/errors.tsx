@@ -45,12 +45,10 @@ export function ErrorHandlingWith(
   Error: ErrorComponentClass, // Must be a class based component and not an FunctionComponent
   alwaysDisplay = false
 ) {
-  return <P, S, T extends new (...args: any[]) => Component<P, S>>(
-    constructor: T
-  ) => {
-    class Wrapped extends constructor {
+  return <P, S, T extends new (...args: any[]) => Component<P, S>>(base: T) => {
+    return class extends base {
       public static get displayName(): string {
-        return constructor.name
+        return base.name
       }
 
       private error: boolean = false
@@ -72,8 +70,6 @@ export function ErrorHandlingWith(
         return super.render()
       }
     }
-
-    return Wrapped
   }
 }
 

@@ -21,7 +21,7 @@ const setup = (override = {}) => {
     () => Promise.resolve
   ) as unknown) as () => Promise<void>
   const wrapper = shallow(<TagList {...props} />, {context: {source}})
-  const instance = wrapper.instance() as TagList
+  const instance = wrapper.instance() as InstanceType<typeof TagList>
 
   return {
     instance,

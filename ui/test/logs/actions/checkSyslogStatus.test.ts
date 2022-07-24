@@ -73,7 +73,7 @@ describe('Logs.Actions.checkSyslogStatus', () => {
 
   it('can update missing measurement status', async () => {
     const response = {
-      results: [{statement_id: 0}],
+      results: [{statement_id: 0, series: []}],
     }
 
     getSyslogMeasurement.mockResolvedValue(Promise.resolve(response))

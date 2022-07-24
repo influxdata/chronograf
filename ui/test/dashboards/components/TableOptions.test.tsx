@@ -5,7 +5,7 @@ import GraphOptionsFixFirstColumn from 'src/dashboards/components/GraphOptionsFi
 import GraphOptionsSortBy from 'src/dashboards/components/GraphOptionsSortBy'
 import GraphOptionsTimeAxis from 'src/dashboards/components/GraphOptionsTimeAxis'
 import GraphOptionsTimeFormat from 'src/dashboards/components/GraphOptionsTimeFormat'
-import {TableOptions} from 'src/dashboards/components/TableOptions'
+import TableOptions from 'src/dashboards/components/TableOptions'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import ThresholdsList from 'src/shared/components/ThresholdsList'
 import ThresholdsListTypeToggle from 'src/shared/components/ThresholdsListTypeToggle'
@@ -42,7 +42,7 @@ const setup = (override = {}) => {
 
   const wrapper = shallow(<TableOptions {...props} />)
 
-  const instance = wrapper.instance() as TableOptions
+  const instance = wrapper.instance() as InstanceType<typeof TableOptions>
 
   return {wrapper, instance, props}
 }

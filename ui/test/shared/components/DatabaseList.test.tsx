@@ -5,6 +5,7 @@ import DatabaseListItem from 'src/shared/components/DatabaseListItem'
 
 import {query, source} from 'test/resources'
 
+type DatabaseListType = InstanceType<typeof DatabaseList>
 // mock data
 const dbrp1 = {database: 'db1', retentionPolicy: 'rp1'}
 const dbrp2 = {database: 'db2', retentionPolicy: 'rp2'}
@@ -54,7 +55,7 @@ describe('Shared.Components.DatabaseList', () => {
         const onChooseNamespace = jest.fn()
         const {dbList} = setup({onChooseNamespace})
 
-        const instance = dbList.instance() as DatabaseList
+        const instance = dbList.instance() as DatabaseListType
         instance.handleChooseNamespace(dbrp1)()
 
         expect(onChooseNamespace).toHaveBeenCalledTimes(1)
@@ -67,7 +68,7 @@ describe('Shared.Components.DatabaseList', () => {
         it('returns false', () => {
           const {dbList} = setup()
 
-          const instance = dbList.instance() as DatabaseList
+          const instance = dbList.instance() as DatabaseListType
           expect(instance.isActive(query, dbrp1)).toBe(false)
         })
 
@@ -81,7 +82,7 @@ describe('Shared.Components.DatabaseList', () => {
             }
 
             const {dbList} = setup()
-            const instance = dbList.instance() as DatabaseList
+            const instance = dbList.instance() as DatabaseListType
 
             expect(instance.isActive(matchingQuery, dbrp1)).toBe(true)
           })
