@@ -50,7 +50,7 @@
       height: $form-xs-height - 10px;
     }
     height: $form-xs-height;
-    border-radius: $form-xs-height / 2;
+    border-radius: $form-xs-height * 0.5;
     width: ($form-xs-height * 2) - 8px;
   }
 
@@ -60,7 +60,7 @@
       height: $form-sm-height - 10px;
     }
     height: $form-sm-height;
-    border-radius: $form-sm-height / 2;
+    border-radius: $form-sm-height * 0.5;
     width: ($form-sm-height * 2) - 8px;
   }
 
@@ -70,7 +70,7 @@
       height: $form-md-height - 10px;
     }
     height: $form-md-height;
-    border-radius: $form-md-height / 2;
+    border-radius: $form-md-height * 0.5;
     width: ($form-md-height * 2) - 8px;
   }
 
@@ -80,7 +80,7 @@
       height: $form-lg-height - 10px;
     }
     height: $form-lg-height;
-    border-radius: $form-lg-height / 2;
+    border-radius: $form-lg-height * 0.5;
     width: ($form-lg-height * 2) - 8px;
   }
 }

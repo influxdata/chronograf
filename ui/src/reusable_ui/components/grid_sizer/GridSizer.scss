@@ -15,7 +15,7 @@ $card-select--gutter: 4px;
   position: relative;
   width: calc(100% - #{$card-select--gutter});
   height: calc(100% - #{$card-select--gutter});
-  margin: $card-select--gutter / 2;
+  margin: $card-select--gutter * 0.5;
 }
 
 .grid-sizer--col-2 {

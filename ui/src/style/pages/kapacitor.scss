@@ -4,7 +4,7 @@
 */
 $rule-builder--accent-color: $c-rainforest;
 $rule-builder--left-gutter: 46px;
-$rule-builder--section-gap: ($chronograf-page-header-height / 2);
+$rule-builder--section-gap: ($chronograf-page-header-height * 0.5);
 $rule-builder--section-bg: $g3-castle;
 $rule-builder--section-border: $g2-kevlar;
 $rule-builder--dot: 6px;
@@ -57,7 +57,7 @@ $rule-builder--radius-lg: 5px;
     height: 100%;
     background-color: $rule-builder--accent-line-color;
     top: 0;
-    left: ($rule-builder--dot/2);
+    left: ($rule-builder--dot*0.5);
   }
 }
 .rule-section--heading {
@@ -80,7 +80,7 @@ $rule-builder--radius-lg: 5px;
     border: 8px solid $rule-builder--accent-line-color;
     border-radius: 50%;
     top: ($rule-builder--section-gap + 3px);
-    left: ($rule-builder--dot / 2);
+    left: ($rule-builder--dot * 0.5);
   }
 }
 .rule-section--sub-heading {

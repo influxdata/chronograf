@@ -20,7 +20,7 @@ $logs-margin: 4px;
   justify-content: space-between;
   flex-wrap: nowrap;
   height: $logs-table-header-height;
-  padding: 0 $logs-table-padding 0 ($logs-table-padding / 2);
+  padding: 0 $logs-table-padding 0 ($logs-table-padding * 0.5);
   background-color: $g4-onyx;
   white-space: nowrap;
   font-size: 17px;
@@ -39,7 +39,7 @@ $logs-margin: 4px;
 
 .logs-table--row {
   position: relative;
-  padding: 8px ($logs-table-padding - 16px) 8px ($logs-table-padding / 2);
+  padding: 8px ($logs-table-padding - 16px) 8px ($logs-table-padding * 0.5);
   border-bottom: 2px solid $g3-castle;
   transition: background-color 0.25s ease;
 
