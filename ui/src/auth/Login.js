@@ -6,8 +6,8 @@ import Notifications from 'shared/components/Notifications'
 import PageSpinner from 'src/shared/components/PageSpinner'
 import SplashPage from 'shared/components/SplashPage'
 import {connect} from 'react-redux'
+import {VERSION} from 'src/shared/constants'
 
-const VERSION = process.env.npm_package_version
 const REDIRECT_KEY = 'chronoRedirect'
 
 function storeRedirectPath() {

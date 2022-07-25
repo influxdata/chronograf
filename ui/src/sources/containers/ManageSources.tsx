@@ -9,6 +9,7 @@ import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {Page} from 'src/reusable_ui'
 import InfluxTable from 'src/sources/components/InfluxTable'
 import ConnectionWizard from 'src/sources/components/ConnectionWizard'
+import {VERSION} from 'src/shared/constants'
 
 import {
   notifySourceDeleted,
@@ -41,8 +42,6 @@ interface OwnProps {
 }
 
 type Props = OwnProps & ReduxStateProps & ReduxDispatchProps
-
-const VERSION = process.env.npm_package_version
 
 class ManageSources extends PureComponent<Props, State> {
   constructor(props: Props) {

@@ -4,8 +4,7 @@ tslint:disable max-classes-per-file
 */
 
 import React, {ComponentClass, Component} from 'react'
-
-const VERSION = process.env.npm_package_version
+import {VERSION} from 'src/shared/constants'
 
 type ErrorComponentClass = ComponentClass<{error: Error} & any>
 
