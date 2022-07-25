@@ -70,7 +70,7 @@ export const WrapToPage = ({children, hideRefresh}: WrapToPageProps) => (
   </Page>
 )
 
-class AdminInfluxDBScopedPageEH extends PureComponent<Props, State> {
+class AdminInfluxDBScopedPage extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -188,7 +188,6 @@ class AdminInfluxDBScopedPageEH extends PureComponent<Props, State> {
     return children
   }
 }
-export const AdminInfluxDBScopedPage = ErrorHandling(AdminInfluxDBScopedPageEH)
 export default withSource(
-  connect(null, mapDispatchToProps)(AdminInfluxDBScopedPage)
+  connect(null, mapDispatchToProps)(ErrorHandling(AdminInfluxDBScopedPage))
 )

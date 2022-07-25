@@ -45,7 +45,7 @@ interface State {
   highlightedItemIndex: number
 }
 
-class SearchableDropdownEH extends Component<Props, State> {
+class SearchableDropdown extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     actions: [],
     searchTerm: '',
@@ -221,5 +221,4 @@ class SearchableDropdownEH extends Component<Props, State> {
   }
 }
 
-export const SearchableDropdown = ErrorHandling(SearchableDropdownEH)
-export default OnClickOutside(SearchableDropdown)
+export default OnClickOutside(ErrorHandling(SearchableDropdown))

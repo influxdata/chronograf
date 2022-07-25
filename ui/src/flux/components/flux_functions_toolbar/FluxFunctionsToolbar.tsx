@@ -82,11 +82,11 @@ class FluxFunctionsToolbar extends PureComponent<Props, State> {
   }
 }
 
-const FluxFunctionsToolbarEH = ErrorHandling(FluxFunctionsToolbar)
+const FluxFunctionsToolbar2 = ErrorHandling(FluxFunctionsToolbar)
 const ConnectedFluxFunctionsToolbar = (props: PassedProps) => (
   <TimeMachineContextConsumer>
     {(container: TimeMachineContainer) => (
-      <FluxFunctionsToolbarEH
+      <FluxFunctionsToolbar2
         {...props}
         script={container.state.draftScript}
         onUpdateScript={container.handleUpdateDraftScript}

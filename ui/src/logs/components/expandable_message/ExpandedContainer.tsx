@@ -37,7 +37,7 @@ enum PinnedState {
   OnMessage = 'PinnedOnMessage',
 }
 
-class ExpandedContainerEH extends Component<Props, State> {
+class ExpandedContainer extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
 
@@ -149,5 +149,4 @@ class ExpandedContainerEH extends Component<Props, State> {
   }
 }
 
-export const ExpandedContainer = ErrorHandling(ExpandedContainerEH)
-export default ExpandedContainer
+export default ErrorHandling(ExpandedContainer)

@@ -100,7 +100,7 @@ function MyDragSource(dragv1, dragv2, dragfunc1) {
   return target => DragSource(dragv1, dragv2, dragfunc1)(target) as any
 }
 
-class GraphOptionsCustomizableFieldEH extends Component<Props> {
+class GraphOptionsCustomizableField extends Component<Props> {
   constructor(props) {
     super(props)
 
@@ -186,6 +186,6 @@ export default ErrorHandling(
         connectDragPreview: connect.dragPreview(),
         isDragging: monitor.isDragging(),
       })
-    )(GraphOptionsCustomizableFieldEH)
+    )(GraphOptionsCustomizableField)
   )
 )

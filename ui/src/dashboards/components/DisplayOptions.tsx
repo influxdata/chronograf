@@ -267,7 +267,7 @@ class DisplayOptions extends Component<Props, State> {
   }
 }
 
-const DisplayOptionsEH = ErrorHandling(DisplayOptions)
+const DisplayOptions2 = ErrorHandling(DisplayOptions)
 
 const ConnectedDisplayOptions = (props: PassedProps) => {
   // TODO: Have individual display option components subscribe directly to
@@ -275,7 +275,7 @@ const ConnectedDisplayOptions = (props: PassedProps) => {
   return (
     <TimeMachineContextConsumer>
       {(timeMachineContainer: TimeMachineContainer) => (
-        <DisplayOptionsEH
+        <DisplayOptions2
           {...props}
           type={timeMachineContainer.state.type}
           axes={timeMachineContainer.state.axes}

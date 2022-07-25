@@ -46,7 +46,7 @@ interface State {
   isLoading: boolean
 }
 
-class AllUsersPageEH extends PureComponent<Props, State> {
+export class AllUsersPage extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
 
@@ -164,5 +164,7 @@ const mapDispatchToProps = dispatch => ({
   actionsConfig: bindActionCreators(configActionCreators, dispatch),
   notify: bindActionCreators(notifyAction, dispatch),
 })
-export const AllUsersPage = ErrorHandling(AllUsersPageEH)
-export default connect(mapStateToProps, mapDispatchToProps)(AllUsersPage)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ErrorHandling(AllUsersPage))

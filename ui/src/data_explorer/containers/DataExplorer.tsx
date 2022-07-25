@@ -117,7 +117,7 @@ interface State {
   activeQueryIndex: number
 }
 
-class DataExplorerEH extends PureComponent<Props, State> {
+class DataExplorer extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
 
@@ -430,7 +430,7 @@ class DataExplorerEH extends PureComponent<Props, State> {
     return
   }
 }
-export const DataExplorer = ErrorHandling(DataExplorerEH)
+const DataExplorer2 = ErrorHandling(DataExplorer)
 
 const ConnectedDataExplorer = (
   props: PassedProps & WithRouterProps & ReduxStateProps & ReduxDispatchProps
@@ -440,7 +440,7 @@ const ConnectedDataExplorer = (
       {(container: TimeMachineContainer) => {
         const {state} = container
         return (
-          <DataExplorer
+          <DataExplorer2
             {...props}
             queryDrafts={state.queryDrafts}
             queryType={state.queryType}

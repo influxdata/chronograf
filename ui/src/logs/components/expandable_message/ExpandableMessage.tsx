@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom'
 
 // Components
 import LogsMessage from 'src/logs/components/logs_message/LogsMessage'
-import {ExpandedContainer} from 'src/logs/components/expandable_message/ExpandedContainer'
+import ExpandedContainer from 'src/logs/components/expandable_message/ExpandedContainer'
 
 // Types
 import {NotificationAction} from 'src/types'
@@ -30,7 +30,7 @@ const MIN_MESSAGE_WIDTH = 200
 const MAX_MESSAGE_HEIGHT = 200
 const SCROLL_MARGIN = 80
 
-class ExpandableMessageEH extends Component<Props, State> {
+class ExpandableMessage extends Component<Props, State> {
   private containerRef: React.RefObject<HTMLDivElement>
 
   constructor(props: Props) {
@@ -121,5 +121,4 @@ class ExpandableMessageEH extends Component<Props, State> {
   }
 }
 
-export const ExpandableMessage = ErrorHandling(ExpandableMessageEH)
-export default ExpandableMessage
+export default ErrorHandling(ExpandableMessage)

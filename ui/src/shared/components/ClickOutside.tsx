@@ -29,5 +29,5 @@ class ClickOutside extends PureComponent<Props> {
   }
 }
 
-const ClickOutsideEH = ErrorHandling(ClickOutside)
-export {ClickOutsideEH as ClickOutside}
+const ClickOutside2 = ErrorHandling(ClickOutside)
+export {ClickOutside2 as ClickOutside}

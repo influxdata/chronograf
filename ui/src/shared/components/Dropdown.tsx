@@ -257,6 +257,6 @@ class Dropdown extends Component<Props, State> {
     }
   }
 }
-const DropdownEH = ErrorHandling(Dropdown)
-export {DropdownEH as Dropdown}
-export default OnClickOutside(DropdownEH)
+const Dropdown2 = ErrorHandling(Dropdown)
+export {Dropdown2 as Dropdown}
+export default OnClickOutside(Dropdown2)

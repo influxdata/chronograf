@@ -61,7 +61,7 @@ interface State {
   layouts: Layout[]
 }
 
-class HostsPageEH extends PureComponent<Props, State> {
+export class HostsPage extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     manualRefresh: 0,
   }
@@ -206,8 +206,6 @@ class HostsPageEH extends PureComponent<Props, State> {
   }
 }
 
-export const HostsPage = ErrorHandling(HostsPageEH)
-
 const mstp = state => {
   const {
     app: {
@@ -226,4 +224,6 @@ const mdtp = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default withSource(connect(mstp, mdtp)(ManualRefresh<Props>(HostsPage)))
+export default withSource(
+  connect(mstp, mdtp)(ManualRefresh<Props>(ErrorHandling(HostsPage)))
+)
