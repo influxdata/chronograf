@@ -28,6 +28,7 @@
     "@parcel/transformer-sass": "^2.6.2",
     "assert": "^2.0.0",
     "events": "^3.3.0",
+    "http-proxy-middleware": "^2.0.6",
     "process": "^0.11.10",
     "querystring-es3": "^0.2.1",
     "util": "^0.12.4"
