@@ -1736,7 +1736,7 @@
   dependencies:
     "@parcel/plugin" "2.6.2"
 
-"@parcel/config-default@2.6.2", "@parcel/config-default@^2.6.2":
+"@parcel/config-default@2.6.2":
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/@parcel/config-default/-/config-default-2.6.2.tgz#0a1af0ce9a431771851c05fc821da13c8d878b7e"
   integrity sha512-kuZFY0rhaioCRX2LqxaMM2ylui6ms/nmdVxuceP4/SAWi/9duc+y1lG2a1zGNShbc6OEgpdQr/W/jxdYM7NJDw==
