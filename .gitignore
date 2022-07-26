@@ -8,7 +8,6 @@ vendor/
 node_modules/
 .parcel-cache/
 
-
 # Binaries
 /chronograf
 /chronoctl
