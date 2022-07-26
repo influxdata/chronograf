@@ -2,7 +2,7 @@
   "name": "chronograf-ui",
   "version": "1.9.4",
   "private": true,
-  "license": "MIT",
+  "license": "AGPL-3.0",
   "description": "",
   "repository": {
     "type": "git",

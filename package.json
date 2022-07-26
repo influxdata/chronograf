@@ -22,7 +22,7 @@
   "author": {
     "name": "InfluxData"
   },
-  "license": "MIT",
+  "license": "AGPL-3.0",
   "devDependencies": {
     "@parcel/core": "^2.6.2",
     "@parcel/transformer-sass": "^2.6.2",
