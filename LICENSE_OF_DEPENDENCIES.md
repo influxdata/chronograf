@@ -118,7 +118,6 @@
 * @babel/plugin-proposal-async-generator-functions 7.16.8 [MIT](https://github.com/babel/babel.git)
 * @babel/plugin-proposal-class-properties 7.16.7 [MIT](https://github.com/babel/babel.git)
 * @babel/plugin-proposal-class-static-block 7.17.6 [MIT](https://github.com/babel/babel.git)
-* @babel/plugin-proposal-decorators 7.17.8 [MIT](https://github.com/babel/babel.git)
 * @babel/plugin-proposal-dynamic-import 7.16.7 [MIT](https://github.com/babel/babel.git)
 * @babel/plugin-proposal-export-namespace-from 7.16.7 [MIT](https://github.com/babel/babel.git)
 * @babel/plugin-proposal-json-strings 7.16.7 [MIT](https://github.com/babel/babel.git)
