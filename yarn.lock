@@ -2278,22 +2278,6 @@
     posthtml-render "^3.0.0"
     semver "^5.7.1"
 
-"@parcel/transformer-typescript-tsc@^2.6.2":
-  version "2.6.2"
-  resolved "https://registry.yarnpkg.com/@parcel/transformer-typescript-tsc/-/transformer-typescript-tsc-2.6.2.tgz#c269c055607868c67232f9fa5d21617351eaa2e8"
-  integrity sha512-Bl7+Zd0tHiQU7JD70IV8XR3DJAh+OfHzXyYWDovWykm1vrpcLZNiAAyFp6cX0BKNluxb7isFrxq8un4ASMQgFg==
-  dependencies:
-    "@parcel/plugin" "2.6.2"
-    "@parcel/source-map" "^2.0.0"
-    "@parcel/ts-utils" "2.6.2"
-
-"@parcel/ts-utils@2.6.2":
-  version "2.6.2"
-  resolved "https://registry.yarnpkg.com/@parcel/ts-utils/-/ts-utils-2.6.2.tgz#a132f876bf399ac61c2bfe75a29248cab6f015a9"
-  integrity sha512-PqmjyBYIa56bSjeumJj/tEFooYOBePw8PVi9dU1dkuJoBtDJl/+s/GPW2JnupaplKnlEtX8ag922vjua4A9gsg==
-  dependencies:
-    nullthrows "^1.1.1"
-
 "@parcel/types@2.6.2":
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/@parcel/types/-/types-2.6.2.tgz#216313bcaf625e59a2bd525a00c3b1f6701b0d92"
@@ -3299,11 +3283,6 @@ aws4@^1.8.0:
   version "1.11.0"
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.11.0.tgz#d61f46d83b2519250e2784daf5b09479a8b41c59"
   integrity sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==
-
-babel-core@^7.0.0-bridge:
-  version "7.0.0-bridge.0"
-  resolved "https://registry.yarnpkg.com/babel-core/-/babel-core-7.0.0-bridge.0.tgz#95a492ddd90f9b4e9a4a1da14eb335b87b634ece"
-  integrity sha512-poPX9mZH/5CSanm50Q+1toVci6pv5KSRv/5TWCwtzQS5XEwn40BcCrgIeMFWP9CKKIniKXNxoIOnOq4VVlGXhg==
 
 babel-eslint@^10.0.1:
   version "10.1.0"
@@ -8061,7 +8040,7 @@ papaparse@^5.3.0:
   resolved "https://registry.yarnpkg.com/papaparse/-/papaparse-5.3.2.tgz#d1abed498a0ee299f103130a6109720404fbd467"
   integrity sha512-6dNZu0Ki+gyV0eBsFKJhYr+MdQYAzFUGlBMNj3GNrmHxmz1lfRa24CjFObPXtjcetlOv5Ad299MhIK0znp3afw==
 
-parcel@^2.0.0:
+parcel@^2.6.2:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/parcel/-/parcel-2.6.2.tgz#4585208880f42b24935c7d3ad167dcd42f8174eb"
   integrity sha512-q6hrD3rm9M4S/VBVTcOs3pl55cnRwWfco7n8hZoAqnInWjWB+Khu92LRBMerMBTdE15Y+lJhWrXNdimDYstfhQ==
