@@ -25,7 +25,6 @@ interface State {
   enabled: boolean
 }
 
-@ErrorHandling
 class PagerDutyConfig extends PureComponent<Props, State> {
   private serviceKey: HTMLInputElement
   private url: HTMLInputElement
@@ -130,4 +129,4 @@ class PagerDutyConfig extends PureComponent<Props, State> {
   }
 }
 
-export default PagerDutyConfig
+export default ErrorHandling(PagerDutyConfig)

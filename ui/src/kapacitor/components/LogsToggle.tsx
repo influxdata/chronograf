@@ -13,7 +13,6 @@ interface Props {
   onToggleLogsVisibility: (visibility: boolean) => void
 }
 
-@ErrorHandling
 class LogsToggle extends PureComponent<Props> {
   public render() {
     const {areLogsVisible, areLogsEnabled, onToggleLogsVisibility} = this.props
@@ -47,4 +46,4 @@ class LogsToggle extends PureComponent<Props> {
   }
 }
 
-export default LogsToggle
+export default ErrorHandling(LogsToggle)

@@ -22,7 +22,6 @@ interface State {
   valid: boolean
 }
 
-@ErrorHandling
 class Threshold extends PureComponent<Props, State> {
   private thresholdInputRef: HTMLInputElement
 
@@ -170,4 +169,4 @@ class Threshold extends PureComponent<Props, State> {
   }
 }
 
-export default Threshold
+export default ErrorHandling(Threshold)

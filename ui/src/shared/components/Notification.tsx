@@ -21,7 +21,6 @@ interface State {
   dismissed: boolean
 }
 
-@ErrorHandling
 class Notification extends Component<Props, State> {
   private notificationRef: HTMLElement
   private dismissalTimer: number
@@ -129,4 +128,4 @@ const mapDispatchToProps = dispatch => ({
   dismissNotification: bindActionCreators(dismissNotificationAction, dispatch),
 })
 
-export default connect(null, mapDispatchToProps)(Notification)
+export default connect(null, mapDispatchToProps)(ErrorHandling(Notification))

@@ -14,7 +14,6 @@ interface Props {
   onClick: () => void
 }
 
-@ErrorHandling
 class CardSelectCard extends PureComponent<Props> {
   public static defaultProps: Partial<Props> = {
     checked: false,
@@ -79,4 +78,4 @@ class CardSelectCard extends PureComponent<Props> {
   }
 }
 
-export default CardSelectCard
+export default ErrorHandling(CardSelectCard)

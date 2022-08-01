@@ -19,7 +19,6 @@ interface Props {
   offsetLG?: Columns
 }
 
-@ErrorHandling
 class FormFooter extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     colsXS: Columns.Twelve,
@@ -55,4 +54,4 @@ class FormFooter extends Component<Props> {
   }
 }
 
-export default FormFooter
+export default ErrorHandling(FormFooter)

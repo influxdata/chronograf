@@ -38,7 +38,6 @@ interface State {
   workspace: string
 }
 
-@ErrorHandling
 class SlackConfig extends PureComponent<Props, State> {
   private url: HTMLInputElement
   private channel: HTMLInputElement
@@ -252,4 +251,4 @@ class SlackConfig extends PureComponent<Props, State> {
   private handleUrlRef = r => (this.url = r)
 }
 
-export default SlackConfig
+export default ErrorHandling(SlackConfig)

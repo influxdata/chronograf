@@ -57,7 +57,6 @@ interface Props {
   children?: JSX.Element
 }
 
-@ErrorHandling
 class DashboardHeader extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     zoomedTimeRange: {
@@ -252,4 +251,4 @@ class DashboardHeader extends Component<Props, State> {
   }
 }
 
-export default DashboardHeader
+export default ErrorHandling(DashboardHeader)

@@ -35,7 +35,6 @@ interface State {
   selectedDashboards: number
 }
 
-@ErrorHandling
 class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
   public static getDerivedStateFromProps(props: Props, state: State) {
     const sourceInState = state.source
@@ -264,4 +263,4 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
   }
 }
 
-export default withRouter(ConnectionWizard)
+export default withRouter(ErrorHandling(ConnectionWizard))

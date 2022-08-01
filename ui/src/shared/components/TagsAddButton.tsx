@@ -17,7 +17,6 @@ interface State {
   open: boolean
 }
 
-@ErrorHandling
 class TagsAddButton extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
@@ -64,4 +63,4 @@ class TagsAddButton extends PureComponent<Props, State> {
   }
 }
 
-export default TagsAddButton
+export default ErrorHandling(TagsAddButton)

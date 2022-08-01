@@ -25,7 +25,6 @@ interface State {
   enabled: boolean
 }
 
-@ErrorHandling
 class BigPandaConfig extends PureComponent<Props, State> {
   private url: HTMLInputElement
   private token: HTMLInputElement
@@ -161,4 +160,4 @@ class BigPandaConfig extends PureComponent<Props, State> {
   }
 }
 
-export default BigPandaConfig
+export default ErrorHandling(BigPandaConfig)

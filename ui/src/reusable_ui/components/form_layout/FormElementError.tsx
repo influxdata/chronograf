@@ -7,7 +7,6 @@ interface Props {
   message: string
 }
 
-@ErrorHandling
 class FormElementError extends Component<Props> {
   public render() {
     const {message} = this.props
@@ -16,4 +15,4 @@ class FormElementError extends Component<Props> {
   }
 }
 
-export default FormElementError
+export default ErrorHandling(FormElementError)

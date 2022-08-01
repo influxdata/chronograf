@@ -22,7 +22,6 @@ interface State {
   measurementsStatus: RemoteDataState
 }
 
-@ErrorHandling
 class MeasurementsTemplateBuilder extends PureComponent<
   TemplateBuilderProps,
   State
@@ -160,4 +159,4 @@ class MeasurementsTemplateBuilder extends PureComponent<
   }
 }
 
-export default MeasurementsTemplateBuilder
+export default ErrorHandling(MeasurementsTemplateBuilder)

@@ -49,8 +49,7 @@ interface State {
   error?: Error
 }
 
-@ErrorHandling
-export class KapacitorScopedPage extends PureComponent<Props, State> {
+class KapacitorScopedPage extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -151,4 +150,4 @@ const mdtp = {
   setActiveKapacitor: setActiveKapacitorAsync,
 }
 
-export default connect(null, mdtp)(KapacitorScopedPage)
+export default connect(null, mdtp)(ErrorHandling(KapacitorScopedPage))

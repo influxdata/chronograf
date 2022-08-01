@@ -17,7 +17,6 @@ interface Props {
   handleClickOutsideInput: (e: MouseEvent<HTMLElement>) => void
 }
 
-@ErrorHandling
 class ClickOutsideInput extends Component<Props> {
   constructor(props) {
     super(props)
@@ -60,4 +59,4 @@ class ClickOutsideInput extends Component<Props> {
   }
 }
 
-export default onClickOutside(ClickOutsideInput)
+export default onClickOutside(ErrorHandling(ClickOutsideInput))

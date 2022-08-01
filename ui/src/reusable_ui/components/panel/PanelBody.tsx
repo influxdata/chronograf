@@ -7,7 +7,6 @@ interface Props {
   children: JSX.Element[] | JSX.Element
 }
 
-@ErrorHandling
 class PanelBody extends Component<Props> {
   public render() {
     const {children} = this.props
@@ -16,4 +15,4 @@ class PanelBody extends Component<Props> {
   }
 }
 
-export default PanelBody
+export default ErrorHandling(PanelBody)

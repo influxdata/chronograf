@@ -53,8 +53,7 @@ interface State {
   loading: RemoteDataState
 }
 
-@ErrorHandling
-export class KapacitorRulesPage extends PureComponent<Props, State> {
+class KapacitorRulesPage extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
     this.state = {
@@ -223,4 +222,6 @@ const mdtp = {
   notify: notifyAction,
 }
 
-export default withSource(connect(mstp, mdtp)(KapacitorRulesPage))
+export default withSource(
+  connect(mstp, mdtp)(ErrorHandling(KapacitorRulesPage))
+)

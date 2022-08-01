@@ -19,7 +19,7 @@ $graph-type--graphic: 150px;
 .graph-type-selector--grid {
   width: 100%;
   display: inline-block;
-  margin: 0 (-$graph-type--gutter / 2);
+  margin: 0 (-$graph-type--gutter * 0.5);
   margin-bottom: -$graph-type--gutter;
 }
 
@@ -49,11 +49,11 @@ $graph-type--graphic: 150px;
     background-color: $g2-kevlar;
     color: $g11-sidewalk;
     border-radius: $ix-radius;
-    width: $graph-type--card - ($graph-type--margin / 2);
-    height: $graph-type--card - ($graph-type--margin / 2);
+    width: $graph-type--card - ($graph-type--margin * 0.5);
+    height: $graph-type--card - ($graph-type--margin * 0.5);
     position: absolute;
-    top: $graph-type--gutter / 2;
-    left: $graph-type--gutter / 2;
+    top: $graph-type--gutter * 0.5;
+    left: $graph-type--gutter * 0.5;
     transition: color 0.25s ease, border-color 0.25s ease,
       background-color 0.25s ease;
 

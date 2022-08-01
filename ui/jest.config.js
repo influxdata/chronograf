@@ -1,6 +1,7 @@
 module.exports = {
   projects: [
     {
+      testEnvironment: 'jsdom',
       displayName: 'test',
       testPathIgnorePatterns: [
         'build',
@@ -11,8 +12,7 @@ module.exports = {
       moduleDirectories: ['src', 'node_modules'],
       setupFiles: ['<rootDir>/test/setup.js'],
       transform: {
-        '^.+\\.tsx?$': 'ts-jest',
-        '^.+\\.js$': 'babel-jest',
+        '^.+\\.[jt]sx?$': ['babel-jest', {configFile: './.babelrc.jest'}],
       },
       testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
       moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],

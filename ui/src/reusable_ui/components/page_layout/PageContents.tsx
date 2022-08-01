@@ -18,7 +18,6 @@ interface Props {
   className?: string
 }
 
-@ErrorHandling
 class PageContents extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     fullWidth: false,
@@ -71,4 +70,4 @@ class PageContents extends Component<Props> {
   }
 }
 
-export default PageContents
+export default ErrorHandling(PageContents)

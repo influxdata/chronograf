@@ -16,7 +16,6 @@ interface Props {
   onClickFunction: (funcName: FluxToolbarFunction) => void
 }
 
-@ErrorHandling
 class FunctionCategory extends PureComponent<Props> {
   public render() {
     const {category, funcs, onClickFunction} = this.props
@@ -35,4 +34,4 @@ class FunctionCategory extends PureComponent<Props> {
   }
 }
 
-export default FunctionCategory
+export default ErrorHandling(FunctionCategory)

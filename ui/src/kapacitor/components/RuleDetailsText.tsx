@@ -8,7 +8,6 @@ interface Props {
   updateDetails: (id: string, value: string) => void
 }
 
-@ErrorHandling
 class RuleDetailsText extends PureComponent<Props> {
   public render() {
     const {rule} = this.props
@@ -30,4 +29,4 @@ class RuleDetailsText extends PureComponent<Props> {
     updateDetails(rule.id, e.target.value)
   }
 }
-export default RuleDetailsText
+export default ErrorHandling(RuleDetailsText)

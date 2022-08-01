@@ -33,7 +33,6 @@ interface State {
   workingFormat: SeverityFormat
 }
 
-@ErrorHandling
 class OptionsOverlay extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -196,4 +195,4 @@ class OptionsOverlay extends Component<Props, State> {
   }
 }
 
-export default OptionsOverlay
+export default ErrorHandling(OptionsOverlay)

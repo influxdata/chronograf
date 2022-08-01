@@ -8,7 +8,6 @@ interface Props {
   link: string
 }
 
-@ErrorHandling
 class TooltipLink extends PureComponent<Props> {
   public render() {
     const {link} = this.props
@@ -25,4 +24,4 @@ class TooltipLink extends PureComponent<Props> {
   }
 }
 
-export default TooltipLink
+export default ErrorHandling(TooltipLink)

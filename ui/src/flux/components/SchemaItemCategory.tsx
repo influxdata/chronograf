@@ -44,7 +44,6 @@ interface State {
   opened: OpenState
 }
 
-@ErrorHandling
 class SchemaItemCategory extends PureComponent<
   PassedProps & ConnectedProps,
   State
@@ -163,12 +162,13 @@ class SchemaItemCategory extends PureComponent<
   }
 }
 
+const SchemaItemCategory2 = ErrorHandling(SchemaItemCategory)
 const ConnectedSchemaItemCategory = (props: PassedProps) => {
   return (
     <TimeMachineContextConsumer>
       {(container: TimeMachineContainer) => {
         return (
-          <SchemaItemCategory
+          <SchemaItemCategory2
             {...props}
             onAddFilter={container.handleAddFilter}
           />

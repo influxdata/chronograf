@@ -31,7 +31,6 @@ interface Props {
   onOpenBuilderUI: () => void
 }
 
-@ErrorHandling
 class Tickscript extends PureComponent<Props> {
   public render() {
     const {
@@ -107,4 +106,4 @@ class Tickscript extends PureComponent<Props> {
   }
 }
 
-export default Tickscript
+export default ErrorHandling(Tickscript)

@@ -24,7 +24,6 @@ interface State {
   expanded: boolean
 }
 
-@ErrorHandling
 class ConfirmButton extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     confirmText: 'Confirm',
@@ -127,4 +126,4 @@ class ConfirmButton extends PureComponent<Props, State> {
   }
 }
 
-export default ConfirmButton
+export default ErrorHandling(ConfirmButton)

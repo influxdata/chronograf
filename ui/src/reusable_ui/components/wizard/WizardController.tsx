@@ -26,7 +26,6 @@ interface Props {
   isJumpingAllowed: boolean
 }
 
-@ErrorHandling
 class WizardController extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     skipLinkText: 'Skip',
@@ -205,4 +204,4 @@ class WizardController extends PureComponent<Props, State> {
   }
 }
 
-export default WizardController
+export default ErrorHandling(WizardController)

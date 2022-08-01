@@ -3,7 +3,7 @@ import _ from 'lodash'
 import {TemplateValueType, TemplateType, Template} from 'src/types'
 import {CellType} from 'src/types/dashboards'
 
-export const VERSION = process.env.npm_package_version
+export const VERSION = process.env.APP_VERSION
 export const GIT_SHA = process.env.GIT_SHA
 
 export const DEFAULT_DURATION_MS = 1000

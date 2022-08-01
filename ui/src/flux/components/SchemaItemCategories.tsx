@@ -19,7 +19,6 @@ interface Props {
   notify: NotificationAction
 }
 
-@ErrorHandling
 class SchemaItemCategories extends PureComponent<Props> {
   public render() {
     const {source, timeRange, db, categoryTree, notify} = this.props
@@ -55,4 +54,4 @@ class SchemaItemCategories extends PureComponent<Props> {
   }
 }
 
-export default SchemaItemCategories
+export default ErrorHandling(SchemaItemCategories)

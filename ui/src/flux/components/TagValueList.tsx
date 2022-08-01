@@ -36,7 +36,6 @@ interface State {
   shouldShowMoreValues: boolean
 }
 
-@ErrorHandling
 class TagValueList extends PureComponent<Props, State> {
   private debouncer: Debouncer = new DefaultDebouncer()
 
@@ -245,4 +244,4 @@ class TagValueList extends PureComponent<Props, State> {
   }
 }
 
-export default TagValueList
+export default ErrorHandling(TagValueList)

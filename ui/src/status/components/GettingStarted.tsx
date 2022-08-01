@@ -3,7 +3,6 @@ import React, {Component} from 'react'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-@ErrorHandling
 class GettingStarted extends Component {
   public render() {
     return (
@@ -96,4 +95,4 @@ class GettingStarted extends Component {
   }
 }
 
-export default GettingStarted
+export default ErrorHandling(GettingStarted)

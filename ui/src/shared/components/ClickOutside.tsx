@@ -7,8 +7,7 @@ interface Props {
   onClickOutside: () => void
 }
 
-@ErrorHandling
-export class ClickOutside extends PureComponent<Props> {
+class ClickOutside extends PureComponent<Props> {
   public componentDidMount() {
     document.addEventListener('click', this.handleClickOutside, true)
   }
@@ -29,3 +28,6 @@ export class ClickOutside extends PureComponent<Props> {
     }
   }
 }
+
+const ClickOutside2 = ErrorHandling(ClickOutside)
+export {ClickOutside2 as ClickOutside}

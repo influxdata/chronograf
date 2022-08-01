@@ -144,7 +144,6 @@ interface State {
   showCellEditorOverlay: boolean
 }
 
-@ErrorHandling
 class DashboardPage extends Component<Props, State> {
   public constructor(props: Props) {
     super(props)
@@ -691,5 +690,5 @@ const mdtp = {
 }
 
 export default withSource(
-  withRouter(connect(mstp, mdtp)(ManualRefresh(DashboardPage)))
+  withRouter(connect(mstp, mdtp)(ManualRefresh(ErrorHandling(DashboardPage))))
 )

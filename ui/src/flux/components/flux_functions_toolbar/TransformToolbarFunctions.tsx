@@ -16,7 +16,6 @@ interface Props {
   searchTerm?: string
 }
 
-@ErrorHandling
 class TransformToolbarFunctions extends PureComponent<Props> {
   public render() {
     return this.props.children(this.sortedFunctions)
@@ -48,4 +47,4 @@ class TransformToolbarFunctions extends PureComponent<Props> {
   }
 }
 
-export default TransformToolbarFunctions
+export default ErrorHandling(TransformToolbarFunctions)

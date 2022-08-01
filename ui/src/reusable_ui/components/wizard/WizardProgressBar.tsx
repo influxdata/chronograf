@@ -16,7 +16,6 @@ interface Props {
   handleJump: (jumpIndex: number) => () => void
 }
 
-@ErrorHandling
 class WizardProgressBar extends PureComponent<Props> {
   public render() {
     return <div className="wizard-progress-bar">{this.WizardProgress}</div>
@@ -80,4 +79,4 @@ class WizardProgressBar extends PureComponent<Props> {
   }
 }
 
-export default WizardProgressBar
+export default ErrorHandling(WizardProgressBar)

@@ -7,7 +7,8 @@ import TemplateMetaQueryPreview from './TemplateMetaQueryPreview'
 import {hydrateTemplate} from 'src/tempVars/utils/graph'
 import {isInvalidMetaQuery} from 'src/tempVars/parsing'
 
-import {TemplateBuilderProps, RemoteDataState} from 'src/types'
+import {RemoteDataState} from 'src/types'
+import type {TemplateBuilderProps} from 'src/types'
 
 const DEBOUNCE_DELAY = 750
 
@@ -17,7 +18,6 @@ interface State {
   metaQueryResultsStatus: RemoteDataState
 }
 
-@ErrorHandling
 class CustomMetaQueryTemplateBuilder extends PureComponent<
   TemplateBuilderProps,
   State
@@ -145,4 +145,4 @@ class CustomMetaQueryTemplateBuilder extends PureComponent<
   }
 }
 
-export default CustomMetaQueryTemplateBuilder
+export default ErrorHandling(CustomMetaQueryTemplateBuilder)

@@ -15,7 +15,6 @@ interface Props {
   text: string
 }
 
-@ErrorHandling
 class MarkdownCell extends Component<Props> {
   public render() {
     const {text} = this.props
@@ -30,4 +29,4 @@ class MarkdownCell extends Component<Props> {
   }
 }
 
-export default MarkdownCell
+export default ErrorHandling(MarkdownCell)

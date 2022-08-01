@@ -67,7 +67,6 @@ interface State {
   handlersOfKind: HandlerKind
 }
 
-@ErrorHandling
 class RuleHandlers extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
@@ -358,4 +357,4 @@ class RuleHandlers extends PureComponent<Props, State> {
   }
 }
 
-export default RuleHandlers
+export default ErrorHandling(RuleHandlers)

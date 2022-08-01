@@ -21,7 +21,6 @@ interface Props {
   onManualRefresh?: () => void
 }
 
-@ErrorHandling
 class AutoRefreshDropdown extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     showManualRefresh: true,
@@ -130,4 +129,4 @@ class AutoRefreshDropdown extends Component<Props> {
   }
 }
 
-export default AutoRefreshDropdown
+export default ErrorHandling(AutoRefreshDropdown)

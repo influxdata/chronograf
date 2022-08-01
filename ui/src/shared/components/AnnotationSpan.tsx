@@ -30,7 +30,6 @@ interface Props {
   xAxisRange: [number, number]
 }
 
-@ErrorHandling
 class AnnotationSpan extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     staticLegendHeight: 0,
@@ -259,4 +258,4 @@ const mapDispatchToProps = {
   updateAnnotation: actions.updateAnnotation,
 }
 
-export default connect(null, mapDispatchToProps)(AnnotationSpan)
+export default connect(null, mapDispatchToProps)(ErrorHandling(AnnotationSpan))

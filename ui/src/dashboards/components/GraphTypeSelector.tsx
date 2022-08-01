@@ -19,7 +19,6 @@ interface Props {
   onUpdateVisType: (newType: CellType) => Promise<void>
 }
 
-@ErrorHandling
 class GraphTypeSelector extends Component<Props> {
   public render() {
     const {type} = this.props
@@ -52,4 +51,4 @@ class GraphTypeSelector extends Component<Props> {
   }
 }
 
-export default GraphTypeSelector
+export default ErrorHandling(GraphTypeSelector)

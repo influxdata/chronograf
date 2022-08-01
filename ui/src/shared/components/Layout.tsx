@@ -42,7 +42,6 @@ interface State {
   visType: VisType
 }
 
-@ErrorHandling
 class Layout extends Component<Props, State> {
   public state = {
     cellData: [],
@@ -205,4 +204,4 @@ class Layout extends Component<Props, State> {
   }
 }
 
-export default Layout
+export default ErrorHandling(Layout)

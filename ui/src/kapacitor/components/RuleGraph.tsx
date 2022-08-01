@@ -38,7 +38,6 @@ interface Props {
   setHoverTime: typeof setHoverTimeAction
 }
 
-@ErrorHandling
 class RuleGraph extends PureComponent<Props> {
   public render() {
     const {source, onChooseTimeRange, timeRange, rule} = this.props
@@ -130,4 +129,4 @@ const mdtp = {
   setHoverTime: setHoverTimeAction,
 }
 
-export default connect(null, mdtp)(RuleGraph)
+export default connect(null, mdtp)(ErrorHandling(RuleGraph))

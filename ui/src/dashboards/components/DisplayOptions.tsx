@@ -77,7 +77,6 @@ interface State {
   proportions: number[]
 }
 
-@ErrorHandling
 class DisplayOptions extends Component<Props, State> {
   constructor(props) {
     super(props)
@@ -268,13 +267,15 @@ class DisplayOptions extends Component<Props, State> {
   }
 }
 
+const DisplayOptions2 = ErrorHandling(DisplayOptions)
+
 const ConnectedDisplayOptions = (props: PassedProps) => {
   // TODO: Have individual display option components subscribe directly to
   // relevant props, rather than passing them through here
   return (
     <TimeMachineContextConsumer>
       {(timeMachineContainer: TimeMachineContainer) => (
-        <DisplayOptions
+        <DisplayOptions2
           {...props}
           type={timeMachineContainer.state.type}
           axes={timeMachineContainer.state.axes}

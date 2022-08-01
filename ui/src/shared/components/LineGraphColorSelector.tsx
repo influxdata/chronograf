@@ -10,7 +10,6 @@ interface Props {
   onUpdateLineColors: (colors: ColorString[]) => void
 }
 
-@ErrorHandling
 class LineGraphColorSelector extends Component<Props> {
   public render() {
     const {lineColors} = this.props
@@ -35,4 +34,4 @@ class LineGraphColorSelector extends Component<Props> {
   }
 }
 
-export default LineGraphColorSelector
+export default ErrorHandling(LineGraphColorSelector)

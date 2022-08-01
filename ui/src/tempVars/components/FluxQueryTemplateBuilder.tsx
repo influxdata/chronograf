@@ -6,7 +6,8 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import TemplateFluxScriptPreview from './TemplateFluxQueryPreview'
 import {hydrateTemplate} from 'src/tempVars/utils/graph'
 
-import {TemplateBuilderProps, RemoteDataState} from 'src/types'
+import type {TemplateBuilderProps} from 'src/types'
+import {RemoteDataState} from 'src/types'
 
 const DEBOUNCE_DELAY = 750
 
@@ -17,7 +18,6 @@ interface State {
   fluxScriptWarning?: string
 }
 
-@ErrorHandling
 class FluxQueryTemplateBuilder extends PureComponent<
   TemplateBuilderProps,
   State
@@ -145,4 +145,4 @@ class FluxQueryTemplateBuilder extends PureComponent<
   }
 }
 
-export default FluxQueryTemplateBuilder
+export default ErrorHandling(FluxQueryTemplateBuilder)

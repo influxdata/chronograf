@@ -20,7 +20,6 @@ interface Props {
   type?: PanelType
 }
 
-@ErrorHandling
 class Panel extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     type: PanelType.Default,
@@ -81,4 +80,4 @@ class Panel extends Component<Props> {
     _.includes(Panel.ValidChildTypes, child.type)
 }
 
-export default Panel
+export default ErrorHandling(Panel)

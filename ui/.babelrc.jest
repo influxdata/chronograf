@@ -1,5 +1,6 @@
 {
   "plugins": [
+    "babel-plugin-transform-import-meta",
     "@babel/plugin-transform-runtime",
     "@babel/plugin-proposal-class-properties",
     "babel-plugin-lodash",

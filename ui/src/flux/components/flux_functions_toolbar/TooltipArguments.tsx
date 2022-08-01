@@ -14,7 +14,6 @@ interface Props {
   argsList?: Args[]
 }
 
-@ErrorHandling
 class TooltipArguments extends PureComponent<Props> {
   public render() {
     return (
@@ -44,4 +43,4 @@ class TooltipArguments extends PureComponent<Props> {
   }
 }
 
-export default TooltipArguments
+export default ErrorHandling(TooltipArguments)

@@ -75,7 +75,7 @@ import {WriteDataMode, QueryUpdateState} from './dataExplorer'
 import {Host, Layout} from './hosts'
 import {Env} from './env'
 
-export {
+export type {
   Me,
   Env,
   Links,
@@ -89,7 +89,6 @@ export {
   Cell,
   NewDefaultCell,
   CellQuery,
-  CellType,
   PBCell,
   Protoboard,
   Legend,
@@ -109,7 +108,6 @@ export {
   NewSource,
   Source,
   SourceLinks,
-  SourceAuthenticationMethod,
   DropdownAction,
   DropdownItem,
   TimeRange,
@@ -132,19 +130,24 @@ export {
   FluxTable,
   ScriptStatus,
   SchemaFilter,
-  RemoteDataState,
   JSONFeedData,
   Annotation,
-  TemplateType,
-  TemplateValueType,
   TemplateUpdate,
   TemplateBuilderProps,
-  WriteDataMode,
   QueryStatus,
   QueryStatuses,
   Host,
   Layout,
-  QueryType,
-  QueryUpdateState,
   BuilderAggregateFunctionType,
+}
+
+export {
+  CellType,
+  QueryType,
+  SourceAuthenticationMethod,
+  RemoteDataState,
+  TemplateType,
+  TemplateValueType,
+  QueryUpdateState,
+  WriteDataMode,
 }

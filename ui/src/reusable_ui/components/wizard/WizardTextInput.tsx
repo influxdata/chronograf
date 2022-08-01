@@ -24,7 +24,6 @@ interface State {
   initialValue: string
 }
 
-@ErrorHandling
 class WizardTextInput extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     value: '',
@@ -131,4 +130,4 @@ class WizardTextInput extends PureComponent<Props, State> {
   }
 }
 
-export default WizardTextInput
+export default ErrorHandling(WizardTextInput)

@@ -26,7 +26,6 @@ interface State {
   opened: OpenState
 }
 
-@ErrorHandling
 class TagKeyListItem extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -86,4 +85,4 @@ class TagKeyListItem extends PureComponent<Props, State> {
   }
 }
 
-export default TagKeyListItem
+export default ErrorHandling(TagKeyListItem)

@@ -23,7 +23,6 @@ interface State {
   isAdding: boolean
 }
 
-@ErrorHandling
 class TemplateControlBar extends Component<Props, State> {
   constructor(props) {
     super(props)
@@ -139,4 +138,4 @@ class TemplateControlBar extends Component<Props, State> {
   }
 }
 
-export default TemplateControlBar
+export default ErrorHandling(TemplateControlBar)

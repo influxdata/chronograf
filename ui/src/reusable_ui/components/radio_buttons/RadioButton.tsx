@@ -16,7 +16,6 @@ interface Props {
   disabledTitleText?: string
 }
 
-@ErrorHandling
 class RadioButton extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     disabled: false,
@@ -65,4 +64,4 @@ class RadioButton extends Component<Props> {
   }
 }
 
-export default RadioButton
+export default ErrorHandling(RadioButton)

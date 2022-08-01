@@ -29,7 +29,6 @@ interface Props {
   staticLegendHeight: number
 }
 
-@ErrorHandling
 class AnnotationPoint extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     staticLegendHeight: 0,
@@ -195,4 +194,4 @@ const mdtp = {
   updateAnnotation: actions.updateAnnotation,
 }
 
-export default connect(null, mdtp)(AnnotationPoint)
+export default connect(null, mdtp)(ErrorHandling(AnnotationPoint))

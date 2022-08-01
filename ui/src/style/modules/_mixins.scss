@@ -51,12 +51,12 @@ $scrollbar-offset: 3px;
     &-track-piece {
       background-color: $trackColor;
       border: $scrollbar-offset solid $trackColor;
-      border-radius: ($scrollbar-width / 2);
+      border-radius: ($scrollbar-width * 0.5);
     }
     &-thumb {
       background-color: $handleColor;
       border: $scrollbar-offset solid $trackColor;
-      border-radius: ($scrollbar-width / 2);
+      border-radius: ($scrollbar-width * 0.5);
     }
     &-corner {
       background-color: $trackColor;
@@ -79,20 +79,20 @@ $scrollbar-offset: 3px;
     }
     &-track {
       background-color: $trackColor;
-      border-top-right-radius: ($scrollbar-width / 2);
-      border-top-left-radius: ($scrollbar-width / 2);
-      border-bottom-left-radius: ($scrollbar-width / 2);
-      border-bottom-right-radius: ($scrollbar-width / 2);
+      border-top-right-radius: ($scrollbar-width * 0.5);
+      border-top-left-radius: ($scrollbar-width * 0.5);
+      border-bottom-left-radius: ($scrollbar-width * 0.5);
+      border-bottom-right-radius: ($scrollbar-width * 0.5);
     }
     &-track-piece {
       background-color: $trackColor;
       border: $scrollbar-offset solid $trackColor;
-      border-radius: ($scrollbar-width / 2);
+      border-radius: ($scrollbar-width * 0.5);
     }
     &-thumb {
       background-color: $handleColor;
       border: $scrollbar-offset solid $trackColor;
-      border-radius: ($scrollbar-width / 2);
+      border-radius: ($scrollbar-width * 0.5);
     }
     &-corner {
       background-color: $trackColor;

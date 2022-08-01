@@ -50,7 +50,6 @@ interface State {
   configs: Config[]
 }
 
-@ErrorHandling
 class KafkaConfigs extends Component<Props, State> {
   public static getDerivedStateFromProps(nextProps: Props, prevState: State) {
     return {...prevState, configs: nextProps.configs}
@@ -119,4 +118,4 @@ class KafkaConfigs extends Component<Props, State> {
   }
 }
 
-export default KafkaConfigs
+export default ErrorHandling(KafkaConfigs)

@@ -20,7 +20,6 @@ interface State {
   format: string
 }
 
-@ErrorHandling
 class GraphOptionsTimeFormat extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -101,4 +100,4 @@ class GraphOptionsTimeFormat extends PureComponent<Props, State> {
   }
 }
 
-export default GraphOptionsTimeFormat
+export default ErrorHandling(GraphOptionsTimeFormat)

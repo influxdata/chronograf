@@ -23,7 +23,7 @@ const setup = (override = {}) => {
     context: {source},
   })
 
-  const instance = wrapper.instance() as MeasurementList
+  const instance = wrapper.instance() as InstanceType<typeof MeasurementList>
 
   return {
     instance,

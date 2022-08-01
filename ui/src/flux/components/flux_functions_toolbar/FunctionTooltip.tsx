@@ -26,7 +26,6 @@ interface State {
 
 const MAX_HEIGHT = 400
 
-@ErrorHandling
 class FunctionTooltip extends PureComponent<Props, State> {
   private tooltipRef = createRef<HTMLDivElement>()
 
@@ -112,4 +111,4 @@ class FunctionTooltip extends PureComponent<Props, State> {
   }
 }
 
-export default FunctionTooltip
+export default ErrorHandling(FunctionTooltip)

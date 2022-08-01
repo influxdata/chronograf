@@ -28,7 +28,6 @@ interface State {
   sortKey: string
 }
 
-@ErrorHandling
 class HostsTable extends PureComponent<Props, State> {
   public getSortedHosts = memoize(
     (
@@ -267,4 +266,4 @@ class HostsTable extends PureComponent<Props, State> {
   }
 }
 
-export default HostsTable
+export default ErrorHandling(HostsTable)

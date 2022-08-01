@@ -13,7 +13,6 @@ interface State {
   editing: boolean
 }
 
-@ErrorHandling
 class RedactedInput extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
@@ -69,4 +68,4 @@ class RedactedInput extends PureComponent<Props, State> {
   }
 }
 
-export default RedactedInput
+export default ErrorHandling(RedactedInput)

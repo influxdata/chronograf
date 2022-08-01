@@ -29,7 +29,6 @@ interface Props {
   onUpdateThresholdsListColors: (c: ColorNumber[]) => void
 }
 
-@ErrorHandling
 class ThresholdsList extends PureComponent<Props> {
   public static defaultProps: Partial<Props> = {
     showListHeading: false,
@@ -184,4 +183,4 @@ class ThresholdsList extends PureComponent<Props> {
   }
 }
 
-export default ThresholdsList
+export default ErrorHandling(ThresholdsList)

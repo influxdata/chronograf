@@ -51,7 +51,6 @@ interface State {
   cellID: string
 }
 
-@ErrorHandling
 class DygraphLegend extends PureComponent<Props, State> {
   private legendRef: HTMLElement | null = null
 
@@ -287,4 +286,7 @@ const mapStateToProps = ({dashboardUI}) => ({
   hoverTime: +dashboardUI.hoverTime,
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(DygraphLegend)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ErrorHandling(DygraphLegend))

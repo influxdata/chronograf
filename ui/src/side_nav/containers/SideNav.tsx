@@ -36,7 +36,6 @@ type RouterProps = WithRouterProps<{
 }>
 type Props = OwnProps & RouterProps
 
-@ErrorHandling
 class SideNav extends PureComponent<Props> {
   constructor(props) {
     super(props)
@@ -219,4 +218,4 @@ const mapStateToProps = ({
   me,
 })
 
-export default connect(mapStateToProps)(withRouter(SideNav))
+export default connect(mapStateToProps)(withRouter(ErrorHandling(SideNav)))

@@ -59,7 +59,6 @@ interface State {
   source: Partial<Source>
 }
 
-@ErrorHandling
 class SourceStep extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     onBoarding: false,
@@ -306,4 +305,6 @@ const mdtp = {
   updateSource: updateSourceAction,
 }
 
-export default connect(null, mdtp, null, {forwardRef: true})(SourceStep)
+export default connect(null, mdtp, null, {forwardRef: true})(
+  ErrorHandling(SourceStep)
+)

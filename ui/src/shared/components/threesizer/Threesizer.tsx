@@ -67,7 +67,6 @@ interface Props {
   onResize: (sizes: number[]) => void
 }
 
-@ErrorHandling
 class Threesizer extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     orientation: HANDLE_HORIZONTAL,
@@ -539,4 +538,4 @@ class Threesizer extends PureComponent<Props, State> {
   }
 }
 
-export default Threesizer
+export default ErrorHandling(Threesizer)

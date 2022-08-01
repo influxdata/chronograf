@@ -27,7 +27,6 @@ interface Props {
   onSetActiveEditorTab: (activeEditorTab: CEOTabs) => void
 }
 
-@ErrorHandling
 class DEHeader extends Component<Props> {
   public render() {
     const {
@@ -91,4 +90,4 @@ class DEHeader extends Component<Props> {
   }
 }
 
-export default DEHeader
+export default ErrorHandling(DEHeader)

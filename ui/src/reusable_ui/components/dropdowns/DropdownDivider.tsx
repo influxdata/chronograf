@@ -13,7 +13,6 @@ interface Props {
   text?: string
 }
 
-@ErrorHandling
 class DropdownDivider extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     text: '',
@@ -30,4 +29,4 @@ class DropdownDivider extends Component<Props> {
   }
 }
 
-export default DropdownDivider
+export default ErrorHandling(DropdownDivider)

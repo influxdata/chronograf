@@ -156,11 +156,11 @@ $input-status-z: $input-field-z + 2;
   }
 
   .input-icon {
-    left: ($height / 2) + $ix-border;
+    left: ($height * 0.5) + $ix-border;
   }
 
   .input-status {
-    right: $height / 2;
+    right: $height * 0.5;
   }
 
   .input-shadow {
@@ -170,8 +170,8 @@ $input-status-z: $input-field-z + 2;
   }
 
   .input-spinner {
-    width: $height / 2;
-    height: $height / 2;
+    width: $height * 0.5;
+    height: $height * 0.5;
   }
 }
 

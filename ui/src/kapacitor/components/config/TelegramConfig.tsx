@@ -30,7 +30,6 @@ interface State {
   enabled: boolean
 }
 
-@ErrorHandling
 class TelegramConfig extends PureComponent<Props, State> {
   private parseModeHTML: HTMLInputElement
   private parseModeMarkdown: HTMLInputElement
@@ -246,4 +245,4 @@ class TelegramConfig extends PureComponent<Props, State> {
   private handleTokenRef = r => (this.token = r)
 }
 
-export default TelegramConfig
+export default ErrorHandling(TelegramConfig)

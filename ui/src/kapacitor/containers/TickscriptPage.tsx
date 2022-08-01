@@ -88,7 +88,6 @@ interface State {
   unsavedChanges: boolean
 }
 
-@ErrorHandling
 export class TickscriptPage extends PureComponent<Props, State> {
   private abortController: AbortController
 
@@ -453,5 +452,5 @@ const mapDispatchToProps = dispatch => ({
 })
 
 export default withSource(
-  connect(mapStateToProps, mapDispatchToProps)(TickscriptPage)
+  connect(mapStateToProps, mapDispatchToProps)(ErrorHandling(TickscriptPage))
 )

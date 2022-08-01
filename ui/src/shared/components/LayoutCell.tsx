@@ -42,8 +42,7 @@ interface Props {
   toggleVisType: () => void
 }
 
-@ErrorHandling
-export default class LayoutCell extends Component<Props> {
+class LayoutCell extends Component<Props> {
   private cellBackgroundColor: string = DEFAULT_CELL_BG_COLOR
   private cellTextColor: string = DEFAULT_CELL_TEXT_COLOR
 
@@ -219,3 +218,4 @@ export default class LayoutCell extends Component<Props> {
     }
   }
 }
+export default ErrorHandling(LayoutCell)

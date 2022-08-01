@@ -61,7 +61,6 @@ interface State {
   fields: Field[]
 }
 
-@ErrorHandling
 class FieldList extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     isKapacitorRule: false,
@@ -316,4 +315,4 @@ class FieldList extends PureComponent<Props, State> {
   }
 }
 
-export default FieldList
+export default ErrorHandling(FieldList)

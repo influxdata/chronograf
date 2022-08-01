@@ -12,7 +12,6 @@ interface Props {
   onUpdateDefaultTemplateValue: (item: TemplateValue) => void
 }
 
-@ErrorHandling
 class TemplateFluxQueryPreview extends PureComponent<Props> {
   public render() {
     const {
@@ -88,4 +87,4 @@ class TemplateFluxQueryPreview extends PureComponent<Props> {
   }
 }
 
-export default TemplateFluxQueryPreview
+export default ErrorHandling(TemplateFluxQueryPreview)

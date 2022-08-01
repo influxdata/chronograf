@@ -28,7 +28,6 @@ interface Props {
   decimalPlaces: DecimalPlaces
 }
 
-@ErrorHandling
 class Gauge extends Component<Props> {
   private canvasRef: React.RefObject<HTMLCanvasElement>
 
@@ -391,4 +390,4 @@ class Gauge extends Component<Props> {
   }
 }
 
-export default Gauge
+export default ErrorHandling(Gauge)

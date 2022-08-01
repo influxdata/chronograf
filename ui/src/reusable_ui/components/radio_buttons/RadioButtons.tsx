@@ -19,7 +19,6 @@ interface Props {
   shape?: ButtonShape
 }
 
-@ErrorHandling
 class Radio extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     color: ComponentColor.Default,
@@ -73,4 +72,4 @@ class Radio extends Component<Props> {
     child.type === RadioButton
 }
 
-export default Radio
+export default ErrorHandling(Radio)

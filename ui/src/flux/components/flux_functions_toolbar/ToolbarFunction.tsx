@@ -20,7 +20,6 @@ interface State {
   hoverPosition: {top: number; right: number}
 }
 
-@ErrorHandling
 class ToolbarFunction extends PureComponent<Props, State> {
   private functionRef = createRef<HTMLDivElement>()
 
@@ -83,4 +82,4 @@ class ToolbarFunction extends PureComponent<Props, State> {
   }
 }
 
-export default ToolbarFunction
+export default ErrorHandling(ToolbarFunction)

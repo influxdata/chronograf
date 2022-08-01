@@ -24,7 +24,6 @@ interface Props {
   title?: string
 }
 
-@ErrorHandling
 class DropdownButton extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     color: ComponentColor.Default,
@@ -95,4 +94,4 @@ class DropdownButton extends Component<Props> {
   }
 }
 
-export default DropdownButton
+export default ErrorHandling(DropdownButton)

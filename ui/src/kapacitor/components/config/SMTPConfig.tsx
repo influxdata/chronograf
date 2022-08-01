@@ -27,7 +27,6 @@ interface State {
   enabled: boolean
 }
 
-@ErrorHandling
 class SMTPConfig extends PureComponent<Props, State> {
   private host: HTMLInputElement
   private port: HTMLInputElement
@@ -190,4 +189,4 @@ class SMTPConfig extends PureComponent<Props, State> {
   }
 }
 
-export default SMTPConfig
+export default ErrorHandling(SMTPConfig)

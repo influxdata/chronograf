@@ -27,7 +27,6 @@ interface State {
   opened: OpenState
 }
 
-@ErrorHandling
 class MeasurementListItem extends PureComponent<Props, State> {
   public static getDerivedStateFromProps(props, state) {
     if (
@@ -114,4 +113,4 @@ class MeasurementListItem extends PureComponent<Props, State> {
   }
 }
 
-export default MeasurementListItem
+export default ErrorHandling(MeasurementListItem)

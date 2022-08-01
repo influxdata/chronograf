@@ -14,7 +14,6 @@ interface State {
   time: string
 }
 
-@ErrorHandling
 class CustomSingularTime extends Component<Props, State> {
   private calendar?: any
   private containerRef: React.RefObject<HTMLDivElement> = React.createRef<HTMLDivElement>()
@@ -90,4 +89,4 @@ class CustomSingularTime extends Component<Props, State> {
   }
 }
 
-export default CustomSingularTime
+export default ErrorHandling(CustomSingularTime)

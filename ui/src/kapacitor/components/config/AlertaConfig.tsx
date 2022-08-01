@@ -29,7 +29,6 @@ interface State {
   enabled: boolean
 }
 
-@ErrorHandling
 class AlertaConfig extends PureComponent<Props, State> {
   private environment: HTMLInputElement
   private origin: HTMLInputElement
@@ -180,4 +179,4 @@ class AlertaConfig extends PureComponent<Props, State> {
   private handleTokenRef = r => (this.token = r)
 }
 
-export default AlertaConfig
+export default ErrorHandling(AlertaConfig)

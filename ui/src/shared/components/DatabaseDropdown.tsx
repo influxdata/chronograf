@@ -26,7 +26,6 @@ interface State {
   databases: string[]
 }
 
-@ErrorHandling
 class DatabaseDropdown extends Component<Props, State> {
   constructor(props) {
     super(props)
@@ -118,4 +117,4 @@ class DatabaseDropdown extends Component<Props, State> {
   }
 }
 
-export default DatabaseDropdown
+export default ErrorHandling(DatabaseDropdown)

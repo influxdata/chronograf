@@ -15,7 +15,6 @@ interface State {
   databasesStatus: RemoteDataState
 }
 
-@ErrorHandling
 class DatabasesTemplateBuilder extends PureComponent<
   TemplateBuilderProps,
   State
@@ -89,4 +88,4 @@ class DatabasesTemplateBuilder extends PureComponent<
   }
 }
 
-export default DatabasesTemplateBuilder
+export default ErrorHandling(DatabasesTemplateBuilder)

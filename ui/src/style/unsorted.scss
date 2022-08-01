@@ -463,7 +463,7 @@ $deceo--tab-width: 220px;
 .deceo--header {
   .page-header--left,
   .page-header--right {
-    flex: 1 0 calc(50% - #{$deceo--tab-width / 2});
+    flex: 1 0 calc(50% - #{$deceo--tab-width * 0.5});
   }
 }
 

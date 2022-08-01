@@ -9,6 +9,7 @@ import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {Page} from 'src/reusable_ui'
 import InfluxTable from 'src/sources/components/InfluxTable'
 import ConnectionWizard from 'src/sources/components/ConnectionWizard'
+import {VERSION} from 'src/shared/constants'
 
 import {
   notifySourceDeleted,
@@ -42,9 +43,6 @@ interface OwnProps {
 
 type Props = OwnProps & ReduxStateProps & ReduxDispatchProps
 
-const VERSION = process.env.npm_package_version
-
-@ErrorHandling
 class ManageSources extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -158,4 +156,4 @@ const mdtp = {
   deleteKapacitor: sourcesActions.deleteKapacitorAsync,
 }
 
-export default withSource(connect(mstp, mdtp)(ManageSources))
+export default withSource(connect(mstp, mdtp)(ErrorHandling(ManageSources)))

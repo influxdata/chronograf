@@ -15,7 +15,6 @@ interface Props {
   onAddFilter?: (value: {[k: string]: string}) => void
 }
 
-@ErrorHandling
 class TagValueListItem extends PureComponent<Props> {
   public render() {
     const {tagValue} = this.props
@@ -58,4 +57,4 @@ class TagValueListItem extends PureComponent<Props> {
   }
 }
 
-export default TagValueListItem
+export default ErrorHandling(TagValueListItem)

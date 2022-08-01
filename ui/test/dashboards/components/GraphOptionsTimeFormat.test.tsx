@@ -20,6 +20,8 @@ const setup = (override = {}) => {
   return shallow(<GraphOptionsTimeFormat {...props} />)
 }
 
+type GraphOptionsTimeFormatType = InstanceType<typeof GraphOptionsTimeFormat>
+
 describe('Dashboards.Components.GraphOptionsTimeFormat', () => {
   describe('rendering', () => {
     describe('when it is not a custom format', () => {
@@ -74,7 +76,7 @@ describe('Dashboards.Components.GraphOptionsTimeFormat', () => {
     describe('#handleChooseFormat', () => {
       describe('when input is custom', () => {
         it('sets the state custom format to true', () => {
-          const instance = setup().instance() as GraphOptionsTimeFormat
+          const instance = setup().instance() as GraphOptionsTimeFormatType
 
           instance.handleChooseFormat(TIME_FORMAT_CUSTOM)
           expect(instance.state.customFormat).toBe(true)
@@ -86,7 +88,7 @@ describe('Dashboards.Components.GraphOptionsTimeFormat', () => {
           const onTimeFormatChange = jest.fn()
           const instance = setup({
             onTimeFormatChange,
-          }).instance() as GraphOptionsTimeFormat
+          }).instance() as GraphOptionsTimeFormatType
 
           instance.handleChooseFormat('blah')
           expect(instance.state.customFormat).toBe(false)
@@ -102,7 +104,7 @@ describe('Dashboards.Components.GraphOptionsTimeFormat', () => {
         const format = 'mmmmmm'
         const instance = setup({
           onTimeFormatChange,
-        }).instance() as GraphOptionsTimeFormat
+        }).instance() as GraphOptionsTimeFormatType
 
         instance.handleChangeFormat({target: {value: format}})
         expect(instance.state.format).toBe(format)

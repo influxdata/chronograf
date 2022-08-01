@@ -3,6 +3,8 @@
     ----------------------------------------------------------------------------
 */
 
+@use "sass:math";
+
 $flux-tree-min-width: 250px;
 $flux-tree-indent: 26px;
 $flux-tree-line: 2px;
@@ -63,7 +65,7 @@ $flux-tree-gutter: 11px;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: $g11-sidewalk;
-    width: $flux-tree-indent / 3;
+    width: math.div($flux-tree-indent, 3);
     height: $flux-tree-line;
     transition: transform 0.25s ease, background-color 0.25s ease;
   } // Vertical Line
@@ -93,7 +95,7 @@ $flux-tree-gutter: 11px;
   > span.icon {
     position: absolute;
     top: 50%;
-    left: $flux-tree-indent / 2;
+    left: $flux-tree-indent * 0.5;
     transform: translate(-50%, -50%);
   }
   &:not(.no-hover):hover {
@@ -208,20 +210,20 @@ $flux-tree-gutter: 11px;
 // Vertical Line
 .flux-schema--child:before {
   top: 0;
-  left: $flux-tree-indent / 2;
+  left: $flux-tree-indent * 0.5;
   width: $flux-tree-line;
   height: 100%;
 }
 
 .flux-schema--child:last-child:before {
-  height: $flux-tree-indent / 2;
+  height: $flux-tree-indent * 0.5;
 }
 
 // Horizontal Line
 .flux-schema--child:after {
-  top: $flux-tree-indent / 2;
-  left: $flux-tree-indent / 2;
-  width: $flux-tree-indent / 2;
+  top: $flux-tree-indent * 0.5;
+  left: $flux-tree-indent * 0.5;
+  width: $flux-tree-indent * 0.5;
   height: $flux-tree-line;
 }
 
@@ -254,15 +256,15 @@ $flux-tree-gutter: 11px;
   // Vertical Line
   &:before {
     top: 0;
-    left: $flux-tree-indent / 2;
+    left: $flux-tree-indent * 0.5;
     width: $flux-tree-line;
     height: 100%;
   }
   // Horizontal Line
   &:after {
-    top: $flux-tree-indent / 2;
-    left: $flux-tree-indent / 2;
-    width: $flux-tree-indent / 2;
+    top: $flux-tree-indent * 0.5;
+    left: $flux-tree-indent * 0.5;
+    width: $flux-tree-indent * 0.5;
     height: $flux-tree-line;
   }
 

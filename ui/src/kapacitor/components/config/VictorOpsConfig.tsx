@@ -26,7 +26,6 @@ interface State {
   enabled: boolean
 }
 
-@ErrorHandling
 class VictorOpsConfig extends PureComponent<Props, State> {
   private apiKey: HTMLInputElement
   private routingKey: HTMLInputElement
@@ -146,4 +145,4 @@ class VictorOpsConfig extends PureComponent<Props, State> {
   private handleApiRef = r => (this.apiKey = r)
 }
 
-export default VictorOpsConfig
+export default ErrorHandling(VictorOpsConfig)

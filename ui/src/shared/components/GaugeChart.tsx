@@ -51,7 +51,6 @@ interface State {
   isValidData: boolean
 }
 
-@ErrorHandling
 class GaugeChart extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     colors: stringifyColorValues(DEFAULT_GAUGE_COLORS),
@@ -182,4 +181,4 @@ class GaugeChart extends PureComponent<Props, State> {
   }
 }
 
-export default GaugeChart
+export default ErrorHandling(GaugeChart)

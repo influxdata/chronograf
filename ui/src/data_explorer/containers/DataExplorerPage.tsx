@@ -11,7 +11,6 @@ interface Props {
   source: Source
 }
 
-@ErrorHandling
 class DataExplorerPage extends PureComponent<Props> {
   public render() {
     return (
@@ -22,4 +21,4 @@ class DataExplorerPage extends PureComponent<Props> {
   }
 }
 
-export default withSource(DataExplorerPage)
+export default withSource(ErrorHandling(DataExplorerPage))

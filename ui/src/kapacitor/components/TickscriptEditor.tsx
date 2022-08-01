@@ -13,7 +13,6 @@ interface Props {
 
 const NOOP = () => {}
 
-@ErrorHandling
 class TickscriptEditor extends Component<Props> {
   constructor(props) {
     super(props)
@@ -47,4 +46,4 @@ class TickscriptEditor extends Component<Props> {
   }
 }
 
-export default TickscriptEditor
+export default ErrorHandling(TickscriptEditor)

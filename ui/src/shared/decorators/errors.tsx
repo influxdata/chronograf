@@ -4,8 +4,7 @@ tslint:disable max-classes-per-file
 */
 
 import React, {ComponentClass, Component} from 'react'
-
-const VERSION = process.env.npm_package_version
+import {VERSION} from 'src/shared/constants'
 
 type ErrorComponentClass = ComponentClass<{error: Error} & any>
 
@@ -45,12 +44,10 @@ export function ErrorHandlingWith(
   Error: ErrorComponentClass, // Must be a class based component and not an FunctionComponent
   alwaysDisplay = false
 ) {
-  return <P, S, T extends new (...args: any[]) => Component<P, S>>(
-    constructor: T
-  ) => {
-    class Wrapped extends constructor {
+  return <P, S, T extends new (...args: any[]) => Component<P, S>>(base: T) => {
+    return class extends base {
       public static get displayName(): string {
-        return constructor.name
+        return base.name
       }
 
       private error: boolean = false
@@ -72,8 +69,6 @@ export function ErrorHandlingWith(
         return super.render()
       }
     }
-
-    return Wrapped
   }
 }
 

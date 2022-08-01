@@ -27,7 +27,6 @@ interface State {
   searchTerm: string
 }
 
-@ErrorHandling
 class MeasurementsList extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -149,4 +148,4 @@ class MeasurementsList extends PureComponent<Props, State> {
   }
 }
 
-export default MeasurementsList
+export default ErrorHandling(MeasurementsList)

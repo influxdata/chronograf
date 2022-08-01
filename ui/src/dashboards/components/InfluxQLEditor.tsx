@@ -61,7 +61,6 @@ const BLURRED_EDITOR_STATE = {
 
 const TEMPLATE_VAR = /[:]\w+[:]/g
 
-@ErrorHandling
 class InfluxQLEditor extends Component<Props, State> {
   public static getDerivedStateFromProps(nextProps: Props, prevState: State) {
     const {isSubmitted, editedQueryText} = prevState
@@ -86,7 +85,7 @@ class InfluxQLEditor extends Component<Props, State> {
     return null
   }
 
-  private codeMirrorRef: React.RefObject<ReactCodeMirror>
+  private codeMirrorRef: React.RefObject<InstanceType<typeof ReactCodeMirror>>
   private pendingUpdates: Array<WrappedCancelablePromise<void>>
 
   constructor(props: Props) {
@@ -452,4 +451,4 @@ class InfluxQLEditor extends Component<Props, State> {
   }
 }
 
-export default InfluxQLEditor
+export default ErrorHandling(InfluxQLEditor)

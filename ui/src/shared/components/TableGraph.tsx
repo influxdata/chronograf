@@ -96,7 +96,6 @@ export class TableGraphError extends PureComponent<{error: Error}> {
   }
 }
 
-@ErrorHandlingWith(TableGraphError)
 class TableGraph extends PureComponent<Props, State> {
   private multiGrid?: MultiGrid
 
@@ -618,4 +617,4 @@ const mstp = ({dashboardUI, app}) => ({
   timeZone: app.persisted.timeZone,
 })
 
-export default connect(mstp)(TableGraph)
+export default connect(mstp)(ErrorHandlingWith(TableGraphError)(TableGraph))

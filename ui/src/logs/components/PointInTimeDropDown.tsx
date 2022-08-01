@@ -24,7 +24,6 @@ interface State {
 const dateFormat = 'YYYY-MM-DD HH:mm'
 const format = (t: string) => moment(t.replace(/\'/g, '')).format(dateFormat)
 
-@ErrorHandling
 class TimeRangeDropdown extends Component<Props, State> {
   constructor(props) {
     super(props)
@@ -158,4 +157,4 @@ class TimeRangeDropdown extends Component<Props, State> {
     this.setState({isTimeSelectorOpen: true})
   }
 }
-export default TimeRangeDropdown
+export default ErrorHandling(TimeRangeDropdown)

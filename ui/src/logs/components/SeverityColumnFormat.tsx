@@ -18,7 +18,6 @@ interface Props {
   onChangeFormat: (format: SeverityFormat) => void
 }
 
-@ErrorHandling
 class SeverityColumnFormat extends PureComponent<Props> {
   constructor(props: Props) {
     super(props)
@@ -64,4 +63,4 @@ class SeverityColumnFormat extends PureComponent<Props> {
   }
 }
 
-export default SeverityColumnFormat
+export default ErrorHandling(SeverityColumnFormat)

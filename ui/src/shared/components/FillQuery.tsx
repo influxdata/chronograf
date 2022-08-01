@@ -30,7 +30,6 @@ interface State {
   value: string
 }
 
-@ErrorHandling
 class FillQuery extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     size: 'sm',
@@ -177,4 +176,4 @@ class FillQuery extends PureComponent<Props, State> {
   }
 }
 
-export default FillQuery
+export default ErrorHandling(FillQuery)

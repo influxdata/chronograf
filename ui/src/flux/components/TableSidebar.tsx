@@ -16,8 +16,7 @@ interface State {
   searchTerm: string
 }
 
-@ErrorHandling
-export default class TableSidebar extends PureComponent<Props, State> {
+class TableSidebar extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
 
@@ -78,3 +77,5 @@ export default class TableSidebar extends PureComponent<Props, State> {
     return _.isEmpty(this.props.data)
   }
 }
+
+export default ErrorHandling(TableSidebar)

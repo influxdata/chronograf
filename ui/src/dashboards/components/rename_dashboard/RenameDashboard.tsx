@@ -18,7 +18,6 @@ interface State {
   isEditing: boolean
   reset: boolean
 }
-@ErrorHandling
 class RenameDashboard extends Component<Props, State> {
   private inputRef: HTMLInputElement
 
@@ -105,4 +104,4 @@ class RenameDashboard extends Component<Props, State> {
   }
 }
 
-export default RenameDashboard
+export default ErrorHandling(RenameDashboard)

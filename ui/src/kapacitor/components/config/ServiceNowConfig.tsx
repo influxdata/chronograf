@@ -26,7 +26,6 @@ interface State {
   enabled: boolean
 }
 
-@ErrorHandling
 class ServiceNowConfig extends PureComponent<Props, State> {
   private url: HTMLInputElement
   private source: HTMLInputElement
@@ -155,4 +154,4 @@ class ServiceNowConfig extends PureComponent<Props, State> {
   }
 }
 
-export default ServiceNowConfig
+export default ErrorHandling(ServiceNowConfig)

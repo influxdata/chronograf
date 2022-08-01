@@ -25,7 +25,6 @@ interface Props {
   onUpdateDecimalPlaces: (decimalPlaces: DecimalPlaces) => void
 }
 
-@ErrorHandling
 class SingleStatOptions extends PureComponent<Props> {
   public render() {
     const {
@@ -105,4 +104,4 @@ class SingleStatOptions extends PureComponent<Props> {
   }
 }
 
-export default SingleStatOptions
+export default ErrorHandling(SingleStatOptions)

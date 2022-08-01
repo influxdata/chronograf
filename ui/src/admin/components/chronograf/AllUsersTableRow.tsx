@@ -46,8 +46,7 @@ interface Props {
   organizations: Organization[]
 }
 
-@ErrorHandling
-export default class AllUsersTableRow extends Component<Props> {
+class AllUsersTableRow extends Component<Props> {
   public shouldComponentUpdate(nextProps) {
     return !_.isEqual(nextProps.user, this.props.user)
   }
@@ -180,3 +179,4 @@ export default class AllUsersTableRow extends Component<Props> {
     onDelete(user)
   }
 }
+export default ErrorHandling(AllUsersTableRow)

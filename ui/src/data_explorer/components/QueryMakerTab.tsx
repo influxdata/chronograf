@@ -12,7 +12,6 @@ interface Props {
   queryIndex: number
 }
 
-@ErrorHandling
 class QueryMakerTab extends PureComponent<Props> {
   public render() {
     return (
@@ -42,4 +41,4 @@ class QueryMakerTab extends PureComponent<Props> {
   }
 }
 
-export default QueryMakerTab
+export default ErrorHandling(QueryMakerTab)

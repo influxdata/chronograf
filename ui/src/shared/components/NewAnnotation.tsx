@@ -41,7 +41,6 @@ interface State {
   gatherMode: string
 }
 
-@ErrorHandling
 class NewAnnotation extends Component<Props & WithRouterProps, State> {
   public wrapperRef: React.RefObject<HTMLDivElement>
   constructor(props) {
@@ -250,4 +249,4 @@ const mdtp = {
   onMouseLeaveTempAnnotation: mouseLeaveTempAnnotation,
 }
 
-export default withRouter(connect(mstp, mdtp)(NewAnnotation))
+export default withRouter(connect(mstp, mdtp)(ErrorHandling(NewAnnotation)))

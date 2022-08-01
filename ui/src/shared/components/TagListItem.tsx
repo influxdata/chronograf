@@ -23,7 +23,6 @@ interface State {
   filterText: string
 }
 
-@ErrorHandling
 class TagListItem extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
@@ -176,4 +175,4 @@ class TagListItem extends PureComponent<Props, State> {
   }
 }
 
-export default TagListItem
+export default ErrorHandling(TagListItem)

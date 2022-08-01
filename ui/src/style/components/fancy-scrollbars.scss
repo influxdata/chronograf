@@ -3,6 +3,8 @@
   ------------------------------------------------------
 */
 
+@use "sass:math";
+
 $scrollbar-track-size: 12px;
 $scrollbar-thumb-size: 6px;
 
@@ -17,7 +19,7 @@ $scrollbar-color-b: $c-comet;
 }
 /* Horizontal Scrollbar Styles */
 .fancy-scroll--track-h {
-  padding: ($scrollbar-track-size - $scrollbar-thumb-size) / 6;
+  padding: math.div($scrollbar-track-size - $scrollbar-thumb-size, 6);
   width: 100%;
   height: $scrollbar-track-size !important;
   bottom: 0;
@@ -25,12 +27,12 @@ $scrollbar-color-b: $c-comet;
 }
 .fancy-scroll--thumb-h {
   height: $scrollbar-thumb-size !important;
-  border-radius: ($scrollbar-thumb-size / 2);
+  border-radius: ($scrollbar-thumb-size * 0.5);
   @include gradient-h($scrollbar-color-a, $scrollbar-color-b);
 }
 /* Vertical Scrollbar Styles */
 .fancy-scroll--track-v {
-  padding: ($scrollbar-track-size - $scrollbar-thumb-size) / 6;
+  padding: math.div($scrollbar-track-size - $scrollbar-thumb-size, 6);
   width: $scrollbar-track-size !important;
   height: 100%;
   top: 0;
@@ -38,7 +40,7 @@ $scrollbar-color-b: $c-comet;
 }
 .fancy-scroll--thumb-v {
   width: $scrollbar-thumb-size !important;
-  border-radius: ($scrollbar-thumb-size / 2);
+  border-radius: ($scrollbar-thumb-size * 0.5);
   @include gradient-v($scrollbar-color-a, $scrollbar-color-b);
 }
 

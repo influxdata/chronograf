@@ -28,7 +28,9 @@ class JobManager {
 
   constructor() {
     _.times(workerCount, () => {
-      const worker = new Worker('./worker.ts')
+      const worker = new Worker(new URL('./worker.ts', import.meta.url), {
+        type: 'module',
+      })
 
       worker.onmessage = this.handleMessage
       worker.onerror = this.handleError

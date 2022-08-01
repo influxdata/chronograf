@@ -19,7 +19,6 @@ interface Props {
   query: QueryConfig
 }
 
-@ErrorHandling
 class Threshold extends Component<Props> {
   public render() {
     const {
@@ -119,4 +118,4 @@ class Threshold extends Component<Props> {
   }
 }
 
-export default Threshold
+export default ErrorHandling(Threshold)

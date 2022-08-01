@@ -36,7 +36,6 @@ interface State {
   isAlertsMaxedOut: boolean
   error?: unknown
 }
-@ErrorHandling
 class AlertsApp extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
@@ -219,4 +218,4 @@ class AlertsApp extends PureComponent<Props, State> {
   }
 }
 
-export default withSource(AlertsApp)
+export default withSource(ErrorHandling(AlertsApp))

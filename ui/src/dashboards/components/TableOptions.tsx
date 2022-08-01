@@ -58,8 +58,7 @@ interface Props {
   onUpdateThresholdsListType: (newType: ThresholdType) => void
 }
 
-@ErrorHandling
-export class TableOptions extends Component<Props, Record<string, never>> {
+class TableOptions extends Component<Props, Record<string, never>> {
   constructor(props) {
     super(props)
     this.moveField = this.moveField.bind(this)
@@ -206,5 +205,4 @@ export class TableOptions extends Component<Props, Record<string, never>> {
     onUpdateFieldOptions(updatedFieldOptions)
   }
 }
-
-export default TableOptions
+export default ErrorHandling(TableOptions)

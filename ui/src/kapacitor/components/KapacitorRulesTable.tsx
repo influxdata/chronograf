@@ -53,7 +53,7 @@ const KapacitorRulesTable: FunctionComponent<KapacitorRulesTableProps> = ({
     <tbody>
       {_.sortBy(rules, r => r.name.toLowerCase()).map(rule => {
         return (
-          <RuleRow
+          <RuleRow2
             key={rule.id}
             rule={rule}
             editLink={`${kapacitorLink}/alert-rules/${rule.id}`}
@@ -66,8 +66,7 @@ const KapacitorRulesTable: FunctionComponent<KapacitorRulesTableProps> = ({
   </table>
 )
 
-@ErrorHandling
-export class RuleRow extends PureComponent<RuleRowProps> {
+class RuleRow extends PureComponent<RuleRowProps> {
   constructor(props) {
     super(props)
 
@@ -131,5 +130,7 @@ export class RuleRow extends PureComponent<RuleRowProps> {
     )
   }
 }
+const RuleRow2 = ErrorHandling(RuleRow)
+export {RuleRow2 as RuleRow}
 
 export default KapacitorRulesTable

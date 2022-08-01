@@ -35,7 +35,6 @@ interface State {
   subMenuIsOpen: boolean
 }
 
-@ErrorHandling
 class LayoutCellMenu extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -183,4 +182,4 @@ class LayoutCellMenu extends Component<Props, State> {
   }
 }
 
-export default LayoutCellMenu
+export default ErrorHandling(LayoutCellMenu)

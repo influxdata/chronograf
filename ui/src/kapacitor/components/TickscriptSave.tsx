@@ -15,7 +15,6 @@ interface SaveProps {
   unsavedChanges: boolean
 }
 
-@ErrorHandling
 class TickscriptSave extends PureComponent<SaveProps> {
   public render() {
     const {onSave} = this.props
@@ -64,4 +63,4 @@ class TickscriptSave extends PureComponent<SaveProps> {
   }
 }
 
-export default TickscriptSave
+export default ErrorHandling(TickscriptSave)

@@ -12,7 +12,6 @@ interface Props {
   ruleActions: KapacitorRuleActions
 }
 
-@ErrorHandling
 class RuleMessage extends Component<Props> {
   constructor(props) {
     super(props)
@@ -44,4 +43,4 @@ class RuleMessage extends Component<Props> {
   }
 }
 
-export default RuleMessage
+export default ErrorHandling(RuleMessage)

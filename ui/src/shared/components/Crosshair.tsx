@@ -12,7 +12,6 @@ interface Props {
   staticLegendHeight: number
 }
 
-@ErrorHandling
 class Crosshair extends PureComponent<Props> {
   public render() {
     if (!this.isVisible) {
@@ -71,4 +70,4 @@ const mapStateToProps = ({dashboardUI, annotations: {mode}}) => ({
   hoverTime: +dashboardUI.hoverTime,
 })
 
-export default connect(mapStateToProps, null)(Crosshair)
+export default connect(mapStateToProps, null)(ErrorHandling(Crosshair))

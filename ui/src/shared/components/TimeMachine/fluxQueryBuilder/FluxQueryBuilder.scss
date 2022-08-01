@@ -139,7 +139,7 @@ $flux-form-control-checkbox-gap: 20px;
       display: block;
       position: absolute;
       top: 50%;
-      left: ($flux-form-control-checkbox / 2);
+      left: ($flux-form-control-checkbox * 0.5);
       transform: translate(-50%,-50%) scale(2,2);
       width: $flux-form-control-checkdot;
       height: $flux-form-control-checkdot;

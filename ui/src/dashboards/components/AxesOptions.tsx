@@ -43,7 +43,6 @@ interface State {
   suffix: string
 }
 
-@ErrorHandling
 class AxesOptions extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     axes: {
@@ -353,4 +352,4 @@ class AxesOptions extends PureComponent<Props, State> {
   }
 }
 
-export default AxesOptions
+export default ErrorHandling(AxesOptions)

@@ -24,7 +24,6 @@ interface State {
   searchTerm: string
 }
 
-@ErrorHandling
 class FieldList extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -117,4 +116,4 @@ class FieldList extends PureComponent<Props, State> {
   }
 }
 
-export default FieldList
+export default ErrorHandling(FieldList)

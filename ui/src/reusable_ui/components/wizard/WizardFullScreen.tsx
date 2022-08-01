@@ -17,7 +17,6 @@ interface Props {
   isJumpingAllowed: boolean
 }
 
-@ErrorHandling
 class WizardFullScreen extends PureComponent<Props> {
   public render() {
     return (
@@ -59,4 +58,4 @@ class WizardFullScreen extends PureComponent<Props> {
   }
 }
 
-export default WizardFullScreen
+export default ErrorHandling(WizardFullScreen)

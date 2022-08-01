@@ -7,7 +7,6 @@ interface Props {
   label: string
 }
 
-@ErrorHandling
 class FormLabel extends Component<Props> {
   public render() {
     const {label} = this.props
@@ -16,4 +15,4 @@ class FormLabel extends Component<Props> {
   }
 }
 
-export default FormLabel
+export default ErrorHandling(FormLabel)

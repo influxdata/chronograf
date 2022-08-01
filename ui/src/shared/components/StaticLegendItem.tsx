@@ -14,7 +14,6 @@ interface Props {
   enabled?: boolean
 }
 
-@ErrorHandling
 class StaticLegend extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     enabled: true,
@@ -47,4 +46,4 @@ class StaticLegend extends Component<Props> {
   }
 }
 
-export default StaticLegend
+export default ErrorHandling(StaticLegend)

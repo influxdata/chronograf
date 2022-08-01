@@ -42,7 +42,6 @@ interface State {
   enabled: boolean
 }
 
-@ErrorHandling
 class KafkaConfig extends PureComponent<Props, State> {
   private id: HTMLInputElement
   private timeout: HTMLInputElement
@@ -330,4 +329,4 @@ class KafkaConfig extends PureComponent<Props, State> {
   }
 }
 
-export default KafkaConfig
+export default ErrorHandling(KafkaConfig)

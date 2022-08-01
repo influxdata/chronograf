@@ -10,7 +10,6 @@ interface State {
   searchTerm: string
 }
 
-@ErrorHandling
 class SearchBar extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -49,4 +48,4 @@ class SearchBar extends PureComponent<Props, State> {
   }
 }
 
-export default SearchBar
+export default ErrorHandling(SearchBar)

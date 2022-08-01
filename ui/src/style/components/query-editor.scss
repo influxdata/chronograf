@@ -134,7 +134,7 @@
   transition: transform 0.6s ease;
   transform-style: preserve-3d;
   position: relative;
-  transform-origin: 100% #{$query-editor--status-height / 2};
+  transform-origin: 100% #{$query-editor--status-height * 0.5};
 }
 .varmoji-front,
 .varmoji-back {

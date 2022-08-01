@@ -56,7 +56,6 @@ interface State {
 
 const NOOP = () => {}
 
-@ErrorHandling
 class SingleStat extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     prefix: '',
@@ -291,4 +290,4 @@ class SingleStat extends PureComponent<Props, State> {
   }
 }
 
-export default SingleStat
+export default ErrorHandling(SingleStat)

@@ -15,7 +15,6 @@ interface State {
   reset: boolean
 }
 
-@ErrorHandling
 class NameSection extends Component<Props, State> {
   private inputRef: HTMLInputElement
 
@@ -89,4 +88,4 @@ class NameSection extends Component<Props, State> {
   }
 }
 
-export default NameSection
+export default ErrorHandling(NameSection)

@@ -43,7 +43,6 @@ interface EditorInstance extends CMEditor {
   showHint: (options?: ShowHintOptions) => void
 }
 
-@ErrorHandling
 class FluxScriptEditor extends PureComponent<Props, State> {
   private editor: EditorInstance
   private lineWidgets: Widget[] = []
@@ -267,4 +266,4 @@ class FluxScriptEditor extends PureComponent<Props, State> {
   }
 }
 
-export default FluxScriptEditor
+export default ErrorHandling(FluxScriptEditor)

@@ -6,7 +6,6 @@ interface TickscriptIDProps {
   id: string
 }
 
-@ErrorHandling
 class TickscriptID extends Component<TickscriptIDProps> {
   constructor(props) {
     super(props)
@@ -29,4 +28,4 @@ class TickscriptID extends Component<TickscriptIDProps> {
   }
 }
 
-export default TickscriptID
+export default ErrorHandling(TickscriptID)

@@ -10,7 +10,6 @@ interface Props {
   status: ConnectorState
 }
 
-@ErrorHandling
 class ProgressConnector extends PureComponent<Props> {
   public render() {
     const {status} = this.props
@@ -25,4 +24,4 @@ class ProgressConnector extends PureComponent<Props> {
   }
 }
 
-export default ProgressConnector
+export default ErrorHandling(ProgressConnector)

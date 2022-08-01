@@ -160,7 +160,7 @@ pre.admin-table--query {
   }
   
   .influxdb-admin--contents{
-    height: calc(100%-60px);
+    height: calc(100% - 60px);
   }
   div.permission-value,div.role-value,div.user-value{
     @include btn-base-styles(

@@ -84,7 +84,7 @@ $color-dropdown--name-padding: 20px;
 .color-dropdown--swatches {
   width: $color-dropdown--bar;
   height: $color-dropdown--bar-height;
-  border-radius: $color-dropdown--bar-height / 2;
+  border-radius: $color-dropdown--bar-height * 0.5;
   left: $color-dropdown--left-padding;
 }
 .color-dropdown--name {
