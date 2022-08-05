@@ -19,7 +19,6 @@ unexport TMP_BUILD_VERSION
 
 BINARY=chronograf
 CTLBINARY=chronoctl
-GO111MODULE=on
 
 .DEFAULT_GOAL := all
 
@@ -30,8 +29,8 @@ all: dep build
 build: assets ${BINARY}
 
 ${BINARY}: $(SOURCES) .bindata .jsdep .godep
-	GO111MODULE=on go build -o ${BINARY} ${LDFLAGS} ./cmd/chronograf/main.go
-	GO111MODULE=on go build -o ${CTLBINARY} ${LDFLAGS} ./cmd/chronoctl
+	go build -o ${BINARY} ${LDFLAGS} ./cmd/chronograf/main.go
+	go build -o ${CTLBINARY} ${LDFLAGS} ./cmd/chronoctl
 
 define CHRONOGIRAFFE
              ._ o o
@@ -48,7 +47,7 @@ chronogiraffe: ${BINARY}
 	@echo "$$CHRONOGIRAFFE"
 
 docker-${BINARY}: $(SOURCES)
-	CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -installsuffix cgo -o ${BINARY} ${LDFLAGS} \
+	CGO_ENABLED=0 GOOS=linux go build -installsuffix cgo -o ${BINARY} ${LDFLAGS} \
 		./cmd/chronograf/main.go
 
 docker: dep assets docker-${BINARY}
@@ -66,7 +65,7 @@ assets: .jssrc .bindata
 dep: .jsdep .godep
 
 .godep:
-	GO111MODULE=on go get
+	go get
 	@touch .godep
 
 .jsdep: ./yarn.lock
@@ -80,7 +79,7 @@ endif
 gen: internal.pb.go
 
 internal.pb.go: kv/internal/internal.proto
-	GO111MODULE=on go generate -x ./kv/internal
+	go generate -x ./kv/internal
 
 test: gochecktidy gocheckfmt jstest gotest gotestrace lint-ci
 
@@ -101,10 +100,10 @@ gocheckfmt:
 	fi
 
 gotest:
-	GO111MODULE=on go test -timeout 10s ./...
+	go test -timeout 10s ./...
 
 gotestrace:
-	GO111MODULE=on go test -race ./...
+	go test -race ./...
 
 jstest:
 	cd ui && yarn test --runInBand
