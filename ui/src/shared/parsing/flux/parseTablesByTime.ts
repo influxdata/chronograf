@@ -20,6 +20,22 @@ interface ParseTablesByTimeResult {
   nonNumericColumns: string[]
 }
 
+const IGNORED_TABLE_KEYS = ['_start', '_stop', '_field']
+
+function fluxTableKey(table: FluxTable, columnName: string): string {
+  const name =
+    columnName === '_value' && table.groupKey._field
+      ? table.groupKey._field
+      : columnName
+  const groupKeys = Object.entries(table.groupKey).reduce((acc, [k, v]) => {
+    if (!IGNORED_TABLE_KEYS.includes(k)) {
+      acc.push(`${k === '_measurement' ? 'measurement' : k}=${v}`)
+    }
+    return acc
+  }, [])
+  return groupKeys.length ? `${name} (${groupKeys.join(' ')})` : name
+}
+
 export const parseTablesByTime = (
   tables: FluxTable[]
 ): ParseTablesByTimeResult => {
@@ -47,10 +63,7 @@ export const parseTablesByTime = (
         continue
       }
 
-      const uniqueColumnName = Object.entries(table.groupKey).reduce(
-        (acc, [k, v]) => acc + `[${k}=${v}]`,
-        columnName
-      )
+      const uniqueColumnName = fluxTableKey(table, columnName)
 
       columnNames[i] = uniqueColumnName
       allColumnNames.push(uniqueColumnName)
