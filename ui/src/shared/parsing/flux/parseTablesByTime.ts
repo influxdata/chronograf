@@ -33,7 +33,7 @@ function fluxTableKey(table: FluxTable, columnName: string): string {
     }
     return acc
   }, [])
-  return groupKeys.length ? `${name} (${groupKeys.join(' ')})` : name
+  return groupKeys.length ? `${name} ${groupKeys.join(' ')}` : name
 }
 
 export const parseTablesByTime = (

@@ -39,10 +39,10 @@ describe('fluxTablesToDygraph', () => {
     const expected = {
       labels: [
         'time',
-        'mean_usage_idle[_measurement=cpu]',
-        'mean_usage_user[_measurement=cpu]',
-        'mean_usage_idle[_measurement=mem]',
-        'mean_usage_user[_measurement=mem]',
+        'mean_usage_idle measurement=cpu',
+        'mean_usage_user measurement=cpu',
+        'mean_usage_idle measurement=mem',
+        'mean_usage_user measurement=mem',
       ],
       dygraphsData: [
         [new Date('2018-09-10T16:54:37Z'), 85, 10, 8, 1],
@@ -60,8 +60,8 @@ describe('fluxTablesToDygraph', () => {
     const expected = {
       labels: [
         'time',
-        'mean_usage_idle[_measurement=cpu]',
-        'mean_usage_idle[_measurement=mem]',
+        'mean_usage_idle measurement=cpu',
+        'mean_usage_idle measurement=mem',
       ],
       dygraphsData: [
         [new Date('2018-09-10T16:54:37Z'), 85, 8],
