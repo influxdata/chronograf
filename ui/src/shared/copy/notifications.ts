@@ -928,3 +928,13 @@ export const fluxWizardError = (message: string): Notification => ({
   duration: FIVE_SECONDS,
   message,
 })
+
+export const notifyDBRPCreated = (
+  bucket: string,
+  db: string,
+  rp: string
+): Notification => ({
+  ...defaultSuccessNotification,
+  duration: TEN_SECONDS,
+  message: `Default V1 DBRP mapping created. V2 bucket '${bucket}' is mapped to v1 database '${db}' with retention policy '${rp}'.`,
+})
