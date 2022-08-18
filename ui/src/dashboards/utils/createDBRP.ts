@@ -17,17 +17,20 @@ async function getTelegrafBucketID(
   const v2BucketsPath = `/api/v2/buckets?org=${encodeURIComponent(
     source.username
   )}&name=${encodeURIComponent(source.telegraf)}`
-  const response = await AJAX({
-    method: 'GET',
-    url: `${source.links.flux}?version=${encodeURIComponent(
-      source.version
-    )}&path=${encodeURIComponent(v2BucketsPath)}`,
-    data: '',
-  })
-  if (response.status !== 200) {
-    return undefined
-  }
-  return response.data?.buckets?.[0]?.id
+  try {
+    const response = await AJAX({
+      method: 'GET',
+      url: `${source.links.flux}?version=${encodeURIComponent(
+        source.version
+      )}&path=${encodeURIComponent(v2BucketsPath)}`,
+      data: '',
+    })
+    if (response.status !== 200) {
+      return undefined
+    }
+    return response.data?.buckets?.[0]?.id
+    // eslint-disable-next-line no-empty
+  } catch (e) {}
 }
 
 async function createDBRPMapping(
@@ -42,18 +45,22 @@ async function createDBRPMapping(
     default: true,
     org: source.username,
   }
-  const response = await AJAX({
-    method: 'POST',
-    url: `${source.links.flux}?version=${encodeURIComponent(
-      source.version
-    )}&path=/api/v2/dbrps`,
-    data: body,
-    headers: {'Content-Type': 'application/json'},
-  })
-  if (response.status === 201 && response.data.id) {
-    return response.data as DBRP
+  try {
+    const response = await AJAX({
+      method: 'POST',
+      url: `${source.links.flux}?version=${encodeURIComponent(
+        source.version
+      )}&path=/api/v2/dbrps`,
+      data: body,
+      headers: {'Content-Type': 'application/json'},
+    })
+    if (response.status === 201 && response.data.id) {
+      return response.data as DBRP
+    }
+    console.warn('Cannot create v1 DBRP mapping', response.data)
+  } catch (e) {
+    console.warn('Cannot create v1 DBRP mapping', e)
   }
-  return
 }
 
 export async function createDBRP(source: Source): Promise<DBRP | undefined> {
@@ -67,6 +74,9 @@ export async function createDBRP(source: Source): Promise<DBRP | undefined> {
 
   const bucketID = await getTelegrafBucketID(source)
   if (!bucketID) {
+    console.warn(
+      `Cannot verify existence of ${source.telegraf} bucket, v1 DBRP mapping cannot be created`
+    )
     return
   }
 
