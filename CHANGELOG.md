@@ -14,6 +14,7 @@
 1. [#5959](https://github.com/influxdata/chronograf/pull/5959): Allow to customize annotation color.
 1. [#5967](https://github.com/influxdata/chronograf/pull/5967): Remember whether to start with shown annotations on Dashboard page.
 1. [#5977](https://github.com/influxdata/chronograf/pull/5977): Select current value in dropdown search input.
+1. [#5997](https://github.com/influxdata/chronograf/pull/5997): Simplify flux labels.
 1. [#5998](https://github.com/influxdata/chronograf/pull/5998): Setup DBRP mapping automatically for a v2 connection.
 
 ### Bug Fixes
