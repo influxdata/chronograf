@@ -1,4 +1,12 @@
-## v1.10
+## v1.10.1
+
+### Features
+
+### Bug Fixes
+
+### Other
+
+## v1.10.0 [2022-08-23]
 
 ### Features
 
