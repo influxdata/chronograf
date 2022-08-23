@@ -27,11 +27,13 @@ import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {
   notifyDashboardCreated,
   notifyDashboardCreationFailed,
+  notifyDBRPCreated,
 } from 'src/shared/copy/notifications'
 
 // Types
 import {Protoboard, Source, RemoteDataState} from 'src/types'
 import {NextReturn} from 'src/types/wizard'
+import {DBRP} from 'src/dashboards/utils/createDBRP'
 
 interface SelectedDashboard {
   [x: string]: boolean
@@ -237,7 +239,7 @@ class DashboardStep extends Component<Props, State> {
 
   private handleSuggest = async () => {
     const {protoboards} = this.state
-    const {source} = this.props
+    const {source, notify} = this.props
 
     if (source) {
       if (this.isComponentMounted) {
@@ -247,7 +249,16 @@ class DashboardStep extends Component<Props, State> {
       try {
         const suggestedProtoboardsList = await getSuggestedProtoboards(
           source,
-          protoboards
+          protoboards,
+          (dbrp: DBRP) => {
+            notify(
+              notifyDBRPCreated(
+                source.telegraf,
+                dbrp.database,
+                dbrp.retention_policy
+              )
+            )
+          }
         )
 
         if (suggestedProtoboardsList.length === 0) {

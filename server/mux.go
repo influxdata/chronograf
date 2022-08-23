@@ -204,6 +204,7 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	// Source Proxy to Influx's flux endpoint; compression because the responses from
 	// flux could be large.
 	router.Handler("POST", "/chronograf/v1/sources/:id/proxy/flux", EnsureReader(service.ProxyFlux))
+	router.Handler("GET", "/chronograf/v1/sources/:id/proxy/flux", EnsureReader(service.ProxyFlux))
 
 	// Write proxies line protocol write requests to InfluxDB
 	router.POST("/chronograf/v1/sources/:id/write", EnsureViewer(service.Write))

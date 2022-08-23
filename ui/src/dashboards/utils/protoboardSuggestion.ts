@@ -4,6 +4,8 @@ import _ from 'lodash'
 import {proxy} from 'src/utils/queryUrlGenerator'
 // Types
 import {Source, Protoboard} from 'src/types'
+import {SOURCE_TYPE_INFLUX_V2} from 'src/shared/constants'
+import {createDBRP, DBRP} from './createDBRP'
 
 interface SeriesObject {
   measurement: string
@@ -32,9 +34,10 @@ interface HostsSeries {
 
 export const getSuggestedProtoboards = async (
   source: Source,
-  protoboards: Protoboard[]
+  protoboards: Protoboard[],
+  afterCreatedDBRP: (dbrp: DBRP) => void = () => undefined
 ): Promise<string[]> => {
-  const hosts = await getHosts(source)
+  const hosts = await getHosts(source, afterCreatedDBRP)
 
   if (!hosts) {
     return []
@@ -94,16 +97,38 @@ export const addAppsToHosts = async (
   return newHosts
 }
 
-export const getHosts = async (source: Source): Promise<Hosts> => {
+const getHosts = async (
+  source: Source,
+  afterCreatedDBRP: (dbrp: DBRP) => void
+): Promise<Hosts> => {
   const hosts = {}
 
   const query = `SHOW TAG VALUES WITH KEY = "host" WHERE TIME > now() - 10m;`
 
-  const resp = await proxy({
+  let resp = await proxy({
     source: source.links.proxy,
     query,
     db: source.telegraf,
   })
+  const loadError = _.get(resp, ['data', 'results', '0', 'error'])
+  if (loadError) {
+    console.warn('Cannot suggest protoboards:', loadError)
+    if (source.type === SOURCE_TYPE_INFLUX_V2) {
+      // try to create DBRP mapping for ${source.telegraf} bucket
+      const dbrp = await createDBRP(source)
+      if (dbrp) {
+        if (afterCreatedDBRP) {
+          afterCreatedDBRP(dbrp)
+        }
+        // reload query
+        resp = await proxy({
+          source: source.links.proxy,
+          query,
+          db: source.telegraf,
+        })
+      }
+    }
+  }
 
   const allHostsSeries: HostsSeries[] = _.get(
     resp,
