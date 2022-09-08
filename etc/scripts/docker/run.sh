@@ -9,6 +9,9 @@
 
 set -e
 
+# Default ${GNUPGHOME} to ${HOME}/.gnupg if not set
+GNUPGHOME="${GNUPGHOME:-${HOME}/.gnupg}"
+
 # Default SSH key to $HOME/.ssh/id_rsa if not set
 test -z $SSH_KEY_PATH && SSH_KEY_PATH="$HOME/.ssh/id_rsa"
 echo "Using SSH key located at: $SSH_KEY_PATH"
@@ -19,6 +22,7 @@ test -z "$DOCKER_TAG" && DOCKER_TAG="chronograf-20220721"
 docker run \
        -e AWS_ACCESS_KEY_ID \
        -e AWS_SECRET_ACCESS_KEY \
+       -v "${GNUPGHOME}:/root/.gnupg" \
        -v $SSH_KEY_PATH:/root/.ssh/id_rsa \
        -v ~/.ssh/known_hosts:/root/.ssh/known_hosts \
        -v $(pwd):/root/go/src/github.com/influxdata/chronograf \

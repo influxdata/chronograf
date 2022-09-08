@@ -1,0 +1,17 @@
+#!/bin/bash
+set -o errexit \
+    -o nounset \
+    -o pipefail
+
+sudo -s <<EOF
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get install --yes --no-install-recommends gnupg
+EOF
+
+# CircleCI automatically removes newlines from environment
+# variables. gpg cannot process keys (even if armored) without
+# the newlines present. To preserve special characters, the
+# gpg key has been base64 encoded.
+gpg --batch --yes --import <(base64 -d <<<"${GPG_1X_SIGNING_KEY}")
+
