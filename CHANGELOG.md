@@ -4,6 +4,8 @@
 
 ### Bug Fixes
 
+1. [#6001](https://github.com/influxdata/chronograf/pull/6001): Repair UI served under BASEPATH.
+
 ### Other
 
 ## v1.10.0 [2022-08-23]

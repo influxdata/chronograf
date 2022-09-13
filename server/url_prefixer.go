@@ -84,8 +84,8 @@ func (up *URLPrefixer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	isSVG, _ := regexp.Match(".svg$", []byte(r.URL.String()))
-	if isSVG {
+	// do not process JS or SVG files, it only harms them
+	if isIgnored, _ := regexp.Match("\\.(svg|js)$", []byte(r.URL.String())); isIgnored {
 		up.Next.ServeHTTP(rw, r)
 		return
 	}
@@ -186,8 +186,6 @@ func NewDefaultURLPrefixer(prefix string, next http.Handler, lg chronograf.Logge
 			[]byte(`src="`),
 			[]byte(`href="`),
 			[]byte(`url(`),
-			[]byte(`new Worker("`),
-			[]byte(`new Worker('`),
 			[]byte(`data-basepath="`), // for forwarding basepath to frontend
 		},
 	}

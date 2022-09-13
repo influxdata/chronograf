@@ -176,3 +176,37 @@ func Test_Server_Prefixer_NoPrefixingWithoutFlusther(t *testing.T) {
 		t.Error("No Flusher", ":\n Expected Error Message: \"", server.ErrNotFlusher, "\" but saw none. Msgs:", tl.Messages)
 	}
 }
+
+func Test_Server_Prefixer_IgnoreJsAndSvg(t *testing.T) {
+	expected := "Keep it the same please"
+	backend := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(rw, expected)
+	})
+
+	tl := &mocks.TestLogger{}
+	pfx := &server.URLPrefixer{
+		Prefix: " error",
+		Next:   backend,
+		Logger: tl,
+		Attrs: [][]byte{
+			[]byte("same"),
+		},
+	}
+
+	ts := httptest.NewServer(pfx)
+	defer ts.Close()
+
+	for _, fileName := range []string{"/test.js", "/test.svg"} {
+		res, err := http.Get(ts.URL + fileName)
+		if err != nil {
+			t.Fatal("Unexpected error fetching from prefixer: err:", err)
+		}
+		actual, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			t.Fatal("Unable to read prefixed body: err:", err)
+		}
+		if string(actual) != expected {
+			t.Error("Prefixing changed content of ", fileName, ":\n\t\tWant:\n", expected, "\n\t\tGot:\n", string(actual))
+		}
+	}
+}
