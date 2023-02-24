@@ -33,7 +33,7 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
 
 # Install go
 ENV GOPATH /root/go
-ENV GO_VERSION 1.18.4
+ENV GO_VERSION 1.20.0
 ENV GO_ARCH amd64
 ENV GO111MODULES ON
 RUN wget https://golang.org/dl/go${GO_VERSION}.linux-${GO_ARCH}.tar.gz; \
