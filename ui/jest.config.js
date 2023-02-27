@@ -14,6 +14,7 @@ module.exports = {
       transform: {
         '^.+\\.[jt]sx?$': ['babel-jest', {configFile: './.babelrc.jest'}],
       },
+      transformIgnorePatterns: ['/node_modules/(?!(d3-color)/)'],
       testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
       moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
       snapshotSerializers: ['enzyme-to-json/serializer'],
