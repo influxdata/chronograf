@@ -60,7 +60,7 @@ jobs:
               --set installCRDs=true
           kubectl apply -f .github/workflows/resources/test-resources.yaml
           kubectl create secret generic influxdb-license --from-literal=INFLUXDB_ENTERPRISE_LICENSE_KEY=${INFLUXDB_ENTERPRISE_LICENSE_KEY}
-          helm upgrade --install influxdb influxdata/influxdb-enterprise --namespace default \
+          helm upgrade --timeout 10m --install influxdb influxdata/influxdb-enterprise --namespace default \
               --set-string envFromSecret=influxdb-license \
               --set-string data.service.type=NodePort \
               --set-string meta.service.type=NodePort \
@@ -121,4 +121,3 @@ jobs:
               ui/cypress/videos/*.mp4
               ui/cypress/screenshots/
               ui/cypress/results/results-*.xml
-
