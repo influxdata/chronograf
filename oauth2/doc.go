@@ -3,49 +3,49 @@
 //
 // This is how the pieces of this package fit together:
 //
-//  ┌────────────────────────────────────────┐
-//  │github.com/influxdata/chronograf/oauth2 │
-//  ├────────────────────────────────────────┴────────────────────────────────────┐
-//  │┌────────────────────┐                                                       │
-//  ││   <<interface>>    │        ┌─────────────────────────┐                    │
-//  ││   Authenticator    │        │         AuthMux         │                    │
-//  │├────────────────────┤        ├─────────────────────────┤                    │
-//  ││Authorize()         │   Auth │+SuccessURL : string     │                    │
-//  ││Validate()          ◀────────│+FailureURL : string     │──────────┐         │
-//  ||Expire()            |        |+Now : func() time.Time  |          |         |
-//  │└──────────△─────────┘        └─────────────────────────┘          |         |
-//  │           │                               │                       │         |
-//  │           │                               │                       │         │
-//  │           │                               │                       │         │
-//  │           │                       Provider│                       │         │
-//  │           │                           ┌───┘                       │         │
-//  │┌──────────┴────────────┐              │                           ▽         │
-//  ││         Tokenizer     │              │                   ┌───────────────┐ │
-//  │├───────────────────────┤              ▼                   │ <<interface>> │ │
-//  ││Create()               │      ┌───────────────┐           │   OAuth2Mux   │ │
-//  ││ValidPrincipal()       │      │ <<interface>> │           ├───────────────┤ │
-//  │└───────────────────────┘      │   Provider    │           │Login()        │ │
-//  │                               ├───────────────┤           │Logout()       │ │
-//  │                               │ID()           │           │Callback()     │ │
-//  │                               │Scopes()       │           └───────────────┘ │
-//  │                               │Secret()       │                             │
-//  │                               │Authenticator()│                             │
-//  │                               └───────────────┘                             │
-//  │                                       △                                     │
-//  │                                       │                                     │
-//  │             ┌─────────────────────────┼─────────────────────────┐           │
-//  │             │                         │                         │           │
-//  │             │                         │                         │           │
-//  │             │                         │                         │           │
-//  │ ┌───────────────────────┐ ┌──────────────────────┐  ┌──────────────────────┐│
-//  │ │        Github         │ │        Google        │  │        Heroku        ││
-//  │ ├───────────────────────┤ ├──────────────────────┤  ├──────────────────────┤│
-//  │ │+ClientID : string     │ │+ClientID : string    │  │+ClientID : string    ││
-//  │ │+ClientSecret : string │ │+ClientSecret : string│  │+ClientSecret : string││
-//  │ │+Orgs : []string       │ │+Domains : []string   │  └──────────────────────┘│
-//  │ └───────────────────────┘ │+RedirectURL : string │                          │
-//  │                           └──────────────────────┘                          │
-//  └─────────────────────────────────────────────────────────────────────────────┘
+//	┌────────────────────────────────────────┐
+//	│github.com/influxdata/chronograf/oauth2 │
+//	├────────────────────────────────────────┴────────────────────────────────────┐
+//	│┌────────────────────┐                                                       │
+//	││   <<interface>>    │        ┌─────────────────────────┐                    │
+//	││   Authenticator    │        │         AuthMux         │                    │
+//	│├────────────────────┤        ├─────────────────────────┤                    │
+//	││Authorize()         │   Auth │+SuccessURL : string     │                    │
+//	││Validate()          ◀────────│+FailureURL : string     │──────────┐         │
+//	||Expire()            |        |+Now : func() time.Time  |          |         |
+//	│└──────────△─────────┘        └─────────────────────────┘          |         |
+//	│           │                               │                       │         |
+//	│           │                               │                       │         │
+//	│           │                               │                       │         │
+//	│           │                       Provider│                       │         │
+//	│           │                           ┌───┘                       │         │
+//	│┌──────────┴────────────┐              │                           ▽         │
+//	││         Tokenizer     │              │                   ┌───────────────┐ │
+//	│├───────────────────────┤              ▼                   │ <<interface>> │ │
+//	││Create()               │      ┌───────────────┐           │   OAuth2Mux   │ │
+//	││ValidPrincipal()       │      │ <<interface>> │           ├───────────────┤ │
+//	│└───────────────────────┘      │   Provider    │           │Login()        │ │
+//	│                               ├───────────────┤           │Logout()       │ │
+//	│                               │ID()           │           │Callback()     │ │
+//	│                               │Scopes()       │           └───────────────┘ │
+//	│                               │Secret()       │                             │
+//	│                               │Authenticator()│                             │
+//	│                               └───────────────┘                             │
+//	│                                       △                                     │
+//	│                                       │                                     │
+//	│             ┌─────────────────────────┼─────────────────────────┐           │
+//	│             │                         │                         │           │
+//	│             │                         │                         │           │
+//	│             │                         │                         │           │
+//	│ ┌───────────────────────┐ ┌──────────────────────┐  ┌──────────────────────┐│
+//	│ │        Github         │ │        Google        │  │        Heroku        ││
+//	│ ├───────────────────────┤ ├──────────────────────┤  ├──────────────────────┤│
+//	│ │+ClientID : string     │ │+ClientID : string    │  │+ClientID : string    ││
+//	│ │+ClientSecret : string │ │+ClientSecret : string│  │+ClientSecret : string││
+//	│ │+Orgs : []string       │ │+Domains : []string   │  └──────────────────────┘│
+//	│ └───────────────────────┘ │+RedirectURL : string │                          │
+//	│                           └──────────────────────┘                          │
+//	└─────────────────────────────────────────────────────────────────────────────┘
 //
 // The design focuses on an Authenticator, a Provider, and an OAuth2Mux. Their
 // responsibilities, respectively, are to decode and encode secrets received
@@ -57,36 +57,36 @@
 // The Oauth2 flow between a browser, backend, and a Provider that this package
 // implements is pictured below for reference.
 //
-//      ┌─────────┐                ┌───────────┐                     ┌────────┐
-//      │ Browser │                │Chronograf │                     │Provider│
-//      └─────────┘                └───────────┘                     └────────┘
-//           │                           │                                │
-//           ├─────── GET /auth ─────────▶                                │
-//           │                           │                                │
-//           │                           │                                │
-//           ◀ ─ ─ ─302 to Provider  ─ ─ ┤                                │
-//           │                           │                                │
-//           │                           │                                │
-//           ├──────────────── GET /auth w/ callback ─────────────────────▶
-//           │                           │                                │
-//           │                           │                                │
-//           ◀─ ─ ─ ─ ─ ─ ─   302 to Chronograf Callback  ─ ─ ─ ─ ─ ─ ─ ─ ┤
-//           │                           │                                │
-//           │   Code and State from     │                                │
-//           │        Provider           │                                │
-//           ├───────────────────────────▶    Request token w/ code &     │
-//           │                           │             state              │
-//           │                           ├────────────────────────────────▶
-//           │                           │                                │
-//           │                           │          Response with         │
-//           │                           │              Token             │
-//           │   Set cookie, Redirect    │◀ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┤
-//           │           to /            │                                │
-//           ◀───────────────────────────┤                                │
-//           │                           │                                │
-//           │                           │                                │
-//           │                           │                                │
-//           │                           │                                │
+//	┌─────────┐                ┌───────────┐                     ┌────────┐
+//	│ Browser │                │Chronograf │                     │Provider│
+//	└─────────┘                └───────────┘                     └────────┘
+//	     │                           │                                │
+//	     ├─────── GET /auth ─────────▶                                │
+//	     │                           │                                │
+//	     │                           │                                │
+//	     ◀ ─ ─ ─302 to Provider  ─ ─ ┤                                │
+//	     │                           │                                │
+//	     │                           │                                │
+//	     ├──────────────── GET /auth w/ callback ─────────────────────▶
+//	     │                           │                                │
+//	     │                           │                                │
+//	     ◀─ ─ ─ ─ ─ ─ ─   302 to Chronograf Callback  ─ ─ ─ ─ ─ ─ ─ ─ ┤
+//	     │                           │                                │
+//	     │   Code and State from     │                                │
+//	     │        Provider           │                                │
+//	     ├───────────────────────────▶    Request token w/ code &     │
+//	     │                           │             state              │
+//	     │                           ├────────────────────────────────▶
+//	     │                           │                                │
+//	     │                           │          Response with         │
+//	     │                           │              Token             │
+//	     │   Set cookie, Redirect    │◀ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┤
+//	     │           to /            │                                │
+//	     ◀───────────────────────────┤                                │
+//	     │                           │                                │
+//	     │                           │                                │
+//	     │                           │                                │
+//	     │                           │                                │
 //
 // The browser ultimately receives a cookie from Chronograf, authorizing it.
 // Its contents are encoded as a JWT whose "sub" claim is the user's email
@@ -102,14 +102,14 @@
 // convention to ensure compatibility with the front end logic. These routes
 // and their responsibilities are:
 //
-//   /oauth/{provider}/login
+//	/oauth/{provider}/login
 //
 // The `/oauth` endpoint redirects to the Provider for OAuth.  Chronograf sets
 // the OAuth `state` request parameter to a JWT with a random "sub".  Using
 // $TOKEN_SECRET `/oauth/github/callback` can validate the `state` parameter
 // without needing `state` to be saved.
 //
-//   /oauth/{provider}/callback
+//	/oauth/{provider}/callback
 //
 // The `/oauth/github/callback` receives the OAuth `authorization code`  and `state`.
 //
@@ -135,7 +135,7 @@
 // of the JWT within the cookie value.
 // If the request did not have a valid JWT, the API returns `HTTP/1.1 401 Unauthorized`.
 //
-//   /oauth/{provider}/logout
+//	/oauth/{provider}/logout
 //
 // Simply expires the session cookie and redirects to `/`.
 package oauth2

@@ -8,12 +8,13 @@
 //
 // Resources that are storable in a file are:
 // (CRUD refers to create, read, update, delete. An '_' means not supported)
-//    Apps(layouts) - _R__
-//    Dashboards    - _RUD
-//    Kapacitors    - _RUD
-//    Organizations - _R__
-//    Protoboards   - _R__
-//    Sources       - _RUD
+//
+//	Apps(layouts) - _R__
+//	Dashboards    - _RUD
+//	Kapacitors    - _RUD
+//	Organizations - _R__
+//	Protoboards   - _R__
+//	Sources       - _RUD
 //
 // Caution should be taken when editing resources provided via the filestore,
 // especially in a distributed environment as unexpected behavior may occur.
