@@ -22,9 +22,9 @@ RUN gem install fpm
 # Install node
 ENV NODE_VERSION v16.14.2
 RUN wget -q https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-linux-x64.tar.gz; \
-   mkdir /usr/local/node; \
-   tar -xvf node-${NODE_VERSION}-linux-x64.tar.gz -C /usr/local/node --strip-components=1; \
-   rm -f node-${NODE_VERSION}-linux-x64.tar.gz
+    mkdir /usr/local/node; \
+    tar -xvf node-${NODE_VERSION}-linux-x64.tar.gz -C /usr/local/node --strip-components=1; \
+    rm -f node-${NODE_VERSION}-linux-x64.tar.gz
 ENV PATH=/usr/local/node/bin:$PATH
 
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
@@ -33,12 +33,12 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
 
 # Install go
 ENV GOPATH /root/go
-ENV GO_VERSION 1.18.4
+ENV GO_VERSION 1.20.1
 ENV GO_ARCH amd64
 ENV GO111MODULES ON
 RUN wget https://golang.org/dl/go${GO_VERSION}.linux-${GO_ARCH}.tar.gz; \
-   tar -C /usr/local/ -xf /go${GO_VERSION}.linux-${GO_ARCH}.tar.gz ; \
-   rm /go${GO_VERSION}.linux-${GO_ARCH}.tar.gz
+    tar -C /usr/local/ -xf /go${GO_VERSION}.linux-${GO_ARCH}.tar.gz ; \
+    rm /go${GO_VERSION}.linux-${GO_ARCH}.tar.gz
 ENV PATH /usr/local/go/bin:$PATH
 
 ENV PROJECT_DIR $GOPATH/src/github.com/influxdata/chronograf

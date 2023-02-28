@@ -37,7 +37,7 @@ workflows:
 jobs:
   build:
     environment:
-      DOCKER_TAG: chronograf-20220721
+      DOCKER_TAG: chronograf-20230228
       GO111MODULE: "ON"
     machine:
       image: ubuntu-2004:202201-02
@@ -61,7 +61,7 @@ jobs:
 
   deploy-nightly:
     environment:
-      DOCKER_TAG: chronograf-20220721
+      DOCKER_TAG: chronograf-20230228
       GO111MODULE: "ON"
     machine:
       image: ubuntu-2004:202201-02
@@ -90,7 +90,7 @@ jobs:
 
   deploy-pre-release:
     environment:
-      DOCKER_TAG: chronograf-20220721
+      DOCKER_TAG: chronograf-20230228
       GO111MODULE: "ON"
     machine:
       image: ubuntu-2004:202201-02
@@ -121,7 +121,7 @@ jobs:
 
   deploy-release:
     environment:
-      DOCKER_TAG: chronograf-20220721
+      DOCKER_TAG: chronograf-20230228
       GO111MODULE: "ON"
     machine:
       image: ubuntu-2004:202201-02

@@ -1,4 +1,4 @@
-FROM alpine:3.12
+FROM alpine:3.17
 
 ENV PROTOBOARDS_PATH /usr/share/chronograf/protoboards
 ENV CANNED_PATH /usr/share/chronograf/canned
