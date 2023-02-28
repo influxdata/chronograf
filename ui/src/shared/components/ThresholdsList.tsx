@@ -72,6 +72,7 @@ class ThresholdsList extends PureComponent<Props> {
             </div>
           ) : (
             <Threshold
+              key={color.id}
               visualizationType="single-stat"
               threshold={color}
               onChooseColor={this.handleChooseColor}
