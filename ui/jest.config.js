@@ -14,7 +14,10 @@ module.exports = {
       transform: {
         '^.+\\.[jt]sx?$': ['babel-jest', {configFile: './.babelrc.jest'}],
       },
-      transformIgnorePatterns: ['/node_modules/(?!(d3-color)/)'],
+      transformIgnorePatterns: [
+        //'/node_modules/(?!(d3-color|d3-scale|d3-array|internmap|d3-interpolate|d3-format)/)',
+        '/node_modules/(?!(d3-.*|internmap)/)',
+      ],
       testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
       moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
       snapshotSerializers: ['enzyme-to-json/serializer'],
