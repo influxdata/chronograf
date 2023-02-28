@@ -821,13 +821,15 @@ const MappingWildcard string = "*"
 // explicit role within the organization.
 //
 // One can think of a mapping like so:
-//     Provider:Scheme:Group -> Organization
-//     github:oauth2:influxdata -> Happy
-//     beyondcorp:ldap:influxdata -> TheBillHilliettas
+//
+//	Provider:Scheme:Group -> Organization
+//	github:oauth2:influxdata -> Happy
+//	beyondcorp:ldap:influxdata -> TheBillHilliettas
 //
 // Any of Provider, Scheme, or Group may be provided as a wildcard *
-//     github:oauth2:* -> MyOrg
-//     *:*:* -> AllOrg
+//
+//	github:oauth2:* -> MyOrg
+//	*:*:* -> AllOrg
 type Mapping struct {
 	ID                   string `json:"id"`
 	Organization         string `json:"organizationId"`

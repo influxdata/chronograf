@@ -297,6 +297,10 @@ def get_current_commit(short=False):
     out = run(command)
     return out.strip('\'\n\r ')
 
+def set_safe_directory():
+    out = run("git config --global --add safe.directory *")
+    return out.strip()
+
 def get_current_branch():
     """Retrieve the current git branch.
     """
@@ -948,6 +952,7 @@ if __name__ == '__main__':
                         level=LOG_LEVEL,
                         format=log_format)
 
+    logging.info(set_safe_directory())
     parser = argparse.ArgumentParser(description='InfluxDB build and packaging script.')
     parser.add_argument('--verbose','-v','--debug',
                         action='store_true',
