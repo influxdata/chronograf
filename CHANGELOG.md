@@ -8,6 +8,12 @@
 
 ### Other
 
+1. [#6010](https://github.com/influxdata/chronograf/pull/6010): Security Updates
+1. [#6021](https://github.com/influxdata/chronograf/pull/6021): Security Updates
+1. [#6025](https://github.com/influxdata/chronograf/pull/6025): Security Updates
+1. [#6026](https://github.com/influxdata/chronograf/pull/6026): Bump to Go 1.20
+1. [#6028](https://github.com/influxdata/chronograf/pull/6028): Build releases with Go 1.20
+
 ## v1.10.0 [2022-08-23]
 
 ### Features
@@ -30,9 +36,9 @@
 ### Bug Fixes
 
 1. [#5882](https://github.com/influxdata/chronograf/pull/5882): Repair table visualization of string values.
-1. [#5913](https://github.com/influxdata/chronograf/pull/5913): Improve InfluxDB Enterprise detection. 
-1. [#5917](https://github.com/influxdata/chronograf/pull/5917): Improve InfluxDB Enterprise user creation process. 
-1. [#5917](https://github.com/influxdata/chronograf/pull/5917): Avoid stale reads in communication with InfluxDB Enterprise meta nodes. 
+1. [#5913](https://github.com/influxdata/chronograf/pull/5913): Improve InfluxDB Enterprise detection.
+1. [#5917](https://github.com/influxdata/chronograf/pull/5917): Improve InfluxDB Enterprise user creation process.
+1. [#5917](https://github.com/influxdata/chronograf/pull/5917): Avoid stale reads in communication with InfluxDB Enterprise meta nodes.
 1. [#5938](https://github.com/influxdata/chronograf/pull/5938): Properly detect unsupported values in Alert Rule builder.
 1. [#5965](https://github.com/influxdata/chronograf/pull/5965): Inform the user to use v2 administration.
 1. [#5976](https://github.com/influxdata/chronograf/pull/5976): Make markdown cell content selectable.
@@ -202,10 +208,10 @@
 
 ### Breaking Changes
 
-1. [#5710](https://github.com/influxdata/chronograf/pull/5710): OAuth integrations newly use OAuth PKCE (RFC7636) 
-to provide a more secure OAuth token exchange. Google, Azure, Octa, Auth0, Gitlab (and more) integrations already 
-support OAuth PKCE. PKCE enablement should have no effect on the communication with authorization servers that 
-don't support it yet (such as Github, Bitbucket). PKCE can be eventually turned off with `OAUTH_NO_PKCE=true` 
+1. [#5710](https://github.com/influxdata/chronograf/pull/5710): OAuth integrations newly use OAuth PKCE (RFC7636)
+to provide a more secure OAuth token exchange. Google, Azure, Octa, Auth0, Gitlab (and more) integrations already
+support OAuth PKCE. PKCE enablement should have no effect on the communication with authorization servers that
+don't support it yet (such as Github, Bitbucket). PKCE can be eventually turned off with `OAUTH_NO_PKCE=true`
 environment variable.
 
 ## v1.8.10 [2021-02-08]
