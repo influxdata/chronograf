@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   browser-tools: circleci/browser-tools@1.1.3
+  aws-s3: circleci/aws-s3@2.0.0
 
 
 workflows:
@@ -25,9 +26,43 @@ workflows:
               ignore: /.*/
             tags:
               only: /^[0-9]+(\.[0-9]+)*(\S*)([a|rc|beta]([0-9]+))+$/
+      - packages-sign:
+          name: packages-sign-prerelease
+          requires:
+            - deploy-pre-release
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^[0-9]+(\.[0-9]+)*(\S*)([a|rc|beta]([0-9]+))+$/
+      - packages-upload-signatures:
+          requires:
+            - packages-sign-prerelease
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^[0-9]+(\.[0-9]+)*(\S*)([a|rc|beta]([0-9]+))+$/
       - deploy-release:
           requires:
             - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^[0-9]+(\.[0-9]+)*$/
+      - packages-sign:
+          name: packages-sign-release
+          requires:
+            - deploy-release
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^[0-9]+(\.[0-9]+)*$/
+      - packages-upload-signatures:
+          requires:
+            - packages-sign-release
           filters:
             branches:
               ignore: /.*/
@@ -118,6 +153,10 @@ jobs:
           docker push quay.io/influxdb/chronograf:${CIRCLE_TAG}
       - store_artifacts:
           path: ./build/
+      - persist_to_workspace:
+          root: .
+          paths:
+            - build
 
   deploy-release:
     environment:
@@ -151,3 +190,62 @@ jobs:
           docker push quay.io/influxdb/chronograf:latest
       - store_artifacts:
           path: ./build/
+      - persist_to_workspace:
+          root: .
+          paths:
+            - build
+
+  packages-sign:
+    circleci_ip_ranges: true
+    docker:
+      - image: quay.io/influxdb/rsign:latest
+        auth:
+          username: $QUAY_RSIGN_USERNAME
+          password: $QUAY_RSIGN_PASSWORD
+    steps:
+      - add_ssh_keys:
+          fingerpints:
+            - 92:24:4f:e1:e1:ee:6a:39:22:d7:b5:fa:9e:a9:bf:4b
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: |
+          for target in /tmp/workspace/build/*
+          do
+            case "${target}"
+            in
+              # rsign is shipped on Alpine Linux which uses "busybox ash" instead
+              # of bash. ash is somewhat more posix compliant and is missing some
+              # extensions and niceties from bash.
+              *.deb|*.rpm|*.tar.gz|*.zip)
+                rsign "${target}"
+              ;;
+            esac
+          done
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - build
+      - store_artifacts:
+          path: /tmp/workspace/build
+
+  packages-upload-signatures:
+    docker:
+      # `cimg/python` may seem incorrect, but apparently it includes `curl`
+      # which is required for `aws-s3/sync` to work. This image is also
+      # suggested by the orb's documentation:
+      # https://circleci.com/developer/orbs/orb/circleci/aws-s3#usage-examples
+      - image: 'cimg/python:3.6'
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace/build
+      - aws-s3/sync:
+          arguments: |
+            --dryrun \
+            --exclude '*' \
+            --include '*.asc' \
+            --acl public-read
+          aws-region: AWS_REGION
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+          from: '/tmp/workspace/build'
+          to: 's3://dl.influxdata.com/chronograf/releases/'
