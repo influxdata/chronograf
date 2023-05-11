@@ -1,5 +1,6 @@
 #!/bin/bash
 set -x
+
 DOCKER_TAG="chronograf-$(date +%Y%m%d)"
 
 docker build --rm=false -f etc/Dockerfile_build -t builder:$DOCKER_TAG .

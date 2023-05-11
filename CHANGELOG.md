@@ -13,6 +13,7 @@
 1. [#6025](https://github.com/influxdata/chronograf/pull/6025): Security Updates
 1. [#6026](https://github.com/influxdata/chronograf/pull/6026): Bump to Go 1.20
 1. [#6028](https://github.com/influxdata/chronograf/pull/6028): Build releases with Go 1.20
+1. [#6032](https://github.com/influxdata/chronograf/pull/6032): Upgrade golang to 1.20.4
 
 ## v1.10.0 [2022-08-23]
 
