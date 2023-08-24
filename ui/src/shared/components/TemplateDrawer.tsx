@@ -15,16 +15,14 @@ interface Props {
   ) => (e: MouseEvent<HTMLDivElement>) => void
 }
 
-class TemplateDrawer extends Component<Props>{
-
-  constructor(props: Props | Readonly<Props>){  
-    super(props);
+class TemplateDrawer extends Component<Props> {
+  constructor(props: Props | Readonly<Props>) {
+    super(props)
   }
 
-  public render(): React.ReactNode { 
-    
+  public render(): React.ReactNode {
     const {templates, selected, onMouseOverTempVar, onClickTempVar} = this.props
-    
+
     return (
       <div className="template-drawer">
         {templates.map(t => (
