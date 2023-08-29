@@ -4,9 +4,13 @@ import classnames from 'classnames'
 
 import {Template} from 'src/types'
 
+interface TempVar {
+  tempVar: string
+}
+
 interface Props {
   templates: Template[]
-  selected: Template
+  selected: TempVar
   onMouseOverTempVar: (
     template: Template
   ) => (e: MouseEvent<HTMLDivElement>) => void
