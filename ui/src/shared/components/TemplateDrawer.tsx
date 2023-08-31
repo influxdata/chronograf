@@ -19,6 +19,8 @@ interface Props {
   ) => (e: MouseEvent<HTMLDivElement>) => void
 }
 
+// TemplateDrawer must be a class component,
+// functional components are not supported by react-onclickoutside
 class TemplateDrawer extends Component<Props> {
   constructor(props: Props | Readonly<Props>) {
     super(props)
