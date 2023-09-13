@@ -1,3 +1,7 @@
+### Bug Fixes
+
+1. [#6056](https://github.com/influxdata/chronograf/pull/6056): Fix error on typing colon
+
 ## v1.10.1
 
 ### Features
