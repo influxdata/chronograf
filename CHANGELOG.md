@@ -3,6 +3,10 @@
 1. [#6056](https://github.com/influxdata/chronograf/pull/6056): Fix error on typing colon
 2. [#6060](https://github.com/influxdata/chronograf/pull/6060): Fix time interval in `Processor_Queue_Length` query
 
+### Other
+
+1. [#6063](https://github.com/influxdata/chronograf/pull/6063): Upgrade golang to 1.20.10
+
 ## v1.10.1
 
 ### Features
