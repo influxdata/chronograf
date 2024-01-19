@@ -15,20 +15,24 @@ var _ Mux = &AuthMux{}
 const TenMinutes = 10 * time.Minute
 
 // NewAuthMux constructs a Mux handler that checks a cookie against the authenticator
-func NewAuthMux(p Provider, a Authenticator, t Tokenizer,
-	basepath string, l chronograf.Logger,
-	UseIDToken bool, LoginHint string,
-	client *http.Client, codeExchange CodeExchange,
-) *AuthMux {
+func NewAuthMux(p Provider, a Authenticator, t Tokenizer, basepath string, l chronograf.Logger, UseIDToken bool, LoginHint string, client *http.Client, codeExchange CodeExchange, logoutCallback string) *AuthMux {
 	if codeExchange == nil {
 		codeExchange = simpleTokenExchange
 	}
+
+	var afterLogoutURL string
+	if logoutCallback != "" {
+		afterLogoutURL = logoutCallback
+	} else {
+		afterLogoutURL = path.Join(basepath, "/")
+	}
+
 	mux := &AuthMux{
 		Provider:       p,
 		Auth:           a,
 		Tokens:         t,
 		SuccessURL:     path.Join(basepath, "/landing"),
-		AfterLogoutURL: path.Join(basepath, "/"),
+		AfterLogoutURL: afterLogoutURL,
 		FailureURL:     path.Join(basepath, "/login"),
 		Now:            DefaultNowTime,
 		Logger:         l,
