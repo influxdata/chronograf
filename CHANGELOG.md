@@ -4,6 +4,10 @@
 
 1. [#6073](https://github.com/influxdata/chronograf/pull/6073): Possibility to specify OAuth logout endpoint to logout from OAuth Identity provider.
 
+### Other
+
+1. [#6074](https://github.com/influxdata/chronograf/pull/6074): Upgrade golang to 1.20.13.
+
 ## v1.10.2 [2023-10-20]
 
 ### Bug Fixes
