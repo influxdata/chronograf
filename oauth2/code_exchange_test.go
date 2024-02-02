@@ -32,7 +32,7 @@ func Test_CodeExchangeCSRF_AuthCodeURL(t *testing.T) {
 		ProviderURL: "http://localhost:1234",
 		Orgs:        "",
 	}
-	authMux := NewAuthMux(mp, auth, mt, "", clog.New(clog.ParseLevel("debug")), useidtoken, "hello", nil, nil)
+	authMux := NewAuthMux(mp, auth, mt, "", clog.New(clog.ParseLevel("debug")), useidtoken, "hello", nil, nil, "")
 
 	// create AuthCodeURL with code exchange without PKCE
 	codeExchange := NewCodeExchange(false, "")
@@ -95,7 +95,7 @@ func Test_CodeExchangeCSRF_ExchangeCodeForToken(t *testing.T) {
 		ProviderURL: authServer.URL,
 		Orgs:        "",
 	}
-	authMux := NewAuthMux(mp, auth, auth.Tokens, "", clog.New(clog.ParseLevel("debug")), useidtoken, "hi", nil, nil)
+	authMux := NewAuthMux(mp, auth, auth.Tokens, "", clog.New(clog.ParseLevel("debug")), useidtoken, "hi", nil, nil, "")
 
 	// create AuthCodeURL using CodeExchange with PKCE
 	codeExchange := simpleTokenExchange
@@ -136,7 +136,7 @@ func Test_CodeExchangePKCE_AuthCodeURL(t *testing.T) {
 		ProviderURL: "http://localhost:1234",
 		Orgs:        "",
 	}
-	authMux := NewAuthMux(mp, auth, mt, "", clog.New(clog.ParseLevel("debug")), useidtoken, "hi", nil, nil)
+	authMux := NewAuthMux(mp, auth, mt, "", clog.New(clog.ParseLevel("debug")), useidtoken, "hi", nil, nil, "")
 
 	// create AuthCodeURL using CodeExchange with PKCE
 	codeExchange := NewCodeExchange(true, "secret")
@@ -213,7 +213,7 @@ func Test_CodeExchangePKCE_ExchangeCodeForToken(t *testing.T) {
 		ProviderURL: authServer.URL,
 		Orgs:        "",
 	}
-	authMux := NewAuthMux(mp, auth, jwt, "", clog.New(clog.ParseLevel("debug")), useidtoken, "hi", nil, nil)
+	authMux := NewAuthMux(mp, auth, jwt, "", clog.New(clog.ParseLevel("debug")), useidtoken, "hi", nil, nil, "")
 
 	// create AuthCodeURL using CodeExchange with PKCE
 	codeExchange := CodeExchangePKCE{Secret: secret}

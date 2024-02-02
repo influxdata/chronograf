@@ -24,7 +24,7 @@ type mockCallbackResponse struct {
 // a function, and returning the desired handler. Cleanup is still the
 // responsibility of the test writer, so the httptest.Server's Close() method
 // should be deferred.
-func setupMuxTest(response interface{}, selector func(*AuthMux) http.Handler) (*http.Client, *httptest.Server, *httptest.Server) {
+func setupMuxTest(response interface{}, selector func(*AuthMux) http.Handler, config ...map[string]string) (*http.Client, *httptest.Server, *httptest.Server) {
 	provider := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		rw.Header().Set("content-type", "application/json")
 		rw.WriteHeader(http.StatusOK)
@@ -53,7 +53,13 @@ func setupMuxTest(response interface{}, selector func(*AuthMux) http.Handler) (*
 
 	useidtoken := false
 
-	jm := NewAuthMux(mp, auth, mt, "", clog.New(clog.ParseLevel("debug")), useidtoken, "", nil, nil)
+	logoutCallback := ""
+	if len(config) > 0 {
+		if v, ok := config[0]["logoutCallback"]; ok {
+			logoutCallback = v
+		}
+	}
+	jm := NewAuthMux(mp, auth, mt, "", clog.New(clog.ParseLevel("debug")), useidtoken, "", nil, nil, logoutCallback)
 	ts := httptest.NewServer(selector(jm))
 	jar, _ := cookiejar.New(nil)
 	hc := http.Client{
@@ -108,6 +114,44 @@ func Test_AuthMux_Logout_DeletesSessionCookie(t *testing.T) {
 	c := cookies[0]
 	if c.Name != DefaultCookieName || c.Expires != testTime.Add(-1*time.Hour) {
 		t.Fatal("Expected cookie to be expired but wasn't")
+	}
+}
+
+func Test_AuthMux_Logout_RedirectToLogoutCallback(t *testing.T) {
+	t.Parallel()
+
+	var response interface{}
+
+	hc, ts, prov := setupMuxTest(response, func(j *AuthMux) http.Handler {
+		return j.Logout()
+	}, map[string]string{"logoutCallback": "http://custom-url:8123?redirect=http://localhost:8888"})
+	defer teardownMuxTest(hc, ts, prov)
+
+	tsURL, _ := url.Parse(ts.URL)
+
+	hc.Jar.SetCookies(tsURL, []*http.Cookie{
+		{
+			Name:  DefaultCookieName,
+			Value: "",
+		},
+	})
+
+	resp, err := hc.Get(ts.URL)
+	if err != nil {
+		t.Fatal("Error communicating with Logout() handler: err:", err)
+	}
+
+	if resp.StatusCode < 300 || resp.StatusCode >= 400 {
+		t.Fatal("Expected to be redirected, but received status code", resp.StatusCode)
+	}
+
+	loc, err := resp.Location()
+	if err != nil {
+		t.Fatal("Expected a location to be redirected to, but wasn't present")
+	}
+
+	if loc.String() != "http://custom-url:8123?redirect=http://localhost:8888" {
+		t.Fatal("Expected to be redirected to http://custom-url:8123?redirect=http://localhost:8888, but was", loc.String())
 	}
 }
 
