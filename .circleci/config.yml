@@ -209,18 +209,7 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - run: |
-          for target in /tmp/workspace/build/*
-          do
-            case "${target}"
-            in
-              # rsign is shipped on Alpine Linux which uses "busybox ash" instead
-              # of bash. ash is somewhat more posix compliant and is missing some
-              # extensions and niceties from bash.
-              *.deb|*.rpm|*.tar.gz|*.zip)
-                rsign "${target}"
-              ;;
-            esac
-          done
+          find /tmp/workspace/build -type f -exec rsign '{}' \;
       - persist_to_workspace:
           root: /tmp/workspace
           paths:
@@ -240,7 +229,6 @@ jobs:
           at: /tmp/workspace/build
       - aws-s3/sync:
           arguments: |
-            --dryrun \
             --exclude '*' \
             --include '*.asc' \
             --acl public-read
