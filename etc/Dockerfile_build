@@ -17,6 +17,7 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     libtool
 
 RUN pip3 install boto requests python-jose --upgrade
+RUN gem install dotenv -v 2.8.1
 RUN gem install fpm
 
 # Install node
