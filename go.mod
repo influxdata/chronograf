@@ -1,6 +1,6 @@
 module github.com/influxdata/chronograf
 
-go 1.20
+go 1.21
 
 require (
 	cloud.google.com/go/bigtable v1.10.0 // indirect
@@ -17,7 +17,7 @@ require (
 	github.com/influxdata/usage-client v0.0.0-20160829180054-6d3895376368
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/lestrrat-go/jwx/v2 v2.0.19
-	github.com/microcosm-cc/bluemonday v1.0.16
+	github.com/microcosm-cc/bluemonday v1.0.26
 	github.com/sergi/go-diff v1.1.0
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.8.4
