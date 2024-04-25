@@ -209,31 +209,35 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - run: |
-          find /tmp/workspace/build -type f -exec rsign '{}' \;
+          mkdir -p /tmp/workspace/signatures
+          find /tmp/workspace/build \
+            -type f \(              \
+                 -iname '*.deb'     \
+              -o -iname '*.rpm'     \
+              -o -iname '*.tar.gz'  \
+              -o -iname '*.zip'     \
+            \) -exec rsign "{}" \; -exec mv "{}.asc" /tmp/workspace/signatures \;
       - persist_to_workspace:
           root: /tmp/workspace
           paths:
-            - build
+            - signatures
       - store_artifacts:
-          path: /tmp/workspace/build
+          path: /tmp/workspace/signatures
 
   packages-upload-signatures:
     docker:
-      # `cimg/python` may seem incorrect, but apparently it includes `curl`
-      # which is required for `aws-s3/sync` to work. This image is also
-      # suggested by the orb's documentation:
-      # https://circleci.com/developer/orbs/orb/circleci/aws-s3#usage-examples
-      - image: 'cimg/python:3.6'
+      - image: cimg/python:3.12.3
     steps:
       - attach_workspace:
-          at: /tmp/workspace/build
+          at: /tmp/workspace
       - aws-s3/sync:
-          arguments: |
-            --exclude '*' \
-            --include '*.asc' \
+          arguments: >
+            --exclude '*'
+            --include 'chronograf-*.asc'
+            --include 'chronograf_*.asc'
             --acl public-read
-          aws-region: AWS_REGION
-          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-region:            AWS_REGION
+          aws-access-key-id:     AWS_ACCESS_KEY_ID
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-          from: '/tmp/workspace/build'
-          to: 's3://dl.influxdata.com/chronograf/releases/'
+          from: /tmp/workspace/signatures/
+          to:   s3://dl.influxdata.com/chronograf/releases/
