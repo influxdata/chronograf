@@ -1,5 +1,9 @@
 ## [unreleased]
 
+### Other
+
+1. [#6102](https://github.com/influxdata/chronograf/pull/6102): Upgrade golang to 1.21.12.
+
 ## v1.10.5 [2024-05-31]
 
 ### Other
