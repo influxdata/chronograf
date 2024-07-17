@@ -173,25 +173,49 @@ func (s *Service) Write(w http.ResponseWriter, r *http.Request) {
 
 // setupQueryFromCommand set query parameters from its command
 func setupQueryFromCommand(req *chronograf.Query) {
-	// allow to set active database with USE command, examples:
+	// normalize whitespaces
+	req.Command = strings.Join(strings.Fields(req.Command), " ")
+
+	// set active database (and retention policy) from the query
+	useDb := func(dbSpec string) error {
+		dbSpecReader := csv.NewReader(bytes.NewReader(([]byte)(dbSpec)))
+		dbSpecReader.Comma = '.'
+		if dbrp, err := dbSpecReader.Read(); err == nil {
+			fmt.Println(dbrp)
+			if len(dbrp) > 0 {
+				req.DB = dbrp[0]
+			}
+			if len(dbrp) > 1 {
+				req.RP = dbrp[1]
+			}
+		} else {
+			return err
+		}
+		return nil
+	}
+
+	// allow to set active database with USE command or via ON clause, examples:
 	//  use mydb
 	//  use "mydb"
 	//  USE "mydb"."myrp"
 	//  use "mydb.myrp"
 	//  use mydb.myrp
+	//  show tag keys on "mydb"
+	//  SHOW TAG KEYS ON "mydb"
 	if strings.HasPrefix(req.Command, "use ") || strings.HasPrefix(req.Command, "USE ") {
 		if nextCommand := strings.IndexRune(req.Command, ';'); nextCommand > 4 {
 			dbSpec := strings.TrimSpace(req.Command[4:nextCommand])
-			dbSpecReader := csv.NewReader(bytes.NewReader(([]byte)(dbSpec)))
-			dbSpecReader.Comma = '.'
-			if dbrp, err := dbSpecReader.Read(); err == nil {
-				if len(dbrp) > 0 {
-					req.DB = dbrp[0]
-				}
-				if len(dbrp) > 1 {
-					req.RP = dbrp[1]
-				}
+			if useDb(dbSpec) == nil {
 				req.Command = strings.TrimSpace(req.Command[nextCommand+1:])
+			}
+		}
+	} else if strings.Contains(req.Command, " on ") || strings.Contains(req.Command, " ON ") {
+		fields := strings.Fields(req.Command)
+		for i, field := range fields {
+			if field == "on" || field == "ON" {
+				if i < len(fields)-1 {
+					_ = useDb(fields[i+1])
+				}
 			}
 		}
 	}
