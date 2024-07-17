@@ -187,10 +187,10 @@ func setupQueryFromCommand(req *chronograf.Query) {
 			if len(dbrp) > 1 {
 				req.RP = dbrp[1]
 			}
+			return nil
 		} else {
 			return err
 		}
-		return nil
 	}
 
 	// allow to set active database with USE command or via ON clause, examples:
