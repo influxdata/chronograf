@@ -181,7 +181,6 @@ func setupQueryFromCommand(req *chronograf.Query) {
 		dbSpecReader := csv.NewReader(bytes.NewReader(([]byte)(dbSpec)))
 		dbSpecReader.Comma = '.'
 		if dbrp, err := dbSpecReader.Read(); err == nil {
-			fmt.Println(dbrp)
 			if len(dbrp) > 0 {
 				req.DB = dbrp[0]
 			}
