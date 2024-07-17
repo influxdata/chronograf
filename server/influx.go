@@ -216,6 +216,7 @@ func setupQueryFromCommand(req *chronograf.Query) {
 				if i < len(fields)-1 {
 					_ = useDb(fields[i+1])
 				}
+				break
 			}
 		}
 	}
