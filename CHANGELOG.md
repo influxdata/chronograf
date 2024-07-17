@@ -2,7 +2,7 @@
 
 ### Bug Fixes
 
-1. [#6103](https://github.com/influxdata/chronograf/pull/6103): Set active database for InfluxQL meta queries with Cloud Serverless.
+1. [#6103](https://github.com/influxdata/chronograf/pull/6103): Set active database for InfluxQL meta queries.
 
 ### Other
 
