@@ -239,6 +239,10 @@ func TestService_Influx_CommandWithOnClause(t *testing.T) {
 			db:   "mydb",
 		},
 		{
+			name: "USE anotherdb; SHOW TAG KEYS ON mydb",
+			db:   "anotherdb",
+		},
+		{
 			name: `show tag keys on "mydb"`,
 			db:   "mydb",
 		},
