@@ -201,17 +201,18 @@ func setupQueryFromCommand(req *chronograf.Query) {
 	//  use mydb.myrp
 	//  show tag keys on "mydb"
 	//  SHOW TAG KEYS ON "mydb"
-	if strings.HasPrefix(req.Command, "use ") || strings.HasPrefix(req.Command, "USE ") {
+	command := strings.ToLower(req.Command)
+	if strings.HasPrefix(command, "use ") {
 		if nextCommand := strings.IndexRune(req.Command, ';'); nextCommand > 4 {
 			dbSpec := strings.TrimSpace(req.Command[4:nextCommand])
 			if useDb(dbSpec) == nil {
 				req.Command = strings.TrimSpace(req.Command[nextCommand+1:])
 			}
 		}
-	} else if strings.Contains(req.Command, " on ") || strings.Contains(req.Command, " ON ") {
+	} else if strings.Contains(command, " on ") {
 		fields := strings.Fields(req.Command)
 		for i, field := range fields {
-			if field == "on" || field == "ON" {
+			if strings.ToLower(field) == "on" {
 				if i < len(fields)-1 {
 					_ = useDb(fields[i+1])
 				}
