@@ -173,14 +173,12 @@ func (s *Service) Write(w http.ResponseWriter, r *http.Request) {
 
 // setupQueryFromCommand set query parameters from its command
 func setupQueryFromCommand(req *chronograf.Query) {
-	// normalize whitespaces
-	req.Command = strings.Join(strings.Fields(req.Command), " ")
-
-	// set active database (and retention policy) from the query
+	// sets active database (and retention policy) from the query
 	useDb := func(dbSpec string) error {
 		dbSpecReader := csv.NewReader(bytes.NewReader(([]byte)(dbSpec)))
 		dbSpecReader.Comma = '.'
 		if dbrp, err := dbSpecReader.Read(); err == nil {
+			fmt.Println(dbrp)
 			if len(dbrp) > 0 {
 				req.DB = dbrp[0]
 			}
@@ -210,13 +208,24 @@ func setupQueryFromCommand(req *chronograf.Query) {
 			}
 		}
 	} else if strings.Contains(command, " on ") {
-		fields := strings.Fields(req.Command)
-		for i, field := range fields {
-			if strings.ToLower(field) == "on" {
-				if i < len(fields)-1 {
-					_ = useDb(fields[i+1])
+		r := csv.NewReader(strings.NewReader(req.Command))
+		r.Comma = ' '
+		if tokens, err := r.Read(); err == nil {
+			// filter empty tokens (i.e. redundant whitespaces, using https://go.dev/wiki/SliceTricks#filtering-without-allocating)
+			fields := tokens[:0]
+			for _, field := range tokens {
+				if field != "" {
+					fields = append(fields, field)
 				}
-				break
+			}
+			// try to find ON clause and use its value to set the database
+			for i, field := range fields {
+				if strings.ToLower(field) == "on" {
+					if i < len(fields)-1 {
+						_ = useDb(fields[i+1])
+					}
+					break
+				}
 			}
 		}
 	}
