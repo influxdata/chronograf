@@ -250,6 +250,22 @@ func TestService_Influx_CommandWithOnClause(t *testing.T) {
 			name: `show tag keys on "mydb" from "table"`,
 			db:   "mydb",
 		},
+		{
+			name: `show tag keys on "my_db" from "table"`,
+			db:   "my_db",
+		},
+		{
+			name: `show tag keys on "my-db" from "table"`,
+			db:   "my-db",
+		},
+		{
+			name: `show tag keys on "my/db" from "table"`,
+			db:   "my/db",
+		},
+		{
+			name: `show tag keys on "my db" from "table"`,
+			db:   "my db",
+		},
 	}
 
 	h := &Service{
