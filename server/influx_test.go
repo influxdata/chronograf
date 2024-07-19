@@ -247,6 +247,10 @@ func TestService_Influx_CommandWithOnClause(t *testing.T) {
 			db:   "mydb",
 		},
 		{
+			name: `show tag keys oN "mydb"`,
+			db:   "mydb",
+		},
+		{
 			name: `show tag keys on "mydb" from "table"`,
 			db:   "mydb",
 		},
