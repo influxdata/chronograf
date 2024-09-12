@@ -4,17 +4,18 @@ import {TEMP_VAR_INTERVAL, DEFAULT_DURATION_MS} from 'src/shared/constants'
 import replaceTemplates, {replaceInterval} from 'src/tempVars/utils/replace'
 import {proxy} from 'src/utils/queryUrlGenerator'
 
-import {Source, Template} from 'src/types'
+import {Query, Source, Template} from 'src/types'
 import {TimeSeriesResponse} from 'src/types/series'
+import {isExcludedStatement} from '../../utils/queryFilter'
 
 // REVIEW: why is this different than the `Query` in src/types?
-interface Query {
-  text: string
-  id: string
-  database?: string
-  db?: string
-  rp?: string
-}
+// interface Query {
+//   text: string
+//   id: string
+//   database?: string
+//   db?: string
+//   rp?: string
+// }
 
 interface QueryResult {
   value: TimeSeriesResponse | null
@@ -33,6 +34,10 @@ export function executeQueries(
     let counter = queries.length
 
     for (let i = 0; i < queries.length; i++) {
+      if(isExcludedStatement(queries[i].text) && !queries[i].queryConfig.isSubmitted) {
+        counter -= 1
+        continue
+      }
       executeQuery(source, queries[i], templates, uuid)
         .then(result => (results[i] = {value: result, error: null}))
         .catch(result => (results[i] = {value: null, error: result}))
@@ -58,9 +63,9 @@ export const executeQuery = async (
 
   const {data} = await proxy({
     source: source.links.proxy,
-    rp: query.rp,
+    rp: query.queryConfig.retentionPolicy,
     query: text,
-    db: query.db || query.database,
+    db: query.queryConfig.database,
     uuid,
   })
 

@@ -140,12 +140,12 @@ class TimeSeries extends PureComponent<Props, State> {
     const timeRangeChanged = oldLower !== newLower || oldUpper !== newUpper
 
     const shouldExecuteQueries =
-      queriesDifferent ||
-      timeRangeChanged ||
-      templatesDifferent ||
-      this.props.uuid !== prevProps.uuid ||
-      this.state.fetchCount === 0 ||
-      this.props.xPixels !== prevProps.xPixels
+        queriesDifferent ||
+        timeRangeChanged ||
+        templatesDifferent ||
+        this.props.uuid !== prevProps.uuid ||
+        this.state.fetchCount === 0 ||
+        this.props.xPixels !== prevProps.xPixels
 
     if (shouldExecuteQueries) {
       this.debouncer.call(this.executeQueries, EXECUTE_QUERIES_DEBOUNCE_MS)

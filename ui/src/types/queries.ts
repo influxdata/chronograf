@@ -26,6 +26,7 @@ export interface QueryConfig {
   lower?: string
   upper?: string
   isQuerySupportedByExplorer?: boolean // doesn't come from server -- is set in CellEditorOverlay
+  isSubmitted?: boolean // doesn't come from server -- is set in InfluxQLEditor
   originalQuery?: string
 }
 

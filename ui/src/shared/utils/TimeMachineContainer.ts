@@ -27,6 +27,7 @@ import {
   setLocalStorage,
   TMLocalStorageKey,
 } from 'src/shared/utils/timeMachine'
+import {isExcludedStatement} from '../../utils/queryFilter'
 
 // Constants
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
@@ -161,8 +162,8 @@ export class TimeMachineContainer {
         const queries = query.split(';')
         let isSavable = true
         for (let i = 0; i <= queries.length; i++) {
-          const qs = getDeep<string>(queries, `${i}`, '').toLocaleLowerCase()
-          if (qs.startsWith('drop') || qs.startsWith('delete')) {
+          const qs = getDeep<string>(queries, `${i}`, '')
+          if (isExcludedStatement(qs)) {
             isSavable = false
           }
         }
