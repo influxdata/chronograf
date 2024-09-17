@@ -75,7 +75,7 @@ jobs:
       DOCKER_TAG: chronograf-20240710
       GO111MODULE: "ON"
     machine:
-      image: ubuntu-2004:202201-02
+      image: default
     steps:
       - checkout
       - run: |
