@@ -34,7 +34,11 @@ export function executeQueries(
     let counter = queries.length
 
     for (let i = 0; i < queries.length; i++) {
-      if(isExcludedStatement(queries[i].text) && !queries[i].queryConfig.isSubmitted) {
+      if (
+        isExcludedStatement(queries[i].text) &&
+        !queries[i].queryConfig.isSubmitted
+      ) {
+        results[i] = {value: null, error: 'skipped'}
         counter -= 1
         continue
       }

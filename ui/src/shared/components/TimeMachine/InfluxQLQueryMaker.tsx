@@ -107,6 +107,7 @@ const QueryMaker: FunctionComponent<Props> = ({
             onUpdate={onEditRawText}
             templates={templates}
             onMetaQuerySelected={onMetaQuerySelected}
+            activeQueryIndex={activeQueryIndex}
           />
           <SchemaExplorer
             source={source}
