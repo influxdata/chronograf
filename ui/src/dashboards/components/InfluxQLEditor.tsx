@@ -40,7 +40,7 @@ interface State {
   selectedTemplate: TempVar
   isShowingTemplateValues: boolean
   filteredTemplates: Template[]
-  isSubmitted: boolean
+  submitted: Map<number, boolean>
   configID: string
 }
 
@@ -65,9 +65,10 @@ const TEMPLATE_VAR = /[:]\w+[:]/g
 
 class InfluxQLEditor extends Component<Props, State> {
   public static getDerivedStateFromProps(nextProps: Props, prevState: State) {
-    const {isSubmitted, editedQueryText} = prevState
+    const {submitted, editedQueryText} = prevState
+    const isSubmitted = submitted.get(nextProps.activeQueryIndex)??true
     console.log(
-      `getDerivedStateFromProps: ${nextProps.activeQueryIndex}, isSubmitted: ${isSubmitted}`
+      `getDerivedStateFromProps: ${nextProps.activeQueryIndex}, isSubmitted: ${isSubmitted}, submitted: ${JSON.stringify(submitted)}, editedQueryText: ${editedQueryText}, query: ${nextProps.query}`
     )
     const isQueryConfigChanged = nextProps.config.id !== prevState.configID
     const isQueryTextChanged = editedQueryText.trim() !== nextProps.query.trim()
@@ -106,11 +107,11 @@ class InfluxQLEditor extends Component<Props, State> {
       filteredTemplates: props.templates,
       templatingQueryText: props.query,
       editedQueryText: props.query,
-      isSubmitted: true,
       configID: props.config.id,
+      submitted: new Map(),
     }
     console.log(
-      `Constructor: ${props.activeQueryIndex}, isSubmitted ${this.state.isSubmitted}`
+      `Constructor: ${props.activeQueryIndex}, isSubmitted ${this.state.submitted}`
     )
   }
 
@@ -132,9 +133,10 @@ class InfluxQLEditor extends Component<Props, State> {
       filteredTemplates,
       isShowingTemplateValues,
       focused,
-      isSubmitted,
+      submitted,
     } = this.state
 
+    const isSubmitted = submitted.get(this.props.activeQueryIndex)??true
     return (
       <div className="query-editor" onMouseDown={this.handleMouseDown}>
         {this.dismissPreviewButton}
@@ -206,8 +208,9 @@ class InfluxQLEditor extends Component<Props, State> {
   }
 
   private handleBlurEditor = (): void => {
+    const isSubmitted = this.state.submitted.get(this.props.activeQueryIndex)??true
     console.log(
-      `handleBlurEditor: ${this.props.activeQueryIndex}, isSubmitted: ${this.state.isSubmitted}`
+      `handleBlurEditor: ${this.props.activeQueryIndex}, isSubmitted: ${isSubmitted}`
     )
     this.setState({focused: false, isShowingTemplateValues: false})
     this.handleUpdate(true)
@@ -242,9 +245,11 @@ class InfluxQLEditor extends Component<Props, State> {
 
   private handleChange = (value: string): void => {
     const {templates, query, activeQueryIndex} = this.props
+    //const {templates, activeQueryIndex} = this.props
     const isEditedChanged = value !== this.state.editedQueryText
     const isSubmitted = value.trim() === query.trim()
-    console.log(`handleChange: ${activeQueryIndex}, isSubmitted ${isSubmitted}`)
+    const isSubmittedState = this.state.submitted.get(activeQueryIndex)??true
+    console.log(`handleChange: ${activeQueryIndex}, isSubmitted ${isSubmitted}, isSubmittedState: ${isSubmittedState}`)
 
     if (!isEditedChanged || this.state.isShowingTemplateValues) {
       return
@@ -270,22 +275,29 @@ class InfluxQLEditor extends Component<Props, State> {
         selectedTemplate,
         filteredTemplates,
         editedQueryText: value,
-        isSubmitted,
+        submitted: new Map(this.state.submitted).set(activeQueryIndex, isSubmitted)
       })
     } else {
       this.setState({
         isTemplating,
         templatingQueryText: value,
         editedQueryText: value,
-        isSubmitted,
+        submitted: new Map(this.state.submitted).set(activeQueryIndex, isSubmitted)
       })
     }
+    //this.setSubmitted(isSubmitted)
+  }
+
+  private setSubmitted = (isSubmitted: boolean): void => {
+    const {activeQueryIndex} = this.props
+    console.log(`setSubmitted: ${activeQueryIndex}, isSubmitted ${isSubmitted}`)
+    this.setState({submitted: new Map(this.state.submitted).set(activeQueryIndex, isSubmitted)})
   }
 
   private handleUpdate = async (isAutoSubmitted?: boolean): Promise<void> => {
     const {onUpdate, activeQueryIndex} = this.props
-
-    if (!this.isDisabled && !this.state.isSubmitted) {
+    const isSubmitted = this.state.submitted.get(activeQueryIndex)??true
+    if (!this.isDisabled && !isSubmitted) {
       const {editedQueryText} = this.state
       this.cancelPendingUpdates()
       const update = onUpdate(editedQueryText, isAutoSubmitted)
@@ -301,7 +313,7 @@ class InfluxQLEditor extends Component<Props, State> {
           ((!isAutoSubmitted && isExcludedStatement(editedQueryText)) ||
             !isExcludedStatement(editedQueryText))
         ) {
-          this.setState({isSubmitted: true})
+          this.setSubmitted(true)
           console.log(`handleUpdate: ${activeQueryIndex}, set isSubmitted true`)
         }
       } catch (error) {

@@ -148,7 +148,7 @@ export class TimeMachineContainer {
       state = {...state, queryDrafts}
     }
 
-    // prevents "DROP" or "DELETE" queries from being persisted.
+    // prevents DDL and DML statements from being persisted.
     const savable = getDeep<CellQuery[]>(state, 'queryDrafts', []).filter(
       ({query, type}) => {
         if (type !== 'influxql') {
