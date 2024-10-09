@@ -239,7 +239,7 @@ func Test_ProtoboardsID(t *testing.T) {
 			wants: wants{
 				statusCode:  http.StatusOK,
 				contentType: "application/json",
-				body:        `{"id":"1","meta":{"name":"","version":"","dashboardVersion":""},"data":{"cells":null},"links":{"self":"/chronograf/v1/protoboards/1"}}`,
+				body:        `{"id":"1","meta":{"name":"","version":"","measurements":null,"dashboardVersion":""},"data":{"cells":null,"templates":null},"links":{"self":"/chronograf/v1/protoboards/1"}}`,
 			},
 			args: args{
 				id: "1",
