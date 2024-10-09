@@ -11,7 +11,7 @@ const proxy = async (msg: ProxyMsg): Promise<{data: any}> => {
   const {
     payload: {url, query, rp, db, uuid},
   } = msg
-
+  console.log('proxy', url, query)
   const body = {url, query, rp, db, uuid}
   try {
     const response = await fetch(url, {

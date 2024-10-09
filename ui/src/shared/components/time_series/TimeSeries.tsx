@@ -124,8 +124,8 @@ class TimeSeries extends PureComponent<Props, State> {
   }
 
   public async componentDidUpdate(prevProps: Props) {
-    const prevQueries = _.map(prevProps.queries, q => q.text)
-    const currQueries = _.map(this.props.queries, q => q.text)
+    const prevQueries = _.map(prevProps.queries, q =>  { return { text: q.text, isManuallySubmitted: q.queryConfig.isManuallySubmitted}} )
+    const currQueries = _.map(this.props.queries, q => { return { text: q.text, isManuallySubmitted: q.queryConfig.isManuallySubmitted}} )
     const queriesDifferent = !_.isEqual(prevQueries, currQueries)
 
     const prevTemplates = _.get(prevProps, 'templates')
@@ -146,6 +146,7 @@ class TimeSeries extends PureComponent<Props, State> {
       this.props.uuid !== prevProps.uuid ||
       this.state.fetchCount === 0 ||
       this.props.xPixels !== prevProps.xPixels
+    console.log(`shouldExecuteQueries: ${shouldExecuteQueries}, queriesDifferent: ${queriesDifferent}`)
 
     if (shouldExecuteQueries) {
       this.debouncer.call(this.executeQueries, EXECUTE_QUERIES_DEBOUNCE_MS)

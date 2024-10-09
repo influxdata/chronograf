@@ -50,7 +50,7 @@ interface PassedProps {
   templates: Template[]
   onAddQuery: () => void
   onDeleteQuery: (index: number) => void
-  onEditRawText: (text: string) => Promise<void>
+  onEditRawText: (text: string, isAutoSubmitted: boolean) => Promise<void>
   onMetaQuerySelected: () => void
 }
 
@@ -107,6 +107,7 @@ const QueryMaker: FunctionComponent<Props> = ({
             onUpdate={onEditRawText}
             templates={templates}
             onMetaQuerySelected={onMetaQuerySelected}
+            activeQueryIndex={activeQueryIndex}
           />
           <SchemaExplorer
             source={source}
