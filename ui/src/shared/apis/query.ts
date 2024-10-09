@@ -36,8 +36,9 @@ export function executeQueries(
     for (let i = 0; i < queries.length; i++) {
       if (
         isExcludedStatement(queries[i].text) &&
-        !queries[i].queryConfig.isSubmitted
+        !queries[i].queryConfig.isManuallySubmitted
       ) {
+        console.log('skipping query', queries[i].text)
         results[i] = {value: null, error: 'skipped'}
         counter -= 1
         continue

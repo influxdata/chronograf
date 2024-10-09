@@ -68,7 +68,7 @@ class InfluxQLEditor extends Component<Props, State> {
     const {submitted, editedQueryText} = prevState
     const isSubmitted = submitted.get(nextProps.activeQueryIndex)??true
     console.log(
-      `getDerivedStateFromProps: ${nextProps.activeQueryIndex}, isSubmitted: ${isSubmitted}, submitted: ${JSON.stringify(submitted)}, editedQueryText: ${editedQueryText}, query: ${nextProps.query}`
+      `getDerivedStateFromProps: ${nextProps.activeQueryIndex}, isSubmitted: ${isSubmitted}, submitted: ${JSON.stringify(submitted)}, editedQueryText: ${editedQueryText.substring(0, Math.min(editedQueryText.length, 20))}, query: ${nextProps.query.substring(0, Math.min(nextProps.query.length, 20))}`
     )
     const isQueryConfigChanged = nextProps.config.id !== prevState.configID
     const isQueryTextChanged = editedQueryText.trim() !== nextProps.query.trim()
@@ -247,9 +247,10 @@ class InfluxQLEditor extends Component<Props, State> {
     const {templates, query, activeQueryIndex} = this.props
     //const {templates, activeQueryIndex} = this.props
     const isEditedChanged = value !== this.state.editedQueryText
-    const isSubmitted = value.trim() === query.trim()
     const isSubmittedState = this.state.submitted.get(activeQueryIndex)??true
-    console.log(`handleChange: ${activeQueryIndex}, isSubmitted ${isSubmitted}, isSubmittedState: ${isSubmittedState}`)
+    //const isSubmitted = isExcludedStatement(value)? isSubmittedState :value.trim() === query.trim()
+    const isSubmitted = value.trim() === query.trim()
+    console.log(`handleChange: ${activeQueryIndex}, isSubmitted ${isSubmitted}, isSubmittedState: ${isSubmittedState}, isEditedChanged: ${isEditedChanged}`)
 
     if (!isEditedChanged || this.state.isShowingTemplateValues) {
       return
