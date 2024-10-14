@@ -42,6 +42,7 @@ interface State {
   filteredTemplates: Template[]
   submitted: Map<number, boolean>
   configID: string
+  isExcluded: boolean
 }
 
 interface Props {
@@ -66,23 +67,24 @@ const TEMPLATE_VAR = /[:]\w+[:]/g
 class InfluxQLEditor extends Component<Props, State> {
   public static getDerivedStateFromProps(nextProps: Props, prevState: State) {
     const {submitted, editedQueryText} = prevState
-    const isSubmitted = submitted.get(nextProps.activeQueryIndex)??true
+    const {query, activeQueryIndex, config, templates} = nextProps
+    const isSubmitted = submitted.get(activeQueryIndex)??true
+    const isQueryConfigChanged = config.id !== prevState.configID
+    const isQueryTextChanged = editedQueryText.trim() !== query.trim()
     console.log(
-      `getDerivedStateFromProps: ${nextProps.activeQueryIndex}, isSubmitted: ${isSubmitted}, submitted: ${JSON.stringify(submitted)}, editedQueryText: ${editedQueryText.substring(0, Math.min(editedQueryText.length, 20))}, query: ${nextProps.query.substring(0, Math.min(nextProps.query.length, 20))}`
+      `getDerivedStateFromProps: ${nextProps.activeQueryIndex}, isSubmitted: ${isSubmitted}, submitted: ${JSON.stringify(submitted)}\n\teditedQueryText: ${editedQueryText.substring(0, Math.min(editedQueryText.length, 20))}, query: ${query.substring(0, Math.min(query.length, 20))}
+\tisQueryConfigChanged: ${isQueryConfigChanged}, isQueryTextChanged: ${isQueryTextChanged}, isManuallySubmitted: ${config.isManuallySubmitted}, isLoading: ${config.status?.loading}`
     )
-    const isQueryConfigChanged = nextProps.config.id !== prevState.configID
-    const isQueryTextChanged = editedQueryText.trim() !== nextProps.query.trim()
-
     if ((isSubmitted && isQueryTextChanged) || isQueryConfigChanged) {
       return {
         ...BLURRED_EDITOR_STATE,
         selectedTemplate: {
-          tempVar: getDeep<string>(nextProps.templates, FIRST_TEMP_VAR, ''),
+          tempVar: getDeep<string>(templates, FIRST_TEMP_VAR, ''),
         },
-        filteredTemplates: nextProps.templates,
-        templatingQueryText: nextProps.query,
-        editedQueryText: nextProps.query,
-        configID: nextProps.config.id,
+        filteredTemplates: templates,
+        templatingQueryText: query,
+        editedQueryText: query,
+        configID: config.id,
         focused: isQueryConfigChanged,
       }
     }
@@ -109,6 +111,7 @@ class InfluxQLEditor extends Component<Props, State> {
       editedQueryText: props.query,
       configID: props.config.id,
       submitted: new Map(),
+      isExcluded: false,
     }
     console.log(
       `Constructor: ${props.activeQueryIndex}, isSubmitted ${this.state.submitted}`
@@ -279,8 +282,10 @@ class InfluxQLEditor extends Component<Props, State> {
         submitted: new Map(this.state.submitted).set(activeQueryIndex, isSubmitted)
       })
     } else {
+      const isExcluded =  isExcludedStatement(value)
       this.setState({
         isTemplating,
+        isExcluded,
         templatingQueryText: value,
         editedQueryText: value,
         submitted: new Map(this.state.submitted).set(activeQueryIndex, isSubmitted)
@@ -296,10 +301,10 @@ class InfluxQLEditor extends Component<Props, State> {
   }
 
   private handleUpdate = async (isAutoSubmitted?: boolean): Promise<void> => {
-    const {onUpdate, activeQueryIndex} = this.props
-    const isSubmitted = this.state.submitted.get(activeQueryIndex)??true
-    if (!this.isDisabled && !isSubmitted) {
-      const {editedQueryText} = this.state
+    const {onUpdate, activeQueryIndex, config} = this.props
+    const {editedQueryText, submitted, isExcluded} = this.state
+    const isSubmitted = submitted.get(activeQueryIndex)??true
+    if (!this.isDisabled && (!isSubmitted || !config.isManuallySubmitted)) {
       this.cancelPendingUpdates()
       const update = onUpdate(editedQueryText, isAutoSubmitted)
       const cancelableUpdate = makeCancelable(update)
@@ -309,11 +314,7 @@ class InfluxQLEditor extends Component<Props, State> {
       try {
         await cancelableUpdate.promise
         // prevent changing submitted status when edited while awaiting update
-        if (
-          this.state.editedQueryText === editedQueryText &&
-          ((!isAutoSubmitted && isExcludedStatement(editedQueryText)) ||
-            !isExcludedStatement(editedQueryText))
-        ) {
+        if (this.state.editedQueryText === editedQueryText && ((!isAutoSubmitted && isExcluded) || !isExcluded)) {
           this.setSubmitted(true)
           console.log(`handleUpdate: ${activeQueryIndex}, set isSubmitted true`)
         }

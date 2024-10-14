@@ -41,6 +41,9 @@ export function executeQueries(
         console.log('skipping query', queries[i].text)
         results[i] = {value: null, error: 'skipped'}
         counter -= 1
+        if (counter === 0) {
+          resolve(results)
+        }
         continue
       }
       executeQuery(source, queries[i], templates, uuid)
