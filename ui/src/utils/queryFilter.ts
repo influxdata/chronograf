@@ -3,8 +3,9 @@ const excludedStatements: string[] = [
   'delete',
   'alter',
   'create',
-  'update',
-  'insert',
+  'grant',
+  'revoke',
+  'use',
 ]
 
 export const isExcludedStatement = (query: string): boolean => {
