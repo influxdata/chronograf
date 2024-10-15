@@ -431,8 +431,7 @@ class TimeMachine extends PureComponent<Props, State> {
     let newQueryConfig
 
     try {
-      newQueryConfig = await getConfig(url, activeID, text, templates)
-      newQueryConfig.isManuallySubmitted = !isAutoSubmitted
+      newQueryConfig = await getConfig(url, activeID, text, templates, !isAutoSubmitted)
     } catch {
       notify(analyzeQueryFailed)
       return
