@@ -146,7 +146,6 @@ class TimeSeries extends PureComponent<Props, State> {
       this.props.uuid !== prevProps.uuid ||
       this.state.fetchCount === 0 ||
       this.props.xPixels !== prevProps.xPixels
-    console.log(`shouldExecuteQueries: ${shouldExecuteQueries}, queriesDifferent: ${queriesDifferent}`)
 
     if (shouldExecuteQueries) {
       this.debouncer.call(this.executeQueries, EXECUTE_QUERIES_DEBOUNCE_MS)

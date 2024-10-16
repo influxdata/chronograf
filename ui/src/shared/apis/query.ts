@@ -38,7 +38,6 @@ export function executeQueries(
         isExcludedStatement(queries[i].text) &&
         !queries[i].queryConfig.isManuallySubmitted
       ) {
-        console.log('skipping query', queries[i].text)
         results[i] = {value: null, error: 'skipped'}
         counter -= 1
         if (counter === 0) {

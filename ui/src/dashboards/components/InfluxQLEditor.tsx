@@ -66,9 +66,6 @@ class InfluxQLEditor extends Component<Props, State> {
     const isQueryTextChanged = editedQueryText.trim() !== query.trim()
     // if query has been switched, set submitted state for excluded query based on the previous submitted way
     const isSubmitted = isQueryConfigChanged ? (isExcludedStatement(query) ? config.isManuallySubmitted : true) : submitted
-    console.log(
-      `getDerivedStateFromProps: ${config.id}, isSubmitted: ${isSubmitted}, submitted: ${submitted}, wasSubmitted: ${config.isManuallySubmitted}\n\teditedQueryText: ${editedQueryText.substring(0, Math.min(editedQueryText.length, 20))}, query: ${query.substring(0, Math.min(query.length, 20))}\n\tisQueryConfigChanged: ${isQueryConfigChanged}, isQueryTextChanged: ${isQueryTextChanged}, isManuallySubmitted: ${config.isManuallySubmitted}, isLoading: ${config.status?.loading}`
-    )
     if ((isSubmitted && isQueryTextChanged) || isQueryConfigChanged) {
       return {
         ...BLURRED_EDITOR_STATE,
@@ -109,9 +106,6 @@ class InfluxQLEditor extends Component<Props, State> {
       submitted: true,
       isExcluded: false,
     }
-    console.log(
-      `Constructor: ${props.config.id}, isSubmitted ${this.state.submitted}`,
-    )
   }
 
   public componentWillUnmount() {
@@ -206,10 +200,6 @@ class InfluxQLEditor extends Component<Props, State> {
   }
 
   private handleBlurEditor = (): void => {
-    const isSubmitted = this.state.submitted
-    console.log(
-      `handleBlurEditor: ${this.state.configID}, isSubmitted: ${isSubmitted}`,
-    )
     this.setState({focused: false, isShowingTemplateValues: false})
     this.handleUpdate(true)
   }
@@ -243,12 +233,8 @@ class InfluxQLEditor extends Component<Props, State> {
 
   private handleChange = (value: string): void => {
     const {templates, query} = this.props
-    //const {templates, activeQueryIndex} = this.props
     const isEditedChanged = value !== this.state.editedQueryText
-    const isSubmittedState = this.state.submitted
-    //const isSubmitted = isExcludedStatement(value)? isSubmittedState :value.trim() === query.trim()
     const isSubmitted = value.trim() === query.trim()
-    console.log(`handleChange: ${this.state.configID}, isSubmitted ${isSubmitted}, isSubmittedState: ${isSubmittedState}, isEditedChanged: ${isEditedChanged}`)
 
     if (!isEditedChanged || this.state.isShowingTemplateValues) {
       return
@@ -290,7 +276,7 @@ class InfluxQLEditor extends Component<Props, State> {
 
   private handleUpdate = async (isAutoSubmitted?: boolean): Promise<void> => {
     const {onUpdate, config} = this.props
-    const {editedQueryText, submitted, isExcluded, configID} = this.state
+    const {editedQueryText, submitted, isExcluded} = this.state
     if (!this.isDisabled && (!submitted || !config.isManuallySubmitted)) {
       this.cancelPendingUpdates()
       const update = onUpdate(editedQueryText, isAutoSubmitted)
@@ -303,7 +289,6 @@ class InfluxQLEditor extends Component<Props, State> {
         // prevent changing submitted status when edited while awaiting update
         if (this.state.editedQueryText === editedQueryText && (!isExcluded || (!isAutoSubmitted && isExcluded))) {
           this.setState({submitted: true})
-          console.log(`handleUpdate: ${configID}, set isSubmitted true`)
         }
       } catch (error) {
         if (!error.isCanceled) {
