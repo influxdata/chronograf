@@ -127,13 +127,13 @@ class TimeSeries extends PureComponent<Props, State> {
     const prevQueries = _.map(prevProps.queries, q => {
       return {
         text: q.text,
-        isManuallySubmitted: q.queryConfig.isManuallySubmitted,
+        isManuallySubmitted: q.queryConfig?.isManuallySubmitted,
       }
     })
     const currQueries = _.map(this.props.queries, q => {
       return {
         text: q.text,
-        isManuallySubmitted: q.queryConfig.isManuallySubmitted,
+        isManuallySubmitted: q.queryConfig?.isManuallySubmitted,
       }
     })
     const queriesDifferent = !_.isEqual(prevQueries, currQueries)
