@@ -420,7 +420,10 @@ class TimeMachine extends PureComponent<Props, State> {
     return getDeep(queryDrafts, '0.source', '') === ''
   }
 
-  private handleEditRawText = async (text: string): Promise<void> => {
+  private handleEditRawText = async (
+    text: string,
+    isAutoSubmitted: boolean
+  ): Promise<void> => {
     const {templates, onUpdateQueryDrafts, queryDrafts, notify} = this.props
     const activeID = this.activeQuery.id
     const url: string = _.get(this.source, 'links.queries', '')
@@ -445,12 +448,14 @@ class TimeMachine extends PureComponent<Props, State> {
         query: text,
         queryConfig: {
           ...newQueryConfig,
+          isManuallySubmitted: !isAutoSubmitted,
           rawText: text,
           status: {loading: true},
         },
       }
     })
-
+    // Update global query status to loading, skipped query will remain in this state
+    this.handleEditQueryStatus(activeID, {loading: true})
     onUpdateQueryDrafts(updatedQueryDrafts)
   }
 
