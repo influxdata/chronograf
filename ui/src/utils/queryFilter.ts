@@ -10,6 +10,6 @@ const excludedStatements: string[] = [
 
 export const isExcludedStatement = (query: string): boolean => {
   return excludedStatements.some(statement =>
-    query.toLowerCase().startsWith(statement)
+    query?.toLowerCase().startsWith(statement)
   )
 }

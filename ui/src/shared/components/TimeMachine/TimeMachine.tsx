@@ -431,13 +431,7 @@ class TimeMachine extends PureComponent<Props, State> {
     let newQueryConfig
 
     try {
-      newQueryConfig = await getConfig(
-        url,
-        activeID,
-        text,
-        templates,
-        !isAutoSubmitted
-      )
+      newQueryConfig = await getConfig(url, activeID, text, templates)
     } catch {
       notify(analyzeQueryFailed)
       return
@@ -454,11 +448,14 @@ class TimeMachine extends PureComponent<Props, State> {
         query: text,
         queryConfig: {
           ...newQueryConfig,
+          isManuallySubmitted: !isAutoSubmitted,
           rawText: text,
           status: {loading: true},
         },
       }
     })
+    // Update global query status to loading, skipped query will remain in this state
+    this.handleEditQueryStatus(activeID, {loading: true})
     onUpdateQueryDrafts(updatedQueryDrafts)
   }
 

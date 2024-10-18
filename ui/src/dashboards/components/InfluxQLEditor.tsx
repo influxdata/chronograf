@@ -84,11 +84,6 @@ class InfluxQLEditor extends Component<Props, State> {
     } else {
       isSubmitted = submitted
     }
-    // const isSubmitted = isQueryConfigChanged
-    //   ? isExcludedStatement(query)
-    //     ? config.isManuallySubmitted
-    //     : true
-    //   : submitted
     if ((isSubmitted && isQueryTextChanged) || isQueryConfigChanged) {
       return {
         ...BLURRED_EDITOR_STATE,
@@ -185,7 +180,7 @@ class InfluxQLEditor extends Component<Props, State> {
               <QueryStatus
                 status={config.status}
                 isShowingTemplateValues={isShowingTemplateValues}
-                isSubmitted={submitted && config.status?.error !== 'skipped'}
+                isSubmitted={submitted && !config.status?.loading}
               >
                 {this.queryStatusButtons}
               </QueryStatus>
@@ -300,7 +295,10 @@ class InfluxQLEditor extends Component<Props, State> {
   private handleUpdate = async (isAutoSubmitted?: boolean): Promise<void> => {
     const {onUpdate, config} = this.props
     const {editedQueryText, submitted, isExcluded} = this.state
-    if (!this.isDisabled && (!submitted || !config.isManuallySubmitted)) {
+    if (
+      !this.isDisabled &&
+      (!submitted || (!config.isManuallySubmitted && isExcluded))
+    ) {
       this.cancelPendingUpdates()
       const update = onUpdate(editedQueryText, isAutoSubmitted)
       const cancelableUpdate = makeCancelable(update)

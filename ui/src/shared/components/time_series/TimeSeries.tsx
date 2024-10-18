@@ -124,18 +124,8 @@ class TimeSeries extends PureComponent<Props, State> {
   }
 
   public async componentDidUpdate(prevProps: Props) {
-    const prevQueries = _.map(prevProps.queries, q => {
-      return {
-        text: q.text,
-        isManuallySubmitted: q.queryConfig?.isManuallySubmitted,
-      }
-    })
-    const currQueries = _.map(this.props.queries, q => {
-      return {
-        text: q.text,
-        isManuallySubmitted: q.queryConfig?.isManuallySubmitted,
-      }
-    })
+    const prevQueries = _.map(prevProps.queries, q => q.text)
+    const currQueries = _.map(this.props.queries, q => q.text)
     const queriesDifferent = !_.isEqual(prevQueries, currQueries)
 
     const prevTemplates = _.get(prevProps, 'templates')

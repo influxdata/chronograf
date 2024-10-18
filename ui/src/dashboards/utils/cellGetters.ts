@@ -175,8 +175,7 @@ export const getConfig = async (
   url,
   id: string,
   query: string,
-  templates: Template[],
-  isManuallySubmitted = false
+  templates: Template[]
 ): Promise<QueryConfig> => {
   const renderedQuery = templateReplace(query, templates)
   const queries = await getQueryConfigAndStatus(url, [
@@ -190,8 +189,6 @@ export const getConfig = async (
     // return back the raw query
     queryConfig.rawText = query
   }
-
-  queryConfig.isManuallySubmitted = isManuallySubmitted
 
   return {
     ...queryConfig,
