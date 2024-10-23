@@ -420,7 +420,10 @@ class TimeMachine extends PureComponent<Props, State> {
     return getDeep(queryDrafts, '0.source', '') === ''
   }
 
-  private handleEditRawText = async (text: string): Promise<void> => {
+  private handleEditRawText = async (
+    text: string,
+    isAutoSubmitted: boolean
+  ): Promise<void> => {
     const {templates, onUpdateQueryDrafts, queryDrafts, notify} = this.props
     const activeID = this.activeQuery.id
     const url: string = _.get(this.source, 'links.queries', '')
@@ -436,7 +439,13 @@ class TimeMachine extends PureComponent<Props, State> {
 
     const updatedQueryDrafts = queryDrafts.map(query => {
       if (query.queryConfig.id !== activeID) {
-        return query
+        return {
+          ...query,
+          queryConfig: {
+            ...query.queryConfig,
+            isManuallySubmitted: false,
+          },
+        }
       }
 
       return {
@@ -445,12 +454,18 @@ class TimeMachine extends PureComponent<Props, State> {
         query: text,
         queryConfig: {
           ...newQueryConfig,
+          isManuallySubmitted: !isAutoSubmitted,
           rawText: text,
           status: {loading: true},
+          submittedQuery: isAutoSubmitted
+            ? query.queryConfig.submittedQuery
+            : text,
+          submittedStatus: query.queryConfig.status?.wasManuallySubmitted
+            ? query.queryConfig.status
+            : query.queryConfig.submittedStatus,
         },
       }
     })
-
     onUpdateQueryDrafts(updatedQueryDrafts)
   }
 

@@ -189,6 +189,7 @@ export const getConfig = async (
     // return back the raw query
     queryConfig.rawText = query
   }
+
   return {
     ...queryConfig,
     originalQuery: query,
