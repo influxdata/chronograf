@@ -46,7 +46,7 @@ interface State {
   selectedTemplate: TempVar
   isShowingTemplateValues: boolean
   filteredTemplates: Template[]
-  submitted: boolean
+  isSubmitted: boolean
   configID: string
   isExcluded: boolean
 }
@@ -71,20 +71,20 @@ const TEMPLATE_VAR = /[:]\w+[:]/g
 
 class InfluxQLEditor extends Component<Props, State> {
   public static getDerivedStateFromProps(nextProps: Props, prevState: State) {
-    const {submitted, editedQueryText} = prevState
+    const {isSubmitted, editedQueryText} = prevState
     const {query, config, templates} = nextProps
     const isQueryConfigChanged = config.id !== prevState.configID
     const isQueryTextChanged = editedQueryText.trim() !== query.trim()
     // if query has been switched, set submitted state for excluded query based on the previous submitted way
-    let isSubmitted: boolean
+    let submitted: boolean
     if (isQueryConfigChanged) {
-      isSubmitted = isExcludedStatement(query)
-        ? config.isManuallySubmitted
+      submitted = isExcludedStatement(query)
+        ? config.status?.wasManuallySubmitted
         : true
     } else {
-      isSubmitted = submitted
+      submitted = isSubmitted
     }
-    if ((isSubmitted && isQueryTextChanged) || isQueryConfigChanged) {
+    if ((submitted && isQueryTextChanged) || isQueryConfigChanged) {
       return {
         ...BLURRED_EDITOR_STATE,
         selectedTemplate: {
@@ -95,7 +95,7 @@ class InfluxQLEditor extends Component<Props, State> {
         editedQueryText: query,
         configID: config.id,
         focused: isQueryConfigChanged,
-        submitted: isSubmitted,
+        isSubmitted: submitted,
         isExcluded: isExcludedStatement(query),
       }
     }
@@ -121,8 +121,8 @@ class InfluxQLEditor extends Component<Props, State> {
       templatingQueryText: props.query,
       editedQueryText: props.query,
       configID: props.config.id,
-      submitted: true,
-      isExcluded: false,
+      isSubmitted: true,
+      isExcluded: isExcludedStatement(props.query),
     }
   }
 
@@ -144,7 +144,8 @@ class InfluxQLEditor extends Component<Props, State> {
       filteredTemplates,
       isShowingTemplateValues,
       focused,
-      submitted,
+      isSubmitted,
+      isExcluded,
     } = this.state
 
     return (
@@ -178,9 +179,16 @@ class InfluxQLEditor extends Component<Props, State> {
           <div className="varmoji-container">
             <div className="varmoji-front">
               <QueryStatus
-                status={config.status}
+                status={
+                  config.status?.error === 'skipped'
+                    ? config.submittedStatus
+                    : config.status
+                }
                 isShowingTemplateValues={isShowingTemplateValues}
-                isSubmitted={submitted && !config.status?.loading}
+                isSubmitted={
+                  (isSubmitted && !isExcluded) ||
+                  (isExcluded && templatingQueryText === config.submittedQuery)
+                }
               >
                 {this.queryStatusButtons}
               </QueryStatus>
@@ -278,7 +286,7 @@ class InfluxQLEditor extends Component<Props, State> {
         selectedTemplate,
         filteredTemplates,
         editedQueryText: value,
-        submitted: isSubmitted,
+        isSubmitted,
       })
     } else {
       const isExcluded = isExcludedStatement(value)
@@ -287,17 +295,17 @@ class InfluxQLEditor extends Component<Props, State> {
         isExcluded,
         templatingQueryText: value,
         editedQueryText: value,
-        submitted: isSubmitted,
+        isSubmitted,
       })
     }
   }
 
   private handleUpdate = async (isAutoSubmitted?: boolean): Promise<void> => {
     const {onUpdate, config} = this.props
-    const {editedQueryText, submitted, isExcluded} = this.state
+    const {editedQueryText, isSubmitted, isExcluded} = this.state
     if (
       !this.isDisabled &&
-      (!submitted || (!config.isManuallySubmitted && isExcluded))
+      (!isSubmitted || (!config.status?.wasManuallySubmitted && isExcluded))
     ) {
       this.cancelPendingUpdates()
       const update = onUpdate(editedQueryText, isAutoSubmitted)
@@ -312,7 +320,7 @@ class InfluxQLEditor extends Component<Props, State> {
           this.state.editedQueryText === editedQueryText &&
           (!isExcluded || (!isAutoSubmitted && isExcluded))
         ) {
-          this.setState({submitted: true})
+          this.setState({isSubmitted: true})
         }
       } catch (error) {
         if (!error.isCanceled) {

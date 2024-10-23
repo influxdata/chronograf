@@ -28,6 +28,8 @@ export interface QueryConfig {
   isQuerySupportedByExplorer?: boolean // doesn't come from server -- is set in CellEditorOverlay
   isManuallySubmitted?: boolean // doesn't come from server -- is set in InfluxQLEditor
   originalQuery?: string
+  submittedQuery?: string
+  submittedStatus?: Status
 }
 
 export interface QueryStatus {
@@ -87,6 +89,7 @@ export interface Namespace {
 
 export interface Status {
   loading?: boolean
+  wasManuallySubmitted?: boolean
   error?: string
   warn?: string
   success?: string

@@ -439,7 +439,13 @@ class TimeMachine extends PureComponent<Props, State> {
 
     const updatedQueryDrafts = queryDrafts.map(query => {
       if (query.queryConfig.id !== activeID) {
-        return query
+        return {
+          ...query,
+          queryConfig: {
+            ...query.queryConfig,
+            isManuallySubmitted: false,
+          },
+        }
       }
 
       return {
@@ -451,11 +457,15 @@ class TimeMachine extends PureComponent<Props, State> {
           isManuallySubmitted: !isAutoSubmitted,
           rawText: text,
           status: {loading: true},
+          submittedQuery: isAutoSubmitted
+            ? query.queryConfig.submittedQuery
+            : text,
+          submittedStatus: query.queryConfig.status?.wasManuallySubmitted
+            ? query.queryConfig.status
+            : query.queryConfig.submittedStatus,
         },
       }
     })
-    // Update global query status to loading, skipped query will remain in this state
-    this.handleEditQueryStatus(activeID, {loading: true})
     onUpdateQueryDrafts(updatedQueryDrafts)
   }
 
