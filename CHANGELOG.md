@@ -3,6 +3,7 @@
 ### Bug Fixes
 
 1. [#6103](https://github.com/influxdata/chronograf/pull/6103): Set active database for InfluxQL meta queries.
+1. [#6111](https://github.com/influxdata/chronograf/pull/6111): Fix loading Hosts page for large number of hosts.
 
 ### Other
 
