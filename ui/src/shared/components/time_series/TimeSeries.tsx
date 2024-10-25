@@ -158,6 +158,13 @@ class TimeSeries extends PureComponent<Props, State> {
       this.props.xPixels !== prevProps.xPixels
 
     if (shouldExecuteQueries) {
+      if (!queriesDifferent && !this.isFluxQuery) {
+        this.props.queries.forEach(q => {
+          if (q.queryConfig) {
+            q.queryConfig.isManuallySubmitted = false
+          }
+        })
+      }
       this.debouncer.call(this.executeQueries, EXECUTE_QUERIES_DEBOUNCE_MS)
     }
   }
@@ -349,7 +356,6 @@ class TimeSeries extends PureComponent<Props, State> {
         ...queryStatus,
         wasManuallySubmitted: query.queryConfig.isManuallySubmitted,
       })
-      query.queryConfig.isManuallySubmitted = false
     }
 
     const validQueryResults = results

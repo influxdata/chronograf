@@ -54,6 +54,7 @@ import {
 import {SourceOption} from 'src/types/sources'
 import {Links, ScriptStatus} from 'src/types/flux'
 import queryBuilderFetcher from './fluxQueryBuilder/apis/queryBuilderFetcher'
+import {isExcludedStatement} from '../../../utils/queryFilter'
 
 interface ConnectedProps {
   script: string
@@ -424,9 +425,16 @@ class TimeMachine extends PureComponent<Props, State> {
     text: string,
     isAutoSubmitted: boolean
   ): Promise<void> => {
-    const {templates, onUpdateQueryDrafts, queryDrafts, notify} = this.props
+    const {
+      templates,
+      onUpdateQueryDrafts,
+      queryDrafts,
+      queryStatuses,
+      notify,
+    } = this.props
     const activeID = this.activeQuery.id
     const url: string = _.get(this.source, 'links.queries', '')
+    const isExcluded = isExcludedStatement(text)
 
     let newQueryConfig
 
@@ -438,12 +446,17 @@ class TimeMachine extends PureComponent<Props, State> {
     }
 
     const updatedQueryDrafts = queryDrafts.map(query => {
+      const submittedStatus =
+        isExcluded && queryStatuses[String(query.id)]?.wasManuallySubmitted
+          ? queryStatuses[String(query.id)]
+          : query.queryConfig.submittedStatus
       if (query.queryConfig.id !== activeID) {
         return {
           ...query,
           queryConfig: {
             ...query.queryConfig,
             isManuallySubmitted: false,
+            submittedStatus,
           },
         }
       }
@@ -457,12 +470,11 @@ class TimeMachine extends PureComponent<Props, State> {
           isManuallySubmitted: !isAutoSubmitted,
           rawText: text,
           status: {loading: true},
-          submittedQuery: isAutoSubmitted
-            ? query.queryConfig.submittedQuery
-            : text,
-          submittedStatus: query.queryConfig.status?.wasManuallySubmitted
-            ? query.queryConfig.status
-            : query.queryConfig.submittedStatus,
+          submittedQuery:
+            isExcluded && isAutoSubmitted
+              ? query.queryConfig.submittedQuery
+              : text,
+          submittedStatus,
         },
       }
     })
