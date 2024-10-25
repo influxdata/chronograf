@@ -12,7 +12,7 @@ import {Template, Layout, Source, Host} from 'src/types'
 import {HostNames, HostName} from 'src/types/hosts'
 import {DashboardSwitcherLinks} from '../../types/dashboards'
 
-interface HostsObject {
+export interface HostsObject {
   [x: string]: Host
 }
 
@@ -49,13 +49,13 @@ export const getCpuAndLoadForHosts = async (
   tempVars: Template[]
 ): Promise<HostsObject> => {
   const query = replaceTemplate(
-    `SELECT mean("usage_user") FROM \":db:\".\":rp:\".\"cpu\" WHERE "cpu" = 'cpu-total' AND time > now() - 10m GROUP BY host;
+    `SHOW TAG VALUES WITH KEY = "host" WHERE TIME > now() - 10m;
+      SELECT mean("usage_user") FROM \":db:\".\":rp:\".\"cpu\" WHERE "cpu" = 'cpu-total' AND time > now() - 10m GROUP BY host;
       SELECT mean("load1") FROM \":db:\".\":rp:\".\"system\" WHERE time > now() - 10m GROUP BY host;
       SELECT non_negative_derivative(mean(uptime)) AS deltaUptime FROM \":db:\".\":rp:\".\"system\" WHERE time > now() - ${telegrafSystemInterval} * 10 GROUP BY host, time(${telegrafSystemInterval}) fill(0);
       SELECT mean("Percent_Processor_Time") FROM \":db:\".\":rp:\".\"win_cpu\" WHERE time > now() - 10m GROUP BY host;
       SELECT mean("Processor_Queue_Length") FROM \":db:\".\":rp:\".\"win_system\" WHERE time > now() - 10m GROUP BY host;
-      SELECT non_negative_derivative(mean("System_Up_Time")) AS winDeltaUptime FROM \":db:\".\":rp:\".\"win_system\" WHERE time > now() - ${telegrafSystemInterval} * 10 GROUP BY host, time(${telegrafSystemInterval}) fill(0);
-      SHOW TAG VALUES WITH KEY = "host" WHERE TIME > now() - 10m;`,
+      SELECT non_negative_derivative(mean("System_Up_Time")) AS winDeltaUptime FROM \":db:\".\":rp:\".\"win_system\" WHERE time > now() - ${telegrafSystemInterval} * 10 GROUP BY host, time(${telegrafSystemInterval}) fill(0);`,
     tempVars
   )
 
@@ -65,15 +65,19 @@ export const getCpuAndLoadForHosts = async (
     db: telegrafDB,
   })
 
+  return parseHostsObject(data)
+}
+
+export const parseHostsObject = (data: any): HostsObject => {
   const hosts: HostsObject = {}
   const precision = 100
-  const cpuSeries = getDeep<Series[]>(data, 'results.[0].series', [])
-  const loadSeries = getDeep<Series[]>(data, 'results.[1].series', [])
-  const uptimeSeries = getDeep<Series[]>(data, 'results.[2].series', [])
-  const winCPUSeries = getDeep<Series[]>(data, 'results.[3].series', [])
-  const winLoadSeries = getDeep<Series[]>(data, 'results.[4].series', [])
-  const winUptimeSeries = getDeep<Series[]>(data, 'results.[5].series', [])
-  const allHostsSeries = getDeep<Series[]>(data, 'results.[6].series', [])
+  const allHostsSeries = getDeep<Series[]>(data, 'results.[0].series', [])
+  const cpuSeries = getDeep<Series[]>(data, 'results.[1].series', [])
+  const loadSeries = getDeep<Series[]>(data, 'results.[2].series', [])
+  const uptimeSeries = getDeep<Series[]>(data, 'results.[3].series', [])
+  const winCPUSeries = getDeep<Series[]>(data, 'results.[4].series', [])
+  const winLoadSeries = getDeep<Series[]>(data, 'results.[5].series', [])
+  const winUptimeSeries = getDeep<Series[]>(data, 'results.[6].series', [])
 
   allHostsSeries.forEach(s => {
     const hostnameIndex = s.columns.findIndex(col => col === 'value')
