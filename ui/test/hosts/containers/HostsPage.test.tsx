@@ -11,7 +11,7 @@ import {source, authLinks} from 'test/resources'
 jest.mock('src/hosts/apis', () => require('mocks/hosts/apis'))
 jest.mock('src/shared/apis/env', () => require('mocks/shared/apis/env'))
 
-import {getCpuAndLoadForHosts, HostsObject} from 'src/hosts/apis'
+import {getCpuAndLoadForHosts} from 'src/hosts/apis'
 const {parseHostsObject} = jest.requireActual('src/hosts/apis')
 
 const setup = (override = {}) => {
@@ -171,7 +171,7 @@ describe('Parsing HostsObject', () => {
   })
 
   it('parse', () => {
-    const hosts = parseHostsObject(cpu_load_hosts) as HostsObject
+    const hosts = parseHostsObject(cpu_load_hosts)
     expect(hosts['my-host1']).toStrictEqual({
       name: 'my-host1',
       cpu: 2.29,
@@ -190,7 +190,7 @@ describe('Parsing HostsObject', () => {
   })
   it('missing in cpu', () => {
     cpu_load_hosts.results[1].series = [cpu_load_hosts.results[1].series[0]]
-    const hosts = parseHostsObject(cpu_load_hosts) as HostsObject
+    const hosts = parseHostsObject(cpu_load_hosts)
     expect(hosts['my-host1']).toBeDefined()
     expect(hosts['my-host1']).toStrictEqual({
       name: 'my-host1',
@@ -211,7 +211,7 @@ describe('Parsing HostsObject', () => {
   it('missing in host', () => {
     const series = cpu_load_hosts.results[0].series[0]
     cpu_load_hosts.results[0].series = [series]
-    const hosts = parseHostsObject(cpu_load_hosts) as HostsObject
+    const hosts = parseHostsObject(cpu_load_hosts)
     expect(hosts['my-host1']).toBeDefined()
     expect(hosts['my-host1']).toStrictEqual({
       name: 'my-host1',

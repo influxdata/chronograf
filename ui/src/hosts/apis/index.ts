@@ -12,7 +12,7 @@ import {Template, Layout, Source, Host} from 'src/types'
 import {HostNames, HostName} from 'src/types/hosts'
 import {DashboardSwitcherLinks} from '../../types/dashboards'
 
-export interface HostsObject {
+interface HostsObject {
   [x: string]: Host
 }
 
