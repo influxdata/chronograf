@@ -4,6 +4,13 @@ orbs:
   aws-s3: circleci/aws-s3@2.0.0
 
 
+parameters:
+  trigger:
+    type: enum
+    enum: [none, deploy-as-artifacts]
+    default: none
+
+
 workflows:
   version: 2
   main:
@@ -68,6 +75,12 @@ workflows:
               ignore: /.*/
             tags:
               only: /^[0-9]+(\.[0-9]+)*$/
+
+  trigger:
+    when:
+      equal: [ deploy-as-artifacts, << pipeline.parameters.trigger >> ]
+    jobs:
+      - build
 
 jobs:
   build:
