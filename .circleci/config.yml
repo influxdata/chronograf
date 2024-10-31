@@ -155,10 +155,8 @@ jobs:
             --package \
             --platform all \
             --arch all \
-            --upload \
             --nightly \
             --version=${CIRCLE_SHA1:0:7} \
-            --bucket=dl.influxdata.com/chronograf/releases
           cp build/linux/static_amd64/chronograf .
           cp build/linux/static_amd64/chronoctl .
       - store_artifacts:
