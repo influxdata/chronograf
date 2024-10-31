@@ -156,7 +156,7 @@ jobs:
             --platform all \
             --arch all \
             --nightly \
-            --version=${CIRCLE_SHA1:0:7} \
+            --version=${CIRCLE_SHA1:0:7}
           cp build/linux/static_amd64/chronograf .
           cp build/linux/static_amd64/chronoctl .
       - store_artifacts:
