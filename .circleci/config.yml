@@ -81,6 +81,9 @@ workflows:
       equal: [ deploy-as-artifacts, << pipeline.parameters.trigger >> ]
     jobs:
       - build
+      - build-nightly:
+          requires:
+            - build
 
 jobs:
   build:
@@ -133,6 +136,31 @@ jobs:
           docker login -u "$QUAY_USER" -p $QUAY_PASS quay.io
           docker tag chronograf quay.io/influxdb/chronograf:nightly
           docker push quay.io/influxdb/chronograf:nightly
+      - store_artifacts:
+          path: ./build/
+
+  build-nightly:
+    environment:
+      DOCKER_TAG: chronograf-20240919
+      GO111MODULE: "ON"
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - attach_workspace:
+          at: /home/circleci
+      - run: |
+          ./etc/scripts/docker/run.sh \
+            --debug \
+            --clean \
+            --package \
+            --platform all \
+            --arch all \
+            --upload \
+            --nightly \
+            --version=${CIRCLE_SHA1:0:7} \
+            --bucket=dl.influxdata.com/chronograf/releases
+          cp build/linux/static_amd64/chronograf .
+          cp build/linux/static_amd64/chronoctl .
       - store_artifacts:
           path: ./build/
 
