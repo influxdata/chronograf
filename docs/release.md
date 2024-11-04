@@ -55,7 +55,7 @@ git push --tags
 ## Testing builds
 
 The test builds are stored as artifacts on the CircleCI build page. If you want to create a test build, you can do it by triggering a pipeline on CircleCI.
-During the trigger of the pipeline, you should specify the `action` parameter with the value `deploy-as-artifacts`:
+During the trigger of the pipeline, you should specify the `trigger` parameter with the value `deploy-as-artifacts`:
 
 <p align="left">
   <img src="./images/testing-builds-pipeline.png"/>
