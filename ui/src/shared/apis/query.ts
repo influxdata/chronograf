@@ -6,7 +6,7 @@ import {proxy} from 'src/utils/queryUrlGenerator'
 
 import {Query, Source, Template} from 'src/types'
 import {TimeSeriesResponse} from 'src/types/series'
-import {isExcludedStatement} from '../../utils/queryFilter'
+import {ErrorSkipped} from '../../types/queries'
 
 interface QueryResult {
   value: TimeSeriesResponse | null
@@ -25,11 +25,12 @@ export function executeQueries(
     let counter = queries.length
 
     for (let i = 0; i < queries.length; i++) {
+      const q = queries[i]
       if (
-        isExcludedStatement(queries[i].text) &&
-        !queries[i].queryConfig.isManuallySubmitted
+        q.queryConfig.isExcluded &&
+        !q.queryConfig.status.isManuallySubmitted
       ) {
-        results[i] = {value: null, error: 'skipped'}
+        results[i] = {value: null, error: ErrorSkipped}
         counter -= 1
         if (counter === 0) {
           resolve(results)

@@ -446,19 +446,8 @@ class TimeMachine extends PureComponent<Props, State> {
     }
 
     const updatedQueryDrafts = queryDrafts.map(query => {
-      const submittedStatus =
-        isExcluded && queryStatuses[String(query.id)]?.wasManuallySubmitted
-          ? queryStatuses[String(query.id)]
-          : query.queryConfig.submittedStatus
       if (query.queryConfig.id !== activeID) {
-        return {
-          ...query,
-          queryConfig: {
-            ...query.queryConfig,
-            isManuallySubmitted: false,
-            submittedStatus,
-          },
-        }
+        return query
       }
 
       return {
@@ -467,16 +456,16 @@ class TimeMachine extends PureComponent<Props, State> {
         query: text,
         queryConfig: {
           ...newQueryConfig,
-          isManuallySubmitted: !isAutoSubmitted,
           rawText: text,
-          status: {loading: true},
-          submittedQuery:
-            isExcluded && isAutoSubmitted
-              ? query.queryConfig.submittedQuery
-              : text,
-          submittedStatus,
+          isExcluded,
         },
       }
+    })
+    this.handleEditQueryStatus(activeID, {
+      ...queryStatuses[activeID],
+      isManuallySubmitted: !isAutoSubmitted,
+      submittedStatus: queryStatuses[activeID]?.submittedStatus,
+      submittedQuery: queryStatuses[activeID]?.submittedQuery,
     })
     onUpdateQueryDrafts(updatedQueryDrafts)
   }

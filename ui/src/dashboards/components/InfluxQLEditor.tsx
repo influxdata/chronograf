@@ -33,6 +33,7 @@ import {
 import {QueryConfig, Template} from 'src/types'
 import {WrappedCancelablePromise} from 'src/types/promises'
 import {isExcludedStatement} from '../../utils/queryFilter'
+import {ErrorSkipped} from '../../types/queries'
 
 interface TempVar {
   tempVar: string
@@ -79,7 +80,7 @@ class InfluxQLEditor extends Component<Props, State> {
     let submitted: boolean
     if (isQueryConfigChanged) {
       submitted = isExcludedStatement(query)
-        ? config.status?.wasManuallySubmitted
+        ? config.status?.error !== ErrorSkipped
         : true
     } else {
       submitted = isSubmitted
@@ -180,14 +181,15 @@ class InfluxQLEditor extends Component<Props, State> {
             <div className="varmoji-front">
               <QueryStatus
                 status={
-                  config.status?.error === 'skipped'
-                    ? config.submittedStatus
+                  config.status?.error === ErrorSkipped
+                    ? config.status.submittedStatus
                     : config.status
                 }
                 isShowingTemplateValues={isShowingTemplateValues}
                 isSubmitted={
                   (isSubmitted && !isExcluded) ||
-                  (isExcluded && templatingQueryText === config.submittedQuery)
+                  (isExcluded &&
+                    templatingQueryText === config.status?.submittedQuery)
                 }
               >
                 {this.queryStatusButtons}
@@ -305,7 +307,7 @@ class InfluxQLEditor extends Component<Props, State> {
     const {editedQueryText, isSubmitted, isExcluded} = this.state
     if (
       !this.isDisabled &&
-      (!isSubmitted || (!config.status?.wasManuallySubmitted && isExcluded))
+      (!isSubmitted || (isExcluded && config.status?.error === ErrorSkipped))
     ) {
       this.cancelPendingUpdates()
       const update = onUpdate(editedQueryText, isAutoSubmitted)
@@ -318,7 +320,7 @@ class InfluxQLEditor extends Component<Props, State> {
         // prevent changing submitted status when edited while awaiting update
         if (
           this.state.editedQueryText === editedQueryText &&
-          (!isExcluded || (!isAutoSubmitted && isExcluded))
+          (!isExcluded || !isAutoSubmitted)
         ) {
           this.setState({isSubmitted: true})
         }

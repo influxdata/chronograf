@@ -124,20 +124,24 @@ class TimeSeries extends PureComponent<Props, State> {
   }
 
   public async componentDidUpdate(prevProps: Props) {
-    const prevQueries = _.map(prevProps.queries, q => {
-      return {
-        text: q.text,
-        isManuallySubmitted: q.queryConfig?.isManuallySubmitted,
-      }
-    })
-    const currQueries = _.map(this.props.queries, q => {
-      return {
-        text: q.text,
-        isManuallySubmitted: q.queryConfig?.isManuallySubmitted,
-      }
-    })
+    const prevQueries = _.map(prevProps.queries, q => q.text)
+    const currQueries = _.map(this.props.queries, q => q.text)
     const queriesDifferent = !_.isEqual(prevQueries, currQueries)
 
+    let manualSubmit = false
+    if (!queriesDifferent) {
+      for (let i = 0; i < this.props.queries.length; i++) {
+        const query = this.props.queries[i]
+        const prevQuery = prevProps.queries[i]
+        if (
+          query.queryConfig?.status?.isManuallySubmitted &&
+          !prevQuery.queryConfig?.status?.isManuallySubmitted
+        ) {
+          manualSubmit = true
+          break
+        }
+      }
+    }
     const prevTemplates = _.get(prevProps, 'templates')
     const newTemplates = _.get(this.props, 'templates')
     // templates includes dashTime and upperDashTime which capture zoomedTimeRange
@@ -150,6 +154,7 @@ class TimeSeries extends PureComponent<Props, State> {
     const timeRangeChanged = oldLower !== newLower || oldUpper !== newUpper
 
     const shouldExecuteQueries =
+      manualSubmit ||
       queriesDifferent ||
       timeRangeChanged ||
       templatesDifferent ||
@@ -158,13 +163,6 @@ class TimeSeries extends PureComponent<Props, State> {
       this.props.xPixels !== prevProps.xPixels
 
     if (shouldExecuteQueries) {
-      if (!queriesDifferent && !this.isFluxQuery) {
-        this.props.queries.forEach(q => {
-          if (q.queryConfig) {
-            q.queryConfig.isManuallySubmitted = false
-          }
-        })
-      }
       this.debouncer.call(this.executeQueries, EXECUTE_QUERIES_DEBOUNCE_MS)
     }
   }
@@ -325,7 +323,13 @@ class TimeSeries extends PureComponent<Props, State> {
     const {source, templates, editQueryStatus, queries} = this.props
 
     for (const query of queries) {
-      editQueryStatus(query.id, {loading: true})
+      const prevStatus = query.queryConfig.status
+      editQueryStatus(query.id, {
+        loading: true,
+        isManuallySubmitted: prevStatus?.isManuallySubmitted,
+        submittedStatus: prevStatus?.submittedStatus,
+        submittedQuery: prevStatus?.submittedQuery,
+      })
     }
 
     const results = await this.executeInfluxQLQueries(
@@ -352,9 +356,17 @@ class TimeSeries extends PureComponent<Props, State> {
           queryStatus = {success: 'Success!'}
         }
       }
+      const shouldPreserve =
+        query.queryConfig.isExcluded &&
+        !query.queryConfig.status?.isManuallySubmitted
       editQueryStatus(query.id, {
         ...queryStatus,
-        wasManuallySubmitted: query.queryConfig.isManuallySubmitted,
+        submittedStatus: shouldPreserve
+          ? query.queryConfig.status.submittedStatus
+          : queryStatus,
+        submittedQuery: shouldPreserve
+          ? query.queryConfig.status.submittedQuery
+          : query.text,
       })
     }
 

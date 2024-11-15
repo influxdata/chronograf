@@ -1,6 +1,8 @@
 // Types
 import {Source} from 'src/types'
 
+export const ErrorSkipped = 'skipped'
+
 export interface Query {
   text: string
   id: string
@@ -26,10 +28,8 @@ export interface QueryConfig {
   lower?: string
   upper?: string
   isQuerySupportedByExplorer?: boolean // doesn't come from server -- is set in CellEditorOverlay
-  isManuallySubmitted?: boolean // doesn't come from server -- is set in InfluxQLEditor
   originalQuery?: string
-  submittedQuery?: string
-  submittedStatus?: Status
+  isExcluded?: boolean
 }
 
 export interface QueryStatus {
@@ -89,10 +89,12 @@ export interface Namespace {
 
 export interface Status {
   loading?: boolean
-  wasManuallySubmitted?: boolean
+  isManuallySubmitted?: boolean
   error?: string
   warn?: string
   success?: string
+  submittedStatus?: Status
+  submittedQuery?: string
 }
 
 export interface TimeRange {
