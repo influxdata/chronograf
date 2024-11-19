@@ -27,7 +27,7 @@ import {
   setLocalStorage,
   TMLocalStorageKey,
 } from 'src/shared/utils/timeMachine'
-import {isExcludedStatement} from '../../utils/queryFilter'
+import {isExcludedStatement} from 'src/utils/queryFilter'
 
 // Constants
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'

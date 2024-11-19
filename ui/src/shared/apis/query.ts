@@ -6,7 +6,7 @@ import {proxy} from 'src/utils/queryUrlGenerator'
 
 import {Query, Source, Template} from 'src/types'
 import {TimeSeriesResponse} from 'src/types/series'
-import {ErrorSkipped} from '../../types/queries'
+import {ErrorSkipped} from 'src/types/queries'
 
 interface QueryResult {
   value: TimeSeriesResponse | null

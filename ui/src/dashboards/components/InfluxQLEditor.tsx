@@ -32,8 +32,8 @@ import {
 // Types
 import {QueryConfig, Template} from 'src/types'
 import {WrappedCancelablePromise} from 'src/types/promises'
-import {isExcludedStatement} from '../../utils/queryFilter'
-import {ErrorSkipped} from '../../types/queries'
+import {isExcludedStatement} from 'src/utils/queryFilter'
+import {ErrorSkipped} from 'src/types/queries'
 
 interface TempVar {
   tempVar: string

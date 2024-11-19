@@ -54,7 +54,7 @@ import {
 import {SourceOption} from 'src/types/sources'
 import {Links, ScriptStatus} from 'src/types/flux'
 import queryBuilderFetcher from './fluxQueryBuilder/apis/queryBuilderFetcher'
-import {isExcludedStatement} from '../../../utils/queryFilter'
+import {isExcludedStatement} from 'src/utils/queryFilter'
 
 interface ConnectedProps {
   script: string
