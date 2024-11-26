@@ -83,7 +83,7 @@ func TestAuthenticate(t *testing.T) {
 		{
 			Desc:     "Test jwt with empty subject is invalid",
 			Secret:   "secret",
-			Token:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOi00NDY3NzQ0MDAsImV4cCI6LTQ0Njc3NDQwMCwibmJmIjotNDQ2Nzc0NDAwfQ.gxsA6_Ei3s0f2I1TAtrrb8FmGiO25OqVlktlF_ylhX4",
+			Token:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOi00NDY3NzQ0MDAsImV4cCI6LTQ0Njc3NDM5OSwibmJmIjotNDQ2Nzc0NDAwfQ.Ik90GX1cLvTQzkFvKgBxDPIi-GZsIqFhqQlCxek9TPg",
 			Duration: time.Second,
 			Principal: oauth2.Principal{
 				Subject:   "",
@@ -103,6 +103,18 @@ func TestAuthenticate(t *testing.T) {
 				IssuedAt:  history.Add(100 * time.Second),
 			},
 			Err: errors.New("claims duration is different from auth lifespan"),
+		},
+		{
+			Desc:     "Test expiration time is present",
+			Secret:   "secret",
+			Token:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIvY2hyb25vZ3JhZi92MS91c2Vycy8xIiwibmFtZSI6IkRvYyBCcm93biIsImlhdCI6LTQ0Njc3NDQwMCwiZXhwIjotNDQ2Nzc0NDAwLCJuYmYiOi00NDY3NzQ0MDB9._rZ4gOIei9PizHOABH6kLcJTA3jm8ls0YnDxtz1qeUI",
+			Duration: time.Second,
+			Principal: oauth2.Principal{
+				Subject:   "/chronograf/v1/users/1",
+				ExpiresAt: history.Add(time.Second),
+				IssuedAt:  history,
+			},
+			Err: errors.New("token is expired by 0s"),
 		},
 	}
 	for _, test := range tests {

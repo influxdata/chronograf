@@ -4,6 +4,13 @@ orbs:
   aws-s3: circleci/aws-s3@2.0.0
 
 
+parameters:
+  trigger:
+    type: enum
+    enum: [none, deploy-as-artifacts]
+    default: none
+
+
 workflows:
   version: 2
   main:
@@ -69,6 +76,15 @@ workflows:
             tags:
               only: /^[0-9]+(\.[0-9]+)*$/
 
+  trigger:
+    when:
+      equal: [ deploy-as-artifacts, << pipeline.parameters.trigger >> ]
+    jobs:
+      - build
+      - build-nightly:
+          requires:
+            - build
+
 jobs:
   build:
     environment:
@@ -120,6 +136,27 @@ jobs:
           docker login -u "$QUAY_USER" -p $QUAY_PASS quay.io
           docker tag chronograf quay.io/influxdb/chronograf:nightly
           docker push quay.io/influxdb/chronograf:nightly
+      - store_artifacts:
+          path: ./build/
+
+  build-nightly:
+    environment:
+      DOCKER_TAG: chronograf-20240919
+      GO111MODULE: "ON"
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - attach_workspace:
+          at: /home/circleci
+      - run: |
+          ./etc/scripts/docker/run.sh \
+            --debug \
+            --clean \
+            --package \
+            --platform all \
+            --arch all \
+            --nightly \
+            --version=${CIRCLE_SHA1:0:7}
       - store_artifacts:
           path: ./build/
 
