@@ -103,8 +103,9 @@ export function findValues({
 
   // 1.x InfluxDB produce wrong results when _field tag is filtered,
   // experiments showed that keeping an extra column is a workaround
+  const version = source.version || ''
   const v1ExtraKeep =
-    (source.version || '').startsWith('1.') &&
+    (version.startsWith('1.') || version === 'ENT') &&
     tagsSelections.some(x => x.tagKey === '_field' && x.tagValues?.length)
       ? ', "_field"'
       : ''
