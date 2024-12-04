@@ -54,6 +54,7 @@ import {
 import {SourceOption} from 'src/types/sources'
 import {Links, ScriptStatus} from 'src/types/flux'
 import queryBuilderFetcher from './fluxQueryBuilder/apis/queryBuilderFetcher'
+import {isExcludedStatement} from 'src/utils/queryFilter'
 
 interface ConnectedProps {
   script: string
@@ -420,10 +421,20 @@ class TimeMachine extends PureComponent<Props, State> {
     return getDeep(queryDrafts, '0.source', '') === ''
   }
 
-  private handleEditRawText = async (text: string): Promise<void> => {
-    const {templates, onUpdateQueryDrafts, queryDrafts, notify} = this.props
+  private handleEditRawText = async (
+    text: string,
+    isAutoSubmitted: boolean
+  ): Promise<void> => {
+    const {
+      templates,
+      onUpdateQueryDrafts,
+      queryDrafts,
+      queryStatuses,
+      notify,
+    } = this.props
     const activeID = this.activeQuery.id
     const url: string = _.get(this.source, 'links.queries', '')
+    const isExcluded = isExcludedStatement(text)
 
     let newQueryConfig
 
@@ -446,11 +457,16 @@ class TimeMachine extends PureComponent<Props, State> {
         queryConfig: {
           ...newQueryConfig,
           rawText: text,
-          status: {loading: true},
+          isExcluded,
         },
       }
     })
-
+    this.handleEditQueryStatus(activeID, {
+      ...queryStatuses[activeID],
+      isManuallySubmitted: !isAutoSubmitted,
+      submittedStatus: queryStatuses[activeID]?.submittedStatus,
+      submittedQuery: queryStatuses[activeID]?.submittedQuery,
+    })
     onUpdateQueryDrafts(updatedQueryDrafts)
   }
 

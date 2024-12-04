@@ -27,6 +27,7 @@ import {
   setLocalStorage,
   TMLocalStorageKey,
 } from 'src/shared/utils/timeMachine'
+import {isExcludedStatement} from 'src/utils/queryFilter'
 
 // Constants
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
@@ -147,7 +148,7 @@ export class TimeMachineContainer {
       state = {...state, queryDrafts}
     }
 
-    // prevents "DROP" or "DELETE" queries from being persisted.
+    // prevents DDL and DML statements from being persisted.
     const savable = getDeep<CellQuery[]>(state, 'queryDrafts', []).filter(
       ({query, type}) => {
         if (type !== 'influxql') {
@@ -161,8 +162,8 @@ export class TimeMachineContainer {
         const queries = query.split(';')
         let isSavable = true
         for (let i = 0; i <= queries.length; i++) {
-          const qs = getDeep<string>(queries, `${i}`, '').toLocaleLowerCase()
-          if (qs.startsWith('drop') || qs.startsWith('delete')) {
+          const qs = getDeep<string>(queries, `${i}`, '')
+          if (isExcludedStatement(qs)) {
             isSavable = false
           }
         }
