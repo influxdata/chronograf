@@ -82,18 +82,16 @@ export interface FindValuesOptions {
   limit?: number
 }
 
-export function findValues({
-  source,
-  bucket,
-  tagsSelections,
-  key,
-  searchTerm = '',
-  timeRange = DEFAULT_TIME_RANGE,
-  limit = FQB_RESULTS_LIMIT,
-}: FindValuesOptions): CancelBox<TruncatedResult<string[]>> {
-  const tagFilter = formatTagFilter(tagsSelections)
-  const timeRangeArguments = rangeArguments(timeRange)
-
+export function createValuesQuery(
+  searchTerm: string,
+  dbVersion: string,
+  tagsSelections: BuilderTagsType[],
+  bucket: string,
+  timeRangeArguments: string,
+  tagFilter: string,
+  key: string,
+  limit: number
+) {
   // requires Flux package to work which we will put in the query
   const searchFilter = !searchTerm
     ? ''
@@ -103,8 +101,9 @@ export function findValues({
 
   // 1.x InfluxDB produce wrong results when _field tag is filtered,
   // experiments showed that keeping an extra column is a workaround
+  const version = dbVersion || ''
   const v1ExtraKeep =
-    (source.version || '').startsWith('1.') &&
+    (version.startsWith('1.') || version === 'ENT') &&
     tagsSelections.some(x => x.tagKey === '_field' && x.tagValues?.length)
       ? ', "_field"'
       : ''
@@ -118,6 +117,30 @@ from(bucket: ${fluxString(bucket)})
   |> distinct(column: ${fluxString(key)})${searchFilter}
   |> sort()
   |> limit(n: ${limit})`
+  return query
+}
+
+export function findValues({
+  source,
+  bucket,
+  tagsSelections,
+  key,
+  searchTerm = '',
+  timeRange = DEFAULT_TIME_RANGE,
+  limit = FQB_RESULTS_LIMIT,
+}: FindValuesOptions): CancelBox<TruncatedResult<string[]>> {
+  const tagFilter = formatTagFilter(tagsSelections)
+  const timeRangeArguments = rangeArguments(timeRange)
+  const query = createValuesQuery(
+    searchTerm,
+    source.version,
+    tagsSelections,
+    bucket,
+    timeRangeArguments,
+    tagFilter,
+    key,
+    limit
+  )
 
   return extractBoxedCol(runQuery(source, query), '_value', limit)
 }
