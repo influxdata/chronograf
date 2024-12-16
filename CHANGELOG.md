@@ -1,5 +1,7 @@
 ## [unreleased]
 
+## v1.10.6 [2024-12-16]
+
 ### Bug Fixes
 
 1. [#6103](https://github.com/influxdata/chronograf/pull/6103): Set active database for InfluxQL meta queries.
@@ -9,7 +11,7 @@
 
 ### Other
 
-1. [#6102](https://github.com/influxdata/chronograf/pull/6102): Upgrade golang to 1.21.12.
+1. [#6108](https://github.com/influxdata/chronograf/pull/6108): Upgrade golang to 1.22.7.
 
 ## v1.10.5 [2024-05-31]
 
