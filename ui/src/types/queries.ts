@@ -1,6 +1,8 @@
 // Types
 import {Source} from 'src/types'
 
+export const ErrorSkipped = 'skipped'
+
 export interface Query {
   text: string
   id: string
@@ -27,6 +29,7 @@ export interface QueryConfig {
   upper?: string
   isQuerySupportedByExplorer?: boolean // doesn't come from server -- is set in CellEditorOverlay
   originalQuery?: string
+  isExcluded?: boolean
 }
 
 export interface QueryStatus {
@@ -86,9 +89,12 @@ export interface Namespace {
 
 export interface Status {
   loading?: boolean
+  isManuallySubmitted?: boolean
   error?: string
   warn?: string
   success?: string
+  submittedStatus?: Status
+  submittedQuery?: string
 }
 
 export interface TimeRange {

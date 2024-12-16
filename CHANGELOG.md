@@ -1,5 +1,18 @@
 ## [unreleased]
 
+## v1.10.6 [2024-12-16]
+
+### Bug Fixes
+
+1. [#6103](https://github.com/influxdata/chronograf/pull/6103): Set active database for InfluxQL meta queries.
+2. [#6105](https://github.com/influxdata/chronograf/pull/6105): Prevent dangerous InfluxQL statements from auto-execution.
+3. [#6111](https://github.com/influxdata/chronograf/pull/6111): Loading Hosts page for large number of hosts.
+4. [#6116](https://github.com/influxdata/chronograf/pull/6116): Showing tag values in Flux query builder connected to InfluxDB Enterprise.
+
+### Other
+
+1. [#6108](https://github.com/influxdata/chronograf/pull/6108): Upgrade golang to 1.22.7.
+
 ## v1.10.5 [2024-05-31]
 
 ### Other
