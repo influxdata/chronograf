@@ -3,6 +3,7 @@
 ### Other
 
 1. [#6123](https://github.com/influxdata/chronograf/pull/6123): Upgrade golang to 1.22.11.
+2. [#6129](https://github.com/influxdata/chronograf/pull/6129): Upgrade golang to 1.23.8
 
 ## v1.10.6 [2024-12-16]
 
