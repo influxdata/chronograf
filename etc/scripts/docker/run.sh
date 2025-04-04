@@ -14,7 +14,7 @@ test -z $SSH_KEY_PATH && SSH_KEY_PATH="$HOME/.ssh/id_rsa"
 echo "Using SSH key located at: $SSH_KEY_PATH"
 
 # Default docker tag if not specified
-test -z "$DOCKER_TAG" && DOCKER_TAG="chronograf-20250203"
+test -z "$DOCKER_TAG" && DOCKER_TAG="chronograf-20250404"
 
 docker run \
        -e AWS_ACCESS_KEY_ID \
