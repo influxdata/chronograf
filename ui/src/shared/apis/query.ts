@@ -27,8 +27,8 @@ export function executeQueries(
     for (let i = 0; i < queries.length; i++) {
       const q = queries[i]
       if (
-        q.queryConfig.isExcluded &&
-        !q.queryConfig.status.isManuallySubmitted
+        q.queryConfig?.isExcluded &&
+        !q.queryConfig.status?.isManuallySubmitted
       ) {
         results[i] = {value: null, error: ErrorSkipped}
         counter -= 1
@@ -61,11 +61,11 @@ export const executeQuery = async (
   const text = await replace(query.text, source, templates)
 
   const {data} = await proxy({
-    source: source.links.proxy,
-    rp: query.queryConfig.retentionPolicy,
-    query: text,
-    db: query.queryConfig.database,
-    uuid,
+     source: source.links.proxy,
+     rp: query.queryConfig?.retentionPolicy,
+     query: text,
+     db: query.queryConfig?.database,
+     uuid,
   })
 
   return data
