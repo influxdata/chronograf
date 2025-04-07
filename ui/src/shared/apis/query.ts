@@ -61,11 +61,11 @@ export const executeQuery = async (
   const text = await replace(query.text, source, templates)
 
   const {data} = await proxy({
-     source: source.links.proxy,
-     rp: query.queryConfig?.retentionPolicy,
-     query: text,
-     db: query.queryConfig?.database,
-     uuid,
+    source: source.links.proxy,
+    rp: query.queryConfig?.retentionPolicy,
+    query: text,
+    db: query.queryConfig?.database,
+    uuid,
   })
 
   return data
