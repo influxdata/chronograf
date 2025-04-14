@@ -323,7 +323,7 @@ class TimeSeries extends PureComponent<Props, State> {
     const {source, templates, editQueryStatus, queries} = this.props
 
     for (const query of queries) {
-      const prevStatus = query.queryConfig.status
+      const prevStatus = query.queryConfig?.status
       editQueryStatus(query.id, {
         loading: true,
         isManuallySubmitted: prevStatus?.isManuallySubmitted,
@@ -357,7 +357,7 @@ class TimeSeries extends PureComponent<Props, State> {
         }
       }
       const shouldPreserve =
-        query.queryConfig.isExcluded &&
+        query.queryConfig?.isExcluded &&
         !query.queryConfig.status?.isManuallySubmitted
       editQueryStatus(query.id, {
         ...queryStatus,

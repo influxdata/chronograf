@@ -1,5 +1,9 @@
 ## [unreleased]
 
+### Bug Fixes
+
+1. [#6131](https://github.com/influxdata/chronograf/pull/6131): Handle missing queryConfig in Host page queries
+
 ### Other
 
 1. [#6129](https://github.com/influxdata/chronograf/pull/6129): Upgrade golang to 1.23.8
