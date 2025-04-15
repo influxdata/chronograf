@@ -1,4 +1,4 @@
-## [unreleased]
+## v1.10.7 [2025-04-15]
 
 ### Bug Fixes
 
