@@ -40,7 +40,10 @@ func init() {
 type Client struct {
 	URL                *url.URL
 	Authorizer         Authorizer
+	MgmtURL            *url.URL   // (optional) URL for management API
+	MgmtAuthorizer     Authorizer // (optional) Authorizer for management API
 	InsecureSkipVerify bool
+	SrcType            string
 	Logger             chronograf.Logger
 }
 
@@ -168,8 +171,13 @@ func (c *Client) ValidateAuth(ctx context.Context, src *chronograf.Source) error
 	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
 	defer cancel()
 
+	// Cloud Dedicated:
+	if src.Type == chronograf.InfluxDBCloudDedicated {
+		return c.validateCloudDedicatedAuth(ctx)
+	}
+	// v2: use flux query
 	if src.Type == chronograf.InfluxDBv2 {
-		return c.validateAuthFlux(ctx, src)
+		return c.validateV2Auth(ctx, src)
 	}
 	// v1: use InfluxQL
 	if _, err := c.Query(ctx, chronograf.Query{Command: "SHOW DATABASES"}); err != nil {
@@ -178,8 +186,8 @@ func (c *Client) ValidateAuth(ctx context.Context, src *chronograf.Source) error
 	return nil
 }
 
-// validateAuthFlux uses Flux query to validate token authentication
-func (c *Client) validateAuthFlux(ctx context.Context, src *chronograf.Source) error {
+// validateV2Auth uses Flux query to validate token authentication
+func (c *Client) validateV2Auth(ctx context.Context, src *chronograf.Source) error {
 	u, err := url.Parse(c.URL.String())
 	if err != nil {
 		return err
@@ -210,11 +218,15 @@ func (c *Client) validateAuthFlux(ctx context.Context, src *chronograf.Source) e
 		}
 	}
 
+	return c.executeRequest(err, req)
+}
+
+func (c *Client) executeRequest(err error, req *http.Request) error {
 	hc := &http.Client{}
 	hc.Transport = SharedTransport(c.InsecureSkipVerify)
 	resp, err := hc.Do(req)
 	if err != nil {
-		if err == context.DeadlineExceeded || err == context.Canceled {
+		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 			return chronograf.ErrUpstreamTimeout
 		}
 		return err
@@ -245,6 +257,20 @@ func (c *Client) Connect(ctx context.Context, src *chronograf.Source) error {
 	}
 
 	c.URL = u
+
+	// InfluxDB Cloud Dedicated also provides a management API.
+	if src.Type == chronograf.InfluxDBCloudDedicated {
+		mgmtUrl := fmt.Sprintf("https://console.influxdata.com/api/v0/accounts/%s/clusters/%s", src.AccountID, src.ClusterID)
+		if u, err = url.Parse(mgmtUrl); err != nil {
+			return err
+		}
+
+		c.MgmtURL = u
+		c.MgmtAuthorizer = &BearerToken{
+			Token: src.ManagementToken,
+		}
+	}
+	c.SrcType = src.Type
 	return nil
 }
 
@@ -331,11 +357,18 @@ func (c *Client) ping(u *url.URL) (string, string, error) {
 		return "", "", err
 	}
 
-	version := resp.Header.Get("X-Influxdb-Build")
-	if version == "ENT" {
-		return version, chronograf.InfluxEnterprise, nil
+	builds := resp.Header.Values("X-Influxdb-Build")
+	isCloud2 := false
+	for _, build := range builds {
+		if build == "ENT" {
+			return build, chronograf.InfluxEnterprise, nil
+		}
+		if build == "cloud2" {
+			isCloud2 = true
+		}
 	}
-	version = resp.Header.Get("X-Influxdb-Version")
+
+	version := resp.Header.Get("X-Influxdb-Version")
 	if strings.Contains(version, "-c") {
 		return version, chronograf.InfluxEnterprise, nil
 	} else if strings.Contains(version, "relay") {
@@ -345,6 +378,11 @@ func (c *Client) ping(u *url.URL) (string, string, error) {
 	// InfluxDB 2.2.0 return version in format vx.x.x
 	if strings.HasPrefix(version, "v") {
 		version = version[1:]
+	}
+
+	if isCloud2 {
+		// TODO: improve this, other influxdb v3 version could also return "cloud2"
+		return version, chronograf.InfluxDBCloudDedicated, nil
 	}
 
 	return version, chronograf.InfluxDB, nil

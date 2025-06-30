@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/influxdata/chronograf/enterprise"
 	"github.com/influxdata/chronograf/flux"
 
@@ -76,6 +77,10 @@ func hasFlux(ctx context.Context, src chronograf.Source) (bool, error) {
 	// and a non-empty Organization (stored in Username)
 	if src.Version == "" /* v2 OSS reports no version */ || strings.HasPrefix(src.Version, "2.") {
 		return src.Type == chronograf.InfluxDBv2 && src.Username != "", nil
+	}
+	if src.Type == chronograf.InfluxDBCloudDedicated {
+		// InfluxDB 3 doesn't support Flux.
+		return false, nil
 	}
 
 	url, err := url.ParseRequestURI(src.URL)
@@ -222,8 +227,8 @@ func (s *Service) tsdbVersion(ctx context.Context, src *chronograf.Source) (stri
 }
 
 func (s *Service) tsdbType(ctx context.Context, src *chronograf.Source) (string, error) {
-	if src.Type == chronograf.InfluxDBv2 {
-		return chronograf.InfluxDBv2, nil // v2 selected by the user
+	if src.Type == chronograf.InfluxDBv2 || src.Type == chronograf.InfluxDBCloudDedicated {
+		return src.Type, nil // type selected by the user
 	}
 	cli := &influx.Client{
 		Logger: s.Logger,
@@ -490,6 +495,7 @@ func ValidSourceRequest(s *chronograf.Source, defaultOrgID string) error {
 	if s.Type != "" {
 		if s.Type != chronograf.InfluxDB &&
 			s.Type != chronograf.InfluxDBv2 &&
+			s.Type != chronograf.InfluxDBCloudDedicated &&
 			s.Type != chronograf.InfluxEnterprise &&
 			s.Type != chronograf.InfluxRelay {
 			return fmt.Errorf("invalid source type %s", s.Type)
@@ -506,6 +512,27 @@ func ValidSourceRequest(s *chronograf.Source, defaultOrgID string) error {
 	}
 	if len(url.Scheme) == 0 {
 		return fmt.Errorf("invalid URL; no URL scheme defined")
+	}
+
+	if s.Type == chronograf.InfluxDBCloudDedicated {
+		if len(s.ClusterID) == 0 {
+			return fmt.Errorf("cluster ID required")
+		}
+		if _, err := uuid.Parse(s.ClusterID); err != nil {
+			return fmt.Errorf("cluster ID is not a valid UUID")
+		}
+		if len(s.AccountID) == 0 {
+			return fmt.Errorf("account ID required")
+		}
+		if _, err := uuid.Parse(s.AccountID); err != nil {
+			return fmt.Errorf("account ID is not a valid UUID")
+		}
+		if len(s.ManagementToken) == 0 {
+			return fmt.Errorf("management token required")
+		}
+		if len(s.DatabaseToken) == 0 {
+			return fmt.Errorf("database token required")
+		}
 	}
 
 	return nil

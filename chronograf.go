@@ -99,6 +99,8 @@ const (
 	InfluxRelay = "influx-relay"
 	// InfluxDBv2 is Influx DB 2.x with Token authentication
 	InfluxDBv2 = "influx-v2"
+	// InfluxDBCloudDedicated is InfluxDB Cloud Dedicated with Account ID, Cluster ID, Management and DB Token
+	InfluxDBCloudDedicated = "influx-cloud-dedicated"
 )
 
 // TSDBStatus represents the current status of a time series database
@@ -243,6 +245,10 @@ type Source struct {
 	Username           string `json:"username,omitempty"`           // Username is the username to connect to the source
 	Password           string `json:"password,omitempty"`           // Password is in CLEARTEXT
 	SharedSecret       string `json:"sharedSecret,omitempty"`       // ShareSecret is the optional signing secret for Influx JWT authorization
+	ClusterID          string `json:"clusterId,omitempty"`          // ClusterID is the cluster ID for InfluxDB Cloud Dedicated sources
+	AccountID          string `json:"accountId,omitempty"`          // AccountID is the account ID for InfluxDB Cloud Dedicated sources
+	ManagementToken    string `json:"managementToken,omitempty"`    // ManagementToken is the management token for InfluxDB Cloud Dedicated sources
+	DatabaseToken      string `json:"databaseToken,omitempty"`      // DatabaseToken is the database token for InfluxDB Cloud Dedicated sources
 	URL                string `json:"url"`                          // URL are the connections to the source
 	MetaURL            string `json:"metaUrl,omitempty"`            // MetaURL is the url for the meta node
 	InsecureSkipVerify bool   `json:"insecureSkipVerify,omitempty"` // InsecureSkipVerify as true means any certificate presented by the source is accepted.

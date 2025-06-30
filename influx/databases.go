@@ -11,6 +11,9 @@ import (
 
 // AllDB returns all databases from within Influx
 func (c *Client) AllDB(ctx context.Context) ([]chronograf.Database, error) {
+	if c.SrcType == chronograf.InfluxDBCloudDedicated {
+		return c.listDatabasesForCloudDedicated(ctx)
+	}
 	return c.showDatabases(ctx)
 }
 
@@ -42,6 +45,10 @@ func (c *Client) DropDB(ctx context.Context, db string) error {
 
 // AllRP returns all the retention policies for a specific database
 func (c *Client) AllRP(ctx context.Context, db string) ([]chronograf.RetentionPolicy, error) {
+	if c.SrcType == chronograf.InfluxDBCloudDedicated {
+		// Data retention in InfluxDB 3 is configured differently, on database level.
+		return []chronograf.RetentionPolicy{}, nil
+	}
 	return c.showRetentionPolicies(ctx, db)
 }
 
