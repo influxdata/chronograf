@@ -31,6 +31,7 @@ import {
 import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
 import {
   DEFAULT_SOURCE,
+  SOURCE_TYPE_INFLUX_CLOUD_DEDICATED,
   SOURCE_TYPE_INFLUX_V2,
   SOURCE_TYPE_INFLUX_V1,
 } from 'src/shared/constants'
@@ -43,6 +44,8 @@ import {NextReturn} from 'src/types/wizard'
 const isNewSource = (source: Partial<Source>) => !source.id
 const isV2Auth = (source: Partial<Source>) =>
   source.type && source.type === SOURCE_TYPE_INFLUX_V2
+const isCD = (source: Partial<Source>) =>
+  source.type && source.type === SOURCE_TYPE_INFLUX_CLOUD_DEDICATED
 
 interface Props {
   notify: typeof notifyAction
@@ -105,6 +108,7 @@ class SourceStep extends PureComponent<Props, State> {
     const {source} = this.state
     const {isUsingAuth, onBoarding} = this.props
     const sourceIsV2 = isV2Auth(source)
+    const sourceIsCD = isCD(source)
 
     return (
       <>
@@ -123,22 +127,55 @@ class SourceStep extends PureComponent<Props, State> {
           onChange={this.onChangeInput('name')}
           testId="connection-name--input"
         />
-        <WizardTextInput
-          value={source.username}
-          label={sourceIsV2 ? 'Organization' : 'Username'}
-          onChange={this.onChangeInput('username')}
-          onSubmit={this.handleSubmitUsername}
-          testId="connection-username--input"
-        />
-        <WizardTextInput
-          value={source.password}
-          label={sourceIsV2 ? 'Token' : 'Password'}
-          placeholder={this.passwordPlaceholder}
-          type="password"
-          onChange={this.onChangeInput('password')}
-          onSubmit={this.handleSubmitPassword}
-          testId="connection-password--input"
-        />
+        {!sourceIsCD && (
+          <>
+            <WizardTextInput
+              value={source.username}
+              label={sourceIsV2 ? 'Organization' : 'Username'}
+              onChange={this.onChangeInput('username')}
+              onSubmit={this.handleSubmitUsername}
+              testId="connection-username--input"
+            />
+            <WizardTextInput
+              value={source.password}
+              label={sourceIsV2 ? 'Token' : 'Password'}
+              placeholder={this.passwordPlaceholder}
+              type="password"
+              onChange={this.onChangeInput('password')}
+              onSubmit={this.handleSubmitPassword}
+              testId="connection-password--input"
+            />
+          </>
+        )}
+
+        {/* InfluxDB Cloud Dedicated fields */}
+        {sourceIsCD && (
+          <>
+            <WizardTextInput
+              value={source.clusterId}
+              label={'Cluster ID'}
+              onChange={this.onChangeInput('clusterId')}
+            />
+            <WizardTextInput
+              value={source.accountId}
+              label={'Account ID'}
+              onChange={this.onChangeInput('accountId')}
+            />
+            <WizardTextInput
+              value={source.managementToken}
+              label={'Management Token'}
+              type="password"
+              onChange={this.onChangeInput('managementToken')}
+            />
+            <WizardTextInput
+              value={source.databaseToken}
+              label={'Database Token'}
+              type="password"
+              onChange={this.onChangeInput('databaseToken')}
+            />
+          </>
+        )}
+
         <WizardTextInput
           value={source.telegraf}
           label="Telegraf Database Name"
@@ -159,7 +196,7 @@ class SourceStep extends PureComponent<Props, State> {
         )}
         {!onBoarding && (
           <WizardCheckbox
-            halfWidth={true}
+            halfWidth={false}
             isChecked={source.default}
             text={'Default connection'}
             onChange={this.onChangeInput('default')}
@@ -167,10 +204,16 @@ class SourceStep extends PureComponent<Props, State> {
           />
         )}
         <WizardCheckbox
-          halfWidth={!onBoarding}
+          halfWidth={true}
           isChecked={sourceIsV2}
           text={'InfluxDB v2 Auth'}
-          onChange={this.changeAuth}
+          onChange={this.changeV2Auth}
+        />
+        <WizardCheckbox
+          halfWidth={true}
+          isChecked={sourceIsCD}
+          text={'InfluxDB Cloud Dedicated'}
+          onChange={this.changeCD}
         />
 
         {this.isHTTPS && (
@@ -236,17 +279,35 @@ class SourceStep extends PureComponent<Props, State> {
     this.setState({source: {...source, [key]: value}})
     setError(false)
   }
-  private changeAuth = (v2: boolean) => {
+  private changeSourceType = (type: string, version: string) => {
     const {source} = this.state
     this.setState({
       source: {
         ...source,
         username: '',
         password: '',
-        type: v2 ? SOURCE_TYPE_INFLUX_V2 : SOURCE_TYPE_INFLUX_V1,
-        version: v2 ? '2.x' : '1.x',
+        clusterId: '',
+        accountId: '',
+        managementToken: '',
+        databaseToken: '',
+        type,
+        version,
       },
     })
+  }
+  private changeV2Auth = (v2: boolean) => {
+    if (v2) {
+      this.changeSourceType(SOURCE_TYPE_INFLUX_V2, '2.x')
+    } else {
+      this.changeSourceType(SOURCE_TYPE_INFLUX_V1, '1.x')
+    }
+  }
+  private changeCD = (cd: boolean) => {
+    if (cd) {
+      this.changeSourceType(SOURCE_TYPE_INFLUX_CLOUD_DEDICATED, 'cloud')
+    } else {
+      this.changeSourceType(SOURCE_TYPE_INFLUX_V1, '1.x')
+    }
   }
 
   private handleSubmitUrl = (url: string) => this.detectServerType({url})
