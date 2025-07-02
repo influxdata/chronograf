@@ -10,67 +10,81 @@ import (
 )
 
 func TestMarshalSource(t *testing.T) {
-	v := chronograf.Source{
-		ID:       12,
-		Name:     "Fountain of Truth",
-		Type:     "influx",
-		Username: "docbrown",
-		Password: "1 point twenty-one g1g@w@tts",
-		URL:      "http://twin-pines.mall.io:8086",
-		MetaURL:  "http://twin-pines.meta.io:8086",
-		Default:  true,
-		Telegraf: "telegraf",
+	tests := []struct {
+		name string
+		src  chronograf.Source
+	}{
+		{
+			name: "Source with Password",
+			src: chronograf.Source{
+				ID:       12,
+				Name:     "Fountain of Truth",
+				Type:     "influx",
+				Username: "docbrown",
+				Password: "1 point twenty-one g1g@w@tts",
+				URL:      "http://twin-pines.mall.io:8086",
+				MetaURL:  "http://twin-pines.meta.io:8086",
+				Default:  true,
+				Telegraf: "telegraf",
+			},
+		},
+		{
+			name: "Source with Shared Secret",
+			src: chronograf.Source{
+				ID:           12,
+				Name:         "Fountain of Truth",
+				Type:         "influx",
+				Username:     "docbrown",
+				SharedSecret: "hunter2s",
+				URL:          "http://twin-pines.mall.io:8086",
+				MetaURL:      "http://twin-pines.meta.io:8086",
+				Default:      true,
+				Telegraf:     "telegraf",
+			},
+		},
+		{
+			name: "Source for Cloud Dedicated",
+			src: chronograf.Source{
+				ID:              12,
+				Name:            "Fountain of Truth",
+				Type:            "influx-cloud-dedicated",
+				ClusterID:       "3F762A1F-B609-4E7A-9657-8F0A39C27A58",
+				AccountID:       "27F924B3-FF40-47B1-B587-3AB980B87EF4",
+				ManagementToken: "mgmt-token",
+				DatabaseToken:   "database-token",
+				URL:             "http://twin-pines.mall.io:8086",
+				MetaURL:         "http://twin-pines.meta.io:8086",
+				Default:         true,
+				Telegraf:        "telegraf",
+			},
+		},
 	}
 
-	var vv chronograf.Source
-	if buf, err := internal.MarshalSource(v); err != nil {
-		t.Fatal(err)
-	} else if err := internal.UnmarshalSource(buf, &vv); err != nil {
-		t.Fatal(err)
-	} else if !reflect.DeepEqual(v, vv) {
-		t.Fatalf("source protobuf copy error: got %#v, expected %#v", vv, v)
-	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			v := tt.src
 
-	// Test if the new insecureskipverify works
-	v.InsecureSkipVerify = true
-	if buf, err := internal.MarshalSource(v); err != nil {
-		t.Fatal(err)
-	} else if err := internal.UnmarshalSource(buf, &vv); err != nil {
-		t.Fatal(err)
-	} else if !reflect.DeepEqual(v, vv) {
-		t.Fatalf("source protobuf copy error: got %#v, expected %#v", vv, v)
-	}
-}
-func TestMarshalSourceWithSecret(t *testing.T) {
-	v := chronograf.Source{
-		ID:           12,
-		Name:         "Fountain of Truth",
-		Type:         "influx",
-		Username:     "docbrown",
-		SharedSecret: "hunter2s",
-		URL:          "http://twin-pines.mall.io:8086",
-		MetaURL:      "http://twin-pines.meta.io:8086",
-		Default:      true,
-		Telegraf:     "telegraf",
-	}
+			// Test initial marshal/unmarshal.
+			var vv chronograf.Source
+			if buf, err := internal.MarshalSource(v); err != nil {
+				t.Fatalf("failed to marshal source: %v", err)
+			} else if err := internal.UnmarshalSource(buf, &vv); err != nil {
+				t.Fatalf("failed to unmarshal source: %v", err)
+			} else if !reflect.DeepEqual(v, vv) {
+				t.Fatalf("source protobuf copy error: got %#v, expected %#v", vv, v)
+			}
 
-	var vv chronograf.Source
-	if buf, err := internal.MarshalSource(v); err != nil {
-		t.Fatal(err)
-	} else if err := internal.UnmarshalSource(buf, &vv); err != nil {
-		t.Fatal(err)
-	} else if !reflect.DeepEqual(v, vv) {
-		t.Fatalf("source protobuf copy error: got %#v, expected %#v", vv, v)
-	}
+			// Test with InsecureSkipVerify set to true.
+			v.InsecureSkipVerify = true
 
-	// Test if the new insecureskipverify works
-	v.InsecureSkipVerify = true
-	if buf, err := internal.MarshalSource(v); err != nil {
-		t.Fatal(err)
-	} else if err := internal.UnmarshalSource(buf, &vv); err != nil {
-		t.Fatal(err)
-	} else if !reflect.DeepEqual(v, vv) {
-		t.Fatalf("source protobuf copy error: got %#v, expected %#v", vv, v)
+			if buf, err := internal.MarshalSource(v); err != nil {
+				t.Fatalf("failed to marshal source with InsecureSkipVerify: %v", err)
+			} else if err := internal.UnmarshalSource(buf, &vv); err != nil {
+				t.Fatalf("failed to unmarshal source with InsecureSkipVerify: %v", err)
+			} else if !reflect.DeepEqual(v, vv) {
+				t.Fatalf("source protobuf copy error with InsecureSkipVerify: got %#v, expected %#v", vv, v)
+			}
+		})
 	}
 }
 
