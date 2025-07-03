@@ -13,6 +13,7 @@ const {func, shape, bool} = PropTypes
 const DatabaseTable = ({
   database,
   isRFDisplayed,
+  isDBReadOnly,
   onEditDatabase,
   onKeyDownDatabase,
   onCancelDatabase,
@@ -46,7 +47,10 @@ const DatabaseTable = ({
         onAddRetentionPolicy={onAddRetentionPolicy}
         onDeleteRetentionPolicy={onDeleteRetentionPolicy}
         onDatabaseDeleteConfirm={onDatabaseDeleteConfirm}
-        isAddRPDisabled={!!database.retentionPolicies.some(rp => rp.isNew)}
+        isAddRPDisabled={
+          !!database.retentionPolicies.some(rp => rp.isNew) || isDBReadOnly
+        }
+        isDBDeleteDisabled={isDBReadOnly}
       />
       {!database.isNew && (
         <div
@@ -100,6 +104,7 @@ DatabaseTable.propTypes = {
   onEditDatabase: func,
   database: shape(),
   isRFDisplayed: bool,
+  isDBReadOnly: bool,
   isAddRPDisabled: bool,
   onKeyDownDatabase: func,
   onDeleteDatabase: func,
