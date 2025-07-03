@@ -45,10 +45,6 @@ func (c *Client) DropDB(ctx context.Context, db string) error {
 
 // AllRP returns all the retention policies for a specific database
 func (c *Client) AllRP(ctx context.Context, db string) ([]chronograf.RetentionPolicy, error) {
-	if c.SrcType == chronograf.InfluxDBCloudDedicated {
-		// Data retention in InfluxDB 3 is configured differently, on database level.
-		return []chronograf.RetentionPolicy{}, nil
-	}
 	return c.showRetentionPolicies(ctx, db)
 }
 
@@ -68,6 +64,10 @@ func (c *Client) getRP(ctx context.Context, db, rp string) (chronograf.Retention
 
 // CreateRP creates a retention policy for a specific database
 func (c *Client) CreateRP(ctx context.Context, db string, rp *chronograf.RetentionPolicy) (*chronograf.RetentionPolicy, error) {
+	if c.SrcType == chronograf.InfluxDBCloudDedicated {
+		// Data retention in InfluxDB 3 is configured differently, on database level.
+		return nil, fmt.Errorf("retention policies not supported in InfluxDB Cloud Dedicated")
+	}
 	query := fmt.Sprintf(`CREATE RETENTION POLICY "%s" ON "%s" DURATION %s REPLICATION %d`, rp.Name, db, rp.Duration, rp.Replication)
 	if len(rp.ShardDuration) != 0 {
 		query = fmt.Sprintf(`%s SHARD DURATION %s`, query, rp.ShardDuration)
@@ -95,6 +95,10 @@ func (c *Client) CreateRP(ctx context.Context, db string, rp *chronograf.Retenti
 
 // UpdateRP updates a specific retention policy for a specific database
 func (c *Client) UpdateRP(ctx context.Context, db string, rp string, upd *chronograf.RetentionPolicy) (*chronograf.RetentionPolicy, error) {
+	if c.SrcType == chronograf.InfluxDBCloudDedicated {
+		// Data retention in InfluxDB 3 is configured differently, on database level.
+		return nil, fmt.Errorf("retention policies not supported in InfluxDB Cloud Dedicated")
+	}
 	var buffer bytes.Buffer
 	buffer.WriteString(fmt.Sprintf(`ALTER RETENTION POLICY "%s" ON "%s"`, rp, db))
 	if len(upd.Duration) > 0 {
@@ -147,6 +151,10 @@ func (c *Client) UpdateRP(ctx context.Context, db string, rp string, upd *chrono
 
 // DropRP removes a specific retention policy for a specific database
 func (c *Client) DropRP(ctx context.Context, db string, rp string) error {
+	if c.SrcType == chronograf.InfluxDBCloudDedicated {
+		// Data retention in InfluxDB 3 is configured differently, on database level.
+		return fmt.Errorf("retention policies not supported in InfluxDB Cloud Dedicated")
+	}
 	_, err := c.Query(ctx, chronograf.Query{
 		Command: fmt.Sprintf(`DROP RETENTION POLICY "%s" ON "%s"`, rp, db),
 		DB:      db,
