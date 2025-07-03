@@ -88,6 +88,7 @@ const DatabaseTable = ({
                     onRemove={onRemoveRetentionPolicy}
                     onDelete={onDeleteRetentionPolicy}
                     isRFDisplayed={isRFDisplayed}
+                    isEditable={!isDBReadOnly}
                     isDeletable={database.retentionPolicies.length > 1}
                   />
                 )
