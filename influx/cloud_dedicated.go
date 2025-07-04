@@ -178,3 +178,38 @@ func (c *Client) newDummyQueryRequestForCloudDedicated(ctx context.Context) (*ht
 	}
 	return req, err
 }
+
+// appendTimeCondition appends a default "WHERE time > 0" clause to the provided SQL command if no WHERE clause exists.
+func appendTimeCondition(cmd string) string {
+	// Remove trailing semicolon if present
+	cmd = strings.TrimSuffix(cmd, ";")
+	upperCmd := strings.ToUpper(cmd)
+
+	if strings.Contains(upperCmd, " WHERE ") {
+		// Already contains a `WHERE` clause (hopefully also with a time condition)
+		return cmd
+	}
+
+	// Find positions of LIMIT and OFFSET clauses
+	limitPos := strings.Index(upperCmd, " LIMIT ")
+	offsetPos := strings.Index(upperCmd, " OFFSET ")
+
+	// Find the earliest position where we need to insert WHERE
+	insertPos := len(cmd) // Default to end
+	if limitPos != -1 && offsetPos != -1 {
+		insertPos = min(limitPos, offsetPos)
+	} else if limitPos != -1 {
+		insertPos = limitPos
+	} else if offsetPos != -1 {
+		insertPos = offsetPos
+	}
+
+	// Insert WHERE condition
+	if insertPos == len(cmd) {
+		// No LIMIT/OFFSET, append to the end
+		return cmd + " WHERE time > 0"
+	} else {
+		// Insert before LIMIT/OFFSET
+		return cmd[:insertPos] + " WHERE time > 0" + cmd[insertPos:]
+	}
+}
