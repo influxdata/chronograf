@@ -13,6 +13,17 @@ import (
 	"github.com/influxdata/chronograf/util"
 )
 
+type fakeInfluxResponse []struct {
+	StatementID int      `json:"statement_id"`
+	Series      []series `json:"series"`
+}
+
+type series struct {
+	Name    string          `json:"name"`
+	Columns []string        `json:"columns"`
+	Values  [][]interface{} `json:"values"`
+}
+
 type cdDatabase struct {
 	Name string `json:"name,omitempty"`
 }
@@ -46,8 +57,8 @@ func (c *Client) validateCloudDedicatedAuth(ctx context.Context) error {
 	return nil
 }
 
-// listDatabasesForCloudDedicated list databases of InfluxDB Cloud Dedicated using the management api.
-func (c *Client) listDatabasesForCloudDedicated(ctx context.Context) ([]chronograf.Database, error) {
+// showDatabasesForCloudDedicated list databases of InfluxDB Cloud Dedicated using the management api and wraps the results into chronograf.Response structure.
+func (c *Client) showDatabasesForCloudDedicated(ctx context.Context) (chronograf.Response, error) {
 	// Prepare request.
 	req, logs, err := c.newListDatabasesRequestForCloudDedicated(ctx)
 	if err != nil {
@@ -85,11 +96,7 @@ func (c *Client) listDatabasesForCloudDedicated(ctx context.Context) ([]chronogr
 	}
 
 	// Convert response.
-	result := make([]chronograf.Database, len(databases))
-	for i, database := range databases {
-		result[i] = chronograf.Database{Name: database.Name}
-	}
-	return result, nil
+	return constructShowDatabasesResponse(databases), nil
 }
 
 // newListDatabasesRequestForCloudDedicated constructs a new http.Request for listing databases in InfluxDB Cloud Dedicated.
@@ -112,6 +119,34 @@ func (c *Client) newListDatabasesRequestForCloudDedicated(ctx context.Context) (
 	}
 
 	return req, logs, err
+}
+
+// constructShowDatabasesResponse constructs a chronograf.Response containing database names formatted as query result data.
+func constructShowDatabasesResponse(databases []cdDatabase) chronograf.Response {
+	values := make([][]interface{}, len(databases))
+	for i, db := range databases {
+		values[i] = []interface{}{db.Name}
+	}
+
+	response := fakeInfluxResponse{
+		{
+			StatementID: 0,
+			Series: []series{
+				{
+					Name:    "databases",
+					Columns: []string{"name"},
+					Values:  values,
+				},
+			},
+		},
+	}
+
+	data, _ := json.Marshal(response)
+	return &responseType{
+		Results: data,
+		Err:     "",
+		V2Err:   "",
+	}
 }
 
 // newDummyQueryRequestForCloudDedicated constructs a http.Request to call a dummy query in InfluxDB Cloud Dedicated.

@@ -152,6 +152,13 @@ type result struct {
 // include both the database and retention policy. In-flight requests can be
 // cancelled using the provided context.
 func (c *Client) Query(ctx context.Context, q chronograf.Query) (chronograf.Response, error) {
+	if c.SrcType == chronograf.InfluxDBCloudDedicated {
+		cmdUpper := strings.ToUpper(q.Command)
+		if cmdUpper == "SHOW DATABASES" {
+			return c.showDatabasesForCloudDedicated(ctx)
+		}
+	}
+
 	resps := make(chan (result))
 	go func() {
 		resp, err := c.query(c.URL, q)

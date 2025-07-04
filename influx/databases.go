@@ -11,9 +11,6 @@ import (
 
 // AllDB returns all databases from within Influx
 func (c *Client) AllDB(ctx context.Context) ([]chronograf.Database, error) {
-	if c.SrcType == chronograf.InfluxDBCloudDedicated {
-		return c.listDatabasesForCloudDedicated(ctx)
-	}
 	return c.showDatabases(ctx)
 }
 
