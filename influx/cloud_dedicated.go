@@ -183,7 +183,7 @@ func (c *Client) newDummyQueryRequestForCloudDedicated(ctx context.Context) (*ht
 func appendTimeCondition(cmd string) string {
 	// Remove trailing semicolon if present
 	cmd = strings.TrimSuffix(cmd, ";")
-	upperCmd := strings.ToUpper(cmd)
+	upperCmd := clearQuotedContent(strings.ToUpper(cmd))
 
 	if strings.Contains(upperCmd, " WHERE ") {
 		// Already contains a `WHERE` clause (hopefully also with a time condition)
@@ -212,4 +212,23 @@ func appendTimeCondition(cmd string) string {
 		// Insert before LIMIT/OFFSET
 		return cmd[:insertPos] + " WHERE time > 0" + cmd[insertPos:]
 	}
+}
+
+// clearQuotedContent replaces content within double quotes in the input string with underscores.
+func clearQuotedContent(cmd string) string {
+	var result strings.Builder
+	inQuotes := false
+
+	for _, char := range cmd {
+		if char == '"' {
+			inQuotes = !inQuotes
+			result.WriteByte('"')
+		} else if inQuotes {
+			result.WriteByte('_')
+		} else {
+			result.WriteByte(byte(char))
+		}
+	}
+
+	return result.String()
 }

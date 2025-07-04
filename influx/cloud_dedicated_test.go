@@ -19,6 +19,11 @@ func TestAppendTimeCondition(t *testing.T) {
 			expected: `SHOW TAG VALUES WITH KEY = "tagkey" WHERE time > 0`,
 		},
 		{
+			name:     "query with tag name with where in it",
+			input:    `SHOW TAG VALUES WITH KEY = "tag name with where in it"`,
+			expected: `SHOW TAG VALUES WITH KEY = "tag name with where in it" WHERE time > 0`,
+		},
+		{
 			name:     "query with quoted table name",
 			input:    `SHOW TAG VALUES FROM "autogen"."machine_data" WITH KEY IN ("t1", "t2")`,
 			expected: `SHOW TAG VALUES FROM "autogen"."machine_data" WITH KEY IN ("t1", "t2") WHERE time > 0`,
