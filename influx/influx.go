@@ -157,6 +157,9 @@ func (c *Client) Query(ctx context.Context, q chronograf.Query) (chronograf.Resp
 		if cmdUpper == "SHOW DATABASES" {
 			return c.showDatabasesForCloudDedicated(ctx)
 		}
+		if strings.Contains(cmdUpper, "SHOW TAG VALUES") {
+			q.Command = appendTimeCondition(q.Command)
+		}
 	}
 
 	resps := make(chan (result))
