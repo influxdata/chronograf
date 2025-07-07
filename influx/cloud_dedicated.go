@@ -11,6 +11,7 @@ import (
 
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/util"
+	"github.com/influxdata/influxdb/influxql"
 )
 
 type fakeInfluxResponse []struct {
@@ -179,57 +180,102 @@ func (c *Client) newDummyQueryRequestForCloudDedicated(ctx context.Context) (*ht
 	return req, err
 }
 
-// appendTimeCondition appends a default "WHERE time > now() - 24h" clause to the provided SQL command if no WHERE clause exists.
-func appendTimeCondition(cmd string) string {
-	const timeCondition = "time > now() - 24h"
-	// Remove trailing semicolon if present
-	cmd = strings.TrimSuffix(cmd, ";")
-	upperCmd := clearQuotedContent(strings.ToUpper(cmd))
-
-	if strings.Contains(upperCmd, " WHERE ") {
-		// Already contains a `WHERE` clause (hopefully also with a time condition)
-		return cmd
+// parseShowTagValuesStatement parses a SHOW TAG VALUES query string into an instance of ShowTagValuesStatement.
+func parseShowTagValuesStatement(query string) (*influxql.ShowTagValuesStatement, error) {
+	stmt, err := influxql.ParseStatement(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse statement: %w", err)
 	}
-
-	// Find positions of LIMIT and OFFSET clauses
-	limitPos := strings.Index(upperCmd, " LIMIT ")
-	offsetPos := strings.Index(upperCmd, " OFFSET ")
-
-	// Find the earliest position where we need to insert WHERE
-	insertPos := len(cmd) // Default to end
-	if limitPos != -1 && offsetPos != -1 {
-		insertPos = min(limitPos, offsetPos)
-	} else if limitPos != -1 {
-		insertPos = limitPos
-	} else if offsetPos != -1 {
-		insertPos = offsetPos
+	showStmt, ok := stmt.(*influxql.ShowTagValuesStatement)
+	if !ok {
+		return nil, fmt.Errorf("not a SHOW TAG VALUES statement")
 	}
+	return showStmt, nil
 
-	// Insert WHERE condition
-	if insertPos == len(cmd) {
-		// No LIMIT/OFFSET, append to the end
-		return cmd + " WHERE " + timeCondition
-	} else {
-		// Insert before LIMIT/OFFSET
-		return cmd[:insertPos] + " WHERE " + timeCondition + cmd[insertPos:]
-	}
 }
 
-// clearQuotedContent replaces content within double quotes in the input string with underscores.
-func clearQuotedContent(cmd string) string {
-	var result strings.Builder
-	inQuotes := false
+// appendTimeCondition appends a default "WHERE time > now() - 1d" clause to the provided SHOW TAG VALUES statement if no time condition exists.
+func appendTimeCondition(showStmt *influxql.ShowTagValuesStatement) error {
+	const timeCondition = "time > now() - 1d"
 
-	for _, char := range cmd {
-		if char == '"' {
-			inQuotes = !inQuotes
-			result.WriteByte('"')
-		} else if inQuotes {
-			result.WriteByte('_')
-		} else {
-			result.WriteByte(byte(char))
+	// Check if there's already a time condition in the WHERE clause
+	if showStmt.Condition != nil && hasTimeCondition(showStmt.Condition) {
+		// Already has a time condition, do nothing
+		return nil
+	}
+
+	// Create the time condition expression
+	timeExpr, err := influxql.ParseExpr(timeCondition)
+	if err != nil {
+		// Expression parsing fails (should not happen)
+		return err
+	}
+
+	// Add or modify the WHERE clause
+	if showStmt.Condition == nil {
+		// No existing WHERE clause, add our time condition
+		showStmt.Condition = timeExpr
+	} else {
+		// Existing WHERE clause without time condition, combine with AND
+		showStmt.Condition = &influxql.BinaryExpr{
+			Op:  influxql.AND,
+			LHS: showStmt.Condition,
+			RHS: timeExpr,
 		}
 	}
 
-	return result.String()
+	return nil
+}
+
+// hasTimeCondition recursively checks if an InfluxQL expression contains a reference to the "time" field.
+func hasTimeCondition(expr influxql.Expr) bool {
+	if expr == nil {
+		return false
+	}
+
+	switch e := expr.(type) {
+	case *influxql.VarRef:
+		return strings.EqualFold(e.Val, "time")
+	case *influxql.BinaryExpr:
+		return hasTimeCondition(e.LHS) || hasTimeCondition(e.RHS)
+	case *influxql.ParenExpr:
+		return hasTimeCondition(e.Expr)
+	case *influxql.Call:
+		for _, arg := range e.Args {
+			if hasTimeCondition(arg) {
+				return true
+			}
+		}
+		return false
+	default:
+		return false
+	}
+}
+
+// extractTablesAndTags extracts all table names and relevant tag keys from a parsed SHOW TAG VALUES statement.
+func extractTablesAndTags(showStmt *influxql.ShowTagValuesStatement) (tables []string, tags []string) {
+	// Extract table names
+	if showStmt.Sources != nil {
+		for _, source := range showStmt.Sources {
+			if mm, ok := source.(*influxql.Measurement); ok {
+				tables = append(tables, mm.Name)
+			}
+		}
+	}
+
+	// Extract tag keys
+	if showStmt.TagKeyExpr != nil {
+		switch expr := showStmt.TagKeyExpr.(type) {
+		case *influxql.ListLiteral:
+			// Handle WITH KEY IN ("tag1", "tag2")
+			for _, val := range expr.Vals {
+				tags = append(tags, val)
+			}
+		case *influxql.StringLiteral:
+			// Handle WITH KEY = "tag"
+			tags = append(tags, expr.Val)
+		}
+	}
+
+	return tables, tags
 }

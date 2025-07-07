@@ -158,7 +158,32 @@ func (c *Client) Query(ctx context.Context, q chronograf.Query) (chronograf.Resp
 			return c.showDatabasesForCloudDedicated(ctx)
 		}
 		if strings.Contains(cmdUpper, "SHOW TAG VALUES") {
-			q.Command = appendTimeCondition(q.Command)
+			// Parse the SHOW TAG VALUES statement
+			showStmt, err := parseShowTagValuesStatement(q.Command)
+			if err != nil {
+				logs := c.Logger.
+					WithField("component", "proxy").
+					WithField("command", q.Command)
+				logs.Debug("Could not parse SHOW TAG VALUES statement", err)
+			} else {
+				// Extract tables and tags
+				tables, tags := extractTablesAndTags(showStmt)
+				logs := c.Logger.
+					WithField("component", "proxy")
+				// TODO Implement reading tag values from CSV. Empty tables means tag values from ALL tables.
+				logs.Debug(fmt.Sprintf("TODO read tag values from CSV (tables=%v tags=%v", tables, tags))
+
+				// Apply time condition
+				err = appendTimeCondition(showStmt)
+				if err != nil {
+					logs := c.Logger.
+						WithField("component", "proxy").
+						WithField("command", q.Command)
+					logs.Debug("Could not append time condition", err)
+				} else {
+					q.Command = showStmt.String()
+				}
+			}
 		}
 	}
 
