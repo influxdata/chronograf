@@ -179,8 +179,9 @@ func (c *Client) newDummyQueryRequestForCloudDedicated(ctx context.Context) (*ht
 	return req, err
 }
 
-// appendTimeCondition appends a default "WHERE time > 0" clause to the provided SQL command if no WHERE clause exists.
+// appendTimeCondition appends a default "WHERE time > now() - 24h" clause to the provided SQL command if no WHERE clause exists.
 func appendTimeCondition(cmd string) string {
+	const timeCondition = "time > now() - 24h"
 	// Remove trailing semicolon if present
 	cmd = strings.TrimSuffix(cmd, ";")
 	upperCmd := clearQuotedContent(strings.ToUpper(cmd))
@@ -207,10 +208,10 @@ func appendTimeCondition(cmd string) string {
 	// Insert WHERE condition
 	if insertPos == len(cmd) {
 		// No LIMIT/OFFSET, append to the end
-		return cmd + " WHERE time > 0"
+		return cmd + " WHERE " + timeCondition
 	} else {
 		// Insert before LIMIT/OFFSET
-		return cmd[:insertPos] + " WHERE time > 0" + cmd[insertPos:]
+		return cmd[:insertPos] + " WHERE " + timeCondition + cmd[insertPos:]
 	}
 }
 
