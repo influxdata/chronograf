@@ -466,6 +466,20 @@ func (s *Service) UpdateSource(w http.ResponseWriter, r *http.Request) {
 	}
 	src.Type = dbType
 
+	if req.ManagementToken != "" {
+		src.ManagementToken = req.ManagementToken
+	}
+	if req.DatabaseToken != "" {
+		src.DatabaseToken = req.DatabaseToken
+	}
+	if req.ClusterID != "" {
+		src.ClusterID = req.ClusterID
+	}
+	if req.AccountID != "" {
+		src.AccountID = req.AccountID
+	}
+	src.TagsCSVPath = req.TagsCSVPath
+
 	if err := s.validateCredentials(ctx, &src); err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), s.Logger)
 		return

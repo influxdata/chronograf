@@ -20,6 +20,7 @@ export interface Source {
   accountId?: string
   managementToken?: string
   databaseToken?: string
+  tagsCSVPath?: string
   url: string
   metaUrl?: string
   insecureSkipVerify: boolean

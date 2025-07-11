@@ -2,11 +2,13 @@ package influx
 
 import (
 	"context"
+	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 
 	"github.com/influxdata/chronograf"
@@ -14,10 +16,11 @@ import (
 	"github.com/influxdata/influxdb/influxql"
 )
 
-type fakeInfluxResponse []struct {
+type influxResult struct {
 	StatementID int      `json:"statement_id"`
 	Series      []series `json:"series"`
 }
+type fakeInfluxResponse []influxResult
 
 type series struct {
 	Name    string          `json:"name"`
@@ -191,7 +194,19 @@ func parseShowTagValuesStatement(query string) (*influxql.ShowTagValuesStatement
 		return nil, fmt.Errorf("not a SHOW TAG VALUES statement")
 	}
 	return showStmt, nil
+}
 
+// parseShowTagKeysStatement parses a SHOW TAG KEYS query string into an instance of ShowTagKeysStatement.
+func parseShowTagKeysStatement(query string) (*influxql.ShowTagKeysStatement, error) {
+	stmt, err := influxql.ParseStatement(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse statement: %w", err)
+	}
+	showStmt, ok := stmt.(*influxql.ShowTagKeysStatement)
+	if !ok {
+		return nil, fmt.Errorf("not a SHOW TAG KEYS statement")
+	}
+	return showStmt, nil
 }
 
 // appendTimeCondition appends a default "WHERE time > now() - 1d" clause to the provided SHOW TAG VALUES statement if no time condition exists.
@@ -252,15 +267,162 @@ func hasTimeCondition(expr influxql.Expr) bool {
 	}
 }
 
+// ReadTagValuesFromCSV reads tag values from a CSV file and returns a TagsStore.
+func ReadTagValuesFromCSV(csvFilePath string) (TagsStore, error) {
+	// Open the CSV file
+	file, err := os.Open(csvFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open CSV file: %w", err)
+	}
+	defer file.Close()
+
+	// Create a CSV reader
+	reader := csv.NewReader(file)
+	reader.Comma = ';'
+
+	data := make(TagsStore)
+	for {
+		record, err := reader.Read()
+		if err != nil {
+			if err.Error() == "EOF" {
+				break // End of file reached
+			}
+			return nil, fmt.Errorf("failed to read CSV record: %w", err)
+		}
+
+		if len(record) < 3 {
+			continue // Skip records that do not have enough fields
+		}
+
+		db, meas, tag, val := record[0], record[1], record[2], record[3]
+		if _, ok := data[db]; !ok {
+			data[db] = make(map[string]map[string][]string)
+		}
+		if _, ok := data[db][meas]; !ok {
+			data[db][meas] = make(map[string][]string)
+		}
+		data[db][meas][tag] = append(data[db][meas][tag], val)
+	}
+	return data, nil
+}
+
+func createShowMeasurementsResponse(tagValues TagsStore, db string) chronograf.Response {
+	if _, ok := tagValues[db]; !ok {
+		return nil
+	}
+	data := make([][]interface{}, 0, len(tagValues[db]))
+	for table := range tagValues[db] {
+		data = append(data, []interface{}{table})
+	}
+	response := fakeInfluxResponse{
+		influxResult{
+			StatementID: 0,
+			Series: []series{
+				{
+					Name:    "measurements",
+					Columns: []string{"name"},
+					Values:  data,
+				},
+			},
+		},
+	}
+	bytes, _ := json.Marshal(response)
+	return &responseType{
+		Results: bytes,
+		Err:     "",
+		V2Err:   "",
+	}
+}
+
+func createTagKeysResponse(tagValues TagsStore, db string, tables []string) chronograf.Response {
+	if _, ok := tagValues[db]; !ok {
+		return nil
+	}
+	if len(tables) == 0 {
+		tables = make([]string, 0, len(tagValues[db]))
+		for k := range tagValues[db] {
+			tables = append(tables, k)
+		}
+	}
+	response := make(fakeInfluxResponse, 0, len(tables))
+	for i, table := range tables {
+		data := make([][]interface{}, 0, len(tagValues[db][table]))
+		for tag := range tagValues[db][table] {
+			data = append(data, []interface{}{tag})
+		}
+		response = append(response, influxResult{
+			StatementID: i,
+			Series: []series{
+				{
+					Name:    table,
+					Columns: []string{"tagKey"},
+					Values:  data,
+				},
+			},
+		})
+	}
+	bytes, _ := json.Marshal(response)
+	return &responseType{
+		Results: bytes,
+		Err:     "",
+		V2Err:   "",
+	}
+}
+
+func createTagValuesResponse(tagValues TagsStore, db string, tables, tags []string) chronograf.Response {
+	if _, ok := tagValues[db]; !ok {
+		return nil
+	}
+	if len(tables) == 0 {
+		tables = make([]string, 0, len(tagValues[db]))
+		for k := range tagValues[db] {
+			tables = append(tables, k)
+		}
+	}
+	response := make(fakeInfluxResponse, 0, len(tables))
+	for i, table := range tables {
+		data := make([][]interface{}, 0, len(tagValues[db][table])*2) //arbitrary lenght
+		for tag, val := range tagValues[db][table] {
+			if len(tags) == 0 || contains(tags, tag) {
+				for _, v := range val {
+					data = append(data, []interface{}{tag, v})
+				}
+			}
+		}
+		response = append(response, influxResult{
+			StatementID: i,
+			Series: []series{
+				{
+					Name:    table,
+					Columns: []string{"key", "value"},
+					Values:  data,
+				},
+			},
+		})
+	}
+	bytes, _ := json.Marshal(response)
+	return &responseType{
+		Results: bytes,
+		Err:     "",
+		V2Err:   "",
+	}
+}
+
+// contains checks if a string is present in a slice of strings.
+func contains(slice []string, str string) bool {
+	for _, item := range slice {
+		if item == str {
+			return true
+		}
+	}
+	return false
+}
+
 // extractTablesAndTags extracts all table names and relevant tag keys from a parsed SHOW TAG VALUES statement.
 func extractTablesAndTags(showStmt *influxql.ShowTagValuesStatement) (tables []string, tags []string) {
 	// Extract table names
 	if showStmt.Sources != nil {
-		for _, source := range showStmt.Sources {
-			if mm, ok := source.(*influxql.Measurement); ok {
-				tables = append(tables, mm.Name)
-			}
-		}
+		tables = showStmt.Sources.Names()
 	}
 
 	// Extract tag keys
@@ -278,4 +440,13 @@ func extractTablesAndTags(showStmt *influxql.ShowTagValuesStatement) (tables []s
 	}
 
 	return tables, tags
+}
+
+// extractTablesAndTags extracts all table names and relevant tag keys from a parsed SHOW TAG VALUES statement.
+func extractTables(showStmt *influxql.ShowTagKeysStatement) []string {
+	// Extract table names
+	if showStmt.Sources != nil {
+		return showStmt.Sources.Names()
+	}
+	return nil
 }

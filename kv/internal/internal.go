@@ -52,6 +52,7 @@ func MarshalSource(s chronograf.Source) ([]byte, error) {
 		AccountID:          s.AccountID,
 		ManagementToken:    s.ManagementToken,
 		DatabaseToken:      s.DatabaseToken,
+		TagsCSVPath:        s.TagsCSVPath,
 	})
 }
 
@@ -81,6 +82,7 @@ func UnmarshalSource(data []byte, s *chronograf.Source) error {
 	s.AccountID = pb.AccountID
 	s.ManagementToken = pb.ManagementToken
 	s.DatabaseToken = pb.DatabaseToken
+	s.TagsCSVPath = pb.TagsCSVPath
 	return nil
 }
 

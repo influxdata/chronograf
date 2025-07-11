@@ -66,6 +66,7 @@ type Server struct {
 	InfluxDBMgmtToken string `long:"influxdb-mgmt-token" description:"Management token for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_MGMT_TOKEN"`
 	InfluxDBClusterID string `long:"influxdb-cluster-id" description:"Cluster ID for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_CLUSTER_ID"`
 	InfluxDBAccountID string `long:"influxdb-account-id" description:"Account ID for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_ACCOUNT_ID"`
+	TagsCSVPath       string `long:"tags-csv-path" description:"Path to CSV file containing tags for InfluxDB v3 sources. Used to populate the tags field in Query Editor." env:"TAGS_CSV_PATH"`
 
 	KapacitorURL      string `long:"kapacitor-url" description:"Location of your Kapacitor instance" env:"KAPACITOR_URL"`
 	KapacitorUsername string `long:"kapacitor-username" description:"Username of your Kapacitor instance" env:"KAPACITOR_USERNAME"`
@@ -79,7 +80,7 @@ type Server struct {
 	TokenSecret        string        `short:"t" long:"token-secret" description:"Secret to sign tokens" env:"TOKEN_SECRET"`
 	JwksURL            string        `long:"jwks-url" description:"URL that returns OpenID Key Discovery JWKS document." env:"JWKS_URL"`
 	UseIDToken         bool          `long:"use-id-token" description:"Enable id_token processing." env:"USE_ID_TOKEN"`
-	LoginHint          string        `long:"login-hint" description:"OpenID login_hint paramter to passed to authorization server during authentication" env:"LOGIN_HINT"`
+	LoginHint          string        `long:"login-hint" description:"OpenID login_hint parameter to passed to authorization server during authentication" env:"LOGIN_HINT"`
 	AuthDuration       time.Duration `long:"auth-duration" default:"720h" description:"Total duration of cookie life for authentication (in hours). 0 means authentication expires on browser close." env:"AUTH_DURATION"`
 	InactivityDuration time.Duration `long:"inactivity-duration" default:"5m" description:"Duration for which a token is valid without any new activity." env:"INACTIVITY_DURATION"`
 
@@ -553,6 +554,7 @@ func (s *Server) newBuilders(logger chronograf.Logger) builders {
 			InfluxDBMgmtToken: s.InfluxDBMgmtToken,
 			InfluxDBClusterID: s.InfluxDBClusterID,
 			InfluxDBAccountID: s.InfluxDBAccountID,
+			TagsCSVPath:       s.TagsCSVPath,
 
 			Logger: logger,
 			ID:     idgen.NewTime(),
