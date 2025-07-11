@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/influxdata/chronograf"
@@ -36,6 +37,8 @@ func init() {
 	defaultTransport = util.CreateTransport(false)
 }
 
+type TagsStore map[string]map[string]map[string][]string
+
 // Client is a device for retrieving time series data from an InfluxDB instance
 type Client struct {
 	URL                *url.URL
@@ -44,7 +47,11 @@ type Client struct {
 	MgmtAuthorizer     Authorizer // (optional) Authorizer for management API
 	InsecureSkipVerify bool
 	SrcType            string
+	TagsCSVPath        string // (optional) path to CSV file with tags for SHOW TAG VALUES queries
 	Logger             chronograf.Logger
+
+	lock      sync.Mutex
+	tagValues TagsStore
 }
 
 // Response is a partial JSON decoded InfluxQL response used
@@ -152,33 +159,45 @@ type result struct {
 // include both the database and retention policy. In-flight requests can be
 // cancelled using the provided context.
 func (c *Client) Query(ctx context.Context, q chronograf.Query) (chronograf.Response, error) {
+	logs := c.Logger.
+		WithField("component", "proxy").
+		WithField("command", q.Command)
+
 	if c.SrcType == chronograf.InfluxDBCloudDedicated {
 		cmdUpper := strings.ToUpper(q.Command)
 		if cmdUpper == "SHOW DATABASES" {
 			return c.showDatabasesForCloudDedicated(ctx)
 		}
-		if strings.Contains(cmdUpper, "SHOW TAG VALUES") {
+		c.initCSV(logs)
+		if strings.Contains(cmdUpper, "SHOW MEASUREMENTS") && c.tagValues != nil {
+			return createShowMeasurementsResponse(c.tagValues, q.DB), nil
+		} else if strings.Contains(cmdUpper, "SHOW TAG KEYS") {
+			if c.tagValues != nil {
+				showStmt, err := parseShowTagKeysStatement(q.Command)
+				if err != nil {
+					logs.Error("Could not parse SHOW TAG VALUES statement", err)
+				} else {
+					tables := extractTables(showStmt)
+					logs.Info("Returning tag keys from CSV")
+					return createTagKeysResponse(c.tagValues, q.DB, tables), nil
+				}
+			}
+		} else if strings.Contains(cmdUpper, "SHOW TAG VALUES") {
 			// Parse the SHOW TAG VALUES statement
 			showStmt, err := parseShowTagValuesStatement(q.Command)
 			if err != nil {
-				logs := c.Logger.
-					WithField("component", "proxy").
-					WithField("command", q.Command)
 				logs.Debug("Could not parse SHOW TAG VALUES statement", err)
 			} else {
-				// Extract tables and tags
-				tables, tags := extractTablesAndTags(showStmt)
-				logs := c.Logger.
-					WithField("component", "proxy")
-				// TODO Implement reading tag values from CSV. Empty tables means tag values from ALL tables.
-				logs.Debug(fmt.Sprintf("TODO read tag values from CSV (tables=%v tags=%v", tables, tags))
-
+				if c.tagValues != nil {
+					tables, tags := extractTablesAndTags(showStmt)
+					logs.Info("Returning tag values from CSV")
+					if resp := createTagValuesResponse(c.tagValues, q.DB, tables, tags); resp != nil {
+						return resp, nil
+					}
+				}
 				// Apply time condition
 				err = appendTimeCondition(showStmt)
 				if err != nil {
-					logs := c.Logger.
-						WithField("component", "proxy").
-						WithField("command", q.Command)
 					logs.Debug("Could not append time condition", err)
 				} else {
 					q.Command = showStmt.String()
@@ -198,6 +217,19 @@ func (c *Client) Query(ctx context.Context, q chronograf.Query) (chronograf.Resp
 		return resp.Response, resp.Err
 	case <-ctx.Done():
 		return nil, chronograf.ErrUpstreamTimeout
+	}
+}
+
+func (c *Client) initCSV(logs chronograf.Logger) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	if c.TagsCSVPath != "" && c.tagValues == nil {
+		// Read tag keys from CSV file
+		var err error
+		c.tagValues, err = ReadTagValuesFromCSV(c.TagsCSVPath)
+		if err != nil {
+			logs.Error("Could not read tag keys from CSV", err)
+		}
 	}
 }
 
@@ -304,6 +336,7 @@ func (c *Client) Connect(ctx context.Context, src *chronograf.Source) error {
 		c.MgmtAuthorizer = &BearerToken{
 			Token: src.ManagementToken,
 		}
+		c.TagsCSVPath = src.TagsCSVPath
 	}
 	c.SrcType = src.Type
 	return nil

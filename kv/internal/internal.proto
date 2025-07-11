@@ -22,6 +22,7 @@ message Source {
 	string AccountID          = 17; // Account ID of an InfluxDB Cloud Dedicated source
 	string ManagementToken    = 18; // Management token of an InfluxDB Cloud Dedicated source
 	string DatabaseToken      = 19; // Database token of an InfluxDB Cloud Dedicated source
+	string TagsCSVPath        = 20; // TagsCSVPATH is the path to a CSV file containing tags for the source
 }
 
 message Dashboard {
@@ -119,7 +120,7 @@ message TemplateQuery {
 	string measurement      = 4; // Measurement is the optinally selected measurement for the query
 	string tag_key          = 5; // TagKey is the optionally selected tag key for the query
 	string field_key        = 6; // FieldKey is the optionally selected field key for the query
-	string flux             = 7; // Flux script content 
+	string flux             = 7; // Flux script content
 }
 
 message Server {

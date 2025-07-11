@@ -173,6 +173,11 @@ class SourceStep extends PureComponent<Props, State> {
               type="password"
               onChange={this.onChangeInput('databaseToken')}
             />
+            <WizardTextInput
+              value={source.tagsCSVPath}
+              label={'Tags CSV Path'}
+              onChange={this.onChangeInput('tagsCSVPath')}
+            />
           </>
         )}
 

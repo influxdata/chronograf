@@ -120,6 +120,7 @@ type MultiSourceBuilder struct {
 	InfluxDBMgmtToken string
 	InfluxDBClusterID string
 	InfluxDBAccountID string
+	TagsCSVPath       string
 
 	Logger chronograf.Logger
 	ID     chronograf.ID
@@ -135,7 +136,7 @@ func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore) (*multistore.Sou
 
 	if fs.InfluxDBURL != "" {
 		var influxdbType, username, password string
-		var clusterID, accountID, mgmtToken, dbToken string
+		var clusterID, accountID, mgmtToken, dbToken, tagsCSVPath string
 		if fs.InfluxDBClusterID != "" && fs.InfluxDBAccountID != "" && fs.InfluxDBToken != "" && fs.InfluxDBMgmtToken != "" {
 			// InfluxDB Cloud Dedicated
 			influxdbType = chronograf.InfluxDBCloudDedicated
@@ -143,6 +144,7 @@ func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore) (*multistore.Sou
 			accountID = fs.InfluxDBAccountID
 			mgmtToken = fs.InfluxDBMgmtToken
 			dbToken = fs.InfluxDBToken
+			tagsCSVPath = fs.TagsCSVPath
 		} else if fs.InfluxDBOrg == "" || fs.InfluxDBToken == "" {
 			// v1 InfluxDB
 			username = fs.InfluxDBUsername
@@ -166,6 +168,7 @@ func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore) (*multistore.Sou
 				AccountID:       accountID,
 				ManagementToken: mgmtToken,
 				DatabaseToken:   dbToken,
+				TagsCSVPath:     tagsCSVPath,
 				URL:             fs.InfluxDBURL,
 				Default:         true,
 				Version:         "unknown", // a real version is re-fetched at runtime; use "unknown" version as a fallback, empty version would imply OSS 2.x
