@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -35,6 +36,18 @@ type cdDatabase struct {
 type cdListDatabasesError struct {
 	Code    string `json:"code,omitempty"`
 	Message string `json:"message,omitempty"`
+}
+
+const timeCondition = "time > now() - 1d"
+
+var timeExpr = mustParseExpr(timeCondition)
+
+func mustParseExpr(expr string) influxql.Expr {
+	exp, err := influxql.ParseExpr(expr)
+	if err != nil {
+		panic(fmt.Sprintf("failed to parse expression %q: %v", expr, err))
+	}
+	return exp
 }
 
 // validateCloudDedicatedAuth checks both the management endpoint and the database endpoint to validate authentication.
@@ -183,6 +196,58 @@ func (c *Client) newDummyQueryRequestForCloudDedicated(ctx context.Context) (*ht
 	return req, err
 }
 
+func (c *Client) handleShowTagKeys(q chronograf.Query, logs chronograf.Logger) (chronograf.Response, error) {
+	if c.tagValues == nil {
+		return nil, nil
+	}
+	stmt, err := parseShowTagKeysStatement(q.Command)
+	if err != nil {
+		logs.Error("Could not parse SHOW TAG KEYS statement", err)
+		return nil, err
+	}
+	tables := extractTables(stmt)
+	logs.Info("Returning tag keys from CSV")
+	return createShowTagKeysResponse(c.tagValues, q.DB, tables), nil
+}
+
+func (c *Client) handleShowTagValues(q *chronograf.Query, logs chronograf.Logger) (chronograf.Response, error) {
+	if c.tagValues == nil {
+		return nil, nil
+	}
+
+	stmt, err := parseShowTagValuesStatement(q.Command)
+	if err != nil {
+		logs.Debug("Could not parse SHOW TAG VALUES statement", err)
+		return nil, err
+	}
+
+	tables, tags := extractTablesAndTags(stmt)
+	logs.Info("Returning tag values from CSV")
+	resp := createShowTagValuesResponse(c.tagValues, q.DB, tables, tags)
+	if resp != nil {
+		return resp, nil
+	}
+
+	appendTimeCondition(stmt)
+	q.Command = stmt.String()
+	return nil, nil
+}
+
+func (c *Client) initCSV(logs chronograf.Logger) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	if c.TagsCSVPath == "" || c.tagValues != nil {
+		return
+	}
+	tagValues, err := ReadTagValuesFromCSV(c.TagsCSVPath)
+	if err != nil {
+		logs.Error("Could not read tag keys from CSV", err)
+		return
+	}
+	c.tagValues = tagValues
+}
+
 // parseShowTagValuesStatement parses a SHOW TAG VALUES query string into an instance of ShowTagValuesStatement.
 func parseShowTagValuesStatement(query string) (*influxql.ShowTagValuesStatement, error) {
 	stmt, err := influxql.ParseStatement(query)
@@ -210,20 +275,11 @@ func parseShowTagKeysStatement(query string) (*influxql.ShowTagKeysStatement, er
 }
 
 // appendTimeCondition appends a default "WHERE time > now() - 1d" clause to the provided SHOW TAG VALUES statement if no time condition exists.
-func appendTimeCondition(showStmt *influxql.ShowTagValuesStatement) error {
-	const timeCondition = "time > now() - 1d"
-
+func appendTimeCondition(showStmt *influxql.ShowTagValuesStatement) {
 	// Check if there's already a time condition in the WHERE clause
 	if showStmt.Condition != nil && hasTimeCondition(showStmt.Condition) {
 		// Already has a time condition, do nothing
-		return nil
-	}
-
-	// Create the time condition expression
-	timeExpr, err := influxql.ParseExpr(timeCondition)
-	if err != nil {
-		// Expression parsing fails (should not happen)
-		return err
+		return
 	}
 
 	// Add or modify the WHERE clause
@@ -238,8 +294,6 @@ func appendTimeCondition(showStmt *influxql.ShowTagValuesStatement) error {
 			RHS: timeExpr,
 		}
 	}
-
-	return nil
 }
 
 // hasTimeCondition recursively checks if an InfluxQL expression contains a reference to the "time" field.
@@ -274,27 +328,30 @@ func ReadTagValuesFromCSV(csvFilePath string) (TagsStore, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to open CSV file: %w", err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		_ = file.Close()
+	}(file)
 
 	// Create a CSV reader
 	reader := csv.NewReader(file)
 	reader.Comma = ';'
+	reader.FieldsPerRecord = -1
 
 	data := make(TagsStore)
 	for {
 		record, err := reader.Read()
 		if err != nil {
-			if err.Error() == "EOF" {
-				break // End of file reached
+			if errors.Is(err, io.EOF) {
+				break
 			}
 			return nil, fmt.Errorf("failed to read CSV record: %w", err)
 		}
 
-		if len(record) < 3 {
-			continue // Skip records that do not have enough fields
+		if len(record) < 4 {
+			continue
 		}
 
-		db, meas, tag, val := record[0], record[1], record[2], record[3]
+		db, meas, tag, val := strings.TrimSpace(record[0]), strings.TrimSpace(record[1]), strings.TrimSpace(record[2]), strings.TrimSpace(record[3])
 		if _, ok := data[db]; !ok {
 			data[db] = make(map[string]map[string][]string)
 		}
@@ -307,12 +364,18 @@ func ReadTagValuesFromCSV(csvFilePath string) (TagsStore, error) {
 }
 
 func createShowMeasurementsResponse(tagValues TagsStore, db string) chronograf.Response {
+	if tagValues == nil {
+		return nil
+	}
 	if _, ok := tagValues[db]; !ok {
 		return nil
 	}
 	data := make([][]interface{}, 0, len(tagValues[db]))
 	for table := range tagValues[db] {
 		data = append(data, []interface{}{table})
+	}
+	if len(data) == 0 {
+		return nil
 	}
 	response := fakeInfluxResponse{
 		influxResult{
@@ -334,7 +397,7 @@ func createShowMeasurementsResponse(tagValues TagsStore, db string) chronograf.R
 	}
 }
 
-func createTagKeysResponse(tagValues TagsStore, db string, tables []string) chronograf.Response {
+func createShowTagKeysResponse(tagValues TagsStore, db string, tables []string) chronograf.Response {
 	if _, ok := tagValues[db]; !ok {
 		return nil
 	}
@@ -350,6 +413,9 @@ func createTagKeysResponse(tagValues TagsStore, db string, tables []string) chro
 		for tag := range tagValues[db][table] {
 			data = append(data, []interface{}{tag})
 		}
+		if len(data) == 0 {
+			continue
+		}
 		response = append(response, influxResult{
 			StatementID: i,
 			Series: []series{
@@ -361,6 +427,9 @@ func createTagKeysResponse(tagValues TagsStore, db string, tables []string) chro
 			},
 		})
 	}
+	if len(response) == 0 {
+		return nil
+	}
 	bytes, _ := json.Marshal(response)
 	return &responseType{
 		Results: bytes,
@@ -369,7 +438,7 @@ func createTagKeysResponse(tagValues TagsStore, db string, tables []string) chro
 	}
 }
 
-func createTagValuesResponse(tagValues TagsStore, db string, tables, tags []string) chronograf.Response {
+func createShowTagValuesResponse(tagValues TagsStore, db string, tables, tags []string) chronograf.Response {
 	if _, ok := tagValues[db]; !ok {
 		return nil
 	}
@@ -389,6 +458,9 @@ func createTagValuesResponse(tagValues TagsStore, db string, tables, tags []stri
 				}
 			}
 		}
+		if len(data) == 0 {
+			continue
+		}
 		response = append(response, influxResult{
 			StatementID: i,
 			Series: []series{
@@ -399,6 +471,9 @@ func createTagValuesResponse(tagValues TagsStore, db string, tables, tags []stri
 				},
 			},
 		})
+	}
+	if len(response) == 0 {
+		return nil
 	}
 	bytes, _ := json.Marshal(response)
 	return &responseType{
