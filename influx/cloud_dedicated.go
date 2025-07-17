@@ -329,9 +329,7 @@ func ReadTagValuesFromCSV(csvFilePath string) (TagsStore, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to open CSV file: %w", err)
 	}
-	defer func(file *os.File) {
-		_ = file.Close()
-	}(file)
+	defer func() { _ = file.Close() }()
 
 	// Create a CSV reader
 	reader := csv.NewReader(file)
@@ -368,11 +366,12 @@ func createShowMeasurementsResponse(tagValues TagsStore, db string) chronograf.R
 	if tagValues == nil {
 		return nil
 	}
-	if _, ok := tagValues[db]; !ok {
+	tablesMap, ok := tagValues[db]
+	if !ok {
 		return nil
 	}
-	data := make([][]interface{}, 0, len(tagValues[db]))
-	for table := range tagValues[db] {
+	data := make([][]interface{}, 0, len(tablesMap))
+	for table := range tablesMap {
 		data = append(data, []interface{}{table})
 	}
 	if len(data) == 0 {
@@ -399,19 +398,21 @@ func createShowMeasurementsResponse(tagValues TagsStore, db string) chronograf.R
 }
 
 func createShowTagKeysResponse(tagValues TagsStore, db string, tables []string) chronograf.Response {
-	if _, ok := tagValues[db]; !ok {
+	tablesMap, ok := tagValues[db]
+	if !ok {
 		return nil
 	}
 	if len(tables) == 0 {
-		tables = make([]string, 0, len(tagValues[db]))
-		for k := range tagValues[db] {
+		tables = make([]string, 0, len(tablesMap))
+		for k := range tablesMap {
 			tables = append(tables, k)
 		}
 	}
 	response := make(fakeInfluxResponse, 0, len(tables))
 	for i, table := range tables {
-		data := make([][]interface{}, 0, len(tagValues[db][table]))
-		for tag := range tagValues[db][table] {
+		tableMap := tablesMap[table]
+		data := make([][]interface{}, 0, len(tableMap))
+		for tag := range tableMap {
 			data = append(data, []interface{}{tag})
 		}
 		if len(data) == 0 {
@@ -440,19 +441,21 @@ func createShowTagKeysResponse(tagValues TagsStore, db string, tables []string) 
 }
 
 func createShowTagValuesResponse(tagValues TagsStore, db string, tables, tags []string) chronograf.Response {
-	if _, ok := tagValues[db]; !ok {
+	tablesMap, ok := tagValues[db]
+	if !ok {
 		return nil
 	}
 	if len(tables) == 0 {
-		tables = make([]string, 0, len(tagValues[db]))
-		for k := range tagValues[db] {
+		tables = make([]string, 0, len(tablesMap))
+		for k := range tablesMap {
 			tables = append(tables, k)
 		}
 	}
 	response := make(fakeInfluxResponse, 0, len(tables))
 	for i, table := range tables {
-		data := make([][]interface{}, 0, len(tagValues[db][table])*2) //arbitrary lenght
-		for tag, val := range tagValues[db][table] {
+		tableMap := tablesMap[table]
+		data := make([][]interface{}, 0, len(tableMap)*2) //arbitrary length
+		for tag, val := range tableMap {
 			if len(tags) == 0 || contains(tags, tag) {
 				for _, v := range val {
 					data = append(data, []interface{}{tag, v})
@@ -518,7 +521,7 @@ func extractTablesAndTags(showStmt *influxql.ShowTagValuesStatement) (tables []s
 	return tables, tags
 }
 
-// extractTablesAndTags extracts all table names and relevant tag keys from a parsed SHOW TAG VALUES statement.
+// extractTables extracts all table names from a parsed SHOW TAG KEYS statement.
 func extractTables(showStmt *influxql.ShowTagKeysStatement) []string {
 	// Extract table names
 	if showStmt.Sources != nil {
