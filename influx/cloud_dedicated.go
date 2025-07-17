@@ -211,25 +211,26 @@ func (c *Client) handleShowTagKeys(q chronograf.Query, logs chronograf.Logger) (
 }
 
 func (c *Client) handleShowTagValues(q *chronograf.Query, logs chronograf.Logger) (chronograf.Response, error) {
-	if c.tagValues == nil {
-		return nil, nil
-	}
-
 	stmt, err := parseShowTagValuesStatement(q.Command)
 	if err != nil {
 		logs.Debug("Could not parse SHOW TAG VALUES statement", err)
 		return nil, err
 	}
 
-	tables, tags := extractTablesAndTags(stmt)
-	logs.Info("Returning tag values from CSV")
-	resp := createShowTagValuesResponse(c.tagValues, q.DB, tables, tags)
-	if resp != nil {
-		return resp, nil
+	if c.tagValues != nil {
+		// Use CSV
+		tables, tags := extractTablesAndTags(stmt)
+		logs.Info("Returning tag values from CSV")
+		resp := createShowTagValuesResponse(c.tagValues, q.DB, tables, tags)
+		if resp != nil {
+			return resp, nil
+		}
+	} else {
+		// Call InfluxDB
+		logs.Info("Returning tag values from InfluxDB with time condition applied")
+		appendTimeCondition(stmt)
+		q.Command = stmt.String()
 	}
-
-	appendTimeCondition(stmt)
-	q.Command = stmt.String()
 	return nil, nil
 }
 
