@@ -9,6 +9,7 @@ import {Namespace} from 'src/types/queries'
 import DatabaseListItem from 'src/shared/components/DatabaseListItem'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import LoadingSpinner from 'src/reusable_ui/components/spinners/LoadingSpinner'
 
 import {getDatabasesWithRetentionPolicies} from 'src/shared/apis/databases'
 
@@ -21,6 +22,7 @@ interface DatabaseListProps {
 
 interface DatabaseListState {
   namespaces: Namespace[]
+  isLoading: boolean
 }
 
 const {shape} = PropTypes
@@ -42,6 +44,7 @@ class DatabaseList extends Component<DatabaseListProps, DatabaseListState> {
     this.handleChooseNamespace = this.handleChooseNamespace.bind(this)
     this.state = {
       namespaces: [],
+      isLoading: false,
     }
   }
 
@@ -74,11 +77,13 @@ class DatabaseList extends Component<DatabaseListProps, DatabaseListState> {
     const {querySource} = this.props
     const proxy = _.get(querySource, ['links', 'proxy'], source.links.proxy)
 
+    this.setState({isLoading: true})
     try {
       const sorted = await getDatabasesWithRetentionPolicies(proxy)
-      this.setState({namespaces: sorted})
+      this.setState({namespaces: sorted, isLoading: false})
     } catch (err) {
       console.error(err)
+      this.setState({isLoading: false})
     }
   }
 
@@ -92,22 +97,32 @@ class DatabaseList extends Component<DatabaseListProps, DatabaseListState> {
     )
   }
 
+  public isLoading(): boolean {
+    return this.state.isLoading
+  }
+
   public render() {
     return (
       <div className="query-builder--column query-builder--column-db">
         <div className="query-builder--heading">DB.RetentionPolicy</div>
-        <div className="query-builder--list">
-          <FancyScrollbar>
-            {this.state.namespaces.map(namespace => (
-              <DatabaseListItem
-                isActive={this.isActive(this.props.query, namespace)}
-                namespace={namespace}
-                onChooseNamespace={this.handleChooseNamespace}
-                key={namespace.database + namespace.retentionPolicy}
-              />
-            ))}
-          </FancyScrollbar>
-        </div>
+        {this.isLoading() ? (
+          <div className="query-builder--list-empty">
+            <LoadingSpinner diameter={40} />
+          </div>
+        ) : (
+          <div className="query-builder--list">
+            <FancyScrollbar>
+              {this.state.namespaces.map(namespace => (
+                <DatabaseListItem
+                  isActive={this.isActive(this.props.query, namespace)}
+                  namespace={namespace}
+                  onChooseNamespace={this.handleChooseNamespace}
+                  key={namespace.database + namespace.retentionPolicy}
+                />
+              ))}
+            </FancyScrollbar>
+          </div>
+        )}
       </div>
     )
   }

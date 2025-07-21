@@ -21,6 +21,7 @@ const DatabaseTableHeader = ({
   onDatabaseDeleteConfirm,
   onAddRetentionPolicy,
   isAddRPDisabled,
+  isDBDeleteDisabled,
 }) => {
   if (database.isEditing) {
     return (
@@ -43,6 +44,7 @@ const DatabaseTableHeader = ({
       onDelete={onDelete}
       onStartDelete={onStartDelete}
       isAddRPDisabled={isAddRPDisabled}
+      isDBDeleteDisabled={isDBDeleteDisabled}
       onAddRetentionPolicy={onAddRetentionPolicy}
       onDatabaseDeleteConfirm={onDatabaseDeleteConfirm}
     />
@@ -56,6 +58,7 @@ const Header = ({
   onDelete,
   onStartDelete,
   isAddRPDisabled,
+  isDBDeleteDisabled,
   onAddRetentionPolicy,
   onDatabaseDeleteConfirm,
 }) => {
@@ -72,6 +75,7 @@ const Header = ({
       {database.name === '_internal' ? null : (
         <button
           className="btn btn-xs btn-danger"
+          disabled={isDBDeleteDisabled}
           onClick={onStartDelete(database)}
           data-test="delete-db--button"
         >
@@ -161,6 +165,7 @@ DatabaseTableHeader.propTypes = {
   onRemoveDeleteCode: func,
   onAddRetentionPolicy: func,
   isAddRPDisabled: bool,
+  isDBDeleteDisabled: bool,
 }
 
 Header.propTypes = {
@@ -171,6 +176,7 @@ Header.propTypes = {
   database: shape(),
   onStartDelete: func,
   isAddRPDisabled: bool,
+  isDBDeleteDisabled: bool,
   onAddRetentionPolicy: func,
   onDatabaseDeleteConfirm: func,
 }
