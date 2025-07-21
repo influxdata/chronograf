@@ -77,9 +77,6 @@ class DatabaseList extends Component<DatabaseListProps, DatabaseListState> {
     const {querySource} = this.props
     const proxy = _.get(querySource, ['links', 'proxy'], source.links.proxy)
 
-    // Unselect database on reload
-    this.props.onChooseNamespace({database: '', retentionPolicy: ''})
-
     this.setState({isLoading: true})
     try {
       const sorted = await getDatabasesWithRetentionPolicies(proxy)
