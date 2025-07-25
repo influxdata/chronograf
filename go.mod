@@ -25,7 +25,7 @@ require (
 	go.etcd.io/etcd/client/v3 v3.5.0-alpha.0
 	go.etcd.io/etcd/server/v3 v3.5.0-alpha.0
 	golang.org/x/net v0.38.0
-	golang.org/x/oauth2 v0.0.0-20210427180440-81ed05c6b58c
+	golang.org/x/oauth2 v0.27.0
 	google.golang.org/api v0.46.0
 	google.golang.org/protobuf v1.33.0
 )
