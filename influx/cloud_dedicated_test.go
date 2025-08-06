@@ -411,157 +411,44 @@ func TestParseShowTagKeysAndExtractTables(t *testing.T) {
 	}
 }
 
-func TestReadTagValuesFromCSV(t *testing.T) {
-	tests := []struct {
-		name     string
-		content  string
-		expected TagsStore
-		wantErr  bool
-	}{
-		{
-			name: "simple valid input",
-			content: `
-db1;meas1;tag1;val1
-db1;meas1;tag1;val2
-db1;meas1;tag2;val3
-`,
-			expected: TagsStore{
-				"db1": {
-					"meas1": {
-						"tag1": {"val1", "val2"},
-						"tag2": {"val3"},
-					},
-				},
-			},
-			wantErr: false,
-		},
-		{
-			name:     "empty input",
-			content:  ``,
-			expected: TagsStore{},
-			wantErr:  false,
-		},
-		{
-			name: "incomplete lines are skipped",
-			content: `
-db1;meas1;tag1;val1
-db1;meas1
-db1;meas1;tag2;val2
-`,
-			expected: TagsStore{
-				"db1": {
-					"meas1": {
-						"tag1": {"val1"},
-						"tag2": {"val2"},
-					},
-				},
-			},
-			wantErr: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Write content to temporary file
-			tmpFile, err := os.CreateTemp("", "*.csv")
-			if err != nil {
-				t.Fatalf("could not create temp file: %v", err)
-			}
-			defer os.Remove(tmpFile.Name())
-			if _, err := tmpFile.WriteString(tt.content); err != nil {
-				t.Fatalf("could not write temp file: %v", err)
-			}
-			tmpFile.Close()
-
-			got, err := ReadTagValuesFromCSV(tmpFile.Name())
-			if (err != nil) != tt.wantErr {
-				t.Fatalf("unexpected error: got %v, wantErr=%v", err, tt.wantErr)
-			}
-
-			if !equalTagsStore(got, tt.expected) {
-				t.Errorf("unexpected result:\nGot: %#v\nWant: %#v", got, tt.expected)
-			}
-		})
-	}
-}
-
-// equalTagsStore compares two TagsStore values deeply
-func equalTagsStore(a, b TagsStore) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for db, measurements := range a {
-		bMeasurements, ok := b[db]
-		if !ok || len(measurements) != len(bMeasurements) {
-			return false
-		}
-		for meas, tags := range measurements {
-			bTags, ok := bMeasurements[meas]
-			if !ok || len(tags) != len(bTags) {
-				return false
-			}
-			for tag, values := range tags {
-				bValues, ok := bTags[tag]
-				if !ok || len(values) != len(bValues) {
-					return false
-				}
-				for i := range values {
-					if values[i] != bValues[i] {
-						return false
-					}
-				}
-			}
-		}
-	}
-	return true
-}
-
 func TestCreateShowMeasurementsResponse(t *testing.T) {
 	tests := []struct {
 		name         string
-		tagValues    TagsStore
-		db           string
+		csvContent   string
 		wantNil      bool
 		wantContains []string
 	}{
 		{
 			name: "valid db with two measurements",
-			tagValues: TagsStore{
-				"db1": {
-					"meas1": {"tag1": {"val1"}},
-					"meas2": {"tag2": {"val2"}},
-				},
-			},
-			db:           "db1",
+			csvContent: `meas1;tag1;val1
+meas2;tag2;val2
+`,
 			wantNil:      false,
 			wantContains: []string{"meas1", "meas2"},
 		},
 		{
-			name:         "non-existent db",
-			tagValues:    TagsStore{},
-			db:           "missing",
-			wantNil:      true,
-			wantContains: nil,
-		},
-		{
-			name: "empty measurements map",
-			tagValues: TagsStore{
-				"db2": {},
-			},
-			db:      "db2",
-			wantNil: true,
-		},
-		{
-			name:      "not a CSV file",
-			tagValues: nil,
-			db:        "db2",
-			wantNil:   true,
+			name:       "empty csv file",
+			csvContent: "",
+			wantNil:    true,
 		},
 	}
 
+	const testDB = "testdb"
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resp := createShowMeasurementsResponse(tt.tagValues, tt.db)
+			tmpDir, err := setupCSVTestDirWithContent(testDB, tt.csvContent)
+			if err != nil {
+				t.Fatalf("could not setup CSV test dir: %v", err)
+			}
+			defer os.RemoveAll(tmpDir)
+
+			csvStore, err := NewCSVTagsStore(tmpDir, log.New(log.DebugLevel))
+			if err != nil {
+				t.Fatalf("could not create CSV tags store: %v", err)
+			}
+
+			resp := createShowMeasurementsResponseFromCSV(csvStore, testDB)
 
 			if tt.wantNil {
 				if resp != nil {
@@ -584,8 +471,7 @@ func TestCreateShowMeasurementsResponse(t *testing.T) {
 				} `json:"series"`
 			}
 			rt := resp.(*responseType) // type assertion
-			err := json.Unmarshal(rt.Results, &decoded)
-			if err != nil {
+			if err := json.Unmarshal(rt.Results, &decoded); err != nil {
 				t.Fatalf("Failed to unmarshal response: %v", err)
 			}
 
@@ -620,9 +506,11 @@ func TestCreateShowMeasurementsResponse(t *testing.T) {
 }
 
 func TestCreateShowTagKeysResponse(t *testing.T) {
+	const testDB = "testdb"
+
 	tests := []struct {
 		name         string
-		tagValues    TagsStore
+		csvContent   string
 		db           string
 		tables       []string
 		wantNil      bool
@@ -630,15 +518,10 @@ func TestCreateShowTagKeysResponse(t *testing.T) {
 	}{
 		{
 			name: "single table with two tags",
-			tagValues: TagsStore{
-				"db1": {
-					"meas1": {
-						"tagA": {"val1"},
-						"tagB": {"val2"},
-					},
-				},
-			},
-			db:      "db1",
+			csvContent: `meas1;tagA;val1
+meas1;tagB;val2
+`,
+			db:      testDB,
 			tables:  []string{"meas1"},
 			wantNil: false,
 			wantResponse: map[string][]string{
@@ -647,13 +530,10 @@ func TestCreateShowTagKeysResponse(t *testing.T) {
 		},
 		{
 			name: "all tables auto-filled",
-			tagValues: TagsStore{
-				"db1": {
-					"meas1": {"t1": {"v1"}},
-					"meas2": {"t2": {"v2"}},
-				},
-			},
-			db:      "db1",
+			csvContent: `meas1;t1;v1
+meas2;t2;v2
+`,
+			db:      testDB,
 			tables:  nil, // will trigger table listing
 			wantNil: false,
 			wantResponse: map[string][]string{
@@ -662,34 +542,39 @@ func TestCreateShowTagKeysResponse(t *testing.T) {
 			},
 		},
 		{
-			name: "not existent table returns nil",
-			tagValues: TagsStore{
-				"db1": {
-					"meas1": {
-						"t1": {"v1", "v2"},
-						"t2": {"v3"},
-					},
-					"meas2": {
-						"t3": {"v4"},
-					},
-				},
-			},
-			db:      "db1",
-			tables:  []string{"meas3"},
+			name: "nonexistent table returns nil",
+			csvContent: `meas1;t1;v1
+meas1;t1;v2
+meas1;t2;v3
+meas2;t3;v4
+`,
+			db:      testDB,
+			tables:  []string{"missing-meas"},
 			wantNil: true,
 		},
 		{
-			name:      "nonexistent db returns nil",
-			tagValues: TagsStore{},
-			db:        "missing",
-			tables:    []string{"meas1"},
-			wantNil:   true,
+			name:       "nonexistent db returns nil",
+			csvContent: "",
+			db:         "missing-db",
+			tables:     []string{"meas1"},
+			wantNil:    true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resp := createShowTagKeysResponse(tt.tagValues, tt.db, tt.tables)
+			tmpDir, err := setupCSVTestDirWithContent(testDB, tt.csvContent)
+			if err != nil {
+				t.Fatalf("could not setup CSV test dir: %v", err)
+			}
+			defer os.RemoveAll(tmpDir)
+
+			csvStore, err := NewCSVTagsStore(tmpDir, log.New(log.DebugLevel))
+			if err != nil {
+				t.Fatalf("could not create CSV tags store: %v", err)
+			}
+
+			resp := createShowTagKeysResponseFromCSV(csvStore, tt.db, tt.tables)
 
 			if tt.wantNil {
 				if resp != nil {
@@ -759,9 +644,11 @@ func TestCreateShowTagKeysResponse(t *testing.T) {
 }
 
 func TestCreateShowTagValuesResponse(t *testing.T) {
+	const testDB = "testdb"
+
 	tests := []struct {
 		name         string
-		tagValues    TagsStore
+		csvContent   string
 		db           string
 		tables       []string
 		tags         []string
@@ -770,18 +657,12 @@ func TestCreateShowTagValuesResponse(t *testing.T) {
 	}{
 		{
 			name: "all tables and all tags",
-			tagValues: TagsStore{
-				"db1": {
-					"meas1": {
-						"tag1": {"a", "b"},
-						"tag2": {"x"},
-					},
-					"meas2": {
-						"tag1": {"y"},
-					},
-				},
-			},
-			db: "db1",
+			csvContent: `meas1;tag1;a
+meas1;tag1;b
+meas1;tag2;x
+meas2;tag1;y
+`,
+			db: testDB,
 			wantResponse: map[string]map[string][]string{
 				"meas1": {
 					"tag1": {"a", "b"},
@@ -794,18 +675,12 @@ func TestCreateShowTagValuesResponse(t *testing.T) {
 		},
 		{
 			name: "filter table and tags",
-			tagValues: TagsStore{
-				"db1": {
-					"meas1": {
-						"t1": {"v1", "v2"},
-						"t2": {"v3"},
-					},
-					"meas2": {
-						"t3": {"v4"},
-					},
-				},
-			},
-			db:     "db1",
+			csvContent: `meas1;t1;v1
+meas1;t1;v2
+meas1;t2;v3
+meas2;t3;v4
+`,
+			db:     testDB,
 			tables: []string{"meas1"},
 			tags:   []string{"t1"},
 			wantResponse: map[string]map[string][]string{
@@ -815,34 +690,39 @@ func TestCreateShowTagValuesResponse(t *testing.T) {
 			},
 		},
 		{
-			name: "not existent table with tags",
-			tagValues: TagsStore{
-				"db1": {
-					"meas1": {
-						"t1": {"v1", "v2"},
-						"t2": {"v3"},
-					},
-					"meas2": {
-						"t3": {"v4"},
-					},
-				},
-			},
-			db:      "db1",
-			tables:  []string{"meas3"},
+			name: "nonexistent table returns nil",
+			csvContent: `meas1;t1;v1
+meas1;t1;v2
+meas1;t2;v3
+meas2;t3;v4
+`,
+			db:      testDB,
+			tables:  []string{"missing-meas"},
 			tags:    []string{"t1"},
 			wantNil: true,
 		},
 		{
-			name:      "nonexistent database",
-			tagValues: TagsStore{},
-			db:        "notfound",
-			wantNil:   true,
+			name:       "nonexistent db returns nil",
+			csvContent: "",
+			db:         "missing-db",
+			wantNil:    true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resp := createShowTagValuesResponse(tt.tagValues, tt.db, tt.tables, tt.tags)
+			tmpDir, err := setupCSVTestDirWithContent(tt.db, tt.csvContent)
+			if err != nil {
+				t.Fatalf("could not setup CSV test dir: %v", err)
+			}
+			defer os.RemoveAll(tmpDir)
+
+			csvStore, err := NewCSVTagsStore(tmpDir, log.New(log.DebugLevel))
+			if err != nil {
+				t.Fatalf("could not create CSV tags store: %v", err)
+			}
+
+			resp := createShowTagValuesResponseFromCSV(csvStore, tt.db, tt.tables, tt.tags)
 
 			if tt.wantNil {
 				if resp != nil {
@@ -916,12 +796,13 @@ func TestCreateShowTagValuesResponse(t *testing.T) {
 		})
 	}
 }
+
 func TestClient_Query(t *testing.T) {
 	type testCase struct {
 		name          string
 		query         chronograf.Query
 		expectedBody  [][]interface{}
-		tagValues     TagsStore
+		csvContent    string
 		mockMgmtReply []cdDatabase
 		expectBackend bool
 	}
@@ -938,10 +819,9 @@ func TestClient_Query(t *testing.T) {
 		{
 			name:  "SHOW MEASUREMENTS from tagValues",
 			query: chronograf.Query{Command: "SHOW MEASUREMENTS", DB: "db1"},
-			tagValues: TagsStore{"db1": {
-				"meas1": {"tag1": {"v1"}},
-				"meas2": {"tag2": {"v2"}},
-			}},
+			csvContent: `meas1;tag1;v1
+meas2;tag2;v2
+`,
 			expectedBody: [][]interface{}{
 				{"meas1"}, {"meas2"},
 			},
@@ -949,9 +829,9 @@ func TestClient_Query(t *testing.T) {
 		{
 			name:  "SHOW TAG KEYS FROM meas1",
 			query: chronograf.Query{Command: "SHOW TAG KEYS FROM meas1", DB: "db1"},
-			tagValues: TagsStore{"db1": {
-				"meas1": {"tag1": {"v1"}, "tag2": {"v2"}},
-			}},
+			csvContent: `meas1;tag1;v1
+meas1;tag2;v2
+`,
 			expectedBody: [][]interface{}{
 				{"tag1"}, {"tag2"},
 			},
@@ -959,9 +839,9 @@ func TestClient_Query(t *testing.T) {
 		{
 			name:  "SHOW TAG VALUES FROM meas1 WITH KEY = tag1",
 			query: chronograf.Query{Command: "SHOW TAG VALUES FROM meas1 WITH KEY = tag1", DB: "db1"},
-			tagValues: TagsStore{"db1": {
-				"meas1": {"tag1": {"v1", "v2"}},
-			}},
+			csvContent: `meas1;tag1;v1
+meas1;tag1;v2
+`,
 			expectedBody: [][]interface{}{
 				{"tag1", "v1"},
 				{"tag1", "v2"},
@@ -970,9 +850,8 @@ func TestClient_Query(t *testing.T) {
 		{
 			name:  "SHOW TAG VALUES fallback to backend",
 			query: chronograf.Query{Command: "SHOW TAG VALUES FROM unknown WITH KEY in (tag1)", DB: "db1"},
-			tagValues: TagsStore{"db1": {
-				"meas1": {"tag1": {"v1"}},
-			}},
+			csvContent: `meas1;tag1;v1
+`,
 			expectBackend: true,
 			expectedBody: [][]interface{}{
 				{"backend", "ok"},
@@ -1003,9 +882,20 @@ func TestClient_Query(t *testing.T) {
 			defer backendSrv.Close()
 
 			client := &Client{
-				Logger:    log.New(log.DebugLevel),
-				tagValues: tc.tagValues,
-				SrcType:   chronograf.InfluxDBCloudDedicated,
+				Logger:  log.New(log.DebugLevel),
+				SrcType: chronograf.InfluxDBCloudDedicated,
+			}
+			if tc.csvContent != "" {
+				tmpDir, err := setupCSVTestDirWithContent("db1", tc.csvContent)
+				if err != nil {
+					t.Fatalf("could not setup CSV test dir: %v", err)
+				}
+				defer os.RemoveAll(tmpDir)
+				csvStore, err := NewCSVTagsStore(tmpDir, log.New(log.DebugLevel))
+				if err != nil {
+					t.Fatalf("could not create CSV tags store: %v", err)
+				}
+				client.csvTagsStore = csvStore
 			}
 
 			client.URL, _ = url.Parse(backendSrv.URL)

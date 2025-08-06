@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/influxdata/chronograf"
@@ -39,8 +38,6 @@ func init() {
 	defaultTransport = util.CreateTransport(false)
 }
 
-type TagsStore map[string]map[string]map[string][]string
-
 // Client is a device for retrieving time series data from an InfluxDB instance
 type Client struct {
 	URL                *url.URL
@@ -49,11 +46,9 @@ type Client struct {
 	MgmtAuthorizer     Authorizer // (optional) Authorizer for management API
 	InsecureSkipVerify bool
 	SrcType            string
-	TagsCSVPath        string // (optional) path to CSV file with tags for SHOW TAG VALUES queries
 	Logger             chronograf.Logger
 
-	lock      sync.Mutex
-	tagValues TagsStore
+	csvTagsStore *CSVTagsStore // (optional) Store to load CSV tag files from source.TagsCSVPath directory
 }
 
 // Response is a partial JSON decoded InfluxQL response used
@@ -167,7 +162,6 @@ func (c *Client) Query(ctx context.Context, q chronograf.Query) (chronograf.Resp
 		logs := c.Logger.
 			WithField("component", "proxy").
 			WithField("command", q.Command)
-		c.initCSV(logs)
 
 		cmdUpper := strings.ToUpper(q.Command)
 		switch {
@@ -175,9 +169,8 @@ func (c *Client) Query(ctx context.Context, q chronograf.Query) (chronograf.Resp
 			return c.showDatabasesForCloudDedicated(ctx)
 
 		case strings.Contains(cmdUpper, "SHOW MEASUREMENTS"):
-			if resp := createShowMeasurementsResponse(c.tagValues, q.DB); resp != nil {
-				logs.Info("Returning measurements from CSV")
-				return resp, nil
+			if resp, err := c.handleShowMeasurements(q, logs); resp != nil || err != nil {
+				return resp, err
 			}
 
 		case strings.Contains(cmdUpper, "SHOW TAG KEYS"):
@@ -308,7 +301,12 @@ func (c *Client) Connect(ctx context.Context, src *chronograf.Source) error {
 		c.MgmtAuthorizer = &BearerToken{
 			Token: src.ManagementToken,
 		}
-		c.TagsCSVPath = src.TagsCSVPath
+
+		if src.TagsCSVPath != "" {
+			if c.csvTagsStore, err = NewCSVTagsStore(src.TagsCSVPath, c.Logger); err != nil {
+				return err
+			}
+		}
 	}
 	c.SrcType = src.Type
 	return nil

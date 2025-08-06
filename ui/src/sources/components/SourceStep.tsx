@@ -175,7 +175,7 @@ class SourceStep extends PureComponent<Props, State> {
             />
             <WizardTextInput
               value={source.tagsCSVPath}
-              label={'Tags CSV Path'}
+              label={'Tags CSV Directory Path'}
               onChange={this.onChangeInput('tagsCSVPath')}
             />
           </>

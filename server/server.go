@@ -66,7 +66,7 @@ type Server struct {
 	InfluxDBMgmtToken string `long:"influxdb-mgmt-token" description:"Management token for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_MGMT_TOKEN"`
 	InfluxDBClusterID string `long:"influxdb-cluster-id" description:"Cluster ID for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_CLUSTER_ID"`
 	InfluxDBAccountID string `long:"influxdb-account-id" description:"Account ID for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_ACCOUNT_ID"`
-	TagsCSVPath       string `long:"tags-csv-path" description:"Path to CSV file containing tags for InfluxDB v3 sources. Used to populate the tags field in Query Editor for your InfluxDB Cloud Dedicated instance." env:"TAGS_CSV_PATH"`
+	TagsCSVPath       string `long:"tags-csv-path" description:"Path to a directory containing CSV files (per db) with tags for InfluxDB v3 sources. Used to populate the tags field in Query Editor for your InfluxDB Cloud Dedicated instance." env:"TAGS_CSV_PATH"`
 
 	KapacitorURL      string `long:"kapacitor-url" description:"Location of your Kapacitor instance" env:"KAPACITOR_URL"`
 	KapacitorUsername string `long:"kapacitor-username" description:"Username of your Kapacitor instance" env:"KAPACITOR_USERNAME"`
