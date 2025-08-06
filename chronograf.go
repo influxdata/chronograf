@@ -249,7 +249,7 @@ type Source struct {
 	AccountID          string `json:"accountId,omitempty"`          // AccountID is the account ID for InfluxDB Cloud Dedicated sources
 	ManagementToken    string `json:"managementToken,omitempty"`    // ManagementToken is the management token for InfluxDB Cloud Dedicated sources
 	DatabaseToken      string `json:"databaseToken,omitempty"`      // DatabaseToken is the database token for InfluxDB Cloud Dedicated sources
-	TagsCSVPath        string `json:"tagsCSVPath,omitempty"`        // TagsCSVPath is the path to the CSV file containing tags for InfluxDB Cloud Dedicated sources
+	TagsCSVPath        string `json:"tagsCSVPath,omitempty"`        // TagsCSVPath is the path to a directory containing CSV files (per db) with tags for InfluxDB Cloud Dedicated sources
 	URL                string `json:"url"`                          // URL are the connections to the source
 	MetaURL            string `json:"metaUrl,omitempty"`            // MetaURL is the url for the meta node
 	InsecureSkipVerify bool   `json:"insecureSkipVerify,omitempty"` // InsecureSkipVerify as true means any certificate presented by the source is accepted.

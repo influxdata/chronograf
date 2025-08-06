@@ -2,14 +2,11 @@ package influx
 
 import (
 	"context"
-	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 
 	"github.com/influxdata/chronograf"
@@ -196,32 +193,40 @@ func (c *Client) newDummyQueryRequestForCloudDedicated(ctx context.Context) (*ht
 	return req, err
 }
 
+func (c *Client) handleShowMeasurements(q chronograf.Query, logs chronograf.Logger) (chronograf.Response, error) {
+	if c.csvTagsStore == nil {
+		return nil, nil
+	}
+	logs.Info("Returning measurements from CSV")
+	return createShowMeasurementsResponseFromCSV(c.csvTagsStore, q.DB), nil
+}
+
 func (c *Client) handleShowTagKeys(q chronograf.Query, logs chronograf.Logger) (chronograf.Response, error) {
-	if c.tagValues == nil {
+	if c.csvTagsStore == nil {
 		return nil, nil
 	}
 	stmt, err := parseShowTagKeysStatement(q.Command)
 	if err != nil {
-		logs.Error("Could not parse SHOW TAG KEYS statement", err)
+		logs.Debug("Could not parse SHOW TAG KEYS statement: ", err)
 		return nil, err
 	}
 	tables := extractTables(stmt)
 	logs.Info("Returning tag keys from CSV")
-	return createShowTagKeysResponse(c.tagValues, q.DB, tables), nil
+	return createShowTagKeysResponseFromCSV(c.csvTagsStore, q.DB, tables), nil
 }
 
 func (c *Client) handleShowTagValues(q *chronograf.Query, logs chronograf.Logger) (chronograf.Response, error) {
 	stmt, err := parseShowTagValuesStatement(q.Command)
 	if err != nil {
-		logs.Debug("Could not parse SHOW TAG VALUES statement", err)
+		logs.Debug("Could not parse SHOW TAG VALUES statement: ", err)
 		return nil, err
 	}
 
-	if c.tagValues != nil {
+	if c.csvTagsStore != nil {
 		// Use CSV
 		tables, tags := extractTablesAndTags(stmt)
 		logs.Info("Returning tag values from CSV")
-		resp := createShowTagValuesResponse(c.tagValues, q.DB, tables, tags)
+		resp := createShowTagValuesResponseFromCSV(c.csvTagsStore, q.DB, tables, tags)
 		if resp != nil {
 			return resp, nil
 		}
@@ -232,21 +237,6 @@ func (c *Client) handleShowTagValues(q *chronograf.Query, logs chronograf.Logger
 		q.Command = stmt.String()
 	}
 	return nil, nil
-}
-
-func (c *Client) initCSV(logs chronograf.Logger) {
-	c.lock.Lock()
-	defer c.lock.Unlock()
-
-	if c.TagsCSVPath == "" || c.tagValues != nil {
-		return
-	}
-	tagValues, err := ReadTagValuesFromCSV(c.TagsCSVPath)
-	if err != nil {
-		logs.Error("Could not read tag keys from CSV", err)
-		return
-	}
-	c.tagValues = tagValues
 }
 
 // parseShowTagValuesStatement parses a SHOW TAG VALUES query string into an instance of ShowTagValuesStatement.
@@ -322,52 +312,12 @@ func hasTimeCondition(expr influxql.Expr) bool {
 	}
 }
 
-// ReadTagValuesFromCSV reads tag values from a CSV file and returns a TagsStore.
-func ReadTagValuesFromCSV(csvFilePath string) (TagsStore, error) {
-	// Open the CSV file
-	file, err := os.Open(csvFilePath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open CSV file: %w", err)
-	}
-	defer func() { _ = file.Close() }()
-
-	// Create a CSV reader
-	reader := csv.NewReader(file)
-	reader.Comma = ';'
-	reader.FieldsPerRecord = -1
-
-	data := make(TagsStore)
-	for {
-		record, err := reader.Read()
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				break
-			}
-			return nil, fmt.Errorf("failed to read CSV record: %w", err)
-		}
-
-		if len(record) < 4 {
-			continue
-		}
-
-		db, meas, tag, val := strings.TrimSpace(record[0]), strings.TrimSpace(record[1]), strings.TrimSpace(record[2]), strings.TrimSpace(record[3])
-		if _, ok := data[db]; !ok {
-			data[db] = make(map[string]map[string][]string)
-		}
-		if _, ok := data[db][meas]; !ok {
-			data[db][meas] = make(map[string][]string)
-		}
-		data[db][meas][tag] = append(data[db][meas][tag], val)
-	}
-	return data, nil
-}
-
-func createShowMeasurementsResponse(tagValues TagsStore, db string) chronograf.Response {
-	if tagValues == nil {
+func createShowMeasurementsResponseFromCSV(csvTagsStore *CSVTagsStore, db string) chronograf.Response {
+	if csvTagsStore == nil {
 		return nil
 	}
-	tablesMap, ok := tagValues[db]
-	if !ok {
+	tablesMap := csvTagsStore.GetMeasurementsMap(db)
+	if tablesMap == nil {
 		return nil
 	}
 	data := make([][]interface{}, 0, len(tablesMap))
@@ -397,9 +347,12 @@ func createShowMeasurementsResponse(tagValues TagsStore, db string) chronograf.R
 	}
 }
 
-func createShowTagKeysResponse(tagValues TagsStore, db string, tables []string) chronograf.Response {
-	tablesMap, ok := tagValues[db]
-	if !ok {
+func createShowTagKeysResponseFromCSV(csvTagsStore *CSVTagsStore, db string, tables []string) chronograf.Response {
+	if csvTagsStore == nil {
+		return nil
+	}
+	tablesMap := csvTagsStore.GetMeasurementsMap(db)
+	if tablesMap == nil {
 		return nil
 	}
 	if len(tables) == 0 {
@@ -440,9 +393,12 @@ func createShowTagKeysResponse(tagValues TagsStore, db string, tables []string) 
 	}
 }
 
-func createShowTagValuesResponse(tagValues TagsStore, db string, tables, tags []string) chronograf.Response {
-	tablesMap, ok := tagValues[db]
-	if !ok {
+func createShowTagValuesResponseFromCSV(csvTagsStore *CSVTagsStore, db string, tables, tags []string) chronograf.Response {
+	if csvTagsStore == nil {
+		return nil
+	}
+	tablesMap := csvTagsStore.GetMeasurementsMap(db)
+	if tablesMap == nil {
 		return nil
 	}
 	if len(tables) == 0 {
