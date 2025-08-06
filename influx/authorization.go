@@ -23,6 +23,12 @@ func (n *NoAuthorization) Set(req *http.Request) error { return nil }
 
 // DefaultAuthorization creates either a shared JWT builder, basic auth or Noop or Token authentication
 func DefaultAuthorization(src *chronograf.Source) Authorizer {
+	// Use Bearer Token authentication for InfluxDB Cloud
+	if src.Type == chronograf.InfluxDBCloudDedicated {
+		return &BearerToken{
+			Token: src.DatabaseToken,
+		}
+	}
 	// Use Token authentication for InfluxDB v2
 	if src.Type == chronograf.InfluxDBv2 {
 		return &TokenAuth{
@@ -68,6 +74,16 @@ type TokenAuth struct {
 // Set adds the token authentication to the request
 func (a *TokenAuth) Set(r *http.Request) error {
 	r.Header.Set("Authorization", "Token "+a.Token)
+	return nil
+}
+
+// BearerToken adds `Authorization: Bearer <Token>` to the request header, where the token is in non-JWT format.
+type BearerToken struct {
+	Token string
+}
+
+func (a *BearerToken) Set(r *http.Request) error {
+	r.Header.Set("Authorization", "Bearer "+a.Token)
 	return nil
 }
 
