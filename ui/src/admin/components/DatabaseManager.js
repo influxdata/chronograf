@@ -7,6 +7,7 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 const DatabaseManager = ({
   databases,
   isRFDisplayed,
+  isDBReadOnly,
   isAddDBDisabled,
   addDatabase,
   onEditDatabase,
@@ -52,6 +53,7 @@ const DatabaseManager = ({
                 key={db.links.self}
                 database={db}
                 isRFDisplayed={isRFDisplayed}
+                isDBReadOnly={isDBReadOnly}
                 onEditDatabase={onEditDatabase}
                 onKeyDownDatabase={onKeyDownDatabase}
                 onCancelDatabase={onCancelDatabase}
@@ -82,6 +84,7 @@ DatabaseManager.propTypes = {
   databases: arrayOf(shape()),
   addDatabase: func,
   isRFDisplayed: bool,
+  isDBReadOnly: bool,
   isAddDBDisabled: bool,
   onEditDatabase: func,
   onKeyDownDatabase: func,

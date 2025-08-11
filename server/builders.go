@@ -112,11 +112,15 @@ type SourcesBuilder interface {
 
 // MultiSourceBuilder implements SourcesBuilder
 type MultiSourceBuilder struct {
-	InfluxDBURL      string
-	InfluxDBUsername string
-	InfluxDBPassword string
-	InfluxDBOrg      string
-	InfluxDBToken    string
+	InfluxDBURL       string
+	InfluxDBUsername  string
+	InfluxDBPassword  string
+	InfluxDBOrg       string
+	InfluxDBToken     string
+	InfluxDBMgmtToken string
+	InfluxDBClusterID string
+	InfluxDBAccountID string
+	TagsCSVPath       string
 
 	Logger chronograf.Logger
 	ID     chronograf.ID
@@ -132,7 +136,16 @@ func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore) (*multistore.Sou
 
 	if fs.InfluxDBURL != "" {
 		var influxdbType, username, password string
-		if fs.InfluxDBOrg == "" || fs.InfluxDBToken == "" {
+		var clusterID, accountID, mgmtToken, dbToken, tagsCSVPath string
+		if fs.InfluxDBClusterID != "" && fs.InfluxDBAccountID != "" && fs.InfluxDBToken != "" && fs.InfluxDBMgmtToken != "" {
+			// InfluxDB Cloud Dedicated
+			influxdbType = chronograf.InfluxDBCloudDedicated
+			clusterID = fs.InfluxDBClusterID
+			accountID = fs.InfluxDBAccountID
+			mgmtToken = fs.InfluxDBMgmtToken
+			dbToken = fs.InfluxDBToken
+			tagsCSVPath = fs.TagsCSVPath
+		} else if fs.InfluxDBOrg == "" || fs.InfluxDBToken == "" {
 			// v1 InfluxDB
 			username = fs.InfluxDBUsername
 			password = fs.InfluxDBPassword
@@ -146,14 +159,19 @@ func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore) (*multistore.Sou
 
 		influxStore := &memdb.SourcesStore{
 			Source: &chronograf.Source{
-				ID:       0,
-				Name:     fs.InfluxDBURL,
-				Type:     influxdbType,
-				Username: username,
-				Password: password,
-				URL:      fs.InfluxDBURL,
-				Default:  true,
-				Version:  "unknown", // a real version is re-fetched at runtime; use "unknown" version as a fallback, empty version would imply OSS 2.x
+				ID:              0,
+				Name:            fs.InfluxDBURL,
+				Type:            influxdbType,
+				Username:        username,
+				Password:        password,
+				ClusterID:       clusterID,
+				AccountID:       accountID,
+				ManagementToken: mgmtToken,
+				DatabaseToken:   dbToken,
+				TagsCSVPath:     tagsCSVPath,
+				URL:             fs.InfluxDBURL,
+				Default:         true,
+				Version:         "unknown", // a real version is re-fetched at runtime; use "unknown" version as a fallback, empty version would imply OSS 2.x
 			}}
 		stores = append([]chronograf.SourcesStore{influxStore}, stores...)
 	}

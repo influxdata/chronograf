@@ -209,6 +209,9 @@ func setupQueryFromCommand(req *chronograf.Query) {
 	} else if strings.Contains(command, " on ") {
 		r := csv.NewReader(strings.NewReader(req.Command))
 		r.Comma = ' '
+		// Without LazyQuotes=true the following query fails with `bare " in non-quoted-field` error:
+		// `SHOW TAG VALUES ON "mydb" FROM "mytable" WITH KEY IN ("tag1", "tag2", "tag3")`
+		r.LazyQuotes = true
 		if tokens, err := r.Read(); err == nil {
 			// filter empty tokens (i.e. redundant whitespaces, using https://go.dev/wiki/SliceTricks#filtering-without-allocating)
 			fields := tokens[:0]
