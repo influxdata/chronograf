@@ -197,7 +197,7 @@ func (c *Client) showRetentionPolicies(ctx context.Context, db string) ([]chrono
 		return nil, err
 	}
 
-	return results.RetentionPolicies(), nil
+	return results.RetentionPolicies(c.Logger), nil
 }
 
 func (c *Client) showMeasurements(ctx context.Context, db string, limit, offset int) ([]chronograf.Measurement, error) {

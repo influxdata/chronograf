@@ -93,35 +93,70 @@ func (r *showResults) Databases() []chronograf.Database {
 	return res
 }
 
-func (r *showResults) RetentionPolicies() []chronograf.RetentionPolicy {
-	res := []chronograf.RetentionPolicy{}
+func (r *showResults) RetentionPolicies(logger chronograf.Logger) []chronograf.RetentionPolicy {
+	var res []chronograf.RetentionPolicy
 	for _, u := range *r {
 		for _, s := range u.Series {
 			for _, v := range s.Values {
-				if name, ok := v[0].(string); !ok {
-					continue
-				} else if duration, ok := v[1].(string); !ok {
-					continue
-				} else if sduration, ok := v[2].(string); !ok {
-					continue
-				} else if replication, ok := v[3].(float64); !ok {
-					continue
-				} else if def, ok := v[4].(bool); !ok {
-					continue
-				} else {
-					d := chronograf.RetentionPolicy{
-						Name:          name,
-						Duration:      duration,
-						ShardDuration: sduration,
-						Replication:   int32(replication),
-						Default:       def,
+				rp, err := parseRetentionPolicy(v)
+				if err != nil {
+					if logger != nil {
+						types := make([]string, len(v))
+						for i, val := range v {
+							types[i] = fmt.Sprintf("%T", val)
+						}
+						logger.
+							WithField("values", fmt.Sprintf("%v", v)).
+							WithField("types", fmt.Sprintf("%v", types)).
+							WithField("error", err.Error()).
+							Error("Unsupported retention policy format")
 					}
-					res = append(res, d)
+					continue
 				}
+				res = append(res, rp)
 			}
 		}
 	}
 	return res
+}
+
+// parseRetentionPolicy validates and parses a retention policy row
+func parseRetentionPolicy(v []interface{}) (chronograf.RetentionPolicy, error) {
+	columns := len(v)
+	if columns < 5 {
+		return chronograf.RetentionPolicy{}, fmt.Errorf("insufficient columns: expected at least 5, got %d", columns)
+	} else if name, ok := v[0].(string); !ok {
+		return chronograf.RetentionPolicy{}, fmt.Errorf("column 0 (name) is not a string")
+	} else if duration, ok := v[1].(string); !ok {
+		return chronograf.RetentionPolicy{}, fmt.Errorf("column 1 (duration) is not a string")
+	} else if sduration, ok := v[2].(string); !ok {
+		return chronograf.RetentionPolicy{}, fmt.Errorf("column 2 (shardDuration) is not a string")
+	} else if replication, ok := v[3].(float64); !ok {
+		return chronograf.RetentionPolicy{}, fmt.Errorf("column 3 (replication) is not a float64")
+	} else {
+		var def bool
+		if columns == 5 {
+			// 5-column format: [name, duration, shardGroupDuration, replicaN, default]
+			if def, ok = v[4].(bool); !ok {
+				return chronograf.RetentionPolicy{}, fmt.Errorf("column 4 (default) is not a bool")
+			}
+		} else if columns == 7 {
+			// 7-column format: [name, duration, shardGroupDuration, replicaN, futureWriteLimit, pastWriteLimit, default]
+			if def, ok = v[6].(bool); !ok {
+				return chronograf.RetentionPolicy{}, fmt.Errorf("column 6 (default) is not a bool")
+			}
+		} else {
+			return chronograf.RetentionPolicy{}, fmt.Errorf("unexpected number of columns: %d", columns)
+		}
+
+		return chronograf.RetentionPolicy{
+			Name:          name,
+			Duration:      duration,
+			ShardDuration: sduration,
+			Replication:   int32(replication),
+			Default:       def,
+		}, nil
+	}
 }
 
 // Measurements converts SHOW MEASUREMENTS to chronograf Measurement
