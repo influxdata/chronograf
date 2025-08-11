@@ -45,7 +45,7 @@ func (c *Client) Permissions(context.Context) chronograf.Permissions {
 // showResults is used to deserialize InfluxQL SHOW commands
 type showResults []struct {
 	Series []struct {
-		Values [][]interface{} `json:"values"`
+		Values []value `json:"values"`
 	} `json:"series"`
 }
 

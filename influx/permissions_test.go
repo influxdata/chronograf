@@ -2,6 +2,8 @@ package influx
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
 	"reflect"
 	"testing"
 
@@ -300,6 +302,349 @@ func TestToRevoke(t *testing.T) {
 			t.Errorf("%q. ToRevoke() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
+}
+
+// mockLoggerWithError is a simple logger that captures error messages passed via WithField
+type mockLoggerWithError struct {
+	errorMsg string
+	fields   map[string]interface{}
+}
+
+func (m *mockLoggerWithError) Debug(...interface{})   {}
+func (m *mockLoggerWithError) Info(...interface{})    {}
+func (m *mockLoggerWithError) Error(_ ...interface{}) {}
+func (m *mockLoggerWithError) WithField(key string, value interface{}) chronograf.Logger {
+	if m.fields == nil {
+		m.fields = make(map[string]interface{})
+	}
+	m.fields[key] = value
+	if key == "error" {
+		m.errorMsg = fmt.Sprintf("%v", value)
+	}
+	return m
+}
+func (m *mockLoggerWithError) Writer() *io.PipeWriter {
+	_, w := io.Pipe()
+	return w
+}
+
+func TestRetentionPolicies(t *testing.T) {
+	tests := []struct {
+		name        string
+		input       showResults
+		expected    []chronograf.RetentionPolicy
+		expectedErr string
+	}{
+		{
+			name: "5-column format with two retention policies",
+			input: showResults{
+				{
+					Series: []struct {
+						Values []value `json:"values"`
+					}{
+						{
+							Values: []value{
+								{
+									"autogen",   // name
+									"2160h0m0s", // duration
+									"168h0m0s",  // shardGroupDuration
+									float64(3),  // replicaN
+									true,        // default
+								},
+								{
+									"quarterly", // name
+									"1560h0m0s", // duration
+									"24h0m0s",   // shardGroupDuration
+									float64(1),  // replicaN
+									false,       // default
+								},
+							},
+						},
+					},
+				},
+			},
+			expected: []chronograf.RetentionPolicy{
+				{
+					Name:          "autogen",
+					Duration:      "2160h0m0s",
+					ShardDuration: "168h0m0s",
+					Replication:   3,
+					Default:       true,
+				},
+				{
+					Name:          "quarterly",
+					Duration:      "1560h0m0s",
+					ShardDuration: "24h0m0s",
+					Replication:   1,
+					Default:       false,
+				},
+			},
+		},
+		{
+			name: "7-column format with two retention policies",
+			input: showResults{
+				{
+					Series: []struct {
+						Values []value `json:"values"`
+					}{
+						{
+							Values: []value{
+								{
+									"autogen",   // name
+									"2160h0m0s", // duration
+									"168h0m0s",  // shardGroupDuration
+									float64(3),  // replicaN
+									"0s",        // futureWriteLimit
+									"0s",        // pastWriteLimit
+									true,        // default
+								},
+								{
+									"quarterly", // name
+									"1560h0m0s", // duration
+									"24h0m0s",   // shardGroupDuration
+									float64(1),  // replicaN
+									"1h",        // futureWriteLimit
+									"30m",       // pastWriteLimit
+									false,       // default
+								},
+							},
+						},
+					},
+				},
+			},
+			expected: []chronograf.RetentionPolicy{
+				{
+					Name:          "autogen",
+					Duration:      "2160h0m0s",
+					ShardDuration: "168h0m0s",
+					Replication:   3,
+					Default:       true,
+				},
+				{
+					Name:          "quarterly",
+					Duration:      "1560h0m0s",
+					ShardDuration: "24h0m0s",
+					Replication:   1,
+					Default:       false,
+				},
+			},
+		},
+		{
+			name: "empty input",
+			input: showResults{
+				{
+					Series: []struct {
+						Values []value `json:"values"`
+					}{
+						{
+							Values: []value{},
+						},
+					},
+				},
+			},
+			expected: []chronograf.RetentionPolicy{},
+		},
+		{
+			name: "insufficient columns (3 columns)",
+			input: showResults{
+				{
+					Series: []struct {
+						Values []value `json:"values"`
+					}{
+						{
+							Values: []value{
+								{"autogen", "2160h0m0s", "168h0m0s"}, // Only 3 columns
+							},
+						},
+					},
+				},
+			},
+			expected:    []chronograf.RetentionPolicy{},
+			expectedErr: "insufficient columns: expected at least 5, got 3",
+		},
+		{
+			name: "wrong type for name (int instead of string)",
+			input: showResults{
+				{
+					Series: []struct {
+						Values []value `json:"values"`
+					}{
+						{
+							Values: []value{
+								{123, "2160h0m0s", "168h0m0s", float64(3), true},
+							},
+						},
+					},
+				},
+			},
+			expected:    []chronograf.RetentionPolicy{},
+			expectedErr: "column 0 (name) is not a string",
+		},
+		{
+			name: "wrong type for duration (int instead of string)",
+			input: showResults{
+				{
+					Series: []struct {
+						Values []value `json:"values"`
+					}{
+						{
+							Values: []value{
+								{"autogen", 2160, "168h0m0s", float64(3), true},
+							},
+						},
+					},
+				},
+			},
+			expected:    []chronograf.RetentionPolicy{},
+			expectedErr: "column 1 (duration) is not a string",
+		},
+		{
+			name: "wrong type for replication (string instead of float64)",
+			input: showResults{
+				{
+					Series: []struct {
+						Values []value `json:"values"`
+					}{
+						{
+							Values: []value{
+								{"autogen", "2160h0m0s", "168h0m0s", "3", true},
+							},
+						},
+					},
+				},
+			},
+			expected:    []chronograf.RetentionPolicy{},
+			expectedErr: "column 3 (replication) is not a float64",
+		},
+		{
+			name: "wrong type for default in 5-column format (string instead of bool)",
+			input: showResults{
+				{
+					Series: []struct {
+						Values []value `json:"values"`
+					}{
+						{
+							Values: []value{
+								{"autogen", "2160h0m0s", "168h0m0s", float64(3), "true"},
+							},
+						},
+					},
+				},
+			},
+			expected:    []chronograf.RetentionPolicy{},
+			expectedErr: "column 4 (default) is not a bool",
+		},
+		{
+			name: "wrong type for default in 7-column format (string instead of bool)",
+			input: showResults{
+				{
+					Series: []struct {
+						Values []value `json:"values"`
+					}{
+						{
+							Values: []value{
+								{"autogen", "2160h0m0s", "168h0m0s", float64(3), "0s", "0s", "true"},
+							},
+						},
+					},
+				},
+			},
+			expected:    []chronograf.RetentionPolicy{},
+			expectedErr: "column 6 (default) is not a bool",
+		},
+		{
+			name: "invalid column count (6 columns)",
+			input: showResults{
+				{
+					Series: []struct {
+						Values []value `json:"values"`
+					}{
+						{
+							Values: []value{
+								{"autogen", "2160h0m0s", "168h0m0s", float64(3), "0s", true},
+							},
+						},
+					},
+				},
+			},
+			expected:    []chronograf.RetentionPolicy{},
+			expectedErr: "unexpected number of columns: 6",
+		},
+		{
+			name: "mixed valid and invalid entries",
+			input: showResults{
+				{
+					Series: []struct {
+						Values []value `json:"values"`
+					}{
+						{
+							Values: []value{
+								{"autogen", "2160h0m0s", "168h0m0s", float64(3), true},   // valid
+								{"invalid", "2160h0m0s", "168h0m0s"},                     // insufficient columns
+								{"quarterly", "1560h0m0s", "24h0m0s", float64(1), false}, // valid
+							},
+						},
+					},
+				},
+			},
+			expected: []chronograf.RetentionPolicy{
+				{
+					Name:          "autogen",
+					Duration:      "2160h0m0s",
+					ShardDuration: "168h0m0s",
+					Replication:   3,
+					Default:       true,
+				},
+				{
+					Name:          "quarterly",
+					Duration:      "1560h0m0s",
+					ShardDuration: "24h0m0s",
+					Replication:   1,
+					Default:       false,
+				},
+			},
+			expectedErr: "insufficient columns: expected at least 5, got 3",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Use mock logger to capture error messages
+			logger := &mockLoggerWithError{}
+			result := tt.input.RetentionPolicies(logger)
+
+			// Check the returned policies match expected
+			if !equalRetentionPolicies(result, tt.expected) {
+				t.Errorf("RetentionPolicies() = %v, want %v", result, tt.expected)
+			}
+
+			// Check the error message if one is expected
+			if tt.expectedErr != "" {
+				if logger.errorMsg != tt.expectedErr {
+					t.Errorf("RetentionPolicies() error = %v, want %v", logger.errorMsg, tt.expectedErr)
+				}
+			} else if logger.errorMsg != "" {
+				t.Errorf("RetentionPolicies() unexpected error = %v", logger.errorMsg)
+			}
+		})
+	}
+}
+
+// equalRetentionPolicies compares two slices of RetentionPolicy for equality
+func equalRetentionPolicies(a, b []chronograf.RetentionPolicy) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i].Name != b[i].Name ||
+			a[i].Duration != b[i].Duration ||
+			a[i].ShardDuration != b[i].ShardDuration ||
+			a[i].Replication != b[i].Replication ||
+			a[i].Default != b[i].Default {
+			return false
+		}
+	}
+	return true
 }
 
 func Test_showResults_Users(t *testing.T) {
