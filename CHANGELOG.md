@@ -1,3 +1,9 @@
+## [unreleased]
+
+### Bug Fixes
+
+1. [#6145](https://github.com/influxdata/chronograf/pull/6145): Show missing retention policies on the Databases page
+
 ## v1.10.7 [2025-04-15]
 
 ### Bug Fixes
