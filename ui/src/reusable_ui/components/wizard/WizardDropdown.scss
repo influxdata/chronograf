@@ -1,0 +1,123 @@
+/*
+  Wizard Dropdown Component
+  ------------------------------------------------------------------------------
+*/
+
+.wizard-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.wizard-dropdown--button {
+  @extend .form-control;
+  @extend .input-sm;
+  padding: 0 $form-sm-padding;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  &:hover {
+    background: $g3-castle;
+    border-color: $g6-smoke;
+    color: $g17-whisper;
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: $c-pool;
+    box-shadow: 0 0 6px 0 $c-pool;
+    background: $g3-castle;
+    color: $g20-white;
+  }
+  
+  &.active {
+    background: $g3-castle;
+    border-color: $c-pool;
+    color: $g20-white;
+  }
+  
+  &.placeholder {
+    color: $g9-mountain;
+    font-weight: 600;
+    font-style: italic;
+  }
+  
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.wizard-dropdown--arrow {
+  width: 8px;
+  height: 8px;
+  border-right: $ix-border solid $g9-mountain;
+  border-bottom: $ix-border solid $g9-mountain;
+  transform: rotate(45deg);
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+  margin-left: $ix-marg-b;
+  
+  .wizard-dropdown--button.active & {
+    transform: rotate(-135deg);
+  }
+}
+
+.wizard-dropdown--menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: $g3-castle;
+  border: $ix-border solid $g5-pepper;
+  border-radius: $radius;
+  margin-top: $ix-marg-a;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 9999;
+  box-shadow: 0 4px 12px rgba($g0-obsidian, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+  
+  &.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+}
+
+.wizard-dropdown--option {
+  padding: $ix-marg-b $ix-marg-c;
+  color: $g15-platinum;
+  cursor: pointer;
+  font-size: $form-sm-font;
+  border-bottom: 1px solid $g5-pepper;
+  transition: background-color 0.15s ease;
+  font-weight: 600;
+  letter-spacing: 0px;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  &:hover {
+    background: $g4-onyx;
+  }
+  
+  &.selected {
+    background: rgba($c-pool, 0.15);
+    color: $c-pool;
+  }
+}
+
+.wizard-dropdown--subtext {
+  display: block;
+  margin-top: $ix-marg-a;
+  margin-left: 0;
+  font-size: 11px;
+  color: $g9-mountain;
+}

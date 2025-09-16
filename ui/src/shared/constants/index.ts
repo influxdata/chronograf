@@ -525,6 +525,8 @@ export const MIN_SIZE = 0
 export const QUERY_BUILDER_LIST_ITEM_HEIGHT = 28
 
 export const SOURCE_TYPE_INFLUX_V1 = 'influx'
+export const SOURCE_TYPE_INFLUX_ENTERPRISE = 'influx-enterprise'
+export const SOURCE_TYPE_INFLUX_RELAY = 'influx-relay'
 export const SOURCE_TYPE_INFLUX_V2 = 'influx-v2'
 export const SOURCE_TYPE_INFLUX_CLOUD_DEDICATED = 'influx-cloud-dedicated'
 

@@ -8,6 +8,7 @@ import _ from 'lodash'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import WizardTextInput from 'src/reusable_ui/components/wizard/WizardTextInput'
 import WizardCheckbox from 'src/reusable_ui/components/wizard/WizardCheckbox'
+import WizardDropdown from 'src/reusable_ui/components/wizard/WizardDropdown'
 
 // Actions
 import {
@@ -34,6 +35,8 @@ import {
   SOURCE_TYPE_INFLUX_CLOUD_DEDICATED,
   SOURCE_TYPE_INFLUX_V2,
   SOURCE_TYPE_INFLUX_V1,
+  SOURCE_TYPE_INFLUX_ENTERPRISE,
+  SOURCE_TYPE_INFLUX_RELAY,
 } from 'src/shared/constants'
 import {SUPERADMIN_ROLE} from 'src/auth/roles'
 
@@ -42,10 +45,6 @@ import {Source, Me} from 'src/types'
 import {NextReturn} from 'src/types/wizard'
 
 const isNewSource = (source: Partial<Source>) => !source.id
-const isV2Auth = (source: Partial<Source>) =>
-  source.type && source.type === SOURCE_TYPE_INFLUX_V2
-const isCD = (source: Partial<Source>) =>
-  source.type && source.type === SOURCE_TYPE_INFLUX_CLOUD_DEDICATED
 
 interface Props {
   notify: typeof notifyAction
@@ -60,6 +59,7 @@ interface Props {
 
 interface State {
   source: Partial<Source>
+  serverType?: string // server type dropdown value
 }
 
 class SourceStep extends PureComponent<Props, State> {
@@ -68,8 +68,10 @@ class SourceStep extends PureComponent<Props, State> {
   }
   constructor(props: Props) {
     super(props)
+    const source = this.props.source || DEFAULT_SOURCE
     this.state = {
-      source: this.props.source || DEFAULT_SOURCE,
+      source,
+      serverType: this.getServerTypeFromSource(source),
     }
   }
 
@@ -107,12 +109,34 @@ class SourceStep extends PureComponent<Props, State> {
   public render() {
     const {source} = this.state
     const {isUsingAuth, onBoarding} = this.props
-    const sourceIsV2 = isV2Auth(source)
-    const sourceIsCD = isCD(source)
+    const sourceIsV2 = this.state.serverType === SOURCE_TYPE_INFLUX_V2
+    const sourceIsCD =
+      this.state.serverType === SOURCE_TYPE_INFLUX_CLOUD_DEDICATED
 
     return (
       <>
         {isUsingAuth && onBoarding && this.authIndicator}
+        <WizardDropdown
+          label="Server Type"
+          placeholder="Select Server Type"
+          value={this.state.serverType}
+          options={[
+            {
+              value: SOURCE_TYPE_INFLUX_V1,
+              label: 'InfluxDB v1',
+            },
+            {
+              value: SOURCE_TYPE_INFLUX_V2,
+              label: 'InfluxDB v2',
+            },
+            {
+              value: SOURCE_TYPE_INFLUX_CLOUD_DEDICATED,
+              label: 'InfluxDB Cloud Dedicated',
+            },
+          ]}
+          onChange={this.handleServerTypeChange}
+          testId="server-type-selector--dropdown"
+        />
         <WizardTextInput
           value={source.url}
           label="Connection URL"
@@ -208,18 +232,6 @@ class SourceStep extends PureComponent<Props, State> {
             testId="default-connection--checkbox"
           />
         )}
-        <WizardCheckbox
-          halfWidth={true}
-          isChecked={sourceIsV2}
-          text={'InfluxDB v2 Auth'}
-          onChange={this.changeV2Auth}
-        />
-        <WizardCheckbox
-          halfWidth={true}
-          isChecked={sourceIsCD}
-          text={'InfluxDB Cloud Dedicated'}
-          onChange={this.changeCD}
-        />
 
         {this.isHTTPS && (
           <WizardCheckbox
@@ -300,20 +312,6 @@ class SourceStep extends PureComponent<Props, State> {
       },
     })
   }
-  private changeV2Auth = (v2: boolean) => {
-    if (v2) {
-      this.changeSourceType(SOURCE_TYPE_INFLUX_V2, '2.x')
-    } else {
-      this.changeSourceType(SOURCE_TYPE_INFLUX_V1, '1.x')
-    }
-  }
-  private changeCD = (cd: boolean) => {
-    if (cd) {
-      this.changeSourceType(SOURCE_TYPE_INFLUX_CLOUD_DEDICATED, 'cloud')
-    } else {
-      this.changeSourceType(SOURCE_TYPE_INFLUX_V1, '1.x')
-    }
-  }
 
   private handleSubmitUrl = (url: string) => this.detectServerType({url})
   private handleSubmitUsername = (username: string) =>
@@ -362,6 +360,40 @@ class SourceStep extends PureComponent<Props, State> {
   private get isEnterprise(): boolean {
     const {source} = this.state
     return _.get(source, 'type', '').includes('enterprise')
+  }
+
+  private getServerTypeFromSource = (
+    source: Partial<Source>
+  ): string | undefined => {
+    if (source.type === SOURCE_TYPE_INFLUX_V2) {
+      return SOURCE_TYPE_INFLUX_V2
+    } else if (source.type === SOURCE_TYPE_INFLUX_CLOUD_DEDICATED) {
+      return SOURCE_TYPE_INFLUX_CLOUD_DEDICATED
+    } else if (
+      source.type === SOURCE_TYPE_INFLUX_V1 ||
+      source.type === SOURCE_TYPE_INFLUX_ENTERPRISE ||
+      source.type === SOURCE_TYPE_INFLUX_RELAY
+    ) {
+      // All 3 source subtypes are displayed as v1
+      return SOURCE_TYPE_INFLUX_V1
+    }
+    return undefined
+  }
+
+  private handleServerTypeChange = (value: string) => {
+    this.setState({serverType: value})
+
+    switch (value) {
+      case SOURCE_TYPE_INFLUX_V2:
+        this.changeSourceType(SOURCE_TYPE_INFLUX_V2, '2.x')
+        break
+      case SOURCE_TYPE_INFLUX_CLOUD_DEDICATED:
+        this.changeSourceType(SOURCE_TYPE_INFLUX_CLOUD_DEDICATED, 'cloud')
+        break
+      case SOURCE_TYPE_INFLUX_V1:
+      default:
+        this.changeSourceType(SOURCE_TYPE_INFLUX_V1, '1.x')
+    }
   }
 }
 
