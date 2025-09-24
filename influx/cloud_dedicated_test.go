@@ -17,7 +17,6 @@ import (
 )
 
 func TestAppendTimeCondition(t *testing.T) {
-	const timeCondition = `time > now() - 1d`
 
 	tests := []struct {
 		name     string
@@ -172,7 +171,7 @@ func TestParseShowTagValuesStatement(t *testing.T) {
 		{
 			name:          "SHOW TAG VALUES without WITH",
 			input:         `SHOW TAG VALUES`,
-			expectedError: "failed to parse statement: found EOF, expected WITH",
+			expectedError: "parsing error: found EOF, expected WITH",
 		},
 		{
 			name:          "query of other type",
@@ -182,12 +181,12 @@ func TestParseShowTagValuesStatement(t *testing.T) {
 		{
 			name:          "empty string",
 			input:         ``,
-			expectedError: "failed to parse statement: found EOF",
+			expectedError: "parsing error: found EOF",
 		},
 		{
 			name:          "malformed query",
 			input:         `SHOW TAG VALUES FROM machine_data WITH KEY = "tagkey INVALID`,
-			expectedError: "failed to parse statement",
+			expectedError: "parsing error",
 		},
 	}
 
