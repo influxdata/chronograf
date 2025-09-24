@@ -35,7 +35,9 @@ type cdListDatabasesError struct {
 	Message string `json:"message,omitempty"`
 }
 
-const timeCondition = "time > now() - 1d"
+// TODO simon: make this expression configurable via environment variable
+// const timeCondition = "time > now() - 1d"
+const timeCondition = "time > 0"
 
 var timeExpr = mustParseExpr(timeCondition)
 
@@ -110,7 +112,11 @@ func (c *Client) showDatabasesForCloudDedicated(ctx context.Context) (chronograf
 	}
 
 	// Convert response.
-	return constructShowDatabasesResponse(databases), nil
+	dbNames := make([]string, len(databases))
+	for i, db := range databases {
+		dbNames[i] = db.Name
+	}
+	return constructShowDatabasesResponse(dbNames), nil
 }
 
 // newListDatabasesRequestForCloudDedicated constructs a new http.Request for listing databases in InfluxDB Cloud Dedicated.
@@ -136,10 +142,10 @@ func (c *Client) newListDatabasesRequestForCloudDedicated(ctx context.Context) (
 }
 
 // constructShowDatabasesResponse constructs a chronograf.Response containing database names formatted as query result data.
-func constructShowDatabasesResponse(databases []cdDatabase) chronograf.Response {
-	values := make([][]interface{}, len(databases))
-	for i, db := range databases {
-		values[i] = []interface{}{db.Name}
+func constructShowDatabasesResponse(dbNames []string) chronograf.Response {
+	values := make([][]interface{}, len(dbNames))
+	for i, dbName := range dbNames {
+		values[i] = []interface{}{dbName}
 	}
 
 	response := fakeInfluxResponse{
@@ -243,7 +249,7 @@ func (c *Client) handleShowTagValues(q *chronograf.Query, logs chronograf.Logger
 func parseShowTagValuesStatement(query string) (*influxql.ShowTagValuesStatement, error) {
 	stmt, err := influxql.ParseStatement(query)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse statement: %w", err)
+		return nil, fmt.Errorf("parsing error: %w", err)
 	}
 	showStmt, ok := stmt.(*influxql.ShowTagValuesStatement)
 	if !ok {
@@ -256,7 +262,7 @@ func parseShowTagValuesStatement(query string) (*influxql.ShowTagValuesStatement
 func parseShowTagKeysStatement(query string) (*influxql.ShowTagKeysStatement, error) {
 	stmt, err := influxql.ParseStatement(query)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse statement: %w", err)
+		return nil, fmt.Errorf("parsing error: %w", err)
 	}
 	showStmt, ok := stmt.(*influxql.ShowTagKeysStatement)
 	if !ok {
@@ -266,11 +272,12 @@ func parseShowTagKeysStatement(query string) (*influxql.ShowTagKeysStatement, er
 }
 
 // appendTimeCondition appends a default "WHERE time > now() - 1d" clause to the provided SHOW TAG VALUES statement if no time condition exists.
-func appendTimeCondition(showStmt *influxql.ShowTagValuesStatement) {
+// Returns true if the statement was modified.
+func appendTimeCondition(showStmt *influxql.ShowTagValuesStatement) bool {
 	// Check if there's already a time condition in the WHERE clause
 	if showStmt.Condition != nil && hasTimeCondition(showStmt.Condition) {
 		// Already has a time condition, do nothing
-		return
+		return false
 	}
 
 	// Add or modify the WHERE clause
@@ -285,6 +292,7 @@ func appendTimeCondition(showStmt *influxql.ShowTagValuesStatement) {
 			RHS: timeExpr,
 		}
 	}
+	return true
 }
 
 // hasTimeCondition recursively checks if an InfluxQL expression contains a reference to the "time" field.

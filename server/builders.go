@@ -145,6 +145,11 @@ func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore) (*multistore.Sou
 			mgmtToken = fs.InfluxDBMgmtToken
 			dbToken = fs.InfluxDBToken
 			tagsCSVPath = fs.TagsCSVPath
+		} else if fs.InfluxDBToken != "" {
+			// TODO simon: modify later, once other v3 versions are added; maybe use the source.type?
+			// InfluxDB 3 Core
+			influxdbType = chronograf.InfluxDBv3Core
+			dbToken = fs.InfluxDBToken
 		} else if fs.InfluxDBOrg == "" || fs.InfluxDBToken == "" {
 			// v1 InfluxDB
 			username = fs.InfluxDBUsername

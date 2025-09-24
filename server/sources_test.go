@@ -151,7 +151,7 @@ func Test_ValidSourceRequest(t *testing.T) {
 			},
 		},
 		{
-			name: "support InfluxDB Cloud Dedicated type",
+			name: "InfluxDB Cloud Dedicated - supported",
 			args: args{
 				source: &chronograf.Source{
 					ID:                 1,
@@ -328,6 +328,50 @@ func Test_ValidSourceRequest(t *testing.T) {
 					ManagementToken:    "mgmt-token",
 					URL:                "http://www.any.url.com",
 					MetaURL:            "http://www.so.meta.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+				},
+			},
+			wants: wants{
+				err: fmt.Errorf("database token required"),
+			},
+		},
+		{
+			name: "InfluxDB 3 Core - supported",
+			args: args{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDBv3Core,
+					DatabaseToken:      "database-token",
+					URL:                "http://www.any.url.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+				},
+			},
+			wants: wants{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDBv3Core,
+					DatabaseToken:      "database-token",
+					URL:                "http://www.any.url.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+				},
+			},
+		},
+		{
+			name: "InfluxDB 3 Core - missing database token",
+			args: args{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDBv3Core,
+					URL:                "http://www.any.url.com",
 					InsecureSkipVerify: true,
 					Default:            true,
 					Telegraf:           "telegraf",

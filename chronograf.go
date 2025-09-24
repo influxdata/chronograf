@@ -99,9 +99,15 @@ const (
 	InfluxRelay = "influx-relay"
 	// InfluxDBv2 is Influx DB 2.x with Token authentication
 	InfluxDBv2 = "influx-v2"
+	// InfluxDBv3 is InfluxDB 3 Core
+	InfluxDBv3Core = "influx-v3-core"
 	// InfluxDBCloudDedicated is InfluxDB Cloud Dedicated with Account ID, Cluster ID, Management and DB Token
 	InfluxDBCloudDedicated = "influx-cloud-dedicated"
 )
+
+func IsV3SrcType(srcType string) bool {
+	return srcType == InfluxDBv3Core || srcType == InfluxDBCloudDedicated
+}
 
 // TSDBStatus represents the current status of a time series database
 type TSDBStatus interface {
@@ -248,7 +254,7 @@ type Source struct {
 	ClusterID          string `json:"clusterId,omitempty"`          // ClusterID is the cluster ID for InfluxDB Cloud Dedicated sources
 	AccountID          string `json:"accountId,omitempty"`          // AccountID is the account ID for InfluxDB Cloud Dedicated sources
 	ManagementToken    string `json:"managementToken,omitempty"`    // ManagementToken is the management token for InfluxDB Cloud Dedicated sources
-	DatabaseToken      string `json:"databaseToken,omitempty"`      // DatabaseToken is the database token for InfluxDB Cloud Dedicated sources
+	DatabaseToken      string `json:"databaseToken,omitempty"`      // DatabaseToken is the database token for InfluxDB Cloud Dedicated or other InfluxDB 3 sources
 	TagsCSVPath        string `json:"tagsCSVPath,omitempty"`        // TagsCSVPath is the path to a directory containing CSV files (per db) with tags for InfluxDB Cloud Dedicated sources
 	URL                string `json:"url"`                          // URL are the connections to the source
 	MetaURL            string `json:"metaUrl,omitempty"`            // MetaURL is the url for the meta node

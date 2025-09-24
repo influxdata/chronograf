@@ -78,7 +78,7 @@ func hasFlux(ctx context.Context, src chronograf.Source) (bool, error) {
 	if src.Version == "" /* v2 OSS reports no version */ || strings.HasPrefix(src.Version, "2.") {
 		return src.Type == chronograf.InfluxDBv2 && src.Username != "", nil
 	}
-	if src.Type == chronograf.InfluxDBCloudDedicated {
+	if chronograf.IsV3SrcType(src.Type) {
 		// InfluxDB 3 doesn't support Flux.
 		return false, nil
 	}
@@ -227,7 +227,9 @@ func (s *Service) tsdbVersion(ctx context.Context, src *chronograf.Source) (stri
 }
 
 func (s *Service) tsdbType(ctx context.Context, src *chronograf.Source) (string, error) {
-	if src.Type == chronograf.InfluxDBv2 || src.Type == chronograf.InfluxDBCloudDedicated {
+	if src.Type == chronograf.InfluxDBv2 ||
+		src.Type == chronograf.InfluxDBCloudDedicated ||
+		src.Type == chronograf.InfluxDBv3Core {
 		return src.Type, nil // type selected by the user
 	}
 	cli := &influx.Client{
@@ -509,6 +511,7 @@ func ValidSourceRequest(s *chronograf.Source, defaultOrgID string) error {
 	if s.Type != "" {
 		if s.Type != chronograf.InfluxDB &&
 			s.Type != chronograf.InfluxDBv2 &&
+			s.Type != chronograf.InfluxDBv3Core &&
 			s.Type != chronograf.InfluxDBCloudDedicated &&
 			s.Type != chronograf.InfluxEnterprise &&
 			s.Type != chronograf.InfluxRelay {
@@ -526,6 +529,12 @@ func ValidSourceRequest(s *chronograf.Source, defaultOrgID string) error {
 	}
 	if len(url.Scheme) == 0 {
 		return fmt.Errorf("invalid URL; no URL scheme defined")
+	}
+
+	if s.Type == chronograf.InfluxDBv3Core {
+		if len(s.DatabaseToken) == 0 {
+			return fmt.Errorf("database token required")
+		}
 	}
 
 	if s.Type == chronograf.InfluxDBCloudDedicated {

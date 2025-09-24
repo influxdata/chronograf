@@ -17,8 +17,7 @@ import {
 } from 'src/shared/copy/notifications'
 import {Source} from 'src/types'
 import {Database, RetentionPolicy} from 'src/types/influxAdmin'
-import AdminInfluxDBTabbedPage from './AdminInfluxDBTabbedPage'
-import {SOURCE_TYPE_INFLUX_CLOUD_DEDICATED} from '../../../shared/constants'
+import AdminInfluxDBTabbedPage, {isV3Source} from './AdminInfluxDBTabbedPage'
 
 interface Props {
   source: Source
@@ -136,7 +135,7 @@ class DatabaseManagerPage extends Component<Props> {
 
   render() {
     const {source, databases, actions} = this.props
-    const isDBReadOnly = source.type === SOURCE_TYPE_INFLUX_CLOUD_DEDICATED
+    const isDBReadOnly = isV3Source(source)
     return (
       <AdminInfluxDBTabbedPage activeTab="databases" source={source}>
         <DatabaseManager

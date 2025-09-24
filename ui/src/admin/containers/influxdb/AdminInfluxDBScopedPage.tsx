@@ -13,7 +13,8 @@ import {Page} from 'src/reusable_ui'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {notify as notifyAction} from 'src/shared/actions/notifications'
-import {Source, RemoteDataState, SourceAuthenticationMethod} from 'src/types'
+import {RemoteDataState, Source} from 'src/types'
+import {isConnectedToLDAP, isV3Source} from './AdminInfluxDBTabbedPage'
 
 const mapDispatchToProps = {
   loadUsers: loadUsersAsync,
@@ -100,7 +101,8 @@ class AdminInfluxDBScopedPage extends PureComponent<Props, State> {
     try {
       errorMessage = 'Failed to load databases.'
       await loadDBsAndRPs(source.links.databases)
-      if (source.authentication !== SourceAuthenticationMethod.LDAP) {
+      if (!isConnectedToLDAP(source) && !isV3Source(source)) {
+        // Load users and permissions
         errorMessage = 'Failed to load users.'
         await loadUsers(source.links.users)
         errorMessage = 'Failed to load permissions.'

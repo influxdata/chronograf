@@ -25,23 +25,24 @@ import {createSource, updateSource} from 'src/shared/apis'
 
 // Constants
 import {
-  notifySourceUpdateFailed,
-  notifySourceCreationFailed,
   notifySourceConnectionSucceeded,
+  notifySourceCreationFailed,
+  notifySourceUpdateFailed,
 } from 'src/shared/copy/notifications'
 import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
 import {
   DEFAULT_SOURCE,
   SOURCE_TYPE_INFLUX_CLOUD_DEDICATED,
-  SOURCE_TYPE_INFLUX_V2,
-  SOURCE_TYPE_INFLUX_V1,
   SOURCE_TYPE_INFLUX_ENTERPRISE,
   SOURCE_TYPE_INFLUX_RELAY,
+  SOURCE_TYPE_INFLUX_V1,
+  SOURCE_TYPE_INFLUX_V2,
+  SOURCE_TYPE_INFLUX_V3_CORE,
 } from 'src/shared/constants'
 import {SUPERADMIN_ROLE} from 'src/auth/roles'
 
 // Types
-import {Source, Me} from 'src/types'
+import {Me, Source} from 'src/types'
 import {NextReturn} from 'src/types/wizard'
 
 const isNewSource = (source: Partial<Source>) => !source.id
@@ -109,10 +110,6 @@ class SourceStep extends PureComponent<Props, State> {
   public render() {
     const {source} = this.state
     const {isUsingAuth, onBoarding} = this.props
-    const sourceIsV2 = this.state.serverType === SOURCE_TYPE_INFLUX_V2
-    const sourceIsCD =
-      this.state.serverType === SOURCE_TYPE_INFLUX_CLOUD_DEDICATED
-
     return (
       <>
         {isUsingAuth && onBoarding && this.authIndicator}
@@ -128,6 +125,10 @@ class SourceStep extends PureComponent<Props, State> {
             {
               value: SOURCE_TYPE_INFLUX_V2,
               label: 'InfluxDB v2',
+            },
+            {
+              value: SOURCE_TYPE_INFLUX_V3_CORE,
+              label: 'InfluxDB 3 Core',
             },
             {
               value: SOURCE_TYPE_INFLUX_CLOUD_DEDICATED,
@@ -151,18 +152,27 @@ class SourceStep extends PureComponent<Props, State> {
           onChange={this.onChangeInput('name')}
           testId="connection-name--input"
         />
-        {!sourceIsCD && (
+        {(this.state.serverType === SOURCE_TYPE_INFLUX_V1 ||
+          this.state.serverType === SOURCE_TYPE_INFLUX_V2) && (
           <>
             <WizardTextInput
               value={source.username}
-              label={sourceIsV2 ? 'Organization' : 'Username'}
+              label={
+                this.state.serverType === SOURCE_TYPE_INFLUX_V2
+                  ? 'Organization'
+                  : 'Username'
+              }
               onChange={this.onChangeInput('username')}
               onSubmit={this.handleSubmitUsername}
               testId="connection-username--input"
             />
             <WizardTextInput
               value={source.password}
-              label={sourceIsV2 ? 'Token' : 'Password'}
+              label={
+                this.state.serverType === SOURCE_TYPE_INFLUX_V2
+                  ? 'Token'
+                  : 'Password'
+              }
               placeholder={this.passwordPlaceholder}
               type="password"
               onChange={this.onChangeInput('password')}
@@ -172,8 +182,20 @@ class SourceStep extends PureComponent<Props, State> {
           </>
         )}
 
+        {/* InfluxDB 3 Core fields */}
+        {this.state.serverType === SOURCE_TYPE_INFLUX_V3_CORE && (
+          <>
+            <WizardTextInput
+              value={source.databaseToken}
+              label={'Database Token'}
+              type="password"
+              onChange={this.onChangeInput('databaseToken')}
+            />
+          </>
+        )}
+
         {/* InfluxDB Cloud Dedicated fields */}
-        {sourceIsCD && (
+        {this.state.serverType === SOURCE_TYPE_INFLUX_CLOUD_DEDICATED && (
           <>
             <WizardTextInput
               value={source.clusterId}
@@ -365,16 +387,19 @@ class SourceStep extends PureComponent<Props, State> {
   private getServerTypeFromSource = (
     source: Partial<Source>
   ): string | undefined => {
-    if (source.type === SOURCE_TYPE_INFLUX_V2) {
-      return SOURCE_TYPE_INFLUX_V2
-    } else if (source.type === SOURCE_TYPE_INFLUX_CLOUD_DEDICATED) {
-      return SOURCE_TYPE_INFLUX_CLOUD_DEDICATED
-    } else if (
+    if (
       source.type === SOURCE_TYPE_INFLUX_V1 ||
+      source.type === SOURCE_TYPE_INFLUX_V2 ||
+      source.type === SOURCE_TYPE_INFLUX_V3_CORE ||
+      source.type === SOURCE_TYPE_INFLUX_CLOUD_DEDICATED
+    ) {
+      return source.type
+    }
+    if (
       source.type === SOURCE_TYPE_INFLUX_ENTERPRISE ||
       source.type === SOURCE_TYPE_INFLUX_RELAY
     ) {
-      // All 3 source subtypes are displayed as v1
+      // Special v1 subtypes are displayed as v1
       return SOURCE_TYPE_INFLUX_V1
     }
     return undefined
@@ -386,6 +411,9 @@ class SourceStep extends PureComponent<Props, State> {
     switch (value) {
       case SOURCE_TYPE_INFLUX_V2:
         this.changeSourceType(SOURCE_TYPE_INFLUX_V2, '2.x')
+        break
+      case SOURCE_TYPE_INFLUX_V3_CORE:
+        this.changeSourceType(SOURCE_TYPE_INFLUX_V3_CORE, '3.x')
         break
       case SOURCE_TYPE_INFLUX_CLOUD_DEDICATED:
         this.changeSourceType(SOURCE_TYPE_INFLUX_CLOUD_DEDICATED, 'cloud')

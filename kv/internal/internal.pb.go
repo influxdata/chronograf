@@ -43,7 +43,7 @@ type Source struct {
 	ClusterID          string `protobuf:"bytes,16,opt,name=ClusterID,proto3" json:"ClusterID,omitempty"`                   // Cluster ID of an InfluxDB Cloud Dedicated source
 	AccountID          string `protobuf:"bytes,17,opt,name=AccountID,proto3" json:"AccountID,omitempty"`                   // Account ID of an InfluxDB Cloud Dedicated source
 	ManagementToken    string `protobuf:"bytes,18,opt,name=ManagementToken,proto3" json:"ManagementToken,omitempty"`       // Management token of an InfluxDB Cloud Dedicated source
-	DatabaseToken      string `protobuf:"bytes,19,opt,name=DatabaseToken,proto3" json:"DatabaseToken,omitempty"`           // Database token of an InfluxDB Cloud Dedicated source
+	DatabaseToken      string `protobuf:"bytes,19,opt,name=DatabaseToken,proto3" json:"DatabaseToken,omitempty"`           // Database token of an InfluxDB Cloud Dedicated or other InfluxDB 3 source
 	TagsCSVPath        string `protobuf:"bytes,20,opt,name=TagsCSVPath,proto3" json:"TagsCSVPath,omitempty"`               // TagsCSVPATH is the path to a directory containing CSV files (per db) with tags for the source
 }
 

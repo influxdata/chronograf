@@ -21,7 +21,7 @@ message Source {
 	string ClusterID          = 16; // Cluster ID of an InfluxDB Cloud Dedicated source
 	string AccountID          = 17; // Account ID of an InfluxDB Cloud Dedicated source
 	string ManagementToken    = 18; // Management token of an InfluxDB Cloud Dedicated source
-	string DatabaseToken      = 19; // Database token of an InfluxDB Cloud Dedicated source
+	string DatabaseToken      = 19; // Database token of an InfluxDB Cloud Dedicated or other InfluxDB 3 source
 	string TagsCSVPath        = 20; // TagsCSVPath is the path to a directory containing CSV files (per db) with tags for the source
 }
 

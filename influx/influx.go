@@ -135,16 +135,6 @@ func (c *Client) query(u *url.URL, q chronograf.Query) (chronograf.Response, err
 		return nil, decErr
 	}
 
-	// If we don't have an error in our json response, and didn't get statusOK
-	// then send back an error
-	if resp.StatusCode != http.StatusOK && response.Err != "" {
-		logs.
-			WithField("influx_status", resp.StatusCode).
-			Error("Received non-200 response from influxdb")
-
-		return &response, fmt.Errorf("received status code %d from server",
-			resp.StatusCode)
-	}
 	return &response, nil
 }
 
@@ -186,7 +176,15 @@ func (c *Client) Query(ctx context.Context, q chronograf.Query) (chronograf.Resp
 
 	resps := make(chan (result))
 	go func() {
-		resp, err := c.query(c.URL, q)
+		var resp chronograf.Response
+		var err error
+		if c.SrcType == chronograf.InfluxDBv3Core {
+			// v3 Core
+			resp, err = c.queryV3(c.URL, q)
+		} else {
+			// v1, v2, v3 Cloud Dedicated
+			resp, err = c.query(c.URL, q)
+		}
 		resps <- result{resp, err}
 	}()
 
@@ -203,7 +201,7 @@ func (c *Client) ValidateAuth(ctx context.Context, src *chronograf.Source) error
 	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
 	defer cancel()
 
-	// Cloud Dedicated:
+	// v3 Cloud Dedicated:
 	if src.Type == chronograf.InfluxDBCloudDedicated {
 		return c.validateCloudDedicatedAuth(ctx)
 	}
@@ -211,7 +209,7 @@ func (c *Client) ValidateAuth(ctx context.Context, src *chronograf.Source) error
 	if src.Type == chronograf.InfluxDBv2 {
 		return c.validateV2Auth(ctx, src)
 	}
-	// v1: use InfluxQL
+	// v1, v3 Core: use InfluxQL
 	if _, err := c.Query(ctx, chronograf.Query{Command: "SHOW DATABASES"}); err != nil {
 		return err
 	}
@@ -355,6 +353,10 @@ func (c *Client) pingTimeout(ctx context.Context) (string, string, error) {
 	}
 }
 
+type v3PingRespBody struct {
+	Version string `json:"version"`
+}
+
 type pingResult struct {
 	Version string
 	Type    string
@@ -390,11 +392,28 @@ func (c *Client) ping(u *url.URL) (string, string, error) {
 		return "", "", err
 	}
 
-	if resp.StatusCode != http.StatusNoContent {
-		var err = fmt.Errorf("%s", string(body))
+	if resp.StatusCode != http.StatusNoContent && resp.StatusCode != http.StatusOK {
+		var err = errors.New(string(body))
 		return "", "", err
 	}
 
+	if c.SrcType == chronograf.InfluxDBv3Core {
+		// Read the version from the body
+		if len(body) == 0 {
+			return "", "", fmt.Errorf("empty ping response body")
+		}
+		var b v3PingRespBody
+		err := json.Unmarshal(body, &b)
+		if err != nil {
+			return "", "", fmt.Errorf("failed to parse ping response body: %w", err)
+		}
+		if b.Version == "" {
+			return "", "", fmt.Errorf("missing version in ping response body")
+		}
+		return b.Version, c.SrcType, nil
+	}
+
+	// Check the `X-Influxdb-Build` header
 	builds := resp.Header.Values("X-Influxdb-Build")
 	isCloud2 := false
 	for _, build := range builds {
@@ -406,12 +425,16 @@ func (c *Client) ping(u *url.URL) (string, string, error) {
 		}
 	}
 
+	// Read the version from the `X-Influxdb-Version` header
 	version := resp.Header.Get("X-Influxdb-Version")
-	if strings.Contains(version, "-c") {
-		return version, chronograf.InfluxEnterprise, nil
-	} else if strings.Contains(version, "relay") {
-		return version, chronograf.InfluxRelay, nil
+	if version != "" {
+		if strings.Contains(version, "-c") {
+			return version, chronograf.InfluxEnterprise, nil
+		} else if strings.Contains(version, "relay") {
+			return version, chronograf.InfluxRelay, nil
+		}
 	}
+
 	// Strip v prefix from version, some older '1.x' versions and also
 	// InfluxDB 2.2.0 return version in format vx.x.x
 	if strings.HasPrefix(version, "v") {

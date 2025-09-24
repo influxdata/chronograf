@@ -4,6 +4,10 @@ import SubSections from 'src/shared/components/SubSections'
 import {Source, SourceAuthenticationMethod} from 'src/types'
 import {PageSection} from 'src/types/shared'
 import {WrapToPage} from './AdminInfluxDBScopedPage'
+import {
+  SOURCE_TYPE_INFLUX_CLOUD_DEDICATED,
+  SOURCE_TYPE_INFLUX_V3_CORE,
+} from 'src/shared/constants'
 
 interface Props {
   source: Source
@@ -18,6 +22,13 @@ export function isConnectedToLDAP(source: Source) {
   return source.authentication === SourceAuthenticationMethod.LDAP
 }
 
+export function isV3Source(source: Source) {
+  return (
+    source.type === SOURCE_TYPE_INFLUX_CLOUD_DEDICATED ||
+    source.type === SOURCE_TYPE_INFLUX_V3_CORE
+  )
+}
+
 export const AdminTabs = ({
   source,
   activeTab,
@@ -27,6 +38,7 @@ export const AdminTabs = ({
   const sections = useMemo(() => {
     const hasRoles = hasRoleManagement(source)
     const isLDAP = isConnectedToLDAP(source)
+    const isV3 = isV3Source(source)
     return [
       {
         url: 'databases',
@@ -36,17 +48,17 @@ export const AdminTabs = ({
       {
         url: 'users',
         name: 'Users',
-        enabled: !isLDAP,
+        enabled: !isLDAP && !isV3,
       },
       {
         url: 'roles',
         name: 'Roles',
-        enabled: hasRoles && !isLDAP,
+        enabled: hasRoles && !isLDAP && !isV3,
       },
       {
         url: 'queries',
         name: 'Queries',
-        enabled: true,
+        enabled: !isV3,
       },
     ]
   }, [source])
