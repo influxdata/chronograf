@@ -23,7 +23,7 @@ func (n *NoAuthorization) Set(req *http.Request) error { return nil }
 
 // DefaultAuthorization creates either a shared JWT builder, basic auth or Noop or Token authentication
 func DefaultAuthorization(src *chronograf.Source) Authorizer {
-	// Use Bearer Token authentication for InfluxDB 3 types
+	// Use Bearer Token authentication for all InfluxDB 3 types
 	if chronograf.IsV3SrcType(src.Type) {
 		return &BearerToken{
 			Token: src.DatabaseToken,

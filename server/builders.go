@@ -112,6 +112,7 @@ type SourcesBuilder interface {
 
 // MultiSourceBuilder implements SourcesBuilder
 type MultiSourceBuilder struct {
+	InfluxDBType      string
 	InfluxDBURL       string
 	InfluxDBUsername  string
 	InfluxDBPassword  string
@@ -134,27 +135,28 @@ func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore) (*multistore.Sou
 
 	stores := []chronograf.SourcesStore{db, files}
 
+	// TODO simon: also process fs.InfluxDBType!
 	if fs.InfluxDBURL != "" {
 		var influxdbType, username, password string
 		var clusterID, accountID, mgmtToken, dbToken, tagsCSVPath string
 		if fs.InfluxDBClusterID != "" && fs.InfluxDBAccountID != "" && fs.InfluxDBToken != "" && fs.InfluxDBMgmtToken != "" {
 			// InfluxDB Cloud Dedicated
-			influxdbType = chronograf.InfluxDBCloudDedicated
+			influxdbType = chronograf.InfluxDBv3CloudDedicated
 			clusterID = fs.InfluxDBClusterID
 			accountID = fs.InfluxDBAccountID
 			mgmtToken = fs.InfluxDBMgmtToken
 			dbToken = fs.InfluxDBToken
 			tagsCSVPath = fs.TagsCSVPath
 		} else if fs.InfluxDBToken != "" {
-			// TODO simon: modify later, once other v3 versions are added; maybe use the source.type?
-			// InfluxDB 3 Core
+			// TODO simon: this is not fully correct, it can be either v3 Core or v3 Enterprise
+			// InfluxDB 3 Core/Enterprise
 			influxdbType = chronograf.InfluxDBv3Core
 			dbToken = fs.InfluxDBToken
 		} else if fs.InfluxDBOrg == "" || fs.InfluxDBToken == "" {
 			// v1 InfluxDB
 			username = fs.InfluxDBUsername
 			password = fs.InfluxDBPassword
-			influxdbType = chronograf.InfluxDB
+			influxdbType = chronograf.InfluxDBv1
 		} else {
 			// v2 InfluxDB
 			username = fs.InfluxDBOrg
@@ -163,6 +165,7 @@ func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore) (*multistore.Sou
 		}
 
 		influxStore := &memdb.SourcesStore{
+			// TODO simon: validate the Source before adding, reuse ValidSourceRequest!
 			Source: &chronograf.Source{
 				ID:              0,
 				Name:            fs.InfluxDBURL,

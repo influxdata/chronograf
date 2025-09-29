@@ -45,7 +45,7 @@ func Test_ValidSourceRequest(t *testing.T) {
 				source: &chronograf.Source{
 					ID:                 1,
 					Name:               "I'm a really great source",
-					Type:               chronograf.InfluxDB,
+					Type:               chronograf.InfluxDBv1,
 					Username:           "fancy",
 					Password:           "i'm so",
 					SharedSecret:       "supersecret",
@@ -89,7 +89,7 @@ func Test_ValidSourceRequest(t *testing.T) {
 				source: &chronograf.Source{
 					ID:                 1,
 					Name:               "I'm a really great source",
-					Type:               chronograf.InfluxDB,
+					Type:               chronograf.InfluxDBv1,
 					Username:           "fancy",
 					Password:           "i'm so",
 					SharedSecret:       "supersecret",
@@ -104,7 +104,7 @@ func Test_ValidSourceRequest(t *testing.T) {
 				source: &chronograf.Source{
 					ID:                 1,
 					Name:               "I'm a really great source",
-					Type:               chronograf.InfluxDB,
+					Type:               chronograf.InfluxDBv1,
 					Username:           "fancy",
 					Password:           "i'm so",
 					SharedSecret:       "supersecret",
@@ -156,7 +156,7 @@ func Test_ValidSourceRequest(t *testing.T) {
 				source: &chronograf.Source{
 					ID:                 1,
 					Name:               "I'm a really great source",
-					Type:               chronograf.InfluxDBCloudDedicated,
+					Type:               chronograf.InfluxDBv3CloudDedicated,
 					Username:           "",
 					Password:           "",
 					SharedSecret:       "supersecret",
@@ -175,7 +175,7 @@ func Test_ValidSourceRequest(t *testing.T) {
 				source: &chronograf.Source{
 					ID:                 1,
 					Name:               "I'm a really great source",
-					Type:               chronograf.InfluxDBCloudDedicated,
+					Type:               chronograf.InfluxDBv3CloudDedicated,
 					Username:           "",
 					Password:           "",
 					SharedSecret:       "supersecret",
@@ -197,7 +197,7 @@ func Test_ValidSourceRequest(t *testing.T) {
 				source: &chronograf.Source{
 					ID:                 1,
 					Name:               "I'm a really great source",
-					Type:               chronograf.InfluxDBCloudDedicated,
+					Type:               chronograf.InfluxDBv3CloudDedicated,
 					Username:           "",
 					Password:           "",
 					SharedSecret:       "supersecret",
@@ -221,7 +221,7 @@ func Test_ValidSourceRequest(t *testing.T) {
 				source: &chronograf.Source{
 					ID:                 1,
 					Name:               "I'm a really great source",
-					Type:               chronograf.InfluxDBCloudDedicated,
+					Type:               chronograf.InfluxDBv3CloudDedicated,
 					Username:           "",
 					Password:           "",
 					SharedSecret:       "supersecret",
@@ -246,7 +246,7 @@ func Test_ValidSourceRequest(t *testing.T) {
 				source: &chronograf.Source{
 					ID:                 1,
 					Name:               "I'm a really great source",
-					Type:               chronograf.InfluxDBCloudDedicated,
+					Type:               chronograf.InfluxDBv3CloudDedicated,
 					Username:           "",
 					Password:           "",
 					SharedSecret:       "supersecret",
@@ -270,7 +270,7 @@ func Test_ValidSourceRequest(t *testing.T) {
 				source: &chronograf.Source{
 					ID:                 1,
 					Name:               "I'm a really great source",
-					Type:               chronograf.InfluxDBCloudDedicated,
+					Type:               chronograf.InfluxDBv3CloudDedicated,
 					Username:           "",
 					Password:           "",
 					SharedSecret:       "supersecret",
@@ -295,7 +295,7 @@ func Test_ValidSourceRequest(t *testing.T) {
 				source: &chronograf.Source{
 					ID:                 1,
 					Name:               "I'm a really great source",
-					Type:               chronograf.InfluxDBCloudDedicated,
+					Type:               chronograf.InfluxDBv3CloudDedicated,
 					Username:           "",
 					Password:           "",
 					SharedSecret:       "supersecret",
@@ -319,7 +319,7 @@ func Test_ValidSourceRequest(t *testing.T) {
 				source: &chronograf.Source{
 					ID:                 1,
 					Name:               "I'm a really great source",
-					Type:               chronograf.InfluxDBCloudDedicated,
+					Type:               chronograf.InfluxDBv3CloudDedicated,
 					Username:           "",
 					Password:           "",
 					SharedSecret:       "supersecret",
@@ -382,12 +382,56 @@ func Test_ValidSourceRequest(t *testing.T) {
 			},
 		},
 		{
+			name: "InfluxDB 3 Enterprise - supported",
+			args: args{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDBv3Enterprise,
+					DatabaseToken:      "database-token",
+					URL:                "http://www.any.url.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+				},
+			},
+			wants: wants{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDBv3Enterprise,
+					DatabaseToken:      "database-token",
+					URL:                "http://www.any.url.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+				},
+			},
+		},
+		{
+			name: "InfluxDB 3 Enterprise - missing database token",
+			args: args{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDBv3Enterprise,
+					URL:                "http://www.any.url.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+				},
+			},
+			wants: wants{
+				err: fmt.Errorf("database token required"),
+			},
+		},
+		{
 			name: "bad url",
 			args: args{
 				source: &chronograf.Source{
 					ID:                 1,
 					Name:               "I'm a really great source",
-					Type:               chronograf.InfluxDB,
+					Type:               chronograf.InfluxDBv1,
 					Username:           "fancy",
 					Password:           "i'm so",
 					SharedSecret:       "supersecret",

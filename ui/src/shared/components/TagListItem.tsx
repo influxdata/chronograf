@@ -96,7 +96,9 @@ class TagListItem extends PureComponent<Props, State> {
     }
 
     const filterText = this.state.filterText.toLowerCase()
-    const filtered = tagValues.filter(v => v.toLowerCase().includes(filterText))
+    const filtered = tagValues.filter(
+      v => !!v && v.toLowerCase().includes(filterText)
+    )
 
     return (
       <div className="query-builder--sub-list">

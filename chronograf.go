@@ -91,22 +91,28 @@ type Assets interface {
 
 // Supported time-series databases
 const (
-	// InfluxDB is the open-source time-series database
-	InfluxDB = "influx"
-	// InfluxEnteprise is the clustered HA time-series database
-	InfluxEnterprise = "influx-enterprise"
-	// InfluxRelay is the basic HA layer over InfluxDB
-	InfluxRelay = "influx-relay"
+	// InfluxDBv1 is InfluxDB OSS v1
+	InfluxDBv1 = "influx"
+	// InfluxDBv1Enterprise is InfluxDB v1 Enterprise (the clustered HA time-series database)
+	InfluxDBv1Enterprise = "influx-enterprise"
+	// InfluxDBv1Relay is the basic HA layer over InfluxDB v1
+	InfluxDBv1Relay = "influx-relay"
+
 	// InfluxDBv2 is Influx DB 2.x with Token authentication
 	InfluxDBv2 = "influx-v2"
-	// InfluxDBv3 is InfluxDB 3 Core
+
+	// InfluxDBv3Core is InfluxDB 3 Core
 	InfluxDBv3Core = "influx-v3-core"
-	// InfluxDBCloudDedicated is InfluxDB Cloud Dedicated with Account ID, Cluster ID, Management and DB Token
-	InfluxDBCloudDedicated = "influx-cloud-dedicated"
+	// InfluxDBv3Enterprise is InfluxDB 3 Enterprise
+	InfluxDBv3Enterprise = "influx-v3-enterprise"
+	// InfluxDBv3CloudDedicated is InfluxDB Cloud Dedicated
+	InfluxDBv3CloudDedicated = "influx-v3-cloud-dedicated"
 )
 
 func IsV3SrcType(srcType string) bool {
-	return srcType == InfluxDBv3Core || srcType == InfluxDBCloudDedicated
+	return srcType == InfluxDBv3Core ||
+		srcType == InfluxDBv3Enterprise ||
+		srcType == InfluxDBv3CloudDedicated
 }
 
 // TSDBStatus represents the current status of a time series database

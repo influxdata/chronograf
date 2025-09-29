@@ -32,12 +32,13 @@ import {
 import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
 import {
   DEFAULT_SOURCE,
-  SOURCE_TYPE_INFLUX_CLOUD_DEDICATED,
-  SOURCE_TYPE_INFLUX_ENTERPRISE,
-  SOURCE_TYPE_INFLUX_RELAY,
   SOURCE_TYPE_INFLUX_V1,
+  SOURCE_TYPE_INFLUX_V1_ENTERPRISE,
+  SOURCE_TYPE_INFLUX_V1_RELAY,
   SOURCE_TYPE_INFLUX_V2,
+  SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED,
   SOURCE_TYPE_INFLUX_V3_CORE,
+  SOURCE_TYPE_INFLUX_V3_ENTERPRISE,
 } from 'src/shared/constants'
 import {SUPERADMIN_ROLE} from 'src/auth/roles'
 
@@ -131,7 +132,11 @@ class SourceStep extends PureComponent<Props, State> {
               label: 'InfluxDB 3 Core',
             },
             {
-              value: SOURCE_TYPE_INFLUX_CLOUD_DEDICATED,
+              value: SOURCE_TYPE_INFLUX_V3_ENTERPRISE,
+              label: 'InfluxDB 3 Enterprise',
+            },
+            {
+              value: SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED,
               label: 'InfluxDB Cloud Dedicated',
             },
           ]}
@@ -182,8 +187,9 @@ class SourceStep extends PureComponent<Props, State> {
           </>
         )}
 
-        {/* InfluxDB 3 Core fields */}
-        {this.state.serverType === SOURCE_TYPE_INFLUX_V3_CORE && (
+        {/* InfluxDB 3 Core/Enterprise fields */}
+        {(this.state.serverType === SOURCE_TYPE_INFLUX_V3_CORE ||
+          this.state.serverType === SOURCE_TYPE_INFLUX_V3_ENTERPRISE) && (
           <>
             <WizardTextInput
               value={source.databaseToken}
@@ -195,7 +201,7 @@ class SourceStep extends PureComponent<Props, State> {
         )}
 
         {/* InfluxDB Cloud Dedicated fields */}
-        {this.state.serverType === SOURCE_TYPE_INFLUX_CLOUD_DEDICATED && (
+        {this.state.serverType === SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED && (
           <>
             <WizardTextInput
               value={source.clusterId}
@@ -391,13 +397,14 @@ class SourceStep extends PureComponent<Props, State> {
       source.type === SOURCE_TYPE_INFLUX_V1 ||
       source.type === SOURCE_TYPE_INFLUX_V2 ||
       source.type === SOURCE_TYPE_INFLUX_V3_CORE ||
-      source.type === SOURCE_TYPE_INFLUX_CLOUD_DEDICATED
+      source.type === SOURCE_TYPE_INFLUX_V3_ENTERPRISE ||
+      source.type === SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED
     ) {
       return source.type
     }
     if (
-      source.type === SOURCE_TYPE_INFLUX_ENTERPRISE ||
-      source.type === SOURCE_TYPE_INFLUX_RELAY
+      source.type === SOURCE_TYPE_INFLUX_V1_ENTERPRISE ||
+      source.type === SOURCE_TYPE_INFLUX_V1_RELAY
     ) {
       // Special v1 subtypes are displayed as v1
       return SOURCE_TYPE_INFLUX_V1
@@ -410,13 +417,16 @@ class SourceStep extends PureComponent<Props, State> {
 
     switch (value) {
       case SOURCE_TYPE_INFLUX_V2:
-        this.changeSourceType(SOURCE_TYPE_INFLUX_V2, '2.x')
+        this.changeSourceType(value, '2.x')
         break
       case SOURCE_TYPE_INFLUX_V3_CORE:
-        this.changeSourceType(SOURCE_TYPE_INFLUX_V3_CORE, '3.x')
+        this.changeSourceType(value, '3.x')
         break
-      case SOURCE_TYPE_INFLUX_CLOUD_DEDICATED:
-        this.changeSourceType(SOURCE_TYPE_INFLUX_CLOUD_DEDICATED, 'cloud')
+      case SOURCE_TYPE_INFLUX_V3_ENTERPRISE:
+        this.changeSourceType(value, '3.x')
+        break
+      case SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED:
+        this.changeSourceType(value, 'cloud')
         break
       case SOURCE_TYPE_INFLUX_V1:
       default:

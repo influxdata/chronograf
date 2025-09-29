@@ -5,8 +5,9 @@ import {Source, SourceAuthenticationMethod} from 'src/types'
 import {PageSection} from 'src/types/shared'
 import {WrapToPage} from './AdminInfluxDBScopedPage'
 import {
-  SOURCE_TYPE_INFLUX_CLOUD_DEDICATED,
+  SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED,
   SOURCE_TYPE_INFLUX_V3_CORE,
+  SOURCE_TYPE_INFLUX_V3_ENTERPRISE,
 } from 'src/shared/constants'
 
 interface Props {
@@ -24,8 +25,9 @@ export function isConnectedToLDAP(source: Source) {
 
 export function isV3Source(source: Source) {
   return (
-    source.type === SOURCE_TYPE_INFLUX_CLOUD_DEDICATED ||
-    source.type === SOURCE_TYPE_INFLUX_V3_CORE
+    source.type === SOURCE_TYPE_INFLUX_V3_CORE ||
+    source.type === SOURCE_TYPE_INFLUX_V3_ENTERPRISE ||
+    source.type === SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED
   )
 }
 

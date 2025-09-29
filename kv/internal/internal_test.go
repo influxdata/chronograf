@@ -47,7 +47,7 @@ func TestMarshalSource(t *testing.T) {
 			src: chronograf.Source{
 				ID:              12,
 				Name:            "Fountain of Truth",
-				Type:            "influx-cloud-dedicated",
+				Type:            "influx-v3-cloud-dedicated",
 				ClusterID:       "3F762A1F-B609-4E7A-9657-8F0A39C27A58",
 				AccountID:       "27F924B3-FF40-47B1-B587-3AB980B87EF4",
 				ManagementToken: "mgmt-token",

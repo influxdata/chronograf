@@ -139,7 +139,7 @@ func newSourceResponse(ctx context.Context, src chronograf.Source) sourceRespons
 	// MetaURL is currently a string, but eventually, we'd like to change it
 	// to a slice. Checking len(src.MetaURL) is functionally equivalent to
 	// checking if it is equal to the empty string.
-	if src.Type == chronograf.InfluxEnterprise && len(src.MetaURL) != 0 {
+	if src.Type == chronograf.InfluxDBv1Enterprise && len(src.MetaURL) != 0 {
 		res.Links.Roles = fmt.Sprintf("%s/%d/roles", httpAPISrcs, src.ID)
 	}
 	return res
@@ -228,8 +228,9 @@ func (s *Service) tsdbVersion(ctx context.Context, src *chronograf.Source) (stri
 
 func (s *Service) tsdbType(ctx context.Context, src *chronograf.Source) (string, error) {
 	if src.Type == chronograf.InfluxDBv2 ||
-		src.Type == chronograf.InfluxDBCloudDedicated ||
-		src.Type == chronograf.InfluxDBv3Core {
+		src.Type == chronograf.InfluxDBv3Core ||
+		src.Type == chronograf.InfluxDBv3Enterprise ||
+		src.Type == chronograf.InfluxDBv3CloudDedicated {
 		return src.Type, nil // type selected by the user
 	}
 	cli := &influx.Client{
@@ -509,12 +510,13 @@ func ValidSourceRequest(s *chronograf.Source, defaultOrgID string) error {
 	}
 	// Validate Type
 	if s.Type != "" {
-		if s.Type != chronograf.InfluxDB &&
+		if s.Type != chronograf.InfluxDBv1 &&
+			s.Type != chronograf.InfluxDBv1Enterprise &&
+			s.Type != chronograf.InfluxDBv1Relay &&
 			s.Type != chronograf.InfluxDBv2 &&
 			s.Type != chronograf.InfluxDBv3Core &&
-			s.Type != chronograf.InfluxDBCloudDedicated &&
-			s.Type != chronograf.InfluxEnterprise &&
-			s.Type != chronograf.InfluxRelay {
+			s.Type != chronograf.InfluxDBv3Enterprise &&
+			s.Type != chronograf.InfluxDBv3CloudDedicated {
 			return fmt.Errorf("invalid source type %s", s.Type)
 		}
 	}
@@ -531,13 +533,13 @@ func ValidSourceRequest(s *chronograf.Source, defaultOrgID string) error {
 		return fmt.Errorf("invalid URL; no URL scheme defined")
 	}
 
-	if s.Type == chronograf.InfluxDBv3Core {
+	if s.Type == chronograf.InfluxDBv3Core || s.Type == chronograf.InfluxDBv3Enterprise {
 		if len(s.DatabaseToken) == 0 {
 			return fmt.Errorf("database token required")
 		}
 	}
 
-	if s.Type == chronograf.InfluxDBCloudDedicated {
+	if s.Type == chronograf.InfluxDBv3CloudDedicated {
 		if len(s.ClusterID) == 0 {
 			return fmt.Errorf("cluster ID required")
 		}

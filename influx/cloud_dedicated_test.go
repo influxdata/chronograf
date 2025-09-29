@@ -882,7 +882,7 @@ meas1;tag1;v2
 
 			client := &Client{
 				Logger:  log.New(log.DebugLevel),
-				SrcType: chronograf.InfluxDBCloudDedicated,
+				SrcType: chronograf.InfluxDBv3CloudDedicated,
 			}
 			if tc.csvContent != "" {
 				tmpDir, err := setupCSVTestDirWithContent("db1", tc.csvContent)
