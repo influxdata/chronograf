@@ -20,7 +20,7 @@ func TestLayoutBuilder(t *testing.T) {
 
 func TestSourcesStoresBuilder(t *testing.T) {
 	var b server.SourcesBuilder = &server.MultiSourceBuilder{}
-	sources, err := b.Build(nil)
+	sources, err := b.Build(nil, "")
 	if err != nil {
 		t.Fatalf("MultiSourceBuilder can't build a MultiSourcesStore: %v", err)
 	}

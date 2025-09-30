@@ -1,6 +1,8 @@
 package server
 
 import (
+	"fmt"
+
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/canned"
 	"github.com/influxdata/chronograf/filestore"
@@ -107,7 +109,7 @@ func (builder *MultiDashboardBuilder) Build(db chronograf.DashboardsStore) (*mul
 
 // SourcesBuilder builds a MultiSourceStore
 type SourcesBuilder interface {
-	Build(chronograf.SourcesStore) (*multistore.SourcesStore, error)
+	Build(chronograf.SourcesStore, string) (*multistore.SourcesStore, error)
 }
 
 // MultiSourceBuilder implements SourcesBuilder
@@ -129,29 +131,27 @@ type MultiSourceBuilder struct {
 }
 
 // Build will return a MultiSourceStore
-func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore) (*multistore.SourcesStore, error) {
+func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore, defaultOrgID string) (*multistore.SourcesStore, error) {
 	// These dashboards are those handled from a directory
 	files := filestore.NewSources(fs.Path, fs.ID, fs.Logger)
 
 	stores := []chronograf.SourcesStore{db, files}
 
-	// TODO simon: also process fs.InfluxDBType!
 	if fs.InfluxDBURL != "" {
 		var influxdbType, username, password string
 		var clusterID, accountID, mgmtToken, dbToken, tagsCSVPath string
-		if fs.InfluxDBClusterID != "" && fs.InfluxDBAccountID != "" && fs.InfluxDBToken != "" && fs.InfluxDBMgmtToken != "" {
+		if fs.InfluxDBType == chronograf.InfluxDBv3Core || fs.InfluxDBType == chronograf.InfluxDBv3Enterprise {
+			// InfluxDB 3 Core, InfluxDB 3 Enterprise
+			influxdbType = fs.InfluxDBType
+			dbToken = fs.InfluxDBToken
+		} else if fs.InfluxDBType == chronograf.InfluxDBv3CloudDedicated {
 			// InfluxDB Cloud Dedicated
-			influxdbType = chronograf.InfluxDBv3CloudDedicated
+			influxdbType = fs.InfluxDBType
 			clusterID = fs.InfluxDBClusterID
 			accountID = fs.InfluxDBAccountID
 			mgmtToken = fs.InfluxDBMgmtToken
 			dbToken = fs.InfluxDBToken
 			tagsCSVPath = fs.TagsCSVPath
-		} else if fs.InfluxDBToken != "" {
-			// TODO simon: this is not fully correct, it can be either v3 Core or v3 Enterprise
-			// InfluxDB 3 Core/Enterprise
-			influxdbType = chronograf.InfluxDBv3Core
-			dbToken = fs.InfluxDBToken
 		} else if fs.InfluxDBOrg == "" || fs.InfluxDBToken == "" {
 			// v1 InfluxDB
 			username = fs.InfluxDBUsername
@@ -164,24 +164,29 @@ func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore) (*multistore.Sou
 			influxdbType = chronograf.InfluxDBv2
 		}
 
-		influxStore := &memdb.SourcesStore{
-			// TODO simon: validate the Source before adding, reuse ValidSourceRequest!
-			Source: &chronograf.Source{
-				ID:              0,
-				Name:            fs.InfluxDBURL,
-				Type:            influxdbType,
-				Username:        username,
-				Password:        password,
-				ClusterID:       clusterID,
-				AccountID:       accountID,
-				ManagementToken: mgmtToken,
-				DatabaseToken:   dbToken,
-				TagsCSVPath:     tagsCSVPath,
-				URL:             fs.InfluxDBURL,
-				Default:         true,
-				Version:         "unknown", // a real version is re-fetched at runtime; use "unknown" version as a fallback, empty version would imply OSS 2.x
-			}}
-		stores = append([]chronograf.SourcesStore{influxStore}, stores...)
+		source := chronograf.Source{
+			ID:              0,
+			Name:            fs.InfluxDBURL,
+			Type:            influxdbType,
+			Username:        username,
+			Password:        password,
+			ClusterID:       clusterID,
+			AccountID:       accountID,
+			ManagementToken: mgmtToken,
+			DatabaseToken:   dbToken,
+			TagsCSVPath:     tagsCSVPath,
+			URL:             fs.InfluxDBURL,
+			Default:         true,
+			Version:         "unknown", // a real version is re-fetched at runtime; use "unknown" version as a fallback, empty version would imply OSS 2.x
+		}
+
+		if err := ValidSourceRequest(&source, defaultOrgID); err == nil {
+			influxStore := &memdb.SourcesStore{Source: &source}
+			stores = append([]chronograf.SourcesStore{influxStore}, stores...)
+		} else {
+			// Log the error and ignore
+			fs.Logger.Error(fmt.Sprintf("Invalid %s source: %s", influxdbType, err))
+		}
 	}
 	sources := &multistore.SourcesStore{
 		Stores: stores,

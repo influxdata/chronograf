@@ -824,6 +824,13 @@ func openService(ctx context.Context, db kv.Store, builder builders, logger chro
 			Error("Unable to construct a MultiOrganizationStore", err)
 		os.Exit(1)
 	}
+	defaultOrg, err := organizations.DefaultOrganization(ctx)
+	if err != nil {
+		logger.
+			WithField("component", "OrganizationsStore").
+			Error("Unable to get default organization", err)
+		os.Exit(1)
+	}
 
 	kapacitors, err := builder.Kapacitors.Build(svc.ServersStore())
 	if err != nil {
@@ -833,7 +840,7 @@ func openService(ctx context.Context, db kv.Store, builder builders, logger chro
 		os.Exit(1)
 	}
 
-	sources, err := builder.Sources.Build(svc.SourcesStore())
+	sources, err := builder.Sources.Build(svc.SourcesStore(), defaultOrg.ID)
 	if err != nil {
 		logger.
 			WithField("component", "SourcesStore").
