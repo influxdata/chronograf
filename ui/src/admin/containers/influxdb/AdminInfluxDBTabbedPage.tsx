@@ -6,6 +6,7 @@ import {PageSection} from 'src/types/shared'
 import {WrapToPage} from './AdminInfluxDBScopedPage'
 import {
   SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED,
+  SOURCE_TYPE_INFLUX_V3_CLUSTERED,
   SOURCE_TYPE_INFLUX_V3_CORE,
   SOURCE_TYPE_INFLUX_V3_ENTERPRISE,
 } from 'src/shared/constants'
@@ -27,6 +28,7 @@ export function isV3Source(source: Source) {
   return (
     source.type === SOURCE_TYPE_INFLUX_V3_CORE ||
     source.type === SOURCE_TYPE_INFLUX_V3_ENTERPRISE ||
+    source.type === SOURCE_TYPE_INFLUX_V3_CLUSTERED ||
     source.type === SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED
   )
 }

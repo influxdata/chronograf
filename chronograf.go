@@ -101,17 +101,20 @@ const (
 	// InfluxDBv2 is Influx DB 2.x with Token authentication
 	InfluxDBv2 = "influx-v2"
 
-	// InfluxDBv3Core is InfluxDB 3 Core
+	// InfluxDBv3Core is InfluxDB 3 Core (self-managed)
 	InfluxDBv3Core = "influx-v3-core"
-	// InfluxDBv3Enterprise is InfluxDB 3 Enterprise
+	// InfluxDBv3Enterprise is InfluxDB 3 Enterprise (self-managed)
 	InfluxDBv3Enterprise = "influx-v3-enterprise"
-	// InfluxDBv3CloudDedicated is InfluxDB Cloud Dedicated
+	// InfluxDBv3Clustered is InfluxDB Clustered (self-managed)
+	InfluxDBv3Clustered = "influx-v3-clustered"
+	// InfluxDBv3CloudDedicated is InfluxDB Cloud Dedicated (fully-managed)
 	InfluxDBv3CloudDedicated = "influx-v3-cloud-dedicated"
 )
 
 func IsV3SrcType(srcType string) bool {
 	return srcType == InfluxDBv3Core ||
 		srcType == InfluxDBv3Enterprise ||
+		srcType == InfluxDBv3Clustered ||
 		srcType == InfluxDBv3CloudDedicated
 }
 

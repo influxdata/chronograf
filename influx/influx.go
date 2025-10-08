@@ -148,7 +148,7 @@ type result struct {
 // include both the database and retention policy. In-flight requests can be
 // cancelled using the provided context.
 func (c *Client) Query(ctx context.Context, q chronograf.Query) (chronograf.Response, error) {
-	if c.SrcType == chronograf.InfluxDBv3CloudDedicated {
+	if c.SrcType == chronograf.InfluxDBv3Clustered || c.SrcType == chronograf.InfluxDBv3CloudDedicated {
 		logs := c.Logger.
 			WithField("component", "proxy").
 			WithField("command", q.Command)
@@ -156,7 +156,7 @@ func (c *Client) Query(ctx context.Context, q chronograf.Query) (chronograf.Resp
 		cmdUpper := strings.ToUpper(q.Command)
 		switch {
 		case cmdUpper == "SHOW DATABASES":
-			return c.showDatabasesForCloudDedicated(ctx)
+			return c.showDatabasesViaMgmtApi(ctx)
 
 		case strings.Contains(cmdUpper, "SHOW MEASUREMENTS"):
 			if resp, err := c.handleShowMeasurements(q, logs); resp != nil || err != nil {
@@ -182,7 +182,7 @@ func (c *Client) Query(ctx context.Context, q chronograf.Query) (chronograf.Resp
 			// v3 Core, v3 Enterprise
 			resp, err = c.queryV3(c.URL, q)
 		} else {
-			// v1, v2, v3 Cloud Dedicated
+			// v1, v2, v3 Clustered, v3 Cloud Dedicated
 			resp, err = c.query(c.URL, q)
 		}
 		resps <- result{resp, err}
@@ -201,15 +201,15 @@ func (c *Client) ValidateAuth(ctx context.Context, src *chronograf.Source) error
 	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
 	defer cancel()
 
-	// v3 Cloud Dedicated:
-	if src.Type == chronograf.InfluxDBv3CloudDedicated {
-		return c.validateCloudDedicatedAuth(ctx)
+	// v3 Clustered, v3 Cloud Dedicated:
+	if src.Type == chronograf.InfluxDBv3Clustered || src.Type == chronograf.InfluxDBv3CloudDedicated {
+		return c.validateClusteredOrCloudDedicatedAuth(ctx)
 	}
 	// v2: use flux query
 	if src.Type == chronograf.InfluxDBv2 {
 		return c.validateV2Auth(ctx, src)
 	}
-	// v1, v3 Core: use InfluxQL
+	// v1, v3 Core, v3 Enterprise: use InfluxQL
 	if _, err := c.Query(ctx, chronograf.Query{Command: "SHOW DATABASES"}); err != nil {
 		return err
 	}
@@ -288,8 +288,26 @@ func (c *Client) Connect(ctx context.Context, src *chronograf.Source) error {
 
 	c.URL = u
 
-	// InfluxDB Cloud Dedicated also provides a management API.
+	if src.Type == chronograf.InfluxDBv3Clustered {
+		// InfluxDB Clustered also provides a management API.
+		accountID := "11111111-1111-1111-1111-111111111111" // hardcoded value
+		clusterID := "11111111-1111-1111-1111-111111111111" // hardcoded value
+		baseURL := *c.URL
+		baseURL.Path = ""
+		baseURL.RawQuery = ""
+		mgmtUrl := fmt.Sprintf("%s/api/v0/accounts/%s/clusters/%s", baseURL.String(), accountID, clusterID)
+		if u, err = url.Parse(mgmtUrl); err != nil {
+			return err
+		}
+
+		c.MgmtURL = u
+		c.MgmtAuthorizer = &BearerToken{
+			Token: src.ManagementToken,
+		}
+	}
+
 	if src.Type == chronograf.InfluxDBv3CloudDedicated {
+		// InfluxDB Cloud Dedicated also provides a management API.
 		mgmtUrl := fmt.Sprintf("https://console.influxdata.com/api/v0/accounts/%s/clusters/%s", src.AccountID, src.ClusterID)
 		if u, err = url.Parse(mgmtUrl); err != nil {
 			return err
@@ -413,21 +431,19 @@ func (c *Client) ping(u *url.URL) (string, string, error) {
 		return b.Version, c.SrcType, nil
 	}
 
-	// Check the `X-Influxdb-Build` header
-	builds := resp.Header.Values("X-Influxdb-Build")
-	isCloud2 := false
-	for _, build := range builds {
-		if build == "ENT" {
-			return build, chronograf.InfluxDBv1Enterprise, nil
-		}
-		if build == "cloud2" {
-			isCloud2 = true
+	if !c.isV3SrcType() {
+		// Check the `X-Influxdb-Build` header
+		builds := resp.Header.Values("X-Influxdb-Build")
+		for _, build := range builds {
+			if build == "ENT" {
+				return build, chronograf.InfluxDBv1Enterprise, nil
+			}
 		}
 	}
 
 	// Read the version from the `X-Influxdb-Version` header
 	version := resp.Header.Get("X-Influxdb-Version")
-	if version != "" {
+	if !c.isV3SrcType() && version != "" {
 		if strings.Contains(version, "-c") {
 			return version, chronograf.InfluxDBv1Enterprise, nil
 		} else if strings.Contains(version, "relay") {
@@ -441,12 +457,7 @@ func (c *Client) ping(u *url.URL) (string, string, error) {
 		version = version[1:]
 	}
 
-	if isCloud2 {
-		// TODO: improve this, other influxdb v3 version could also return "cloud2"
-		return version, chronograf.InfluxDBv3CloudDedicated, nil
-	}
-
-	return version, chronograf.InfluxDBv1, nil
+	return version, c.SrcType, nil
 }
 
 // Write POSTs line protocol to a database and retention policy

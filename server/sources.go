@@ -230,6 +230,7 @@ func (s *Service) tsdbType(ctx context.Context, src *chronograf.Source) (string,
 	if src.Type == chronograf.InfluxDBv2 ||
 		src.Type == chronograf.InfluxDBv3Core ||
 		src.Type == chronograf.InfluxDBv3Enterprise ||
+		src.Type == chronograf.InfluxDBv3Clustered ||
 		src.Type == chronograf.InfluxDBv3CloudDedicated {
 		return src.Type, nil // type selected by the user
 	}
@@ -516,6 +517,7 @@ func ValidSourceRequest(s *chronograf.Source, defaultOrgID string) error {
 			s.Type != chronograf.InfluxDBv2 &&
 			s.Type != chronograf.InfluxDBv3Core &&
 			s.Type != chronograf.InfluxDBv3Enterprise &&
+			s.Type != chronograf.InfluxDBv3Clustered &&
 			s.Type != chronograf.InfluxDBv3CloudDedicated {
 			return fmt.Errorf("invalid source type %s", s.Type)
 		}
@@ -537,6 +539,16 @@ func ValidSourceRequest(s *chronograf.Source, defaultOrgID string) error {
 		if len(s.DatabaseToken) == 0 {
 			return fmt.Errorf("database token required")
 		}
+	}
+
+	if s.Type == chronograf.InfluxDBv3Clustered {
+		if len(s.ManagementToken) == 0 {
+			return fmt.Errorf("management token required")
+		}
+		if len(s.DatabaseToken) == 0 {
+			return fmt.Errorf("database token required")
+		}
+		// TODO simon: make management token optional, similarly to Cloud Dedicated
 	}
 
 	if s.Type == chronograf.InfluxDBv3CloudDedicated {

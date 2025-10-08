@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/influxdata/chronograf"
@@ -49,13 +48,14 @@ func mustParseExpr(expr string) influxql.Expr {
 	return exp
 }
 
-// validateCloudDedicatedAuth checks both the management endpoint and the database endpoint to validate authentication.
-func (c *Client) validateCloudDedicatedAuth(ctx context.Context) error {
+// validateClusteredOrCloudDedicatedAuth checks both the management endpoint and the database endpoint to validate authentication.
+// Used for InfluxDB Clustered and InfluxDB Cloud Dedicated.
+func (c *Client) validateClusteredOrCloudDedicatedAuth(ctx context.Context) error {
 	var req *http.Request
 	var err error
 
 	// Call list databases on management api.
-	if req, _, err = c.newListDatabasesRequestForCloudDedicated(ctx); err != nil {
+	if req, _, err = c.newListDatabasesRequestViaMgmtApi(ctx); err != nil {
 		return fmt.Errorf("management authentication failed: %w", err)
 	}
 	if err = c.executeRequest(err, req); err != nil {
@@ -63,20 +63,18 @@ func (c *Client) validateCloudDedicatedAuth(ctx context.Context) error {
 	}
 
 	// Call dummy query on query api.
-	if req, err = c.newDummyQueryRequestForCloudDedicated(ctx); err != nil {
-		return fmt.Errorf("database authentication failed: %w", err)
-	}
-	if err = c.executeRequest(err, req); err != nil {
+	if _, err := c.Query(ctx, chronograf.Query{Command: "SELECT * FROM dummy WHERE time > now()"}); err != nil {
 		return fmt.Errorf("database authentication failed: %w", err)
 	}
 
 	return nil
 }
 
-// showDatabasesForCloudDedicated list databases of InfluxDB Cloud Dedicated using the management api and wraps the results into chronograf.Response structure.
-func (c *Client) showDatabasesForCloudDedicated(ctx context.Context) (chronograf.Response, error) {
+// showDatabasesViaMgmtApi lists databases using the management api and wraps the results into chronograf.Response structure.
+// Used for InfluxDB Clustered and InfluxDB Cloud Dedicated.
+func (c *Client) showDatabasesViaMgmtApi(ctx context.Context) (chronograf.Response, error) {
 	// Prepare request.
-	req, logs, err := c.newListDatabasesRequestForCloudDedicated(ctx)
+	req, logs, err := c.newListDatabasesRequestViaMgmtApi(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -119,8 +117,9 @@ func (c *Client) showDatabasesForCloudDedicated(ctx context.Context) (chronograf
 	return constructShowDatabasesResponse(dbNames), nil
 }
 
-// newListDatabasesRequestForCloudDedicated constructs a new http.Request for listing databases in InfluxDB Cloud Dedicated.
-func (c *Client) newListDatabasesRequestForCloudDedicated(ctx context.Context) (*http.Request, chronograf.Logger, error) {
+// newListDatabasesRequestViaMgmtApi constructs a new http.Request for listing databases via Management API.
+// Used for InfluxDB Clustered and InfluxDB Cloud Dedicated.
+func (c *Client) newListDatabasesRequestViaMgmtApi(ctx context.Context) (*http.Request, chronograf.Logger, error) {
 	req, err := http.NewRequest("GET", util.AppendPath(c.MgmtURL, "/databases").String(), nil)
 	if err != nil {
 		return nil, nil, err
@@ -167,36 +166,6 @@ func constructShowDatabasesResponse(dbNames []string) chronograf.Response {
 		Err:     "",
 		V2Err:   "",
 	}
-}
-
-// newDummyQueryRequestForCloudDedicated constructs a http.Request to call a dummy query in InfluxDB Cloud Dedicated.
-func (c *Client) newDummyQueryRequestForCloudDedicated(ctx context.Context) (*http.Request, error) {
-	u, err := url.Parse(c.URL.String())
-	if err != nil {
-		return nil, err
-	}
-	u = util.AppendPath(u, "/query")
-
-	form := url.Values{}
-	form.Set("q", "SELECT * FROM dummy")
-	req, err := http.NewRequest("POST", u.String(), strings.NewReader(form.Encode()))
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	logs := c.Logger.
-		WithField("component", "proxy").
-		WithField("host", req.Host)
-	logs.Debug("/query")
-
-	if c.Authorizer != nil {
-		if err := c.Authorizer.Set(req); err != nil {
-			logs.Error("Error setting authorization header ", err)
-			return nil, err
-		}
-	}
-	return req, err
 }
 
 func (c *Client) handleShowMeasurements(q chronograf.Query, logs chronograf.Logger) (chronograf.Response, error) {

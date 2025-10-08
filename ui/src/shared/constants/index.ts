@@ -530,6 +530,7 @@ export const SOURCE_TYPE_INFLUX_V1_RELAY = 'influx-relay'
 export const SOURCE_TYPE_INFLUX_V2 = 'influx-v2'
 export const SOURCE_TYPE_INFLUX_V3_CORE = 'influx-v3-core'
 export const SOURCE_TYPE_INFLUX_V3_ENTERPRISE = 'influx-v3-enterprise'
+export const SOURCE_TYPE_INFLUX_V3_CLUSTERED = 'influx-v3-clustered'
 export const SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED = 'influx-v3-cloud-dedicated'
 
 export enum DataType {

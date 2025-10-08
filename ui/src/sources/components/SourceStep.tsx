@@ -37,6 +37,7 @@ import {
   SOURCE_TYPE_INFLUX_V1_RELAY,
   SOURCE_TYPE_INFLUX_V2,
   SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED,
+  SOURCE_TYPE_INFLUX_V3_CLUSTERED,
   SOURCE_TYPE_INFLUX_V3_CORE,
   SOURCE_TYPE_INFLUX_V3_ENTERPRISE,
 } from 'src/shared/constants'
@@ -136,6 +137,11 @@ class SourceStep extends PureComponent<Props, State> {
               label: 'InfluxDB 3 Enterprise',
             },
             {
+              value: SOURCE_TYPE_INFLUX_V3_CLUSTERED,
+              label: 'InfluxDB Clustered',
+            },
+            // TODO simon: add InfluxDB Cloud Serverless
+            {
               value: SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED,
               label: 'InfluxDB Cloud Dedicated',
             },
@@ -191,6 +197,24 @@ class SourceStep extends PureComponent<Props, State> {
         {(this.state.serverType === SOURCE_TYPE_INFLUX_V3_CORE ||
           this.state.serverType === SOURCE_TYPE_INFLUX_V3_ENTERPRISE) && (
           <>
+            <WizardTextInput
+              value={source.databaseToken}
+              label={'Database Token'}
+              type="password"
+              onChange={this.onChangeInput('databaseToken')}
+            />
+          </>
+        )}
+
+        {/* InfluxDB Clustered fields */}
+        {this.state.serverType === SOURCE_TYPE_INFLUX_V3_CLUSTERED && (
+          <>
+            <WizardTextInput
+              value={source.managementToken}
+              label={'Management Token'}
+              type="password"
+              onChange={this.onChangeInput('managementToken')}
+            />
             <WizardTextInput
               value={source.databaseToken}
               label={'Database Token'}
@@ -398,6 +422,7 @@ class SourceStep extends PureComponent<Props, State> {
       source.type === SOURCE_TYPE_INFLUX_V2 ||
       source.type === SOURCE_TYPE_INFLUX_V3_CORE ||
       source.type === SOURCE_TYPE_INFLUX_V3_ENTERPRISE ||
+      source.type === SOURCE_TYPE_INFLUX_V3_CLUSTERED ||
       source.type === SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED
     ) {
       return source.type
@@ -423,6 +448,9 @@ class SourceStep extends PureComponent<Props, State> {
         this.changeSourceType(value, '3.x')
         break
       case SOURCE_TYPE_INFLUX_V3_ENTERPRISE:
+        this.changeSourceType(value, '3.x')
+        break
+      case SOURCE_TYPE_INFLUX_V3_CLUSTERED:
         this.changeSourceType(value, '3.x')
         break
       case SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED:

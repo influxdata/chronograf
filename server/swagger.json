@@ -5204,7 +5204,7 @@
           "type": "string",
           "description": "Format of the data source",
           "readOnly": true,
-          "enum": ["influx", "influx-enterprise", "influx-relay", "influx-v2", "influx-v3-core", "influx-v3-enterprise", "influx-v3-cloud-dedicated"]
+          "enum": ["influx", "influx-enterprise", "influx-relay", "influx-v2", "influx-v3-core", "influx-v3-enterprise", "influx-v3-clustered", "influx-v3-cloud-dedicated"]
         },
         "username": {
           "type": "string",

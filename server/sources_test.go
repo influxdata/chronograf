@@ -426,6 +426,71 @@ func Test_ValidSourceRequest(t *testing.T) {
 			},
 		},
 		{
+			name: "InfluxDB 3 Clustered - supported",
+			args: args{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDBv3Clustered,
+					ManagementToken:    "mgmt-token",
+					DatabaseToken:      "database-token",
+					URL:                "http://www.any.url.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+				},
+			},
+			wants: wants{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDBv3Clustered,
+					ManagementToken:    "mgmt-token",
+					DatabaseToken:      "database-token",
+					URL:                "http://www.any.url.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+				},
+			},
+		},
+		{
+			name: "InfluxDB 3 Clustered - missing management token",
+			args: args{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDBv3Clustered,
+					DatabaseToken:      "database-token",
+					URL:                "http://www.any.url.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+				},
+			},
+			wants: wants{
+				err: fmt.Errorf("management token required"),
+			},
+		},
+		{
+			name: "InfluxDB 3 Clustered - missing database token",
+			args: args{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDBv3Clustered,
+					ManagementToken:    "mgmt-token",
+					URL:                "http://www.any.url.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+				},
+			},
+			wants: wants{
+				err: fmt.Errorf("database token required"),
+			},
+		},
+		{
 			name: "bad url",
 			args: args{
 				source: &chronograf.Source{
