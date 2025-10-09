@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path"
+	"path/filepath"
 	"time"
 
 	"github.com/influxdata/chronograf"
@@ -239,7 +239,7 @@ func (c *client) backup(ctx context.Context, lastBuild, build chronograf.BuildIn
 
 // copy creates a copy of the database in toFile
 func (c *client) copy(ctx context.Context, version string) error {
-	backupDir := path.Join(path.Dir(c.path), "backup")
+	backupDir := filepath.Join(filepath.Dir(c.path), "backup")
 	if _, err := os.Stat(backupDir); os.IsNotExist(err) {
 		if err = os.Mkdir(backupDir, 0700); err != nil {
 			return err
@@ -254,8 +254,8 @@ func (c *client) copy(ctx context.Context, version string) error {
 	}
 	defer fromFile.Close()
 
-	toName := fmt.Sprintf("%s.%s", path.Base(c.path), version)
-	toPath := path.Join(backupDir, toName)
+	toName := fmt.Sprintf("%s.%s", filepath.Base(c.path), version)
+	toPath := filepath.Join(backupDir, toName)
 	toFile, err := os.OpenFile(toPath, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 		return err
