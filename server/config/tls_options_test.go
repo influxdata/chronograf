@@ -3,10 +3,10 @@ package config_test
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"fmt"
 	"testing"
 
 	"github.com/influxdata/chronograf/server/config"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -144,7 +144,7 @@ func Test_CreateTLSConfig(t *testing.T) {
 				Key:     "tls_options_test.key",
 				CACerts: "tls_options_test2.cert",
 			},
-			err: "open tls_options_test2.cert: no such file or directory",
+			err: "open tls_options_test2.cert:.*file.*",
 		},
 		{
 			name: "unsupported ca certs",
@@ -175,8 +175,8 @@ func Test_CreateTLSConfig(t *testing.T) {
 			} else {
 				require.NotNil(t, err)
 				require.Nil(t, config)
-				// Contains is used, because nested exceptions can evolve with go versions
-				require.Contains(t, fmt.Sprintf("%v", err), test.err)
+				// Regexp is used, because of platform difference message and nested exceptions can evolve with go versions
+				assert.Regexp(t, test.err, err.Error())
 			}
 		})
 	}

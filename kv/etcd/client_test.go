@@ -2,7 +2,6 @@ package etcd
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 	"net/url"
 	"os"
@@ -12,6 +11,7 @@ import (
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/kv"
 	"github.com/influxdata/chronograf/mocks"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/server/v3/embed"
@@ -119,7 +119,7 @@ func Test_WithURL(t *testing.T) {
 		},
 		{
 			url: parse("etcd://u:p@127.0.0.1:2379?cert=a&key=b&ca=c"),
-			err: "no such file or directory",
+			err: ".*file.*",
 		},
 		{
 			url: parse("etcd://a:b@1.2.3.4:5555?ca=test.crt&key=test.key&cert=test.crt"),
@@ -157,7 +157,8 @@ func Test_WithURL(t *testing.T) {
 			} else {
 				require.NotNil(t, err)
 				// Contains is used, because nested exceptions can evolve with go versions
-				require.Contains(t, fmt.Sprintf("%v", err), test.err)
+				//require.Contains(t, fmt.Sprintf("%v", err), test.err)
+				assert.Regexp(t, test.err, err.Error())
 			}
 		})
 	}
