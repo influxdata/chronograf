@@ -192,6 +192,49 @@ func Test_ValidSourceRequest(t *testing.T) {
 			},
 		},
 		{
+			name: "InfluxDB Cloud Dedicated - without cluster/account IDs and management token",
+			args: args{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDBv3CloudDedicated,
+					Username:           "",
+					Password:           "",
+					SharedSecret:       "supersecret",
+					ClusterID:          "",
+					AccountID:          "",
+					ManagementToken:    "",
+					DatabaseToken:      "database-token",
+					URL:                "http://www.any.url.com",
+					MetaURL:            "http://www.so.meta.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+					DefaultDB:          "defaultDB",
+				},
+			},
+			wants: wants{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDBv3CloudDedicated,
+					Username:           "",
+					Password:           "",
+					SharedSecret:       "supersecret",
+					ClusterID:          "",
+					AccountID:          "",
+					ManagementToken:    "",
+					DatabaseToken:      "database-token",
+					URL:                "http://www.any.url.com",
+					MetaURL:            "http://www.so.meta.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+					DefaultDB:          "defaultDB",
+				},
+			},
+		},
+		{
 			name: "InfluxDB Cloud Dedicated - missing cluster ID",
 			args: args{
 				source: &chronograf.Source{
@@ -335,6 +378,30 @@ func Test_ValidSourceRequest(t *testing.T) {
 			},
 			wants: wants{
 				err: fmt.Errorf("database token required"),
+			},
+		},
+		{
+			name: "InfluxDB Cloud Dedicated - missing default DB",
+			args: args{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDBv3CloudDedicated,
+					Username:           "",
+					Password:           "",
+					SharedSecret:       "supersecret",
+					AccountID:          "",
+					ManagementToken:    "",
+					DatabaseToken:      "database-token",
+					URL:                "http://www.any.url.com",
+					MetaURL:            "http://www.so.meta.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+				},
+			},
+			wants: wants{
+				err: fmt.Errorf("default database is required for queries"),
 			},
 		},
 		{
@@ -523,7 +590,9 @@ func Test_ValidSourceRequest(t *testing.T) {
 				}
 				return
 			}
-			if err.Error() != tt.wants.err.Error() {
+			if err != nil && tt.wants.err == nil {
+				t.Errorf("%q. ValidSourceRequest() = %q", tt.name, err)
+			} else if err.Error() != tt.wants.err.Error() {
 				if err != nil && tt.wants.err != nil {
 					if strings.HasPrefix(err.Error(), tt.wants.err.Error()) {
 						// error messages vary between go versions, but they have the same prefixes

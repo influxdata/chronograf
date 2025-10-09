@@ -267,6 +267,13 @@ class SourceStep extends PureComponent<Props, State> {
           label="Default Retention Policy"
           onChange={this.onChangeInput('defaultRP')}
         />
+        {this.state.serverType === SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED && (
+          <WizardTextInput
+            value={source.defaultDB}
+            label="Default Database"
+            onChange={this.onChangeInput('defaultDB')}
+          />
+        )}
         {this.isEnterprise && (
           <WizardTextInput
             value={source.metaUrl}

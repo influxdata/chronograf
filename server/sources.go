@@ -449,6 +449,7 @@ func (s *Service) UpdateSource(w http.ResponseWriter, r *http.Request) {
 		src.Telegraf = req.Telegraf
 	}
 	src.DefaultRP = req.DefaultRP
+	src.DefaultDB = req.DefaultDB
 
 	defaultOrg, err := s.Store.Organizations(ctx).DefaultOrganization(ctx)
 	if err != nil {
@@ -552,6 +553,16 @@ func ValidSourceRequest(s *chronograf.Source, defaultOrgID string) error {
 	}
 
 	if s.Type == chronograf.InfluxDBv3CloudDedicated {
+		if len(s.DatabaseToken) == 0 {
+			return fmt.Errorf("database token required")
+		}
+		// ClusterID, AccountID, and ManagementToken are not required for InfluxDB 3 Cloud Dedicated
+		if len(s.ClusterID) == 0 && len(s.AccountID) == 0 && len(s.ManagementToken) == 0 {
+			if len(s.DefaultDB) == 0 {
+				return fmt.Errorf("default database is required for queries")
+			}
+			return nil
+		}
 		if len(s.ClusterID) == 0 {
 			return fmt.Errorf("cluster ID required")
 		}
@@ -567,9 +578,7 @@ func ValidSourceRequest(s *chronograf.Source, defaultOrgID string) error {
 		if len(s.ManagementToken) == 0 {
 			return fmt.Errorf("management token required")
 		}
-		if len(s.DatabaseToken) == 0 {
-			return fmt.Errorf("database token required")
-		}
+
 	}
 
 	return nil

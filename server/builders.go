@@ -124,6 +124,7 @@ type MultiSourceBuilder struct {
 	InfluxDBClusterID string
 	InfluxDBAccountID string
 	TagsCSVPath       string
+	DefaultDB         string
 
 	Logger chronograf.Logger
 	ID     chronograf.ID
@@ -139,7 +140,7 @@ func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore, defaultOrgID str
 
 	if fs.InfluxDBURL != "" {
 		var influxdbType, username, password string
-		var clusterID, accountID, mgmtToken, dbToken, tagsCSVPath string
+		var clusterID, accountID, mgmtToken, dbToken, tagsCSVPath, defaultDB string
 		if fs.InfluxDBType == chronograf.InfluxDBv3Core || fs.InfluxDBType == chronograf.InfluxDBv3Enterprise {
 			// InfluxDB 3 Core, InfluxDB 3 Enterprise
 			influxdbType = fs.InfluxDBType
@@ -157,6 +158,7 @@ func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore, defaultOrgID str
 			mgmtToken = fs.InfluxDBMgmtToken
 			dbToken = fs.InfluxDBToken
 			tagsCSVPath = fs.TagsCSVPath
+			defaultDB = fs.DefaultDB
 		} else if fs.InfluxDBOrg == "" || fs.InfluxDBToken == "" {
 			// v1 InfluxDB
 			username = fs.InfluxDBUsername
@@ -181,6 +183,7 @@ func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore, defaultOrgID str
 			DatabaseToken:   dbToken,
 			TagsCSVPath:     tagsCSVPath,
 			URL:             fs.InfluxDBURL,
+			DefaultDB:       defaultDB,
 			Default:         true,
 			Version:         "unknown", // a real version is re-fetched at runtime; use "unknown" version as a fallback, empty version would imply OSS 2.x
 		}

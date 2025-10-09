@@ -54,14 +54,15 @@ func (c *Client) validateClusteredOrCloudDedicatedAuth(ctx context.Context) erro
 	var req *http.Request
 	var err error
 
-	// Call list databases on management api.
-	if req, _, err = c.newListDatabasesRequestViaMgmtApi(ctx); err != nil {
-		return fmt.Errorf("management authentication failed: %w", err)
+	if c.MgmtURL != nil {
+		// Call list databases on management api.
+		if req, _, err = c.newListDatabasesRequestViaMgmtApi(ctx); err != nil {
+			return fmt.Errorf("management authentication failed: %w", err)
+		}
+		if err = c.executeRequest(err, req); err != nil {
+			return fmt.Errorf("management authentication failed: %w", err)
+		}
 	}
-	if err = c.executeRequest(err, req); err != nil {
-		return fmt.Errorf("management authentication failed: %w", err)
-	}
-
 	// Call dummy query on query api.
 	if _, err := c.Query(ctx, chronograf.Query{Command: "SELECT * FROM dummy WHERE time > now()"}); err != nil {
 		return fmt.Errorf("database authentication failed: %w", err)
@@ -73,46 +74,51 @@ func (c *Client) validateClusteredOrCloudDedicatedAuth(ctx context.Context) erro
 // showDatabasesViaMgmtApi lists databases using the management api and wraps the results into chronograf.Response structure.
 // Used for InfluxDB Clustered and InfluxDB Cloud Dedicated.
 func (c *Client) showDatabasesViaMgmtApi(ctx context.Context) (chronograf.Response, error) {
-	// Prepare request.
-	req, logs, err := c.newListDatabasesRequestViaMgmtApi(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	// Do request.
-	hc := &http.Client{}
-	hc.Transport = SharedTransport(c.InsecureSkipVerify)
-	resp, err := hc.Do(req)
-	if err != nil {
-		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
-			return nil, chronograf.ErrUpstreamTimeout
+	var dbNames []string
+	if c.MgmtURL == nil {
+		dbNames = []string{c.DefaultDB}
+	} else {
+		// Prepare request.
+		req, logs, err := c.newListDatabasesRequestViaMgmtApi(ctx)
+		if err != nil {
+			return nil, err
 		}
-		return nil, err
-	}
-	defer resp.Body.Close()
 
-	// Handle non-OK status.
-	if resp.StatusCode != http.StatusOK {
-		var errorResponse cdListDatabasesError
+		// Do request.
+		hc := &http.Client{}
+		hc.Transport = SharedTransport(c.InsecureSkipVerify)
+		resp, err := hc.Do(req)
+		if err != nil {
+			if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
+				return nil, chronograf.ErrUpstreamTimeout
+			}
+			return nil, err
+		}
+		defer resp.Body.Close()
+
+		// Handle non-OK status.
+		if resp.StatusCode != http.StatusOK {
+			var errorResponse cdListDatabasesError
+			dec := json.NewDecoder(resp.Body)
+			_ = dec.Decode(&errorResponse)
+			return nil, fmt.Errorf("received status code %d from server: err: %s", resp.StatusCode, errorResponse.Message)
+		}
+
+		// Decode response.
+		var databases []cdDatabase
 		dec := json.NewDecoder(resp.Body)
-		_ = dec.Decode(&errorResponse)
-		return nil, fmt.Errorf("received status code %d from server: err: %s", resp.StatusCode, errorResponse.Message)
-	}
+		decErr := dec.Decode(&databases)
+		if decErr != nil {
+			logs.WithField("influx_status", resp.StatusCode).
+				Error("Error parsing results from influxdb: err:", decErr)
+			return nil, decErr
+		}
 
-	// Decode response.
-	var databases []cdDatabase
-	dec := json.NewDecoder(resp.Body)
-	decErr := dec.Decode(&databases)
-	if decErr != nil {
-		logs.WithField("influx_status", resp.StatusCode).
-			Error("Error parsing results from influxdb: err:", decErr)
-		return nil, decErr
-	}
-
-	// Convert response.
-	dbNames := make([]string, len(databases))
-	for i, db := range databases {
-		dbNames[i] = db.Name
+		// Convert response.
+		dbNames = make([]string, len(databases))
+		for i, db := range databases {
+			dbNames[i] = db.Name
+		}
 	}
 	return constructShowDatabasesResponse(dbNames), nil
 }

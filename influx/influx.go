@@ -47,6 +47,7 @@ type Client struct {
 	InsecureSkipVerify bool
 	SrcType            string
 	Logger             chronograf.Logger
+	DefaultDB          string
 
 	csvTagsStore *CSVTagsStore // (optional) Store to load CSV tag files from source.TagsCSVPath directory
 }
@@ -307,17 +308,19 @@ func (c *Client) Connect(ctx context.Context, src *chronograf.Source) error {
 	}
 
 	if src.Type == chronograf.InfluxDBv3CloudDedicated {
-		// InfluxDB Cloud Dedicated also provides a management API.
-		mgmtUrl := fmt.Sprintf("https://console.influxdata.com/api/v0/accounts/%s/clusters/%s", src.AccountID, src.ClusterID)
-		if u, err = url.Parse(mgmtUrl); err != nil {
-			return err
-		}
+		if len(src.AccountID) > 0 {
+			// InfluxDB Cloud Dedicated also provides a management API.
+			mgmtUrl := fmt.Sprintf("https://console.influxdata.com/api/v0/accounts/%s/clusters/%s", src.AccountID, src.ClusterID)
+			if u, err = url.Parse(mgmtUrl); err != nil {
+				return err
+			}
 
-		c.MgmtURL = u
-		c.MgmtAuthorizer = &BearerToken{
-			Token: src.ManagementToken,
+			c.MgmtURL = u
+			c.MgmtAuthorizer = &BearerToken{
+				Token: src.ManagementToken,
+			}
 		}
-
+		c.DefaultDB = src.DefaultDB
 		if src.TagsCSVPath != "" {
 			if c.csvTagsStore, err = NewCSVTagsStore(src.TagsCSVPath, c.Logger); err != nil {
 				return err

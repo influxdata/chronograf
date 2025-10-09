@@ -53,6 +53,7 @@ func MarshalSource(s chronograf.Source) ([]byte, error) {
 		ManagementToken:    s.ManagementToken,
 		DatabaseToken:      s.DatabaseToken,
 		TagsCSVPath:        s.TagsCSVPath,
+		DefaultDatabase:    s.DefaultDB,
 	})
 }
 
@@ -83,6 +84,7 @@ func UnmarshalSource(data []byte, s *chronograf.Source) error {
 	s.ManagementToken = pb.ManagementToken
 	s.DatabaseToken = pb.DatabaseToken
 	s.TagsCSVPath = pb.TagsCSVPath
+	s.DefaultDB = pb.DefaultDatabase
 	return nil
 }
 

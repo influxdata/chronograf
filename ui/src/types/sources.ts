@@ -26,6 +26,7 @@ export interface Source {
   insecureSkipVerify: boolean
   default: boolean
   telegraf: string
+  defaultDB?: string
   organization: string
   role: string
   defaultRP: string
