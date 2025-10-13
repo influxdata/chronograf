@@ -350,7 +350,7 @@ func (s *Service) deactivateOtherKapacitors(ctx context.Context, srcID int, ID i
 		}
 	}
 	if len(deactivationErrors) > 1 {
-		return fmt.Errorf(strings.Join(deactivationErrors, "\n"))
+		return fmt.Errorf("%s", strings.Join(deactivationErrors, "\n"))
 	}
 	return deactivationError
 }

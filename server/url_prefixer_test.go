@@ -180,7 +180,7 @@ func Test_Server_Prefixer_NoPrefixingWithoutFlusther(t *testing.T) {
 func Test_Server_Prefixer_IgnoreJsAndSvg(t *testing.T) {
 	expected := "Keep it the same please"
 	backend := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(rw, expected)
+		fmt.Fprintf(rw, "%s", expected)
 	})
 
 	tl := &mocks.TestLogger{}
