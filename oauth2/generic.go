@@ -115,7 +115,7 @@ func (g *Generic) PrincipalID(provider *http.Client) (string, error) {
 		if ok := ofDomain(g.Domains, email); !ok {
 			msg := "Not a member of required domain"
 			g.Logger.Error(msg)
-			return "", fmt.Errorf(msg)
+			return "", fmt.Errorf("%s", msg)
 		}
 	}
 

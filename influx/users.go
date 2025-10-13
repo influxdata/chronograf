@@ -48,7 +48,7 @@ func (c *Client) Delete(ctx context.Context, u *chronograf.User) error {
 	// At last, we can check if there are any error strings
 	for _, r := range results {
 		if r.Error != "" {
-			return fmt.Errorf(r.Error)
+			return fmt.Errorf("%s", r.Error)
 		}
 	}
 	return nil
@@ -227,7 +227,7 @@ func (c *Client) updatePassword(ctx context.Context, name, passwd string) error 
 	// At last, we can check if there are any error strings
 	for _, r := range results {
 		if r.Error != "" {
-			return fmt.Errorf(r.Error)
+			return fmt.Errorf("%s", r.Error)
 		}
 	}
 	return nil
