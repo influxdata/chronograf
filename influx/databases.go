@@ -126,7 +126,7 @@ func (c *Client) UpdateRP(ctx context.Context, db string, rp string, upd *chrono
 	// At last, we can check if there are any error strings
 	for _, r := range results {
 		if r.Error != "" {
-			return nil, fmt.Errorf(r.Error)
+			return nil, fmt.Errorf("%s", r.Error)
 		}
 	}
 

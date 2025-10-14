@@ -88,7 +88,7 @@ workflows:
 jobs:
   build:
     environment:
-      DOCKER_TAG: chronograf-20250404
+      DOCKER_TAG: chronograf-20251013
       GO111MODULE: "ON"
     machine:
       image: ubuntu-2204:current
@@ -112,7 +112,7 @@ jobs:
 
   deploy-nightly:
     environment:
-      DOCKER_TAG: chronograf-20250404
+      DOCKER_TAG: chronograf-20251013
       GO111MODULE: "ON"
     machine:
       image: ubuntu-2204:current
@@ -141,7 +141,7 @@ jobs:
 
   build-nightly:
     environment:
-      DOCKER_TAG: chronograf-20250404
+      DOCKER_TAG: chronograf-20251013
       GO111MODULE: "ON"
     machine:
       image: ubuntu-2204:current
@@ -162,7 +162,7 @@ jobs:
 
   deploy-pre-release:
     environment:
-      DOCKER_TAG: chronograf-20250404
+      DOCKER_TAG: chronograf-20251013
       GO111MODULE: "ON"
     machine:
       image: ubuntu-2204:current
@@ -197,7 +197,7 @@ jobs:
 
   deploy-release:
     environment:
-      DOCKER_TAG: chronograf-20250404
+      DOCKER_TAG: chronograf-20251013
       GO111MODULE: "ON"
     machine:
       image: ubuntu-2204:current
