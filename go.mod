@@ -1,6 +1,6 @@
 module github.com/influxdata/chronograf
 
-go 1.25.2
+go 1.25.3
 
 require (
 	cloud.google.com/go/bigtable v1.10.0 // indirect
