@@ -213,7 +213,8 @@ func (s *Service) sourceVersion(ctx context.Context, src *chronograf.Source) str
 
 func (s *Service) tsdbVersion(ctx context.Context, src *chronograf.Source) (string, error) {
 	cli := &influx.Client{
-		Logger: s.Logger,
+		Logger:   s.Logger,
+		V3Config: s.V3Config,
 	}
 
 	if err := cli.Connect(ctx, src); err != nil {
@@ -250,7 +251,8 @@ func (s *Service) tsdbType(ctx context.Context, src *chronograf.Source) (string,
 
 func (s *Service) validateCredentials(ctx context.Context, src *chronograf.Source) error {
 	cli := &influx.Client{
-		Logger: s.Logger,
+		Logger:   s.Logger,
+		V3Config: s.V3Config,
 	}
 	if err := cli.Connect(ctx, src); err != nil {
 		return err
@@ -356,7 +358,8 @@ func (s *Service) SourceHealth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cli := &influx.Client{
-		Logger: s.Logger,
+		Logger:   s.Logger,
+		V3Config: s.V3Config,
 	}
 
 	if err := cli.Connect(ctx, &src); err != nil {

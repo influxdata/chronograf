@@ -58,16 +58,20 @@ type Server struct {
 	Cert flags.Filename `long:"cert" description:"Path to PEM encoded public key certificate. " env:"TLS_CERTIFICATE"`
 	Key  flags.Filename `long:"key" description:"Path to private key associated with given certificate. " env:"TLS_PRIVATE_KEY"`
 
-	InfluxDBType      string `long:"influxdb-type" value-name:"choice" choice:"influx" choice:"influx-enterprise" choice:"influx-relay" choice:"influx-v2" choice:"influx-v3-core" choice:"influx-v3-enterprise" choice:"influx-v3-clustered" choice:"influx-v3-cloud-dedicated" description:"InfluxDB server type instance" env:"INFLUXDB_TYPE"`
-	InfluxDBURL       string `long:"influxdb-url" description:"Location of your InfluxDB instance" env:"INFLUXDB_URL"`
-	InfluxDBUsername  string `long:"influxdb-username" description:"Username for your InfluxDB instance" env:"INFLUXDB_USERNAME"`
-	InfluxDBPassword  string `long:"influxdb-password" description:"Password for your InfluxDB instance" env:"INFLUXDB_PASSWORD"`
-	InfluxDBOrg       string `long:"influxdb-org" description:"Organization for your InfluxDB v2 instance" env:"INFLUXDB_ORG"`
-	InfluxDBToken     string `long:"influxdb-token" description:"Token for your InfluxDB v2, v3 Core/Enterprise or Cloud Dedicated instance" env:"INFLUXDB_TOKEN"`
-	InfluxDBMgmtToken string `long:"influxdb-mgmt-token" description:"Management token for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_MGMT_TOKEN"`
-	InfluxDBClusterID string `long:"influxdb-cluster-id" description:"Cluster ID for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_CLUSTER_ID"`
-	InfluxDBAccountID string `long:"influxdb-account-id" description:"Account ID for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_ACCOUNT_ID"`
-	TagsCSVPath       string `long:"tags-csv-path" description:"Path to a directory containing CSV files (per db) with tags for InfluxDB v3 sources. Used to populate the tags field in Query Editor for your InfluxDB Cloud Dedicated instance." env:"TAGS_CSV_PATH"`
+	InfluxDBType                  string `long:"influxdb-type" value-name:"choice" choice:"influx" choice:"influx-enterprise" choice:"influx-relay" choice:"influx-v2" choice:"influx-v3-core" choice:"influx-v3-enterprise" choice:"influx-v3-clustered" choice:"influx-v3-cloud-dedicated" description:"InfluxDB server type instance" env:"INFLUXDB_TYPE"`
+	InfluxDBURL                   string `long:"influxdb-url" description:"Location of your InfluxDB instance" env:"INFLUXDB_URL"`
+	InfluxDBUsername              string `long:"influxdb-username" description:"Username for your InfluxDB instance" env:"INFLUXDB_USERNAME"`
+	InfluxDBPassword              string `long:"influxdb-password" description:"Password for your InfluxDB instance" env:"INFLUXDB_PASSWORD"`
+	InfluxDBOrg                   string `long:"influxdb-org" description:"Organization for your InfluxDB v2 instance" env:"INFLUXDB_ORG"`
+	InfluxDBToken                 string `long:"influxdb-token" description:"Token for your InfluxDB v2, v3 Core/Enterprise or Cloud Dedicated instance" env:"INFLUXDB_TOKEN"`
+	InfluxDBMgmtToken             string `long:"influxdb-mgmt-token" description:"Management token for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_MGMT_TOKEN"`
+	InfluxDBClusterID             string `long:"influxdb-cluster-id" description:"Cluster ID for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_CLUSTER_ID"`
+	InfluxDBAccountID             string `long:"influxdb-account-id" description:"Account ID for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_ACCOUNT_ID"`
+	TagsCSVPath                   string `long:"tags-csv-path" description:"Path to a directory containing CSV files (per db) with tags for InfluxDB v3 sources. Used to populate the tags field in Query Editor for your InfluxDB Cloud Dedicated instance." env:"TAGS_CSV_PATH"`
+	InfluxDBDefaultDB             string `long:"influxdb-default-db" description:"Default database for your InfluxDB instance" env:"INFLUXDB_DEFAULT_DB"`
+	InfluxDBCloudDedicatedMgmtURL string `long:"influxdb-cloud-dedicated-mgmt-url" description:"Management URL for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_CLOUD_DEDICATED_MGMT_URL" default:"https://console.influxdata.com"`
+	InfluxDBClusteredClusterID    string `long:"influxdb-clustered-cluster-id" description:"Cluster ID for your InfluxDB v3 Clustered instance" env:"INFLUXDB_CLUSTERED_CLUSTER_ID" default:"11111111-1111-1111-1111-111111111111"`
+	InfluxDBClusteredAccountID    string `long:"influxdb-clustered-account-id" description:"Account ID for your InfluxDB v3 Clustered instance" env:"INFLUXDB_CLUSTERED_ACCOUNT_ID" default:"11111111-1111-1111-1111-111111111111"`
 
 	KapacitorURL      string `long:"kapacitor-url" description:"Location of your Kapacitor instance" env:"KAPACITOR_URL"`
 	KapacitorUsername string `long:"kapacitor-username" description:"Username of your Kapacitor instance" env:"KAPACITOR_USERNAME"`
@@ -557,6 +561,7 @@ func (s *Server) newBuilders(logger chronograf.Logger) builders {
 			InfluxDBClusterID: s.InfluxDBClusterID,
 			InfluxDBAccountID: s.InfluxDBAccountID,
 			TagsCSVPath:       s.TagsCSVPath,
+			DefaultDB:         s.InfluxDBDefaultDB,
 
 			Logger: logger,
 			ID:     idgen.NewTime(),
@@ -680,6 +685,11 @@ func (s *Server) Serve(ctx context.Context) {
 		TelegrafSystemInterval: s.TelegrafSystemInterval,
 		HostPageDisabled:       s.HostPageDisabled,
 		CustomAutoRefresh:      s.CustomAutoRefresh,
+	}
+	service.V3Config = influx.V3Config{
+		CloudDedicatedManagementURL: s.InfluxDBCloudDedicatedMgmtURL,
+		ClusteredAccountID:          s.InfluxDBClusteredAccountID,
+		ClusteredClusterID:          s.InfluxDBClusteredClusterID,
 	}
 
 	if !validBasepath(s.Basepath) {

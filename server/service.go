@@ -18,6 +18,7 @@ type Service struct {
 	SuperAdminProviderGroups superAdminProviderGroups
 	Env                      chronograf.Environment
 	Databases                chronograf.Databases
+	V3Config                 influx.V3Config
 }
 
 type superAdminProviderGroups struct {

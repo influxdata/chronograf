@@ -48,6 +48,7 @@ type Client struct {
 	SrcType            string
 	Logger             chronograf.Logger
 	DefaultDB          string
+	V3Config           V3Config
 
 	csvTagsStore *CSVTagsStore // (optional) Store to load CSV tag files from source.TagsCSVPath directory
 }
@@ -291,8 +292,8 @@ func (c *Client) Connect(ctx context.Context, src *chronograf.Source) error {
 
 	if src.Type == chronograf.InfluxDBv3Clustered {
 		// InfluxDB Clustered also provides a management API.
-		accountID := "11111111-1111-1111-1111-111111111111" // hardcoded value
-		clusterID := "11111111-1111-1111-1111-111111111111" // hardcoded value
+		accountID := c.V3Config.ClusteredAccountID
+		clusterID := c.V3Config.ClusteredClusterID
 		baseURL := *c.URL
 		baseURL.Path = ""
 		baseURL.RawQuery = ""
@@ -310,7 +311,7 @@ func (c *Client) Connect(ctx context.Context, src *chronograf.Source) error {
 	if src.Type == chronograf.InfluxDBv3CloudDedicated {
 		if len(src.AccountID) > 0 {
 			// InfluxDB Cloud Dedicated also provides a management API.
-			mgmtUrl := fmt.Sprintf("https://console.influxdata.com/api/v0/accounts/%s/clusters/%s", src.AccountID, src.ClusterID)
+			mgmtUrl := fmt.Sprintf("%s/api/v0/accounts/%s/clusters/%s", c.V3Config.CloudDedicatedManagementURL, src.AccountID, src.ClusterID)
 			if u, err = url.Parse(mgmtUrl); err != nil {
 				return err
 			}

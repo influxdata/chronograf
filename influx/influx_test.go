@@ -761,3 +761,367 @@ func Test_Query(t *testing.T) {
 		}
 	}
 }
+
+func Test_Influx_ValidateAuth_V3Core(t *testing.T) {
+	t.Parallel()
+	calledPath := ""
+	ts := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		calledPath = r.URL.Path
+		// V3 Core uses /api/v3/query_influxql for SHOW DATABASES
+		if strings.HasSuffix(r.URL.Path, "/api/v3/query_influxql") {
+			rw.WriteHeader(http.StatusUnauthorized)
+			rw.Write([]byte(`{"error":"v3coreauthfailed"}`))
+			if auth := r.Header.Get("Authorization"); auth != "Bearer my-db-token" {
+				t.Errorf("Expected Authorization 'Bearer my-db-token' but was: %v", auth)
+			}
+		}
+	}))
+	defer ts.Close()
+	for _, urlContext := range []string{"", "/ctx"} {
+		calledPath = ""
+		client, err := NewClient(ts.URL+urlContext, log.New(log.DebugLevel))
+		if err != nil {
+			t.Fatal("Unexpected error initializing client: err:", err)
+		}
+		source := &chronograf.Source{
+			URL:           ts.URL + urlContext,
+			Type:          chronograf.InfluxDBv3Core,
+			DatabaseToken: "my-db-token",
+		}
+
+		client.Connect(context.Background(), source)
+		err = client.ValidateAuth(context.Background(), source)
+		if err == nil {
+			t.Fatal("Expected error but nil")
+		}
+		if !strings.Contains(err.Error(), "v3coreauthfailed") {
+			t.Errorf("Expected client error '%v' to contain server-sent error message", err)
+		}
+		expectedPath := urlContext + "/api/v3/query_influxql"
+		if calledPath != expectedPath {
+			t.Errorf("Path received: %v, want: %v ", calledPath, expectedPath)
+		}
+	}
+}
+
+func Test_Influx_ValidateAuth_V3Enterprise(t *testing.T) {
+	t.Parallel()
+	calledPath := ""
+	ts := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		calledPath = r.URL.Path
+		// V3 Enterprise uses /api/v3/query_influxql for SHOW DATABASES
+		if strings.HasSuffix(r.URL.Path, "/api/v3/query_influxql") {
+			rw.WriteHeader(http.StatusUnauthorized)
+			rw.Write([]byte(`{"error":"v3enterpriseauthfailed"}`))
+			if auth := r.Header.Get("Authorization"); auth != "Bearer my-db-token" {
+				t.Errorf("Expected Authorization 'Bearer my-db-token' but was: %v", auth)
+			}
+		}
+	}))
+	defer ts.Close()
+	for _, urlContext := range []string{"", "/ctx"} {
+		calledPath = ""
+		client, err := NewClient(ts.URL+urlContext, log.New(log.DebugLevel))
+		if err != nil {
+			t.Fatal("Unexpected error initializing client: err:", err)
+		}
+		source := &chronograf.Source{
+			URL:           ts.URL + urlContext,
+			Type:          chronograf.InfluxDBv3Enterprise,
+			DatabaseToken: "my-db-token",
+		}
+
+		client.Connect(context.Background(), source)
+		err = client.ValidateAuth(context.Background(), source)
+		if err == nil {
+			t.Fatal("Expected error but nil")
+		}
+		if !strings.Contains(err.Error(), "v3enterpriseauthfailed") {
+			t.Errorf("Expected client error '%v' to contain server-sent error message", err)
+		}
+		expectedPath := urlContext + "/api/v3/query_influxql"
+		if calledPath != expectedPath {
+			t.Errorf("Path received: %v, want: %v ", calledPath, expectedPath)
+		}
+	}
+}
+
+func Test_Influx_ValidateAuth_V3Clustered(t *testing.T) {
+	t.Parallel()
+	mgmtAuthCalled := false
+	ts := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		// V3 Clustered validates both management and database auth
+		if strings.Contains(r.URL.Path, "/api/v0/accounts/") {
+			// Management API call
+			mgmtAuthCalled = true
+			auth := r.Header.Get("Authorization")
+			if auth != "Bearer my-mgmt-token" {
+				t.Errorf("Expected Authorization 'Bearer my-mgmt-token' but was: %v", auth)
+			}
+			rw.WriteHeader(http.StatusUnauthorized)
+			rw.Write([]byte(`{"error":"mgmt auth failed"}`))
+		} else if strings.HasSuffix(r.URL.Path, "/query") {
+			// Database query endpoint
+			auth := r.Header.Get("Authorization")
+			if auth != "Bearer my-db-token" {
+				t.Errorf("Expected Authorization 'Bearer my-db-token' but was: %v", auth)
+			}
+			rw.WriteHeader(http.StatusUnauthorized)
+			rw.Write([]byte(`{"error":"db auth failed"}`))
+		}
+	}))
+	defer ts.Close()
+
+	client, err := NewClient(ts.URL, log.New(log.DebugLevel))
+	if err != nil {
+		t.Fatal("Unexpected error initializing client: err:", err)
+	}
+	source := &chronograf.Source{
+		URL:             ts.URL,
+		Type:            chronograf.InfluxDBv3Clustered,
+		DatabaseToken:   "my-db-token",
+		ManagementToken: "my-mgmt-token",
+	}
+
+	client.Connect(context.Background(), source)
+	err = client.ValidateAuth(context.Background(), source)
+	if err == nil {
+		t.Fatal("Expected error but nil")
+	}
+	if !strings.Contains(err.Error(), "management authentication failed") {
+		t.Errorf("Expected error to contain 'management authentication failed' but was: %v", err)
+	}
+	if !mgmtAuthCalled {
+		t.Error("Expected management API to be called")
+	}
+}
+
+func Test_Influx_ValidateAuth_V3CloudDedicated(t *testing.T) {
+	t.Parallel()
+	mgmtAuthCalled := false
+	ts := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		// V3 Cloud Dedicated validates both management and database auth
+		if strings.Contains(r.URL.Path, "/api/v0/accounts/") {
+			// Management API call
+			mgmtAuthCalled = true
+			auth := r.Header.Get("Authorization")
+			if auth != "Bearer my-mgmt-token" {
+				t.Errorf("Expected Authorization 'Bearer my-mgmt-token' but was: %v", auth)
+			}
+			rw.WriteHeader(http.StatusUnauthorized)
+			rw.Write([]byte(`{"error":"mgmt auth failed"}`))
+		} else if strings.HasSuffix(r.URL.Path, "/query") {
+			// Database query endpoint
+			auth := r.Header.Get("Authorization")
+			if auth != "Bearer my-db-token" {
+				t.Errorf("Expected Authorization 'Bearer my-db-token' but was: %v", auth)
+			}
+			rw.WriteHeader(http.StatusUnauthorized)
+			rw.Write([]byte(`{"error":"db auth failed"}`))
+		}
+	}))
+	defer ts.Close()
+
+	client, err := NewClient(ts.URL, log.New(log.DebugLevel))
+	client.V3Config = influx.V3Config{
+		CloudDedicatedManagementURL: ts.URL,
+		ClusteredAccountID:          "test-account-id",
+		ClusteredClusterID:          "test-cluster-id",
+	}
+	if err != nil {
+		t.Fatal("Unexpected error initializing client: err:", err)
+	}
+	source := &chronograf.Source{
+		URL:             ts.URL,
+		Type:            chronograf.InfluxDBv3CloudDedicated,
+		DatabaseToken:   "my-db-token",
+		ManagementToken: "my-mgmt-token",
+		AccountID:       "test-account-id",
+		ClusterID:       "test-cluster-id",
+	}
+
+	client.Connect(context.Background(), source)
+	err = client.ValidateAuth(context.Background(), source)
+	if err == nil {
+		t.Fatal("Expected error but nil")
+	}
+	// Cloud Dedicated validates management auth first
+	if !strings.Contains(err.Error(), "management authentication failed") {
+		t.Errorf("Expected error to contain 'management authentication failed' but was: %v", err)
+	}
+	if !mgmtAuthCalled {
+		t.Error("Expected management API to be called")
+	}
+}
+
+func Test_Influx_Authorization_V3Core(t *testing.T) {
+	t.Parallel()
+	ts := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		auth := r.Header.Get("Authorization")
+		if auth != "Bearer test-token-core" {
+			t.Errorf("Expected Authorization 'Bearer test-token-core' but was: %v", auth)
+		}
+		rw.WriteHeader(http.StatusOK)
+		// V3 Core returns different response format
+		if strings.HasSuffix(r.URL.Path, "/api/v3/query_influxql") {
+			rw.Write([]byte(`[{"iox::database":"mydb","deleted":false}]`))
+		} else {
+			rw.Write([]byte(`{"results":[{}]}`))
+		}
+	}))
+	defer ts.Close()
+
+	client, err := NewClient(ts.URL, log.New(log.DebugLevel))
+	if err != nil {
+		t.Fatal("Unexpected error initializing client: err:", err)
+	}
+	source := &chronograf.Source{
+		URL:           ts.URL,
+		Type:          chronograf.InfluxDBv3Core,
+		DatabaseToken: "test-token-core",
+	}
+
+	client.Connect(context.Background(), source)
+	query := chronograf.Query{
+		Command: "SHOW DATABASES",
+	}
+	_, err = client.Query(context.Background(), query)
+	if err != nil {
+		t.Fatal("Expected no error but was", err)
+	}
+}
+
+func Test_Influx_Authorization_V3Enterprise(t *testing.T) {
+	t.Parallel()
+	ts := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		auth := r.Header.Get("Authorization")
+		if auth != "Bearer test-token-enterprise" {
+			t.Errorf("Expected Authorization 'Bearer test-token-enterprise' but was: %v", auth)
+		}
+		rw.WriteHeader(http.StatusOK)
+		// V3 Enterprise returns different response format
+		if strings.HasSuffix(r.URL.Path, "/api/v3/query_influxql") {
+			rw.Write([]byte(`[{"iox::database":"mydb","deleted":false}]`))
+		} else {
+			rw.Write([]byte(`{"results":[{}]}`))
+		}
+	}))
+	defer ts.Close()
+
+	client, err := NewClient(ts.URL, log.New(log.DebugLevel))
+	if err != nil {
+		t.Fatal("Unexpected error initializing client: err:", err)
+	}
+	source := &chronograf.Source{
+		URL:           ts.URL,
+		Type:          chronograf.InfluxDBv3Enterprise,
+		DatabaseToken: "test-token-enterprise",
+	}
+
+	client.Connect(context.Background(), source)
+	query := chronograf.Query{
+		Command: "SHOW DATABASES",
+	}
+	_, err = client.Query(context.Background(), query)
+	if err != nil {
+		t.Fatal("Expected no error but was", err)
+	}
+}
+
+func Test_Influx_Authorization_V3Clustered(t *testing.T) {
+	t.Parallel()
+	ts := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		// V3 Clustered intercepts SHOW DATABASES and calls management API
+		if strings.Contains(r.URL.Path, "/api/v0/accounts/") {
+			// Management API - expects management token
+			auth := r.Header.Get("Authorization")
+			if auth != "Bearer test-mgmt-token" {
+				t.Errorf("Expected Authorization 'Bearer test-mgmt-token' but was: %v", auth)
+			}
+			rw.WriteHeader(http.StatusOK)
+			rw.Write([]byte(`[{"name":"mydb","maxTables":500,"maxColumnsPerTable":200,"retentionPeriod":0}]`))
+		} else {
+			// Database query - expects database token
+			auth := r.Header.Get("Authorization")
+			if auth != "Bearer test-token-clustered" {
+				t.Errorf("Expected Authorization 'Bearer test-token-clustered' but was: %v", auth)
+			}
+			rw.WriteHeader(http.StatusOK)
+			rw.Write([]byte(`{"results":[{}]}`))
+		}
+	}))
+	defer ts.Close()
+
+	client, err := NewClient(ts.URL, log.New(log.DebugLevel))
+	if err != nil {
+		t.Fatal("Unexpected error initializing client: err:", err)
+	}
+	source := &chronograf.Source{
+		URL:             ts.URL,
+		Type:            chronograf.InfluxDBv3Clustered,
+		DatabaseToken:   "test-token-clustered",
+		ManagementToken: "test-mgmt-token",
+	}
+	client.V3Config = influx.V3Config{
+		CloudDedicatedManagementURL: ts.URL,
+		ClusteredAccountID:          "test-account-id",
+		ClusteredClusterID:          "test-cluster-id",
+	}
+	client.Connect(context.Background(), source)
+	query := chronograf.Query{
+		Command: "SHOW DATABASES",
+	}
+	_, err = client.Query(context.Background(), query)
+	if err != nil {
+		t.Fatal("Expected no error but was", err)
+	}
+}
+
+func Test_Influx_Authorization_V3CloudDedicated(t *testing.T) {
+	t.Parallel()
+	ts := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		// V3 Cloud Dedicated intercepts SHOW DATABASES and calls management API
+		if strings.Contains(r.URL.Path, "/api/v0/accounts/") {
+			// Management API - expects management token
+			auth := r.Header.Get("Authorization")
+			if auth != "Bearer test-mgmt-token" {
+				t.Errorf("Expected Authorization 'Bearer test-mgmt-token' but was: %v", auth)
+			}
+			rw.WriteHeader(http.StatusOK)
+			rw.Write([]byte(`[{"name":"mydb","maxTables":500,"maxColumnsPerTable":200,"retentionPeriod":0}]`))
+		} else {
+			// Database query - expects database token
+			auth := r.Header.Get("Authorization")
+			if auth != "Bearer test-token-cloud-dedicated" {
+				t.Errorf("Expected Authorization 'Bearer test-token-cloud-dedicated' but was: %v", auth)
+			}
+			rw.WriteHeader(http.StatusOK)
+			rw.Write([]byte(`{"results":[{}]}`))
+		}
+	}))
+	defer ts.Close()
+
+	client, err := NewClient(ts.URL, log.New(log.DebugLevel))
+	if err != nil {
+		t.Fatal("Unexpected error initializing client: err:", err)
+	}
+	source := &chronograf.Source{
+		URL:             ts.URL,
+		Type:            chronograf.InfluxDBv3CloudDedicated,
+		DatabaseToken:   "test-token-cloud-dedicated",
+		ManagementToken: "test-mgmt-token",
+		AccountID:       "test-account-id",
+		ClusterID:       "test-cluster-id",
+	}
+	client.V3Config = influx.V3Config{
+		CloudDedicatedManagementURL: ts.URL,
+	}
+	client.Connect(context.Background(), source)
+	query := chronograf.Query{
+		Command: "SHOW DATABASES",
+	}
+	_, err = client.Query(context.Background(), query)
+	if err != nil {
+		t.Fatal("Expected no error but was", err)
+	}
+}
