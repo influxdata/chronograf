@@ -14,6 +14,7 @@ import (
 	"github.com/bouk/httprouter"
 	"github.com/google/go-cmp/cmp"
 	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/influx"
 	"github.com/influxdata/chronograf/log"
 	"github.com/influxdata/chronograf/mocks"
 )
@@ -762,13 +763,15 @@ func TestService_UpdateSource(t *testing.T) {
 		r *http.Request
 	}
 	tests := []struct {
-		name            string
-		args            args
-		fields          fields
-		ID              string
-		wantStatusCode  int
-		wantContentType string
-		wantBody        func(string) string
+		name              string
+		args              args
+		fields            fields
+		ID                string
+		requestBody       func(string) string
+		mockServerHandler http.HandlerFunc
+		wantStatusCode    int
+		wantContentType   string
+		wantBody          func(string) string
 	}{
 		{
 			name: "Update source updates fields",
@@ -800,7 +803,10 @@ func TestService_UpdateSource(t *testing.T) {
 				},
 				Logger: log.New(log.DebugLevel),
 			},
-			ID:              "1",
+			ID: "1",
+			requestBody: func(url string) string {
+				return fmt.Sprintf(`{"name":"marty","password":"the_lake","username":"bob","type":"influx","telegraf":"murlin","defaultRP":"pineapple","url":"%s","metaUrl":"http://murl"}`, url)
+			},
 			wantStatusCode:  200,
 			wantContentType: "application/json",
 			wantBody: func(url string) string {
@@ -808,25 +814,249 @@ func TestService_UpdateSource(t *testing.T) {
 `, url)
 			},
 		},
+		{
+			name: "Update InfluxDB v3 Core source",
+			args: args{
+				w: httptest.NewRecorder(),
+				r: httptest.NewRequest(
+					"PATCH",
+					"http://any.url",
+					nil),
+			},
+			fields: fields{
+				SourcesStore: &mocks.SourcesStore{
+					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+						return chronograf.Source{
+							ID:            2,
+							Type:          chronograf.InfluxDBv3Core,
+							DatabaseToken: "old-token",
+						}, nil
+					},
+					UpdateF: func(ctx context.Context, upd chronograf.Source) error {
+						return nil
+					},
+				},
+				OrganizationsStore: &mocks.OrganizationsStore{
+					DefaultOrganizationF: func(context.Context) (*chronograf.Organization, error) {
+						return &chronograf.Organization{
+							ID:   "1337",
+							Name: "pineapple_kingdom",
+						}, nil
+					},
+				},
+				Logger: log.New(log.DebugLevel),
+			},
+			ID: "2",
+			requestBody: func(url string) string {
+				return fmt.Sprintf(`{"name":"v3-core","type":"influx-v3-core","url":"%s","databaseToken":"test-token-123","defaultDB":"mydb","telegraf":"telegraf"}`, url)
+			},
+			mockServerHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// v3 Core sources validate by querying /api/v3/query_influxql
+				if r.URL.Path == "/api/v3/query_influxql" {
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte(`[]`))
+				} else {
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte(`{}`))
+				}
+			}),
+			wantStatusCode:  200,
+			wantContentType: "application/json",
+			wantBody: func(url string) string {
+				return fmt.Sprintf(`{"id":"2","name":"v3-core","type":"influx-v3-core","databaseToken":"test-token-123","url":"%s","default":false,"telegraf":"telegraf","organization":"1337","defaultRP":"","defaultDB":"mydb","version":"Unknown","authentication":"unknown","links":{"self":"/chronograf/v1/sources/2","kapacitors":"/chronograf/v1/sources/2/kapacitors","services":"/chronograf/v1/sources/2/services","proxy":"/chronograf/v1/sources/2/proxy","queries":"/chronograf/v1/sources/2/queries","write":"/chronograf/v1/sources/2/write","permissions":"/chronograf/v1/sources/2/permissions","users":"/chronograf/v1/sources/2/users","databases":"/chronograf/v1/sources/2/dbs","annotations":"/chronograf/v1/sources/2/annotations","health":"/chronograf/v1/sources/2/health"}}
+`, url)
+			},
+		},
+		{
+			name: "Update InfluxDB v3 Enterprise source",
+			args: args{
+				w: httptest.NewRecorder(),
+				r: httptest.NewRequest(
+					"PATCH",
+					"http://any.url",
+					nil),
+			},
+			fields: fields{
+				SourcesStore: &mocks.SourcesStore{
+					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+						return chronograf.Source{
+							ID:            3,
+							Type:          chronograf.InfluxDBv3Enterprise,
+							DatabaseToken: "old-enterprise-token",
+						}, nil
+					},
+					UpdateF: func(ctx context.Context, upd chronograf.Source) error {
+						return nil
+					},
+				},
+				OrganizationsStore: &mocks.OrganizationsStore{
+					DefaultOrganizationF: func(context.Context) (*chronograf.Organization, error) {
+						return &chronograf.Organization{
+							ID:   "1337",
+							Name: "pineapple_kingdom",
+						}, nil
+					},
+				},
+				Logger: log.New(log.DebugLevel),
+			},
+			ID: "3",
+			requestBody: func(url string) string {
+				return fmt.Sprintf(`{"name":"v3-enterprise","type":"influx-v3-enterprise","url":"%s","databaseToken":"enterprise-token-456","defaultDB":"enterprise_db","telegraf":"telegraf"}`, url)
+			},
+			mockServerHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// v3 Enterprise sources validate by querying /api/v3/query_influxql
+				if r.URL.Path == "/api/v3/query_influxql" {
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte(`[]`))
+				} else {
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte(`{}`))
+				}
+			}),
+			wantStatusCode:  200,
+			wantContentType: "application/json",
+			wantBody: func(url string) string {
+				return fmt.Sprintf(`{"id":"3","name":"v3-enterprise","type":"influx-v3-enterprise","databaseToken":"enterprise-token-456","url":"%s","default":false,"telegraf":"telegraf","organization":"1337","defaultRP":"","defaultDB":"enterprise_db","version":"Unknown","authentication":"unknown","links":{"self":"/chronograf/v1/sources/3","kapacitors":"/chronograf/v1/sources/3/kapacitors","services":"/chronograf/v1/sources/3/services","proxy":"/chronograf/v1/sources/3/proxy","queries":"/chronograf/v1/sources/3/queries","write":"/chronograf/v1/sources/3/write","permissions":"/chronograf/v1/sources/3/permissions","users":"/chronograf/v1/sources/3/users","databases":"/chronograf/v1/sources/3/dbs","annotations":"/chronograf/v1/sources/3/annotations","health":"/chronograf/v1/sources/3/health"}}
+`, url)
+			},
+		},
+		{
+			name: "Update InfluxDB v3 Clustered source",
+			args: args{
+				w: httptest.NewRecorder(),
+				r: httptest.NewRequest(
+					"PATCH",
+					"http://any.url",
+					nil),
+			},
+			fields: fields{
+				SourcesStore: &mocks.SourcesStore{
+					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+						return chronograf.Source{
+							ID:              4,
+							Type:            chronograf.InfluxDBv3Clustered,
+							DatabaseToken:   "old-db-token",
+							ManagementToken: "old-mgmt-token",
+						}, nil
+					},
+					UpdateF: func(ctx context.Context, upd chronograf.Source) error {
+						return nil
+					},
+				},
+				OrganizationsStore: &mocks.OrganizationsStore{
+					DefaultOrganizationF: func(context.Context) (*chronograf.Organization, error) {
+						return &chronograf.Organization{
+							ID:   "1337",
+							Name: "pineapple_kingdom",
+						}, nil
+					},
+				},
+				Logger: log.New(log.DebugLevel),
+			},
+			ID: "4",
+			requestBody: func(url string) string {
+				return fmt.Sprintf(`{"name":"v3-clustered","type":"influx-v3-clustered","url":"%s","databaseToken":"db-token-789","managementToken":"mgmt-token-789","clusterId":"a1b2c3d4-e5f6-7890-abcd-ef1234567890","accountId":"f1e2d3c4-b5a6-9870-dcba-fe9876543210","defaultDB":"clustered_db","telegraf":"telegraf"}`, url)
+			},
+			mockServerHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// v3 Clustered sources validate by accessing the management API
+				if strings.Contains(r.URL.Path, "/api/v0/accounts/") || r.URL.Path == "/api/v3/query_influxql" {
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte(`{"databases":[]}`))
+				} else {
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte(`{}`))
+				}
+			}),
+			wantStatusCode:  200,
+			wantContentType: "application/json",
+			wantBody: func(url string) string {
+				return fmt.Sprintf(`{"id":"4","name":"v3-clustered","type":"influx-v3-clustered","clusterId":"a1b2c3d4-e5f6-7890-abcd-ef1234567890","accountId":"f1e2d3c4-b5a6-9870-dcba-fe9876543210","managementToken":"mgmt-token-789","databaseToken":"db-token-789","url":"%s","default":false,"telegraf":"telegraf","organization":"1337","defaultRP":"","defaultDB":"clustered_db","authentication":"unknown","links":{"self":"/chronograf/v1/sources/4","kapacitors":"/chronograf/v1/sources/4/kapacitors","services":"/chronograf/v1/sources/4/services","proxy":"/chronograf/v1/sources/4/proxy","queries":"/chronograf/v1/sources/4/queries","write":"/chronograf/v1/sources/4/write","permissions":"/chronograf/v1/sources/4/permissions","users":"/chronograf/v1/sources/4/users","databases":"/chronograf/v1/sources/4/dbs","annotations":"/chronograf/v1/sources/4/annotations","health":"/chronograf/v1/sources/4/health"}}
+`, url)
+			},
+		},
+		{
+			name: "Update InfluxDB v3 Cloud Dedicated source",
+			args: args{
+				w: httptest.NewRecorder(),
+				r: httptest.NewRequest(
+					"PATCH",
+					"http://any.url",
+					nil),
+			},
+			fields: fields{
+				SourcesStore: &mocks.SourcesStore{
+					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+						return chronograf.Source{
+							ID:              5,
+							Type:            chronograf.InfluxDBv3CloudDedicated,
+							DatabaseToken:   "old-cloud-token",
+							ManagementToken: "old-cloud-mgmt",
+							ClusterID:       "11111111-1111-1111-1111-111111111111",
+							AccountID:       "22222222-2222-2222-2222-222222222222",
+						}, nil
+					},
+					UpdateF: func(ctx context.Context, upd chronograf.Source) error {
+						return nil
+					},
+				},
+				OrganizationsStore: &mocks.OrganizationsStore{
+					DefaultOrganizationF: func(context.Context) (*chronograf.Organization, error) {
+						return &chronograf.Organization{
+							ID:   "1337",
+							Name: "pineapple_kingdom",
+						}, nil
+					},
+				},
+				Logger: log.New(log.DebugLevel),
+			},
+			ID: "5",
+			requestBody: func(url string) string {
+				return fmt.Sprintf(`{"name":"v3-cloud-dedicated","type":"influx-v3-cloud-dedicated","url":"%s","databaseToken":"cloud-token-abc","managementToken":"cloud-mgmt-abc","clusterId":"12345678-1234-5678-1234-567812345678","accountId":"87654321-4321-8765-4321-876543218765","defaultDB":"cloud_db","telegraf":"telegraf"}`, url)
+			},
+			mockServerHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// v3 Cloud Dedicated sources validate by accessing the management API
+				if strings.Contains(r.URL.Path, "/api/v0/accounts/") || r.URL.Path == "/api/v3/query_influxql" {
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte(`{"databases":[]}`))
+				} else {
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte(`{}`))
+				}
+			}),
+			wantStatusCode:  200,
+			wantContentType: "application/json",
+			wantBody: func(url string) string {
+				return fmt.Sprintf(`{"id":"5","name":"v3-cloud-dedicated","type":"influx-v3-cloud-dedicated","clusterId":"12345678-1234-5678-1234-567812345678","accountId":"87654321-4321-8765-4321-876543218765","managementToken":"cloud-mgmt-abc","databaseToken":"cloud-token-abc","url":"%s","default":false,"telegraf":"telegraf","organization":"1337","defaultRP":"","defaultDB":"cloud_db","authentication":"unknown","links":{"self":"/chronograf/v1/sources/5","kapacitors":"/chronograf/v1/sources/5/kapacitors","services":"/chronograf/v1/sources/5/services","proxy":"/chronograf/v1/sources/5/proxy","queries":"/chronograf/v1/sources/5/queries","write":"/chronograf/v1/sources/5/write","permissions":"/chronograf/v1/sources/5/permissions","users":"/chronograf/v1/sources/5/users","databases":"/chronograf/v1/sources/5/dbs","annotations":"/chronograf/v1/sources/5/annotations","health":"/chronograf/v1/sources/5/health"}}
+`, url)
+			},
+		},
 	}
 	for _, tt := range tests {
+		mockHandler := tt.mockServerHandler
+		if mockHandler == nil {
+			mockHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.URL.Path == "/query" {
+					w.WriteHeader(http.StatusOK) // credentials
+				} else {
+					w.WriteHeader(http.StatusNoContent)
+					w.Header().Set("X-Influxdb-Build", "ENT")
+				}
+				w.Write(([]byte)("{}"))
+			})
+		}
+		ts := httptest.NewServer(mockHandler)
+		defer ts.Close()
+
 		h := &Service{
 			Store: &mocks.Store{
 				SourcesStore:       tt.fields.SourcesStore,
 				OrganizationsStore: tt.fields.OrganizationsStore,
 			},
 			Logger: tt.fields.Logger,
+			V3Config: influx.V3Config{
+				CloudDedicatedManagementURL: ts.URL,
+			},
 		}
-		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path == "/query" {
-				w.WriteHeader(http.StatusOK) // credentials
-			} else {
-				w.WriteHeader(http.StatusNoContent)
-				w.Header().Set("X-Influxdb-Build", "ENT")
-			}
-			w.Write(([]byte)("{}"))
-		}))
-		defer ts.Close()
 
 		tt.args.r = tt.args.r.WithContext(httprouter.WithParams(
 			context.Background(),
@@ -837,9 +1067,7 @@ func TestService_UpdateSource(t *testing.T) {
 				},
 			}))
 		tt.args.r.Body = ioutil.NopCloser(
-			bytes.NewReader([]byte(
-				fmt.Sprintf(`{"name":"marty","password":"the_lake","username":"bob","type":"influx","telegraf":"murlin","defaultRP":"pineapple","url":"%s","metaUrl":"http://murl"}`, ts.URL)),
-			),
+			bytes.NewReader([]byte(tt.requestBody(ts.URL))),
 		)
 		h.UpdateSource(tt.args.w, tt.args.r)
 
