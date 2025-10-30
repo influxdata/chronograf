@@ -1030,6 +1030,59 @@ func TestService_UpdateSource(t *testing.T) {
 `, url)
 			},
 		},
+		{
+			name: "Update InfluxDB v3 Serverless source",
+			args: args{
+				w: httptest.NewRecorder(),
+				r: httptest.NewRequest(
+					"PATCH",
+					"http://any.url",
+					nil),
+			},
+			fields: fields{
+				SourcesStore: &mocks.SourcesStore{
+					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+						return chronograf.Source{
+							ID:            6,
+							Type:          chronograf.InfluxDBv3Serverless,
+							DatabaseToken: "old-serverless-token",
+						}, nil
+					},
+					UpdateF: func(ctx context.Context, upd chronograf.Source) error {
+						return nil
+					},
+				},
+				OrganizationsStore: &mocks.OrganizationsStore{
+					DefaultOrganizationF: func(context.Context) (*chronograf.Organization, error) {
+						return &chronograf.Organization{
+							ID:   "1337",
+							Name: "pineapple_kingdom",
+						}, nil
+					},
+				},
+				Logger: log.New(log.DebugLevel),
+			},
+			ID: "6",
+			requestBody: func(url string) string {
+				return fmt.Sprintf(`{"name":"v3-serverless","type":"influx-v3-serverless","url":"%s","databaseToken":"serverless-token-xyz","defaultDB":"serverless_db","telegraf":"telegraf"}`, url)
+			},
+			mockServerHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// v3 Serverless uses /query endpoint like v1
+				if r.URL.Path == "/query" {
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte(`{"results":[{"statement_id":0,"series":[{"name":"databases","columns":["name"],"values":[["_internal"]]}]}]}`))
+				} else {
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte(`{}`))
+				}
+			}),
+			wantStatusCode:  200,
+			wantContentType: "application/json",
+			wantBody: func(url string) string {
+				return fmt.Sprintf(`{"id":"6","name":"v3-serverless","type":"influx-v3-serverless","databaseToken":"serverless-token-xyz","url":"%s","default":false,"telegraf":"telegraf","organization":"1337","defaultRP":"","defaultDB":"serverless_db","authentication":"token","links":{"self":"/chronograf/v1/sources/6","kapacitors":"/chronograf/v1/sources/6/kapacitors","services":"/chronograf/v1/sources/6/services","proxy":"/chronograf/v1/sources/6/proxy","queries":"/chronograf/v1/sources/6/queries","write":"/chronograf/v1/sources/6/write","permissions":"/chronograf/v1/sources/6/permissions","users":"/chronograf/v1/sources/6/users","databases":"/chronograf/v1/sources/6/dbs","annotations":"/chronograf/v1/sources/6/annotations","health":"/chronograf/v1/sources/6/health"}}
+`, url)
+			},
+		},
 	}
 	for _, tt := range tests {
 		mockHandler := tt.mockServerHandler

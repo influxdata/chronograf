@@ -40,6 +40,7 @@ import {
   SOURCE_TYPE_INFLUX_V3_CLUSTERED,
   SOURCE_TYPE_INFLUX_V3_CORE,
   SOURCE_TYPE_INFLUX_V3_ENTERPRISE,
+  SOURCE_TYPE_INFLUX_V3_SERVERLESS,
 } from 'src/shared/constants'
 import {SUPERADMIN_ROLE} from 'src/auth/roles'
 
@@ -140,10 +141,13 @@ class SourceStep extends PureComponent<Props, State> {
               value: SOURCE_TYPE_INFLUX_V3_CLUSTERED,
               label: 'InfluxDB Clustered',
             },
-            // TODO simon: add InfluxDB Cloud Serverless
             {
               value: SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED,
               label: 'InfluxDB Cloud Dedicated',
+            },
+            {
+              value: SOURCE_TYPE_INFLUX_V3_SERVERLESS,
+              label: 'InfluxDB Cloud Serverless',
             },
           ]}
           onChange={this.handleServerTypeChange}
@@ -193,9 +197,10 @@ class SourceStep extends PureComponent<Props, State> {
           </>
         )}
 
-        {/* InfluxDB 3 Core/Enterprise fields */}
+        {/* InfluxDB 3 Core/Enterprise/Serverless fields */}
         {(this.state.serverType === SOURCE_TYPE_INFLUX_V3_CORE ||
-          this.state.serverType === SOURCE_TYPE_INFLUX_V3_ENTERPRISE) && (
+          this.state.serverType === SOURCE_TYPE_INFLUX_V3_ENTERPRISE ||
+          this.state.serverType === SOURCE_TYPE_INFLUX_V3_SERVERLESS) && (
           <>
             <WizardTextInput
               value={source.databaseToken}
@@ -430,7 +435,8 @@ class SourceStep extends PureComponent<Props, State> {
       source.type === SOURCE_TYPE_INFLUX_V3_CORE ||
       source.type === SOURCE_TYPE_INFLUX_V3_ENTERPRISE ||
       source.type === SOURCE_TYPE_INFLUX_V3_CLUSTERED ||
-      source.type === SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED
+      source.type === SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED ||
+      source.type === SOURCE_TYPE_INFLUX_V3_SERVERLESS
     ) {
       return source.type
     }
@@ -461,6 +467,9 @@ class SourceStep extends PureComponent<Props, State> {
         this.changeSourceType(value, '3.x')
         break
       case SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED:
+        this.changeSourceType(value, 'cloud')
+        break
+      case SOURCE_TYPE_INFLUX_V3_SERVERLESS:
         this.changeSourceType(value, 'cloud')
         break
       case SOURCE_TYPE_INFLUX_V1:

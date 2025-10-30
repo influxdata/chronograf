@@ -109,13 +109,16 @@ const (
 	InfluxDBv3Clustered = "influx-v3-clustered"
 	// InfluxDBv3CloudDedicated is InfluxDB Cloud Dedicated (fully-managed)
 	InfluxDBv3CloudDedicated = "influx-v3-cloud-dedicated"
+	// InfluxDBv3Serverless is InfluxDB Cloud Serverless (fully-managed)
+	InfluxDBv3Serverless = "influx-v3-serverless"
 )
 
 func IsV3SrcType(srcType string) bool {
 	return srcType == InfluxDBv3Core ||
 		srcType == InfluxDBv3Enterprise ||
 		srcType == InfluxDBv3Clustered ||
-		srcType == InfluxDBv3CloudDedicated
+		srcType == InfluxDBv3CloudDedicated ||
+		srcType == InfluxDBv3Serverless
 }
 
 // TSDBStatus represents the current status of a time series database

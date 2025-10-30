@@ -46,6 +46,11 @@ type authenticationResponse struct {
 }
 
 func sourceAuthenticationMethod(ctx context.Context, src chronograf.Source) authenticationResponse {
+	// Check for Token authentication (v2 and v3 Serverless)
+	if src.Type == chronograf.InfluxDBv2 || src.Type == chronograf.InfluxDBv3Serverless {
+		return authenticationResponse{ID: src.ID, AuthenticationMethod: "token"}
+	}
+
 	ldapEnabled := false
 	if src.MetaURL != "" {
 		authorizer := influx.DefaultAuthorization(&src)
@@ -522,7 +527,8 @@ func ValidSourceRequest(s *chronograf.Source, defaultOrgID string) error {
 			s.Type != chronograf.InfluxDBv3Core &&
 			s.Type != chronograf.InfluxDBv3Enterprise &&
 			s.Type != chronograf.InfluxDBv3Clustered &&
-			s.Type != chronograf.InfluxDBv3CloudDedicated {
+			s.Type != chronograf.InfluxDBv3CloudDedicated &&
+			s.Type != chronograf.InfluxDBv3Serverless {
 			return fmt.Errorf("invalid source type %s", s.Type)
 		}
 	}
@@ -540,6 +546,12 @@ func ValidSourceRequest(s *chronograf.Source, defaultOrgID string) error {
 	}
 
 	if s.Type == chronograf.InfluxDBv3Core || s.Type == chronograf.InfluxDBv3Enterprise {
+		if len(s.DatabaseToken) == 0 {
+			return fmt.Errorf("database token required")
+		}
+	}
+
+	if s.Type == chronograf.InfluxDBv3Serverless {
 		if len(s.DatabaseToken) == 0 {
 			return fmt.Errorf("database token required")
 		}

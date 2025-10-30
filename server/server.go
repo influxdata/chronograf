@@ -58,12 +58,12 @@ type Server struct {
 	Cert flags.Filename `long:"cert" description:"Path to PEM encoded public key certificate. " env:"TLS_CERTIFICATE"`
 	Key  flags.Filename `long:"key" description:"Path to private key associated with given certificate. " env:"TLS_PRIVATE_KEY"`
 
-	InfluxDBType                  string `long:"influxdb-type" value-name:"choice" choice:"influx" choice:"influx-enterprise" choice:"influx-relay" choice:"influx-v2" choice:"influx-v3-core" choice:"influx-v3-enterprise" choice:"influx-v3-clustered" choice:"influx-v3-cloud-dedicated" description:"InfluxDB server type instance" env:"INFLUXDB_TYPE"`
+	InfluxDBType                  string `long:"influxdb-type" value-name:"choice" choice:"influx" choice:"influx-enterprise" choice:"influx-relay" choice:"influx-v2" choice:"influx-v3-core" choice:"influx-v3-enterprise" choice:"influx-v3-clustered" choice:"influx-v3-cloud-dedicated" choice:"influx-v3-serverless" description:"InfluxDB server type instance" env:"INFLUXDB_TYPE"`
 	InfluxDBURL                   string `long:"influxdb-url" description:"Location of your InfluxDB instance" env:"INFLUXDB_URL"`
 	InfluxDBUsername              string `long:"influxdb-username" description:"Username for your InfluxDB instance" env:"INFLUXDB_USERNAME"`
 	InfluxDBPassword              string `long:"influxdb-password" description:"Password for your InfluxDB instance" env:"INFLUXDB_PASSWORD"`
 	InfluxDBOrg                   string `long:"influxdb-org" description:"Organization for your InfluxDB v2 instance" env:"INFLUXDB_ORG"`
-	InfluxDBToken                 string `long:"influxdb-token" description:"Token for your InfluxDB v2, v3 Core/Enterprise or Cloud Dedicated instance" env:"INFLUXDB_TOKEN"`
+	InfluxDBToken                 string `long:"influxdb-token" description:"Token for your InfluxDB v2, v3 Core/Enterprise, Cloud Dedicated or Serverless instance" env:"INFLUXDB_TOKEN"`
 	InfluxDBMgmtToken             string `long:"influxdb-mgmt-token" description:"Management token for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_MGMT_TOKEN"`
 	InfluxDBClusterID             string `long:"influxdb-cluster-id" description:"Cluster ID for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_CLUSTER_ID"`
 	InfluxDBAccountID             string `long:"influxdb-account-id" description:"Account ID for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_ACCOUNT_ID"`
