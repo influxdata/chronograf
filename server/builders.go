@@ -141,8 +141,8 @@ func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore, defaultOrgID str
 	if fs.InfluxDBURL != "" {
 		var influxdbType, username, password string
 		var clusterID, accountID, mgmtToken, dbToken, tagsCSVPath, defaultDB string
-		if fs.InfluxDBType == chronograf.InfluxDBv3Core || fs.InfluxDBType == chronograf.InfluxDBv3Enterprise {
-			// InfluxDB 3 Core, InfluxDB 3 Enterprise
+		if fs.InfluxDBType == chronograf.InfluxDBv3Core || fs.InfluxDBType == chronograf.InfluxDBv3Enterprise || fs.InfluxDBType == chronograf.InfluxDBv3Serverless {
+			// InfluxDB 3 Core, InfluxDB 3 Enterprise, InfluxDB 3 Serverless
 			influxdbType = fs.InfluxDBType
 			dbToken = fs.InfluxDBToken
 		} else if fs.InfluxDBType == chronograf.InfluxDBv3Clustered {

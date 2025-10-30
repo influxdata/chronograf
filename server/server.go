@@ -58,7 +58,7 @@ type Server struct {
 	Cert flags.Filename `long:"cert" description:"Path to PEM encoded public key certificate. " env:"TLS_CERTIFICATE"`
 	Key  flags.Filename `long:"key" description:"Path to private key associated with given certificate. " env:"TLS_PRIVATE_KEY"`
 
-	InfluxDBType                  string `long:"influxdb-type" value-name:"choice" choice:"influx" choice:"influx-enterprise" choice:"influx-relay" choice:"influx-v2" choice:"influx-v3-core" choice:"influx-v3-enterprise" choice:"influx-v3-clustered" choice:"influx-v3-cloud-dedicated" choice:"influx-v3-serverless" description:"InfluxDB server type instance" env:"INFLUXDB_TYPE"`
+	InfluxDBType                  string `long:"influxdb-type" description:"InfluxDB server type instance. Valid values: influx, influx-enterprise, influx-relay, influx-v2, influx-v3-core, influx-v3-enterprise, influx-v3-clustered, influx-v3-cloud-dedicated, influx-v3-serverless" env:"INFLUXDB_TYPE"`
 	InfluxDBURL                   string `long:"influxdb-url" description:"Location of your InfluxDB instance" env:"INFLUXDB_URL"`
 	InfluxDBUsername              string `long:"influxdb-username" description:"Username for your InfluxDB instance" env:"INFLUXDB_USERNAME"`
 	InfluxDBPassword              string `long:"influxdb-password" description:"Password for your InfluxDB instance" env:"INFLUXDB_PASSWORD"`
@@ -622,6 +622,33 @@ func (s *Server) Serve(ctx context.Context) {
 	go rotateSuperAdminNonce(ctx, s.NonceExpiration)
 
 	logger := clog.New(clog.ParseLevel(s.LogLevel))
+
+	// Validate InfluxDBType if provided
+	if s.InfluxDBType != "" {
+		validTypes := []string{
+			"influx",
+			"influx-enterprise",
+			"influx-relay",
+			"influx-v2",
+			"influx-v3-core",
+			"influx-v3-enterprise",
+			"influx-v3-clustered",
+			"influx-v3-cloud-dedicated",
+			"influx-v3-serverless",
+		}
+		isValid := false
+		for _, validType := range validTypes {
+			if s.InfluxDBType == validType {
+				isValid = true
+				break
+			}
+		}
+		if !isValid {
+			logger.Error("Invalid --influxdb-type value. Valid values: influx, influx-enterprise, influx-relay, influx-v2, influx-v3-core, influx-v3-enterprise, influx-v3-clustered, influx-v3-cloud-dedicated, influx-v3-serverless")
+			os.Exit(1)
+		}
+	}
+
 	customLinks, err := NewCustomLinks(s.CustomLinks)
 	if err != nil {
 		logger.
