@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/influx"
 )
 
 var _ chronograf.TimeSeries = &TimeSeries{}
@@ -25,7 +26,7 @@ type TimeSeries struct {
 }
 
 // New implements TimeSeriesClient
-func (t *TimeSeries) New(chronograf.Source, chronograf.Logger) (chronograf.TimeSeries, error) {
+func (t *TimeSeries) New(chronograf.Source, chronograf.Logger, influx.V3Config) (chronograf.TimeSeries, error) {
 	return t, nil
 }
 

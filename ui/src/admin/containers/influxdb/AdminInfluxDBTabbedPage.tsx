@@ -9,6 +9,7 @@ import {
   SOURCE_TYPE_INFLUX_V3_CLUSTERED,
   SOURCE_TYPE_INFLUX_V3_CORE,
   SOURCE_TYPE_INFLUX_V3_ENTERPRISE,
+  SOURCE_TYPE_INFLUX_V3_SERVERLESS,
 } from 'src/shared/constants'
 
 interface Props {
@@ -29,7 +30,8 @@ export function isV3Source(source: Source) {
     source.type === SOURCE_TYPE_INFLUX_V3_CORE ||
     source.type === SOURCE_TYPE_INFLUX_V3_ENTERPRISE ||
     source.type === SOURCE_TYPE_INFLUX_V3_CLUSTERED ||
-    source.type === SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED
+    source.type === SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED ||
+    source.type === SOURCE_TYPE_INFLUX_V3_SERVERLESS
   )
 }
 
