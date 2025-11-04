@@ -89,6 +89,12 @@ func (c *Client) queryV3(u *url.URL, q chronograf.Query) (chronograf.Response, e
 			cmd = stmt.String()
 			logs.WithField("command", cmd).Debug("time condition added to SHOW TAG VALUES query")
 		}
+	case *influxql.ShowRetentionPoliciesStatement:
+		// Clear ON <database> modifier from `SHOW RETENTION POLICIES` since not supported in v3
+		if clearOnModifier(s) {
+			cmd = stmt.String()
+			logs.WithField("command", cmd).Debug("ON modifier cleared from SHOW RETENTION POLICIES query")
+		}
 	}
 
 	// Query parameters
@@ -190,6 +196,7 @@ func processV1Response(responseBody []byte) (chronograf.Response, error) {
 func clearMeasurementRP(source influxql.Source) bool {
 	if mm, ok := source.(*influxql.Measurement); ok && mm.RetentionPolicy != "" {
 		mm.RetentionPolicy = ""
+		mm.Database = ""
 		return true
 	}
 	return false
@@ -242,6 +249,16 @@ func parseDatabaseNameFromStatement(stmt influxql.Statement) string {
 	}
 
 	return ""
+}
+
+// clearOnModifier clears ON <database> modifiers from show retention policies in the source.
+// Returns true if the retention policy was cleared.
+func clearOnModifier(stmt influxql.Statement) bool {
+	if mm, ok := stmt.(*influxql.ShowRetentionPoliciesStatement); ok && mm.Database != "" {
+		mm.Database = ""
+		return true
+	}
+	return false
 }
 
 // buildSeriesResponse creates a standardized InfluxQL response with multiple series
