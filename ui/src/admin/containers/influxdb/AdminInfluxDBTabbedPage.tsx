@@ -4,13 +4,7 @@ import SubSections from 'src/shared/components/SubSections'
 import {Source, SourceAuthenticationMethod} from 'src/types'
 import {PageSection} from 'src/types/shared'
 import {WrapToPage} from './AdminInfluxDBScopedPage'
-import {
-  SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED,
-  SOURCE_TYPE_INFLUX_V3_CLUSTERED,
-  SOURCE_TYPE_INFLUX_V3_CORE,
-  SOURCE_TYPE_INFLUX_V3_ENTERPRISE,
-  SOURCE_TYPE_INFLUX_V3_SERVERLESS,
-} from 'src/shared/constants'
+import {isV3Source} from 'src/shared/constants'
 
 interface Props {
   source: Source
@@ -23,16 +17,6 @@ export function hasRoleManagement(source: Source) {
 }
 export function isConnectedToLDAP(source: Source) {
   return source.authentication === SourceAuthenticationMethod.LDAP
-}
-
-export function isV3Source(source: Source) {
-  return (
-    source.type === SOURCE_TYPE_INFLUX_V3_CORE ||
-    source.type === SOURCE_TYPE_INFLUX_V3_ENTERPRISE ||
-    source.type === SOURCE_TYPE_INFLUX_V3_CLUSTERED ||
-    source.type === SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED ||
-    source.type === SOURCE_TYPE_INFLUX_V3_SERVERLESS
-  )
 }
 
 export const AdminTabs = ({

@@ -48,6 +48,7 @@ func main() {
 				code = 0
 			}
 		}
+		fmt.Printf("Error: %s\n", err)
 		os.Exit(code)
 	}
 

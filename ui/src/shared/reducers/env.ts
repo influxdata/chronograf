@@ -4,6 +4,7 @@ import {Env} from 'src/types/'
 const initialState: Env = {
   telegrafSystemInterval: '1m',
   hostPageDisabled: false,
+  v3SupportEnabled: false,
 }
 
 const envReducer = (state = initialState, action: Action) => {
@@ -21,6 +22,14 @@ const envReducer = (state = initialState, action: Action) => {
       return {
         ...state,
         hostPageDisabled,
+      }
+    }
+
+    case ActionTypes.SetV3SupportEnabled: {
+      const {v3SupportEnabled} = action.payload
+      return {
+        ...state,
+        v3SupportEnabled,
       }
     }
 

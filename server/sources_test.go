@@ -14,7 +14,6 @@ import (
 	"github.com/bouk/httprouter"
 	"github.com/google/go-cmp/cmp"
 	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/influx"
 	"github.com/influxdata/chronograf/log"
 	"github.com/influxdata/chronograf/mocks"
 )
@@ -1106,7 +1105,7 @@ func TestService_UpdateSource(t *testing.T) {
 				OrganizationsStore: tt.fields.OrganizationsStore,
 			},
 			Logger: tt.fields.Logger,
-			V3Config: influx.V3Config{
+			V3Config: chronograf.V3Config{
 				CloudDedicatedManagementURL: ts.URL,
 			},
 		}

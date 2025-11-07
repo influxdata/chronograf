@@ -14,7 +14,8 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {RemoteDataState, Source} from 'src/types'
-import {isConnectedToLDAP, isV3Source} from './AdminInfluxDBTabbedPage'
+import {isConnectedToLDAP} from './AdminInfluxDBTabbedPage'
+import {isV3Source} from 'src/shared/constants'
 
 const mapDispatchToProps = {
   loadUsers: loadUsersAsync,

@@ -17,7 +17,8 @@ import {
 } from 'src/shared/copy/notifications'
 import {Source} from 'src/types'
 import {Database, RetentionPolicy} from 'src/types/influxAdmin'
-import AdminInfluxDBTabbedPage, {isV3Source} from './AdminInfluxDBTabbedPage'
+import AdminInfluxDBTabbedPage from './AdminInfluxDBTabbedPage'
+import {isV3Source} from 'src/shared/constants'
 
 interface Props {
   source: Source

@@ -48,7 +48,7 @@ type Client struct {
 	SrcType            string
 	Logger             chronograf.Logger
 	DefaultDB          string
-	V3Config           V3Config
+	V3Config           chronograf.V3Config
 
 	csvTagsStore *CSVTagsStore // (optional) Store to load CSV tag files from source.TagsCSVPath directory
 }

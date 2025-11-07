@@ -48,7 +48,10 @@ import {getMeAsync} from 'src/shared/actions/auth'
 import {disablePresentationMode} from 'src/shared/actions/app'
 import {errorThrown} from 'src/shared/actions/errors'
 import {notify} from 'src/shared/actions/notifications'
-import {setHostPageDisplayStatus} from 'src/shared/actions/env'
+import {
+  setHostPageDisplayStatus,
+  setV3SupportEnabled,
+} from 'src/shared/actions/env'
 import {TimeMachineContextProvider} from 'src/shared/utils/TimeMachineContext'
 
 import {getEnv} from 'src/shared/apis/env'
@@ -115,6 +118,7 @@ const populateEnv = async url => {
   try {
     const envVars = await getEnv(url)
     dispatch(setHostPageDisplayStatus(envVars.hostPageDisabled))
+    dispatch(setV3SupportEnabled(envVars.v3SupportEnabled))
     setCustomAutoRefreshOptions(envVars.customAutoRefresh)
   } catch (error) {
     console.error('Error fetching envVars', error)

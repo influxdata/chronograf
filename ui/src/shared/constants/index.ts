@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-import {TemplateValueType, TemplateType, Template} from 'src/types'
+import {TemplateValueType, TemplateType, Template, Source} from 'src/types'
 import {CellType} from 'src/types/dashboards'
 
 export const VERSION = process.env.APP_VERSION
@@ -533,6 +533,16 @@ export const SOURCE_TYPE_INFLUX_V3_ENTERPRISE = 'influx-v3-enterprise'
 export const SOURCE_TYPE_INFLUX_V3_CLUSTERED = 'influx-v3-clustered'
 export const SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED = 'influx-v3-cloud-dedicated'
 export const SOURCE_TYPE_INFLUX_V3_SERVERLESS = 'influx-v3-serverless'
+
+export const isV3Source = (source: Partial<Source>): boolean => {
+  return (
+    source.type === SOURCE_TYPE_INFLUX_V3_CORE ||
+    source.type === SOURCE_TYPE_INFLUX_V3_ENTERPRISE ||
+    source.type === SOURCE_TYPE_INFLUX_V3_CLUSTERED ||
+    source.type === SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED ||
+    source.type === SOURCE_TYPE_INFLUX_V3_SERVERLESS
+  )
+}
 
 export enum DataType {
   flux = 'flux',

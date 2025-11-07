@@ -18,7 +18,7 @@ type Service struct {
 	SuperAdminProviderGroups superAdminProviderGroups
 	Env                      chronograf.Environment
 	Databases                chronograf.Databases
-	V3Config                 influx.V3Config
+	V3Config                 chronograf.V3Config
 }
 
 type superAdminProviderGroups struct {
@@ -28,7 +28,7 @@ type superAdminProviderGroups struct {
 // TimeSeriesClient returns the correct client for a time series database.
 // todo(glinton): should this be always reconnecting?
 type TimeSeriesClient interface {
-	New(chronograf.Source, chronograf.Logger, influx.V3Config) (chronograf.TimeSeries, error)
+	New(chronograf.Source, chronograf.Logger, chronograf.V3Config) (chronograf.TimeSeries, error)
 }
 
 // ErrorMessage is the error response format for all service errors
@@ -46,7 +46,7 @@ func (s *Service) TimeSeries(src chronograf.Source) (chronograf.TimeSeries, erro
 type InfluxClient struct{}
 
 // New creates a client to connect to OSS or enterprise
-func (c *InfluxClient) New(src chronograf.Source, logger chronograf.Logger, v3Config influx.V3Config) (chronograf.TimeSeries, error) {
+func (c *InfluxClient) New(src chronograf.Source, logger chronograf.Logger, v3Config chronograf.V3Config) (chronograf.TimeSeries, error) {
 	client := &influx.Client{
 		Logger:   logger,
 		V3Config: v3Config,

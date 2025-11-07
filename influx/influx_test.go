@@ -923,7 +923,7 @@ func Test_Influx_ValidateAuth_V3CloudDedicated(t *testing.T) {
 	defer ts.Close()
 
 	client, err := NewClient(ts.URL, log.New(log.DebugLevel))
-	client.V3Config = influx.V3Config{
+	client.V3Config = chronograf.V3Config{
 		CloudDedicatedManagementURL: ts.URL,
 		ClusteredAccountID:          "test-account-id",
 		ClusteredClusterID:          "test-cluster-id",
@@ -1062,7 +1062,7 @@ func Test_Influx_Authorization_V3Clustered(t *testing.T) {
 		DatabaseToken:   "test-token-clustered",
 		ManagementToken: "test-mgmt-token",
 	}
-	client.V3Config = influx.V3Config{
+	client.V3Config = chronograf.V3Config{
 		CloudDedicatedManagementURL: ts.URL,
 		ClusteredAccountID:          "test-account-id",
 		ClusteredClusterID:          "test-cluster-id",
@@ -1113,7 +1113,7 @@ func Test_Influx_Authorization_V3CloudDedicated(t *testing.T) {
 		AccountID:       "test-account-id",
 		ClusterID:       "test-cluster-id",
 	}
-	client.V3Config = influx.V3Config{
+	client.V3Config = chronograf.V3Config{
 		CloudDedicatedManagementURL: ts.URL,
 	}
 	client.Connect(context.Background(), source)

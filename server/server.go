@@ -73,6 +73,7 @@ type Server struct {
 	InfluxDBCloudDedicatedMgmtURL string `long:"influxdb-cloud-dedicated-mgmt-url" description:"Management URL for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_CLOUD_DEDICATED_MGMT_URL" default:"https://console.influxdata.com"`
 	InfluxDBClusteredClusterID    string `long:"influxdb-clustered-cluster-id" description:"Cluster ID for your InfluxDB v3 Clustered instance" env:"INFLUXDB_CLUSTERED_CLUSTER_ID" default:"11111111-1111-1111-1111-111111111111"`
 	InfluxDBClusteredAccountID    string `long:"influxdb-clustered-account-id" description:"Account ID for your InfluxDB v3 Clustered instance" env:"INFLUXDB_CLUSTERED_ACCOUNT_ID" default:"11111111-1111-1111-1111-111111111111"`
+	InfluxDBV3SupportEnabled      bool   `long:"influxdb-v3-support-enabled" description:"Enable InfluxDB v3 support" env:"INFLUXDB_V3_SUPPORT_ENABLED"`
 
 	KapacitorURL      string `long:"kapacitor-url" description:"Location of your Kapacitor instance" env:"KAPACITOR_URL"`
 	KapacitorUsername string `long:"kapacitor-username" description:"Username of your Kapacitor instance" env:"KAPACITOR_USERNAME"`
@@ -623,6 +624,7 @@ func (s *Server) Serve(ctx context.Context) {
 	go rotateSuperAdminNonce(ctx, s.NonceExpiration)
 
 	logger := clog.New(clog.ParseLevel(s.LogLevel))
+	logger.Info("Starting Chronograf ", s.BuildInfo.Version, s.BuildInfo.Commit)
 
 	// Validate InfluxDBType if provided
 	if s.InfluxDBType != "" {
@@ -706,7 +708,7 @@ func (s *Server) Serve(ctx context.Context) {
 	}
 
 	service := openService(ctx, db, s.newBuilders(logger), logger, s.useAuth(),
-		influx.V3Config{
+		chronograf.V3Config{
 			CloudDedicatedManagementURL: s.InfluxDBCloudDedicatedMgmtURL,
 			ClusteredAccountID:          s.InfluxDBClusteredAccountID,
 			ClusteredClusterID:          s.InfluxDBClusteredClusterID,
@@ -718,6 +720,7 @@ func (s *Server) Serve(ctx context.Context) {
 		TelegrafSystemInterval: s.TelegrafSystemInterval,
 		HostPageDisabled:       s.HostPageDisabled,
 		CustomAutoRefresh:      s.CustomAutoRefresh,
+		V3SupportEnabled:       s.InfluxDBV3SupportEnabled,
 	}
 
 	if !validBasepath(s.Basepath) {
@@ -840,7 +843,7 @@ func (s *Server) Serve(ctx context.Context) {
 		Info("Stopped serving chronograf at ", scheme, "://", listener.Addr())
 }
 
-func openService(ctx context.Context, db kv.Store, builder builders, logger chronograf.Logger, useAuth bool, v3Config influx.V3Config) Service {
+func openService(ctx context.Context, db kv.Store, builder builders, logger chronograf.Logger, useAuth bool, v3Config chronograf.V3Config) Service {
 	svc, err := kv.NewService(ctx, db, kv.WithLogger(logger))
 	if err != nil {
 		logger.Error("Unable to create kv service", err)

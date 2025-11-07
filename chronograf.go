@@ -121,6 +121,12 @@ func IsV3SrcType(srcType string) bool {
 		srcType == InfluxDBv3Serverless
 }
 
+type V3Config struct {
+	CloudDedicatedManagementURL string
+	ClusteredAccountID          string
+	ClusteredClusterID          string
+}
+
 // TSDBStatus represents the current status of a time series database
 type TSDBStatus interface {
 	// Connect will connect to the time series using the information in `Source`.
@@ -999,6 +1005,7 @@ type Environment struct {
 	TelegrafSystemInterval time.Duration `json:"telegrafSystemInterval"`
 	HostPageDisabled       bool          `json:"HostPageDisabled"`
 	CustomAutoRefresh      string        `json:"customAutoRefresh,omitempty"`
+	V3SupportEnabled       bool          `json:"v3SupportEnabled"`
 }
 
 // KVClient defines what each kv store should be capable of.
