@@ -35,7 +35,7 @@ func TestEnvironment(t *testing.T) {
 			wants: wants{
 				statusCode:  200,
 				contentType: "application/json",
-				body:        `{"links":{"self":"/chronograf/v1/env"},"telegrafSystemInterval":"1m0s","hostPageDisabled":false}`,
+				body:        `{"links":{"self":"/chronograf/v1/env"},"telegrafSystemInterval":"1m0s","hostPageDisabled":false,"v3SupportEnabled":false}`,
 			},
 		},
 		{
@@ -49,7 +49,20 @@ func TestEnvironment(t *testing.T) {
 			wants: wants{
 				statusCode:  200,
 				contentType: "application/json",
-				body:        `{"links":{"self":"/chronograf/v1/env"},"telegrafSystemInterval":"2m0s","hostPageDisabled":false,"customAutoRefresh": "500ms=500"}`,
+				body:        `{"links":{"self":"/chronograf/v1/env"},"telegrafSystemInterval":"2m0s","hostPageDisabled":false,"customAutoRefresh": "500ms=500","v3SupportEnabled":false}`,
+			},
+		},
+		{
+			name: "Get environment with V3SupportEnabled",
+			fields: fields{
+				Environment: chronograf.Environment{
+					V3SupportEnabled: true,
+				},
+			},
+			wants: wants{
+				statusCode:  200,
+				contentType: "application/json",
+				body:        `{"links":{"self":"/chronograf/v1/env"},"telegrafSystemInterval":"0s","hostPageDisabled":false,"v3SupportEnabled":true}`,
 			},
 		},
 	}
