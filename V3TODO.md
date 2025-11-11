@@ -3,12 +3,12 @@
 ## Features
 
 - [X] Support InfluxDB 3 Serverless
-- [ ] UI should have old UI look for default
-  - [ ] Enable new UI look from settings
+- [X] UI should have old UI look for default
+  - [X] Enable new UI look from settings
 
 ## Issues
 
-- [ ] List databases for Core in Explorer shows fewer dbs than with `show databases` manually
+- [X] List databases for Core in Explorer shows fewer dbs than with `show databases` manually
 - [X] Command line help print-out wrongly formated due to new v3 option:
 ```
 /influxdb-type:choice[influx|influx-enterprise|influx-relay|influx-v2|influx-v3-core|influx-v3-enterprise|influx-v3-cloud-dedicated]  
