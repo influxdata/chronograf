@@ -453,11 +453,14 @@ func (s *Service) UpdateSource(w http.ResponseWriter, r *http.Request) {
 	if req.Type != "" {
 		src.Type = req.Type
 	}
-	if req.Telegraf != "" {
-		src.Telegraf = req.Telegraf
-	}
+	src.Telegraf = req.Telegraf
 	src.DefaultRP = req.DefaultRP
 	src.DefaultDB = req.DefaultDB
+	src.ManagementToken = req.ManagementToken
+	src.DatabaseToken = req.DatabaseToken
+	src.ClusterID = req.ClusterID
+	src.AccountID = req.AccountID
+	src.TagsCSVPath = req.TagsCSVPath
 
 	defaultOrg, err := s.Store.Organizations(ctx).DefaultOrganization(ctx)
 	if err != nil {
@@ -478,20 +481,6 @@ func (s *Service) UpdateSource(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	src.Type = dbType
-
-	if req.ManagementToken != "" {
-		src.ManagementToken = req.ManagementToken
-	}
-	if req.DatabaseToken != "" {
-		src.DatabaseToken = req.DatabaseToken
-	}
-	if req.ClusterID != "" {
-		src.ClusterID = req.ClusterID
-	}
-	if req.AccountID != "" {
-		src.AccountID = req.AccountID
-	}
-	src.TagsCSVPath = req.TagsCSVPath
 
 	if err := s.validateCredentials(ctx, &src); err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), s.Logger)
