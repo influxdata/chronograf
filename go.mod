@@ -42,7 +42,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
-	github.com/eclipse/paho.mqtt.golang v1.2.0 // indirect
+	github.com/eclipse/paho.mqtt.golang v1.5.1 // indirect
 	github.com/form3tech-oss/jwt-go v3.2.2+incompatible // indirect
 	github.com/go-sql-driver/mysql v1.4.1 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
@@ -56,7 +56,7 @@ require (
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
-	github.com/gorilla/websocket v1.4.2 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2 // indirect
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.14.6 // indirect
