@@ -444,7 +444,7 @@ class SourceStep extends PureComponent<Props, State> {
 
   private get isEnterprise(): boolean {
     const {source} = this.state
-    return _.get(source, 'type', '').includes('enterprise')
+    return source.type === SOURCE_TYPE_INFLUX_V1_ENTERPRISE
   }
 
   private getServerTypeFromSource = (source: Partial<Source>): string => {
