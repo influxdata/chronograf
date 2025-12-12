@@ -101,6 +101,10 @@ func (c *Client) queryV3(u *url.URL, q chronograf.Query) (chronograf.Response, e
 	params := req.URL.Query()
 	params.Set("q", cmd)
 	params.Set("db", q.DB)
+	params.Set("epoch", "ms")
+	if q.Epoch != "" {
+		params.Set("epoch", q.Epoch)
+	}
 	req.URL.RawQuery = params.Encode()
 
 	// Authorization

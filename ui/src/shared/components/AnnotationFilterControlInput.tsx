@@ -16,7 +16,12 @@ interface State {
   shouldShowAllSuggestions: boolean
 }
 
-const lexographicOrder = (a: string, b: string) => a.localeCompare(b)
+const lexographicOrder = (a: string, b: string) => {
+  if (a) {
+    return a.localeCompare(b)
+  }
+  return 0
+}
 
 class AnnotationFilterControlInput extends PureComponent<Props, State> {
   public static getDerivedStateFromProps(props: Props, state: State) {
@@ -29,7 +34,9 @@ class AnnotationFilterControlInput extends PureComponent<Props, State> {
       return {filteredSuggestions}
     }
 
-    filteredSuggestions = filteredSuggestions.filter(v => v.includes(value))
+    filteredSuggestions = filteredSuggestions.filter(
+      v => v && v.includes(value)
+    )
 
     return {filteredSuggestions}
   }
