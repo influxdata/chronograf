@@ -19,7 +19,7 @@ require (
 	github.com/lestrrat-go/jwx/v2 v2.0.21
 	github.com/microcosm-cc/bluemonday v1.0.26
 	github.com/sergi/go-diff v1.1.0
-	github.com/sirupsen/logrus v1.7.0
+	github.com/sirupsen/logrus v1.8.3
 	github.com/stretchr/testify v1.9.0
 	go.etcd.io/bbolt v1.3.5
 	go.etcd.io/etcd/client/v3 v3.5.0-alpha.0
