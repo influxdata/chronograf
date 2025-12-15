@@ -27,7 +27,6 @@ const (
 	ErrSourceInvalid                   = Error("source is invalid")
 	ErrServerInvalid                   = Error("server is invalid")
 	ErrAlertNotFound                   = Error("alert not found")
-	ErrAuthentication                  = Error("user not authenticated")
 	ErrUninitialized                   = Error("client uninitialized. Call Open() method")
 	ErrInvalidAxis                     = Error("Unexpected axis in cell. Valid axes are 'x', 'y', and 'y2'")
 	ErrInvalidColorType                = Error("Invalid color type. Valid color types are 'min', 'max', 'threshold', 'text', and 'background'")
@@ -42,9 +41,6 @@ const (
 	ErrCannotDeleteDefaultOrganization = Error("cannot delete default organization")
 	ErrConfigNotFound                  = Error("cannot find configuration")
 	ErrAnnotationNotFound              = Error("annotation not found")
-	ErrInvalidCellOptionsText          = Error("invalid text wrapping option. Valid wrappings are 'truncate', 'wrap', and 'single line'")
-	ErrInvalidCellOptionsSort          = Error("cell options sortby cannot be empty'")
-	ErrInvalidCellOptionsColumns       = Error("cell options columns cannot be empty'")
 	ErrOrganizationConfigNotFound      = Error("could not find organization config")
 	ErrInvalidCellQueryType            = Error("invalid cell query type: must be 'flux' or 'influxql'")
 )
@@ -260,8 +256,6 @@ type TemplateQuery struct {
 type Response interface {
 	MarshalJSON() ([]byte, error)
 }
-
-//TODO use password instead of databaseToken
 
 // Source is connection information to a time-series data store.
 type Source struct {

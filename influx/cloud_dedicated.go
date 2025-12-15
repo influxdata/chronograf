@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 
@@ -75,7 +76,7 @@ func (c *Client) validateClusteredOrCloudDedicatedAuth(ctx context.Context) erro
 // Used for InfluxDB Clustered and InfluxDB Cloud Dedicated.
 func (c *Client) showDatabasesViaMgmtApi(ctx context.Context) (chronograf.Response, error) {
 	var dbNames []string
-	if c.MgmtURL == nil {
+	if c.DefaultDB != "" {
 		dbNames = []string{c.DefaultDB}
 	} else {
 		// Prepare request.
@@ -94,7 +95,9 @@ func (c *Client) showDatabasesViaMgmtApi(ctx context.Context) (chronograf.Respon
 			}
 			return nil, err
 		}
-		defer resp.Body.Close()
+		defer func(Body io.ReadCloser) {
+			_ = Body.Close()
+		}(resp.Body)
 
 		// Handle non-OK status.
 		if resp.StatusCode != http.StatusOK {
