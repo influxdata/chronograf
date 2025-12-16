@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/influxdata/influxdb/influxql"
 	"github.com/influxdata/kapacitor/client/v1"
 )
 
@@ -121,6 +122,7 @@ type V3Config struct {
 	CloudDedicatedManagementURL string
 	ClusteredAccountID          string
 	ClusteredClusterID          string
+	TimeConditionExpr           influxql.Expr // Parsed time condition for SHOW TAG VALUES queries
 }
 
 // TSDBStatus represents the current status of a time series database

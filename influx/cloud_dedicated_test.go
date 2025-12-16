@@ -14,9 +14,16 @@ import (
 
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/log"
+	"github.com/influxdata/influxdb/influxql"
 )
 
 func TestAppendTimeCondition(t *testing.T) {
+	// Define test time condition
+	testTimeCondition := "time > 0"
+	testTimeExpr, err := influxql.ParseExpr(testTimeCondition)
+	if err != nil {
+		t.Fatalf("Failed to parse test time condition: %v", err)
+	}
 
 	tests := []struct {
 		name     string
@@ -26,77 +33,77 @@ func TestAppendTimeCondition(t *testing.T) {
 		{
 			name:     "basic query without WHERE",
 			input:    `SHOW TAG VALUES FROM machine_data WITH KEY = "tagkey"`,
-			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + timeCondition,
+			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + testTimeCondition,
 		},
 		{
 			name:     "query without FROM clause",
 			input:    `SHOW TAG VALUES WITH KEY = "tagkey"`,
-			expected: `SHOW TAG VALUES WITH KEY = tagkey WHERE ` + timeCondition,
+			expected: `SHOW TAG VALUES WITH KEY = tagkey WHERE ` + testTimeCondition,
 		},
 		{
 			name:     "query with tag name with where in it",
 			input:    `SHOW TAG VALUES WITH KEY = "tag name with where in it"`,
-			expected: `SHOW TAG VALUES WITH KEY = "tag name with where in it" WHERE ` + timeCondition,
+			expected: `SHOW TAG VALUES WITH KEY = "tag name with where in it" WHERE ` + testTimeCondition,
 		},
 		{
 			name:     "query with quoted table name and retention policy",
 			input:    `SHOW TAG VALUES FROM "autogen"."machine_data" WITH KEY IN ("t1", "t2")`,
-			expected: `SHOW TAG VALUES FROM autogen.machine_data WITH KEY IN (t1, t2) WHERE ` + timeCondition,
+			expected: `SHOW TAG VALUES FROM autogen.machine_data WITH KEY IN (t1, t2) WHERE ` + testTimeCondition,
 		},
 		{
 			name:     "query with trailing semicolon",
 			input:    `SHOW TAG VALUES FROM machine_data WITH KEY = "tagkey";`,
-			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + timeCondition,
+			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + testTimeCondition,
 		},
 		{
 			name:     "query with existing WHERE clause",
-			input:    `SHOW TAG VALUES FROM machine_data WITH KEY = "tagkey" WHERE ` + timeCondition,
-			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + timeCondition,
+			input:    `SHOW TAG VALUES FROM machine_data WITH KEY = "tagkey" WHERE ` + testTimeCondition,
+			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + testTimeCondition,
 		},
 		{
 			name:     "query with existing WHERE clause (case insensitive)",
-			input:    `SHOW TAG VALUES FROM machine_data WITH KEY = "tagkey" where ` + timeCondition,
-			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + timeCondition,
+			input:    `SHOW TAG VALUES FROM machine_data WITH KEY = "tagkey" where ` + testTimeCondition,
+			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + testTimeCondition,
 		},
 		{
 			name:     "query with LIMIT clause",
 			input:    `SHOW TAG VALUES FROM machine_data WITH KEY = "tagkey" LIMIT 10`,
-			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + timeCondition + ` LIMIT 10`,
+			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + testTimeCondition + ` LIMIT 10`,
 		},
 		{
 			name:     "query with OFFSET clause",
 			input:    `SHOW TAG VALUES FROM machine_data WITH KEY = "tagkey" OFFSET 5`,
-			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + timeCondition + ` OFFSET 5`,
+			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + testTimeCondition + ` OFFSET 5`,
 		},
 		{
 			name:     "query with LIMIT and OFFSET",
 			input:    `SHOW TAG VALUES FROM machine_data WITH KEY = "tagkey" LIMIT 10 OFFSET 5`,
-			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + timeCondition + ` LIMIT 10 OFFSET 5`,
+			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + testTimeCondition + ` LIMIT 10 OFFSET 5`,
 		},
 		{
 			name:     "query with OFFSET and LIMIT (reverse order)",
 			input:    `SHOW TAG VALUES FROM machine_data WITH KEY = "tagkey" OFFSET 5 LIMIT 10`,
-			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + timeCondition + ` OFFSET 5`,
+			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + testTimeCondition + ` OFFSET 5`,
 		},
 		{
 			name:     "query with LIMIT and semicolon",
 			input:    `SHOW TAG VALUES FROM machine_data WITH KEY = "tagkey" LIMIT 10;`,
-			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + timeCondition + ` LIMIT 10`,
+			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + testTimeCondition + ` LIMIT 10`,
 		},
 		{
 			name:     "query with WHERE and LIMIT",
-			input:    `SHOW TAG VALUES FROM machine_data WITH KEY = "tagkey" WHERE ` + timeCondition + ` LIMIT 10`,
-			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + timeCondition + ` LIMIT 10`,
+			input:    `SHOW TAG VALUES FROM machine_data WITH KEY = "tagkey" WHERE ` + testTimeCondition + ` LIMIT 10`,
+			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + testTimeCondition + ` LIMIT 10`,
 		},
 		{
 			name:     "query with WHERE and semicolon",
-			input:    `SHOW TAG VALUES FROM machine_data WITH KEY = "tagkey" WHERE ` + timeCondition + `;`,
-			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + timeCondition,
+			input:    `SHOW TAG VALUES FROM machine_data WITH KEY = "tagkey" WHERE ` + testTimeCondition + `;`,
+			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE ` + testTimeCondition,
 		},
 		{
 			name:     "query with existing WHERE clause but no time condition",
 			input:    `SHOW TAG VALUES FROM machine_data WITH KEY = "tagkey" WHERE "host" = 'server1'`,
-			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE host = 'server1' AND ` + timeCondition,
+			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = tagkey WHERE host = 'server1' AND ` + testTimeCondition,
 		},
 		{
 			name:     "query with complex WHERE clause containing time",
@@ -121,7 +128,7 @@ func TestAppendTimeCondition(t *testing.T) {
 		{
 			name:     "query with tag name containing spaces",
 			input:    `SHOW TAG VALUES FROM machine_data WITH KEY = "tag with spaces"`,
-			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = "tag with spaces" WHERE ` + timeCondition,
+			expected: `SHOW TAG VALUES FROM machine_data WITH KEY = "tag with spaces" WHERE ` + testTimeCondition,
 		},
 	}
 
@@ -136,7 +143,7 @@ func TestAppendTimeCondition(t *testing.T) {
 			}
 
 			// Apply appendTimeCondition to the parsed statement
-			appendTimeCondition(showStmt)
+			appendTimeCondition(showStmt, testTimeExpr)
 
 			// Convert back to string and compare
 			result := showStmt.String()

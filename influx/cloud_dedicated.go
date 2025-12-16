@@ -35,20 +35,6 @@ type cdListDatabasesError struct {
 	Message string `json:"message,omitempty"`
 }
 
-// TODO simon: make this expression configurable via environment variable
-// const timeCondition = "time > now() - 1d"
-const timeCondition = "time > 0"
-
-var timeExpr = mustParseExpr(timeCondition)
-
-func mustParseExpr(expr string) influxql.Expr {
-	exp, err := influxql.ParseExpr(expr)
-	if err != nil {
-		panic(fmt.Sprintf("failed to parse expression %q: %v", expr, err))
-	}
-	return exp
-}
-
 // validateClusteredOrCloudDedicatedAuth checks both the management endpoint and the database endpoint to validate authentication.
 // Used for InfluxDB Clustered and InfluxDB Cloud Dedicated.
 func (c *Client) validateClusteredOrCloudDedicatedAuth(ctx context.Context) error {
@@ -217,7 +203,7 @@ func (c *Client) handleShowTagValues(q *chronograf.Query, logs chronograf.Logger
 	} else {
 		// Call InfluxDB
 		logs.Info("Returning tag values from InfluxDB with time condition applied")
-		appendTimeCondition(stmt)
+		appendTimeCondition(stmt, c.V3Config.TimeConditionExpr)
 		q.Command = stmt.String()
 	}
 	return nil, nil
@@ -249,9 +235,14 @@ func parseShowTagKeysStatement(query string) (*influxql.ShowTagKeysStatement, er
 	return showStmt, nil
 }
 
-// appendTimeCondition appends a default "WHERE time > now() - 1d" clause to the provided SHOW TAG VALUES statement if no time condition exists.
+// appendTimeCondition appends a time condition clause to the provided SHOW TAG VALUES statement if no time condition exists.
 // Returns true if the statement was modified.
-func appendTimeCondition(showStmt *influxql.ShowTagValuesStatement) bool {
+func appendTimeCondition(showStmt *influxql.ShowTagValuesStatement, timeExpr influxql.Expr) bool {
+	// If no time expression provided, do nothing
+	if timeExpr == nil {
+		return false
+	}
+
 	// Check if there's already a time condition in the WHERE clause
 	if showStmt.Condition != nil && hasTimeCondition(showStmt.Condition) {
 		// Already has a time condition, do nothing

@@ -85,7 +85,7 @@ func (c *Client) queryV3(u *url.URL, q chronograf.Query) (chronograf.Response, e
 	switch s := stmt.(type) {
 	case *influxql.ShowTagValuesStatement:
 		// Ensure time condition is added to `SHOW TAG VALUES` queries
-		if appendTimeCondition(s) {
+		if appendTimeCondition(s, c.V3Config.TimeConditionExpr) {
 			cmd = stmt.String()
 			logs.WithField("command", cmd).Debug("time condition added to SHOW TAG VALUES query")
 		}
