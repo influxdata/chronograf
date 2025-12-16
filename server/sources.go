@@ -547,13 +547,12 @@ func ValidSourceRequest(s *chronograf.Source, defaultOrgID string) error {
 	}
 
 	if s.Type == chronograf.InfluxDBv3Clustered {
-		if len(s.ManagementToken) == 0 {
-			return fmt.Errorf("management token required")
-		}
 		if len(s.DatabaseToken) == 0 {
 			return fmt.Errorf("database token required")
 		}
-		// TODO simon: make management token optional, similarly to Cloud Dedicated
+		if len(s.ManagementToken) == 0 && len(s.DefaultDB) == 0 {
+			return fmt.Errorf("management token or default database is required")
+		}
 	}
 
 	if s.Type == chronograf.InfluxDBv3CloudDedicated {

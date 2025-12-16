@@ -522,7 +522,36 @@ func Test_ValidSourceRequest(t *testing.T) {
 			},
 		},
 		{
-			name: "InfluxDB 3 Clustered - missing management token",
+			name: "InfluxDB 3 Clustered - default DB without management token",
+			args: args{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDBv3Clustered,
+					DatabaseToken:      "database-token",
+					URL:                "http://www.any.url.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					DefaultDB:          "defaultDB",
+					Telegraf:           "telegraf",
+				},
+			},
+			wants: wants{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDBv3Clustered,
+					DatabaseToken:      "database-token",
+					URL:                "http://www.any.url.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					DefaultDB:          "defaultDB",
+					Telegraf:           "telegraf",
+				},
+			},
+		},
+		{
+			name: "InfluxDB 3 Clustered - missing management token and default db",
 			args: args{
 				source: &chronograf.Source{
 					ID:                 1,
@@ -536,7 +565,7 @@ func Test_ValidSourceRequest(t *testing.T) {
 				},
 			},
 			wants: wants{
-				err: fmt.Errorf("management token required"),
+				err: fmt.Errorf("management token or default database is required"),
 			},
 		},
 		{

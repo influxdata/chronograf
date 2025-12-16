@@ -883,7 +883,10 @@ func Test_Influx_ValidateAuth_V3Clustered(t *testing.T) {
 		ManagementToken: "my-mgmt-token",
 	}
 
-	client.Connect(context.Background(), source)
+	err = client.Connect(context.Background(), source)
+	if err != nil {
+		t.Fatal("Unexpected error connecting client: err:", err)
+	}
 	err = client.ValidateAuth(context.Background(), source)
 	if err == nil {
 		t.Fatal("Expected error but nil")
@@ -893,6 +896,35 @@ func Test_Influx_ValidateAuth_V3Clustered(t *testing.T) {
 	}
 	if !mgmtAuthCalled {
 		t.Error("Expected management API to be called")
+	}
+
+	mgmtAuthCalled = false
+	client, err = NewClient(ts.URL, log.New(log.DebugLevel))
+	if err != nil {
+		t.Fatal("Unexpected error connecting client: err:", err)
+	}
+	source = &chronograf.Source{
+		URL:           ts.URL,
+		Type:          chronograf.InfluxDBv3Clustered,
+		DatabaseToken: "my-db-token",
+		DefaultDB:     "defaultdb",
+	}
+
+	err = client.Connect(context.Background(), source)
+	if err != nil {
+		t.Fatal("Unexpected error connecting client: err:", err)
+	}
+	if client.DefaultDB != "defaultdb" {
+		t.Errorf("Expected default DB to be 'defaultdb' but was: %v", client.DefaultDB)
+	}
+
+	err = client.ValidateAuth(context.Background(), source)
+	if err == nil {
+		t.Fatal("Expected error but nil")
+	}
+
+	if mgmtAuthCalled {
+		t.Error("Expected management API called")
 	}
 }
 
@@ -923,6 +955,9 @@ func Test_Influx_ValidateAuth_V3CloudDedicated(t *testing.T) {
 	defer ts.Close()
 
 	client, err := NewClient(ts.URL, log.New(log.DebugLevel))
+	if err != nil {
+		t.Fatal("Unexpected error connecting client: err:", err)
+	}
 	client.V3Config = chronograf.V3Config{
 		CloudDedicatedManagementURL: ts.URL,
 		ClusteredAccountID:          "test-account-id",
@@ -940,7 +975,10 @@ func Test_Influx_ValidateAuth_V3CloudDedicated(t *testing.T) {
 		ClusterID:       "test-cluster-id",
 	}
 
-	client.Connect(context.Background(), source)
+	err = client.Connect(context.Background(), source)
+	if err != nil {
+		t.Fatal("Unexpected error connecting client: err:", err)
+	}
 	err = client.ValidateAuth(context.Background(), source)
 	if err == nil {
 		t.Fatal("Expected error but nil")
@@ -951,6 +989,38 @@ func Test_Influx_ValidateAuth_V3CloudDedicated(t *testing.T) {
 	}
 	if !mgmtAuthCalled {
 		t.Error("Expected management API to be called")
+	}
+
+	mgmtAuthCalled = false
+	client, err = NewClient(ts.URL, log.New(log.DebugLevel))
+	if err != nil {
+		t.Fatal("Unexpected error connecting client: err:", err)
+	}
+	client.V3Config = chronograf.V3Config{
+		CloudDedicatedManagementURL: ts.URL,
+	}
+	source = &chronograf.Source{
+		URL:           ts.URL,
+		Type:          chronograf.InfluxDBv3CloudDedicated,
+		DatabaseToken: "my-db-token",
+		DefaultDB:     "defaultdb",
+	}
+
+	err = client.Connect(context.Background(), source)
+	if err != nil {
+		t.Fatal("Unexpected error connecting client: err:", err)
+	}
+	if client.DefaultDB != "defaultdb" {
+		t.Errorf("Expected default DB to be 'defaultdb' but was: %v", client.DefaultDB)
+	}
+
+	err = client.ValidateAuth(context.Background(), source)
+	if err == nil {
+		t.Fatal("Expected error but nil")
+	}
+
+	if mgmtAuthCalled {
+		t.Error("Expected management API called")
 	}
 }
 

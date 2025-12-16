@@ -277,7 +277,8 @@ class SourceStep extends PureComponent<Props, State> {
             onChange={this.onChangeInput('defaultRP')}
           />
         )}
-        {serverType === SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED && (
+        {(serverType === SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED ||
+          serverType === SOURCE_TYPE_INFLUX_V3_CLUSTERED) && (
           <WizardTextInput
             value={source.defaultDB}
             label="Default Database"

@@ -292,20 +292,22 @@ func (c *Client) Connect(ctx context.Context, src *chronograf.Source) error {
 
 	if src.Type == chronograf.InfluxDBv3Clustered {
 		// InfluxDB Clustered also provides a management API.
-		accountID := c.V3Config.ClusteredAccountID
-		clusterID := c.V3Config.ClusteredClusterID
-		baseURL := *c.URL
-		baseURL.Path = ""
-		baseURL.RawQuery = ""
-		mgmtUrl := fmt.Sprintf("%s/api/v0/accounts/%s/clusters/%s", baseURL.String(), accountID, clusterID)
-		if u, err = url.Parse(mgmtUrl); err != nil {
-			return err
+		if len(src.ManagementToken) > 0 {
+			accountID := c.V3Config.ClusteredAccountID
+			clusterID := c.V3Config.ClusteredClusterID
+			baseURL := *c.URL
+			baseURL.Path = ""
+			baseURL.RawQuery = ""
+			mgmtUrl := fmt.Sprintf("%s/api/v0/accounts/%s/clusters/%s", baseURL.String(), accountID, clusterID)
+			if u, err = url.Parse(mgmtUrl); err != nil {
+				return err
+			}
+			c.MgmtURL = u
+			c.MgmtAuthorizer = &BearerToken{
+				Token: src.ManagementToken,
+			}
 		}
-
-		c.MgmtURL = u
-		c.MgmtAuthorizer = &BearerToken{
-			Token: src.ManagementToken,
-		}
+		c.DefaultDB = src.DefaultDB
 	}
 
 	if src.Type == chronograf.InfluxDBv3CloudDedicated {
