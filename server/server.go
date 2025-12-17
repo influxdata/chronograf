@@ -75,7 +75,7 @@ type Server struct {
 	InfluxDBClusteredClusterID    string `long:"influxdb-clustered-cluster-id" description:"Cluster ID for your InfluxDB v3 Clustered instance" env:"INFLUXDB_CLUSTERED_CLUSTER_ID" default:"11111111-1111-1111-1111-111111111111"`
 	InfluxDBClusteredAccountID    string `long:"influxdb-clustered-account-id" description:"Account ID for your InfluxDB v3 Clustered instance" env:"INFLUXDB_CLUSTERED_ACCOUNT_ID" default:"11111111-1111-1111-1111-111111111111"`
 	InfluxDBV3SupportEnabled      bool   `long:"influxdb-v3-support-enabled" description:"Enable InfluxDB v3 support" env:"INFLUXDB_V3_SUPPORT_ENABLED"`
-	InfluxDBV3TimeCondition       string `long:"influxdb-v3-time-condition" description:"Time condition for SHOW TAG VALUES queries in InfluxDB v3 (e.g., 'time > now() - 1d')" env:"INFLUXDB_V3_TIME_CONDITION" default:"time > now() - 7d"`
+	InfluxDBV3TimeCondition       string `long:"influxdb-v3-time-condition" description:"Time condition for SHOW TAG VALUES queries in InfluxDB v3 (e.g., 'time > now() - 1d')" env:"INFLUXDB_V3_TIME_CONDITION" default:"time > now() - 1d"`
 
 	KapacitorURL      string `long:"kapacitor-url" description:"Location of your Kapacitor instance" env:"KAPACITOR_URL"`
 	KapacitorUsername string `long:"kapacitor-username" description:"Username of your Kapacitor instance" env:"KAPACITOR_USERNAME"`
@@ -718,7 +718,7 @@ func (s *Server) Serve(ctx context.Context) {
 				WithField("component", "server").
 				WithField("time_condition", s.InfluxDBV3TimeCondition).
 				Error(fmt.Errorf("invalid InfluxDB v3 time condition: %w", err))
-			os.Exit(1)
+			return
 		}
 		v3TimeConditionExpr = expr
 		logger.
