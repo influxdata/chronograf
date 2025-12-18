@@ -25,7 +25,7 @@ type TimeSeries struct {
 }
 
 // New implements TimeSeriesClient
-func (t *TimeSeries) New(chronograf.Source, chronograf.Logger) (chronograf.TimeSeries, error) {
+func (t *TimeSeries) New(chronograf.Source, chronograf.Logger, chronograf.V3Config) (chronograf.TimeSeries, error) {
 	return t, nil
 }
 

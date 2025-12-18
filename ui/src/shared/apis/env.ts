@@ -4,6 +4,7 @@ const DEFAULT_ENVS = {
   telegrafSystemInterval: '1m',
   hostPageDisabled: false,
   customAutoRefresh: undefined,
+  v3SupportEnabled: false,
 }
 
 export const getEnv = async url => {

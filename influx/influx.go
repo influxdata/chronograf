@@ -1,10 +1,12 @@
 package influx
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -40,8 +42,15 @@ func init() {
 type Client struct {
 	URL                *url.URL
 	Authorizer         Authorizer
+	MgmtURL            *url.URL   // (optional) URL for management API
+	MgmtAuthorizer     Authorizer // (optional) Authorizer for management API
 	InsecureSkipVerify bool
+	SrcType            string
 	Logger             chronograf.Logger
+	DefaultDB          string
+	V3Config           chronograf.V3Config
+
+	csvTagsStore *CSVTagsStore // (optional) Store to load CSV tag files from source.TagsCSVPath directory
 }
 
 // Response is a partial JSON decoded InfluxQL response used
@@ -107,7 +116,9 @@ func (c *Client) query(u *url.URL, q chronograf.Query) (chronograf.Response, err
 	defer resp.Body.Close()
 
 	var response responseType
-	dec := json.NewDecoder(resp.Body)
+	b, _ := io.ReadAll(resp.Body)
+	logs.Debug("JSON response from InfluxDB: ", string(b))
+	dec := json.NewDecoder(bytes.NewReader(b))
 	decErr := dec.Decode(&response)
 
 	if resp.StatusCode != http.StatusOK {
@@ -126,16 +137,6 @@ func (c *Client) query(u *url.URL, q chronograf.Query) (chronograf.Response, err
 		return nil, decErr
 	}
 
-	// If we don't have an error in our json response, and didn't get statusOK
-	// then send back an error
-	if resp.StatusCode != http.StatusOK && response.Err != "" {
-		logs.
-			WithField("influx_status", resp.StatusCode).
-			Error("Received non-200 response from influxdb")
-
-		return &response, fmt.Errorf("received status code %d from server",
-			resp.StatusCode)
-	}
 	return &response, nil
 }
 
@@ -149,9 +150,43 @@ type result struct {
 // include both the database and retention policy. In-flight requests can be
 // cancelled using the provided context.
 func (c *Client) Query(ctx context.Context, q chronograf.Query) (chronograf.Response, error) {
+	if c.SrcType == chronograf.InfluxDBv3Clustered || c.SrcType == chronograf.InfluxDBv3CloudDedicated {
+		logs := c.Logger.
+			WithField("component", "proxy").
+			WithField("command", q.Command)
+
+		cmdUpper := strings.ToUpper(q.Command)
+		switch {
+		case cmdUpper == "SHOW DATABASES":
+			return c.showDatabasesViaMgmtApi(ctx)
+
+		case strings.Contains(cmdUpper, "SHOW MEASUREMENTS"):
+			if resp, err := c.handleShowMeasurements(q, logs); resp != nil || err != nil {
+				return resp, err
+			}
+
+		case strings.Contains(cmdUpper, "SHOW TAG KEYS"):
+			if resp, err := c.handleShowTagKeys(q, logs); resp != nil || err != nil {
+				return resp, err
+			}
+		case strings.Contains(cmdUpper, "SHOW TAG VALUES"):
+			if resp, err := c.handleShowTagValues(&q, logs); resp != nil || err != nil {
+				return resp, err
+			}
+		}
+	}
+
 	resps := make(chan (result))
 	go func() {
-		resp, err := c.query(c.URL, q)
+		var resp chronograf.Response
+		var err error
+		if c.SrcType == chronograf.InfluxDBv3Core || c.SrcType == chronograf.InfluxDBv3Enterprise {
+			// v3 Core, v3 Enterprise
+			resp, err = c.queryV3(c.URL, q)
+		} else {
+			// v1, v2, v3 Clustered, v3 Cloud Dedicated
+			resp, err = c.query(c.URL, q)
+		}
 		resps <- result{resp, err}
 	}()
 
@@ -168,18 +203,23 @@ func (c *Client) ValidateAuth(ctx context.Context, src *chronograf.Source) error
 	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
 	defer cancel()
 
-	if src.Type == chronograf.InfluxDBv2 {
-		return c.validateAuthFlux(ctx, src)
+	// v3 Clustered, v3 Cloud Dedicated:
+	if src.Type == chronograf.InfluxDBv3Clustered || src.Type == chronograf.InfluxDBv3CloudDedicated {
+		return c.validateClusteredOrCloudDedicatedAuth(ctx)
 	}
-	// v1: use InfluxQL
+	// v2: use flux query
+	if src.Type == chronograf.InfluxDBv2 {
+		return c.validateV2Auth(ctx, src)
+	}
+	// v1, v3 Core, v3 Enterprise: use InfluxQL
 	if _, err := c.Query(ctx, chronograf.Query{Command: "SHOW DATABASES"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-// validateAuthFlux uses Flux query to validate token authentication
-func (c *Client) validateAuthFlux(ctx context.Context, src *chronograf.Source) error {
+// validateV2Auth uses Flux query to validate token authentication
+func (c *Client) validateV2Auth(ctx context.Context, src *chronograf.Source) error {
 	u, err := url.Parse(c.URL.String())
 	if err != nil {
 		return err
@@ -210,11 +250,15 @@ func (c *Client) validateAuthFlux(ctx context.Context, src *chronograf.Source) e
 		}
 	}
 
+	return c.executeRequest(err, req)
+}
+
+func (c *Client) executeRequest(err error, req *http.Request) error {
 	hc := &http.Client{}
 	hc.Transport = SharedTransport(c.InsecureSkipVerify)
 	resp, err := hc.Do(req)
 	if err != nil {
-		if err == context.DeadlineExceeded || err == context.Canceled {
+		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 			return chronograf.ErrUpstreamTimeout
 		}
 		return err
@@ -245,6 +289,48 @@ func (c *Client) Connect(ctx context.Context, src *chronograf.Source) error {
 	}
 
 	c.URL = u
+
+	if src.Type == chronograf.InfluxDBv3Clustered {
+		// InfluxDB Clustered also provides a management API.
+		if len(src.ManagementToken) > 0 {
+			accountID := c.V3Config.ClusteredAccountID
+			clusterID := c.V3Config.ClusteredClusterID
+			baseURL := *c.URL
+			baseURL.Path = ""
+			baseURL.RawQuery = ""
+			mgmtUrl := fmt.Sprintf("%s/api/v0/accounts/%s/clusters/%s", baseURL.String(), accountID, clusterID)
+			if u, err = url.Parse(mgmtUrl); err != nil {
+				return err
+			}
+			c.MgmtURL = u
+			c.MgmtAuthorizer = &BearerToken{
+				Token: src.ManagementToken,
+			}
+		}
+		c.DefaultDB = src.DefaultDB
+	}
+
+	if src.Type == chronograf.InfluxDBv3CloudDedicated {
+		if len(src.AccountID) > 0 {
+			// InfluxDB Cloud Dedicated also provides a management API.
+			mgmtUrl := fmt.Sprintf("%s/api/v0/accounts/%s/clusters/%s", c.V3Config.CloudDedicatedManagementURL, src.AccountID, src.ClusterID)
+			if u, err = url.Parse(mgmtUrl); err != nil {
+				return err
+			}
+
+			c.MgmtURL = u
+			c.MgmtAuthorizer = &BearerToken{
+				Token: src.ManagementToken,
+			}
+		}
+		c.DefaultDB = src.DefaultDB
+		if src.TagsCSVPath != "" {
+			if c.csvTagsStore, err = NewCSVTagsStore(src.TagsCSVPath, c.Logger); err != nil {
+				return err
+			}
+		}
+	}
+	c.SrcType = src.Type
 	return nil
 }
 
@@ -291,6 +377,10 @@ func (c *Client) pingTimeout(ctx context.Context) (string, string, error) {
 	}
 }
 
+type v3PingRespBody struct {
+	Version string `json:"version"`
+}
+
 type pingResult struct {
 	Version string
 	Type    string
@@ -326,28 +416,54 @@ func (c *Client) ping(u *url.URL) (string, string, error) {
 		return "", "", err
 	}
 
-	if resp.StatusCode != http.StatusNoContent {
-		var err = fmt.Errorf("%s", string(body))
+	if resp.StatusCode != http.StatusNoContent && resp.StatusCode != http.StatusOK {
+		var err = errors.New(string(body))
 		return "", "", err
 	}
 
-	version := resp.Header.Get("X-Influxdb-Build")
-	if version == "ENT" {
-		return version, chronograf.InfluxEnterprise, nil
+	if c.SrcType == chronograf.InfluxDBv3Core || c.SrcType == chronograf.InfluxDBv3Enterprise {
+		// Read the version from the body
+		if len(body) == 0 {
+			return "", "", fmt.Errorf("empty ping response body")
+		}
+		var b v3PingRespBody
+		err := json.Unmarshal(body, &b)
+		if err != nil {
+			return "", "", fmt.Errorf("failed to parse ping response body: %w", err)
+		}
+		if b.Version == "" {
+			return "", "", fmt.Errorf("missing version in ping response body")
+		}
+		return b.Version, c.SrcType, nil
 	}
-	version = resp.Header.Get("X-Influxdb-Version")
-	if strings.Contains(version, "-c") {
-		return version, chronograf.InfluxEnterprise, nil
-	} else if strings.Contains(version, "relay") {
-		return version, chronograf.InfluxRelay, nil
+
+	if !c.isV3SrcType() {
+		// Check the `X-Influxdb-Build` header
+		builds := resp.Header.Values("X-Influxdb-Build")
+		for _, build := range builds {
+			if build == "ENT" {
+				return build, chronograf.InfluxDBv1Enterprise, nil
+			}
+		}
 	}
+
+	// Read the version from the `X-Influxdb-Version` header
+	version := resp.Header.Get("X-Influxdb-Version")
+	if !c.isV3SrcType() && version != "" {
+		if strings.Contains(version, "-c") {
+			return version, chronograf.InfluxDBv1Enterprise, nil
+		} else if strings.Contains(version, "relay") {
+			return version, chronograf.InfluxDBv1Relay, nil
+		}
+	}
+
 	// Strip v prefix from version, some older '1.x' versions and also
 	// InfluxDB 2.2.0 return version in format vx.x.x
 	if strings.HasPrefix(version, "v") {
 		version = version[1:]
 	}
 
-	return version, chronograf.InfluxDB, nil
+	return version, c.SrcType, nil
 }
 
 // Write POSTs line protocol to a database and retention policy

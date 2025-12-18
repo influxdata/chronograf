@@ -11,6 +11,7 @@ type envResponse struct {
 	TelegrafSystemInterval string    `json:"telegrafSystemInterval"`
 	HostPageDisabled       bool      `json:"hostPageDisabled"`
 	CustomAutoRefresh      string    `json:"customAutoRefresh,omitempty"`
+	V3SupportEnabled       bool      `json:"v3SupportEnabled"`
 }
 
 func newEnvResponse(env chronograf.Environment) *envResponse {
@@ -21,6 +22,7 @@ func newEnvResponse(env chronograf.Environment) *envResponse {
 		TelegrafSystemInterval: env.TelegrafSystemInterval.String(),
 		HostPageDisabled:       env.HostPageDisabled,
 		CustomAutoRefresh:      env.CustomAutoRefresh,
+		V3SupportEnabled:       env.V3SupportEnabled,
 	}
 }
 

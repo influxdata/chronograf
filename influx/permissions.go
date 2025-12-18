@@ -123,6 +123,22 @@ func (r *showResults) RetentionPolicies(logger chronograf.Logger) []chronograf.R
 // parseRetentionPolicy validates and parses a retention policy row
 func parseRetentionPolicy(v []interface{}) (chronograf.RetentionPolicy, error) {
 	columns := len(v)
+
+	if columns == 1 {
+		// 1-column format: [name] -- returned by InfluxDB 3
+		if name, ok := v[0].(string); !ok {
+			return chronograf.RetentionPolicy{}, fmt.Errorf("column 0 (name) is not a string")
+		} else {
+			return chronograf.RetentionPolicy{
+				Name:          name,
+				Duration:      "0s",
+				ShardDuration: "0s",
+				Replication:   1,
+				Default:       false,
+			}, nil
+		}
+	}
+
 	if columns < 5 {
 		return chronograf.RetentionPolicy{}, fmt.Errorf("insufficient columns: expected at least 5, got %d", columns)
 	} else if name, ok := v[0].(string); !ok {

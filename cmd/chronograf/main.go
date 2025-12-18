@@ -43,10 +43,11 @@ func main() {
 
 	if _, err := parser.Parse(); err != nil {
 		code := 1
-		if fe, ok := err.(*flags.Error); ok {
-			if fe.Type == flags.ErrHelp {
-				code = 0
-			}
+		if fe, ok := err.(*flags.Error); ok && fe.Type == flags.ErrHelp {
+			code = 0
+		}
+		if code != 0 {
+			fmt.Printf("Error: %s\n", err)
 		}
 		os.Exit(code)
 	}

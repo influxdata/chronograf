@@ -1,5 +1,9 @@
 ## [unreleased]
 
+### Features
+
+1. [#6139](https://github.com/influxdata/chronograf/pull/6139): Add support for InfluxDB V3 
+
 ### Other
 
 1. [#6150](https://github.com/influxdata/chronograf/pull/6150): Upgrade golang to 1.25.3

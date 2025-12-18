@@ -129,6 +129,7 @@ class DatabaseRow extends Component {
       database,
       onDelete,
       isDeletable,
+      isEditable,
       isRFDisplayed,
     } = this.props
     const {isEditing} = this.state
@@ -233,6 +234,7 @@ class DatabaseRow extends Component {
           <button
             className="btn btn-xs btn-info table--show-on-row-hover"
             onClick={this.handleStartEdit}
+            disabled={!isEditable}
             data-test="edit-rp--button"
           >
             Edit
@@ -263,6 +265,7 @@ DatabaseRow.propTypes = {
     isEditing: bool,
   }),
   isDeletable: bool,
+  isEditable: bool,
   database: shape(),
   onRemove: func,
   onCreate: func,

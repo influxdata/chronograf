@@ -4,6 +4,7 @@ import SubSections from 'src/shared/components/SubSections'
 import {Source, SourceAuthenticationMethod} from 'src/types'
 import {PageSection} from 'src/types/shared'
 import {WrapToPage} from './AdminInfluxDBScopedPage'
+import {isV3Source} from 'src/shared/constants'
 
 interface Props {
   source: Source
@@ -27,6 +28,7 @@ export const AdminTabs = ({
   const sections = useMemo(() => {
     const hasRoles = hasRoleManagement(source)
     const isLDAP = isConnectedToLDAP(source)
+    const isV3 = isV3Source(source)
     return [
       {
         url: 'databases',
@@ -36,17 +38,17 @@ export const AdminTabs = ({
       {
         url: 'users',
         name: 'Users',
-        enabled: !isLDAP,
+        enabled: !isLDAP && !isV3,
       },
       {
         url: 'roles',
         name: 'Roles',
-        enabled: hasRoles && !isLDAP,
+        enabled: hasRoles && !isLDAP && !isV3,
       },
       {
         url: 'queries',
         name: 'Queries',
-        enabled: true,
+        enabled: !isV3,
       },
     ]
   }, [source])

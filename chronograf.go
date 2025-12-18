@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/influxdata/influxdb/influxql"
 	"github.com/influxdata/kapacitor/client/v1"
 )
 
@@ -27,7 +28,6 @@ const (
 	ErrSourceInvalid                   = Error("source is invalid")
 	ErrServerInvalid                   = Error("server is invalid")
 	ErrAlertNotFound                   = Error("alert not found")
-	ErrAuthentication                  = Error("user not authenticated")
 	ErrUninitialized                   = Error("client uninitialized. Call Open() method")
 	ErrInvalidAxis                     = Error("Unexpected axis in cell. Valid axes are 'x', 'y', and 'y2'")
 	ErrInvalidColorType                = Error("Invalid color type. Valid color types are 'min', 'max', 'threshold', 'text', and 'background'")
@@ -42,9 +42,6 @@ const (
 	ErrCannotDeleteDefaultOrganization = Error("cannot delete default organization")
 	ErrConfigNotFound                  = Error("cannot find configuration")
 	ErrAnnotationNotFound              = Error("annotation not found")
-	ErrInvalidCellOptionsText          = Error("invalid text wrapping option. Valid wrappings are 'truncate', 'wrap', and 'single line'")
-	ErrInvalidCellOptionsSort          = Error("cell options sortby cannot be empty'")
-	ErrInvalidCellOptionsColumns       = Error("cell options columns cannot be empty'")
 	ErrOrganizationConfigNotFound      = Error("could not find organization config")
 	ErrInvalidCellQueryType            = Error("invalid cell query type: must be 'flux' or 'influxql'")
 )
@@ -91,15 +88,42 @@ type Assets interface {
 
 // Supported time-series databases
 const (
-	// InfluxDB is the open-source time-series database
-	InfluxDB = "influx"
-	// InfluxEnteprise is the clustered HA time-series database
-	InfluxEnterprise = "influx-enterprise"
-	// InfluxRelay is the basic HA layer over InfluxDB
-	InfluxRelay = "influx-relay"
+	// InfluxDBv1 is InfluxDB OSS v1
+	InfluxDBv1 = "influx"
+	// InfluxDBv1Enterprise is InfluxDB v1 Enterprise (the clustered HA time-series database)
+	InfluxDBv1Enterprise = "influx-enterprise"
+	// InfluxDBv1Relay is the basic HA layer over InfluxDB v1
+	InfluxDBv1Relay = "influx-relay"
+
 	// InfluxDBv2 is Influx DB 2.x with Token authentication
 	InfluxDBv2 = "influx-v2"
+
+	// InfluxDBv3Core is InfluxDB 3 Core (self-managed)
+	InfluxDBv3Core = "influx-v3-core"
+	// InfluxDBv3Enterprise is InfluxDB 3 Enterprise (self-managed)
+	InfluxDBv3Enterprise = "influx-v3-enterprise"
+	// InfluxDBv3Clustered is InfluxDB Clustered (self-managed)
+	InfluxDBv3Clustered = "influx-v3-clustered"
+	// InfluxDBv3CloudDedicated is InfluxDB Cloud Dedicated (fully-managed)
+	InfluxDBv3CloudDedicated = "influx-v3-cloud-dedicated"
+	// InfluxDBv3Serverless is InfluxDB Cloud Serverless (fully-managed)
+	InfluxDBv3Serverless = "influx-v3-serverless"
 )
+
+func IsV3SrcType(srcType string) bool {
+	return srcType == InfluxDBv3Core ||
+		srcType == InfluxDBv3Enterprise ||
+		srcType == InfluxDBv3Clustered ||
+		srcType == InfluxDBv3CloudDedicated ||
+		srcType == InfluxDBv3Serverless
+}
+
+type V3Config struct {
+	CloudDedicatedManagementURL string
+	ClusteredAccountID          string
+	ClusteredClusterID          string
+	TimeConditionExpr           influxql.Expr // Parsed time condition for SHOW TAG VALUES queries
+}
 
 // TSDBStatus represents the current status of a time series database
 type TSDBStatus interface {
@@ -243,6 +267,11 @@ type Source struct {
 	Username           string `json:"username,omitempty"`           // Username is the username to connect to the source
 	Password           string `json:"password,omitempty"`           // Password is in CLEARTEXT
 	SharedSecret       string `json:"sharedSecret,omitempty"`       // ShareSecret is the optional signing secret for Influx JWT authorization
+	ClusterID          string `json:"clusterId,omitempty"`          // ClusterID is the cluster ID for InfluxDB Cloud Dedicated sources
+	AccountID          string `json:"accountId,omitempty"`          // AccountID is the account ID for InfluxDB Cloud Dedicated sources
+	ManagementToken    string `json:"managementToken,omitempty"`    // ManagementToken is the management token for InfluxDB Cloud Dedicated sources
+	DatabaseToken      string `json:"databaseToken,omitempty"`      // DatabaseToken is the database token for InfluxDB Cloud Dedicated or other InfluxDB 3 sources
+	TagsCSVPath        string `json:"tagsCSVPath,omitempty"`        // TagsCSVPath is the path to a directory containing CSV files (per db) with tags for InfluxDB Cloud Dedicated sources
 	URL                string `json:"url"`                          // URL are the connections to the source
 	MetaURL            string `json:"metaUrl,omitempty"`            // MetaURL is the url for the meta node
 	InsecureSkipVerify bool   `json:"insecureSkipVerify,omitempty"` // InsecureSkipVerify as true means any certificate presented by the source is accepted.
@@ -251,6 +280,7 @@ type Source struct {
 	Organization       string `json:"organization"`                 // Organization is the organization ID that resource belongs to
 	Role               string `json:"role,omitempty"`               // Not Currently Used. Role is the name of the minimum role that a user must possess to access the resource.
 	DefaultRP          string `json:"defaultRP"`                    // DefaultRP is the default retention policy used in database queries to this source
+	DefaultDB          string `json:"defaultDB,omitempty"`          // DefaultDB is the default database used in queries for InfluxDB Cloud Dedicated when database list is not available
 	Version            string `json:"version,omitempty"`            // Version of influxdb
 }
 
@@ -971,6 +1001,7 @@ type Environment struct {
 	TelegrafSystemInterval time.Duration `json:"telegrafSystemInterval"`
 	HostPageDisabled       bool          `json:"HostPageDisabled"`
 	CustomAutoRefresh      string        `json:"customAutoRefresh,omitempty"`
+	V3SupportEnabled       bool          `json:"v3SupportEnabled"`
 }
 
 // KVClient defines what each kv store should be capable of.

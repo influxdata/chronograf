@@ -16,11 +16,17 @@ export interface Source {
   username?: string
   password?: string
   sharedSecret?: string
+  clusterId?: string
+  accountId?: string
+  managementToken?: string
+  databaseToken?: string
+  tagsCSVPath?: string
   url: string
   metaUrl?: string
   insecureSkipVerify: boolean
   default: boolean
   telegraf: string
+  defaultDB?: string
   organization: string
   role: string
   defaultRP: string

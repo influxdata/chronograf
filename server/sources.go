@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/influxdata/chronograf/enterprise"
 	"github.com/influxdata/chronograf/flux"
 
@@ -45,6 +46,11 @@ type authenticationResponse struct {
 }
 
 func sourceAuthenticationMethod(ctx context.Context, src chronograf.Source) authenticationResponse {
+	// Check for Token authentication (v2 and v3 Serverless)
+	if src.Type == chronograf.InfluxDBv2 || src.Type == chronograf.InfluxDBv3Serverless {
+		return authenticationResponse{ID: src.ID, AuthenticationMethod: "token"}
+	}
+
 	ldapEnabled := false
 	if src.MetaURL != "" {
 		authorizer := influx.DefaultAuthorization(&src)
@@ -76,6 +82,10 @@ func hasFlux(ctx context.Context, src chronograf.Source) (bool, error) {
 	// and a non-empty Organization (stored in Username)
 	if src.Version == "" /* v2 OSS reports no version */ || strings.HasPrefix(src.Version, "2.") {
 		return src.Type == chronograf.InfluxDBv2 && src.Username != "", nil
+	}
+	if chronograf.IsV3SrcType(src.Type) {
+		// InfluxDB 3 doesn't support Flux.
+		return false, nil
 	}
 
 	url, err := url.ParseRequestURI(src.URL)
@@ -134,7 +144,7 @@ func newSourceResponse(ctx context.Context, src chronograf.Source) sourceRespons
 	// MetaURL is currently a string, but eventually, we'd like to change it
 	// to a slice. Checking len(src.MetaURL) is functionally equivalent to
 	// checking if it is equal to the empty string.
-	if src.Type == chronograf.InfluxEnterprise && len(src.MetaURL) != 0 {
+	if src.Type == chronograf.InfluxDBv1Enterprise && len(src.MetaURL) != 0 {
 		res.Links.Roles = fmt.Sprintf("%s/%d/roles", httpAPISrcs, src.ID)
 	}
 	return res
@@ -208,7 +218,8 @@ func (s *Service) sourceVersion(ctx context.Context, src *chronograf.Source) str
 
 func (s *Service) tsdbVersion(ctx context.Context, src *chronograf.Source) (string, error) {
 	cli := &influx.Client{
-		Logger: s.Logger,
+		Logger:   s.Logger,
+		V3Config: s.V3Config,
 	}
 
 	if err := cli.Connect(ctx, src); err != nil {
@@ -222,8 +233,12 @@ func (s *Service) tsdbVersion(ctx context.Context, src *chronograf.Source) (stri
 }
 
 func (s *Service) tsdbType(ctx context.Context, src *chronograf.Source) (string, error) {
-	if src.Type == chronograf.InfluxDBv2 {
-		return chronograf.InfluxDBv2, nil // v2 selected by the user
+	if src.Type == chronograf.InfluxDBv2 ||
+		src.Type == chronograf.InfluxDBv3Core ||
+		src.Type == chronograf.InfluxDBv3Enterprise ||
+		src.Type == chronograf.InfluxDBv3Clustered ||
+		src.Type == chronograf.InfluxDBv3CloudDedicated {
+		return src.Type, nil // type selected by the user
 	}
 	cli := &influx.Client{
 		Logger: s.Logger,
@@ -241,7 +256,8 @@ func (s *Service) tsdbType(ctx context.Context, src *chronograf.Source) (string,
 
 func (s *Service) validateCredentials(ctx context.Context, src *chronograf.Source) error {
 	cli := &influx.Client{
-		Logger: s.Logger,
+		Logger:   s.Logger,
+		V3Config: s.V3Config,
 	}
 	if err := cli.Connect(ctx, src); err != nil {
 		return err
@@ -347,7 +363,8 @@ func (s *Service) SourceHealth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cli := &influx.Client{
-		Logger: s.Logger,
+		Logger:   s.Logger,
+		V3Config: s.V3Config,
 	}
 
 	if err := cli.Connect(ctx, &src); err != nil {
@@ -436,10 +453,14 @@ func (s *Service) UpdateSource(w http.ResponseWriter, r *http.Request) {
 	if req.Type != "" {
 		src.Type = req.Type
 	}
-	if req.Telegraf != "" {
-		src.Telegraf = req.Telegraf
-	}
+	src.Telegraf = req.Telegraf
 	src.DefaultRP = req.DefaultRP
+	src.DefaultDB = req.DefaultDB
+	src.ManagementToken = req.ManagementToken
+	src.DatabaseToken = req.DatabaseToken
+	src.ClusterID = req.ClusterID
+	src.AccountID = req.AccountID
+	src.TagsCSVPath = req.TagsCSVPath
 
 	defaultOrg, err := s.Store.Organizations(ctx).DefaultOrganization(ctx)
 	if err != nil {
@@ -488,10 +509,15 @@ func ValidSourceRequest(s *chronograf.Source, defaultOrgID string) error {
 	}
 	// Validate Type
 	if s.Type != "" {
-		if s.Type != chronograf.InfluxDB &&
+		if s.Type != chronograf.InfluxDBv1 &&
+			s.Type != chronograf.InfluxDBv1Enterprise &&
+			s.Type != chronograf.InfluxDBv1Relay &&
 			s.Type != chronograf.InfluxDBv2 &&
-			s.Type != chronograf.InfluxEnterprise &&
-			s.Type != chronograf.InfluxRelay {
+			s.Type != chronograf.InfluxDBv3Core &&
+			s.Type != chronograf.InfluxDBv3Enterprise &&
+			s.Type != chronograf.InfluxDBv3Clustered &&
+			s.Type != chronograf.InfluxDBv3CloudDedicated &&
+			s.Type != chronograf.InfluxDBv3Serverless {
 			return fmt.Errorf("invalid source type %s", s.Type)
 		}
 	}
@@ -506,6 +532,56 @@ func ValidSourceRequest(s *chronograf.Source, defaultOrgID string) error {
 	}
 	if len(url.Scheme) == 0 {
 		return fmt.Errorf("invalid URL; no URL scheme defined")
+	}
+
+	if s.Type == chronograf.InfluxDBv3Core || s.Type == chronograf.InfluxDBv3Enterprise {
+		if len(s.DatabaseToken) == 0 {
+			return fmt.Errorf("database token required")
+		}
+	}
+
+	if s.Type == chronograf.InfluxDBv3Serverless {
+		if len(s.DatabaseToken) == 0 {
+			return fmt.Errorf("database token required")
+		}
+	}
+
+	if s.Type == chronograf.InfluxDBv3Clustered {
+		if len(s.DatabaseToken) == 0 {
+			return fmt.Errorf("database token required")
+		}
+		if len(s.ManagementToken) == 0 && len(s.DefaultDB) == 0 {
+			return fmt.Errorf("management token or default database is required")
+		}
+	}
+
+	if s.Type == chronograf.InfluxDBv3CloudDedicated {
+		if len(s.DatabaseToken) == 0 {
+			return fmt.Errorf("database token required")
+		}
+		// ClusterID, AccountID, and ManagementToken are not required for InfluxDB 3 Cloud Dedicated
+		if len(s.ClusterID) == 0 && len(s.AccountID) == 0 && len(s.ManagementToken) == 0 {
+			if len(s.DefaultDB) == 0 {
+				return fmt.Errorf("default database is required for queries")
+			}
+			return nil
+		}
+		if len(s.ClusterID) == 0 {
+			return fmt.Errorf("cluster ID required")
+		}
+		if _, err := uuid.Parse(s.ClusterID); err != nil {
+			return fmt.Errorf("cluster ID is not a valid UUID")
+		}
+		if len(s.AccountID) == 0 {
+			return fmt.Errorf("account ID required")
+		}
+		if _, err := uuid.Parse(s.AccountID); err != nil {
+			return fmt.Errorf("account ID is not a valid UUID")
+		}
+		if len(s.ManagementToken) == 0 {
+			return fmt.Errorf("management token required")
+		}
+
 	}
 
 	return nil

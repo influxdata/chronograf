@@ -8,6 +8,7 @@ import _ from 'lodash'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import WizardTextInput from 'src/reusable_ui/components/wizard/WizardTextInput'
 import WizardCheckbox from 'src/reusable_ui/components/wizard/WizardCheckbox'
+import WizardDropdown from 'src/reusable_ui/components/wizard/WizardDropdown'
 
 // Actions
 import {
@@ -24,25 +25,31 @@ import {createSource, updateSource} from 'src/shared/apis'
 
 // Constants
 import {
-  notifySourceUpdateFailed,
-  notifySourceCreationFailed,
   notifySourceConnectionSucceeded,
+  notifySourceCreationFailed,
+  notifySourceUpdateFailed,
 } from 'src/shared/copy/notifications'
 import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
 import {
   DEFAULT_SOURCE,
-  SOURCE_TYPE_INFLUX_V2,
+  isV3Source,
   SOURCE_TYPE_INFLUX_V1,
+  SOURCE_TYPE_INFLUX_V1_ENTERPRISE,
+  SOURCE_TYPE_INFLUX_V1_RELAY,
+  SOURCE_TYPE_INFLUX_V2,
+  SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED,
+  SOURCE_TYPE_INFLUX_V3_CLUSTERED,
+  SOURCE_TYPE_INFLUX_V3_CORE,
+  SOURCE_TYPE_INFLUX_V3_ENTERPRISE,
+  SOURCE_TYPE_INFLUX_V3_SERVERLESS,
 } from 'src/shared/constants'
 import {SUPERADMIN_ROLE} from 'src/auth/roles'
 
 // Types
-import {Source, Me} from 'src/types'
+import {Me, Source, Env} from 'src/types'
 import {NextReturn} from 'src/types/wizard'
 
 const isNewSource = (source: Partial<Source>) => !source.id
-const isV2Auth = (source: Partial<Source>) =>
-  source.type && source.type === SOURCE_TYPE_INFLUX_V2
 
 interface Props {
   notify: typeof notifyAction
@@ -53,10 +60,12 @@ interface Props {
   onBoarding?: boolean
   me: Me
   isUsingAuth: boolean
+  env: Env
 }
 
 interface State {
   source: Partial<Source>
+  serverType?: string // server type dropdown value
 }
 
 class SourceStep extends PureComponent<Props, State> {
@@ -65,8 +74,10 @@ class SourceStep extends PureComponent<Props, State> {
   }
   constructor(props: Props) {
     super(props)
+    const source = this.props.source || DEFAULT_SOURCE
     this.state = {
-      source: this.props.source || DEFAULT_SOURCE,
+      source,
+      serverType: this.getServerTypeFromSource(source),
     }
   }
 
@@ -102,13 +113,51 @@ class SourceStep extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {source} = this.state
-    const {isUsingAuth, onBoarding} = this.props
-    const sourceIsV2 = isV2Auth(source)
-
+    const {source, serverType} = this.state
+    const {isUsingAuth, onBoarding, env} = this.props
+    const isV3 = isV3Source(source)
     return (
       <>
         {isUsingAuth && onBoarding && this.authIndicator}
+        {env.v3SupportEnabled && (
+          <WizardDropdown
+            label="Server Type"
+            placeholder="Select Server Type"
+            value={serverType}
+            options={[
+              {
+                value: SOURCE_TYPE_INFLUX_V1,
+                label: 'InfluxDB v1',
+              },
+              {
+                value: SOURCE_TYPE_INFLUX_V2,
+                label: 'InfluxDB v2',
+              },
+              {
+                value: SOURCE_TYPE_INFLUX_V3_CORE,
+                label: 'InfluxDB 3 Core',
+              },
+              {
+                value: SOURCE_TYPE_INFLUX_V3_ENTERPRISE,
+                label: 'InfluxDB 3 Enterprise',
+              },
+              {
+                value: SOURCE_TYPE_INFLUX_V3_CLUSTERED,
+                label: 'InfluxDB Clustered',
+              },
+              {
+                value: SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED,
+                label: 'InfluxDB Cloud Dedicated',
+              },
+              {
+                value: SOURCE_TYPE_INFLUX_V3_SERVERLESS,
+                label: 'InfluxDB Cloud Serverless',
+              },
+            ]}
+            onChange={this.handleServerTypeChange}
+            testId="server-type-selector--dropdown"
+          />
+        )}
         <WizardTextInput
           value={source.url}
           label="Connection URL"
@@ -123,32 +172,119 @@ class SourceStep extends PureComponent<Props, State> {
           onChange={this.onChangeInput('name')}
           testId="connection-name--input"
         />
-        <WizardTextInput
-          value={source.username}
-          label={sourceIsV2 ? 'Organization' : 'Username'}
-          onChange={this.onChangeInput('username')}
-          onSubmit={this.handleSubmitUsername}
-          testId="connection-username--input"
-        />
-        <WizardTextInput
-          value={source.password}
-          label={sourceIsV2 ? 'Token' : 'Password'}
-          placeholder={this.passwordPlaceholder}
-          type="password"
-          onChange={this.onChangeInput('password')}
-          onSubmit={this.handleSubmitPassword}
-          testId="connection-password--input"
-        />
+        {(serverType === SOURCE_TYPE_INFLUX_V1 ||
+          serverType === SOURCE_TYPE_INFLUX_V2) && (
+          <>
+            <WizardTextInput
+              value={source.username}
+              label={
+                serverType === SOURCE_TYPE_INFLUX_V2
+                  ? 'Organization'
+                  : 'Username'
+              }
+              onChange={this.onChangeInput('username')}
+              onSubmit={this.handleSubmitUsername}
+              testId="connection-username--input"
+            />
+            <WizardTextInput
+              value={source.password}
+              label={
+                serverType === SOURCE_TYPE_INFLUX_V2 ? 'Token' : 'Password'
+              }
+              placeholder={this.passwordPlaceholder}
+              type="password"
+              onChange={this.onChangeInput('password')}
+              onSubmit={this.handleSubmitPassword}
+              testId="connection-password--input"
+            />
+          </>
+        )}
+
+        {/* InfluxDB 3 Core/Enterprise/Serverless fields */}
+        {(serverType === SOURCE_TYPE_INFLUX_V3_CORE ||
+          serverType === SOURCE_TYPE_INFLUX_V3_ENTERPRISE ||
+          serverType === SOURCE_TYPE_INFLUX_V3_SERVERLESS) && (
+          <>
+            <WizardTextInput
+              value={source.databaseToken}
+              label={'Database Token'}
+              type="password"
+              onChange={this.onChangeInput('databaseToken')}
+            />
+          </>
+        )}
+
+        {/* InfluxDB Clustered fields */}
+        {serverType === SOURCE_TYPE_INFLUX_V3_CLUSTERED && (
+          <>
+            <WizardTextInput
+              value={source.managementToken}
+              label={'Management Token'}
+              type="password"
+              onChange={this.onChangeInput('managementToken')}
+            />
+            <WizardTextInput
+              value={source.databaseToken}
+              label={'Database Token'}
+              type="password"
+              onChange={this.onChangeInput('databaseToken')}
+            />
+          </>
+        )}
+
+        {/* InfluxDB Cloud Dedicated fields */}
+        {serverType === SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED && (
+          <>
+            <WizardTextInput
+              value={source.clusterId}
+              label={'Cluster ID'}
+              onChange={this.onChangeInput('clusterId')}
+            />
+            <WizardTextInput
+              value={source.accountId}
+              label={'Account ID'}
+              onChange={this.onChangeInput('accountId')}
+            />
+            <WizardTextInput
+              value={source.managementToken}
+              label={'Management Token'}
+              type="password"
+              onChange={this.onChangeInput('managementToken')}
+            />
+            <WizardTextInput
+              value={source.databaseToken}
+              label={'Database Token'}
+              type="password"
+              onChange={this.onChangeInput('databaseToken')}
+            />
+            <WizardTextInput
+              value={source.tagsCSVPath}
+              label={'Tags CSV Directory Path'}
+              onChange={this.onChangeInput('tagsCSVPath')}
+            />
+          </>
+        )}
+
         <WizardTextInput
           value={source.telegraf}
           label="Telegraf Database Name"
           onChange={this.onChangeInput('telegraf')}
         />
-        <WizardTextInput
-          value={source.defaultRP}
-          label="Default Retention Policy"
-          onChange={this.onChangeInput('defaultRP')}
-        />
+        {!isV3 && (
+          <WizardTextInput
+            value={source.defaultRP}
+            label="Default Retention Policy"
+            onChange={this.onChangeInput('defaultRP')}
+          />
+        )}
+        {(serverType === SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED ||
+          serverType === SOURCE_TYPE_INFLUX_V3_CLUSTERED) && (
+          <WizardTextInput
+            value={source.defaultDB}
+            label="Default Database"
+            onChange={this.onChangeInput('defaultDB')}
+          />
+        )}
         {this.isEnterprise && (
           <WizardTextInput
             value={source.metaUrl}
@@ -166,12 +302,14 @@ class SourceStep extends PureComponent<Props, State> {
             testId="default-connection--checkbox"
           />
         )}
-        <WizardCheckbox
-          halfWidth={!onBoarding}
-          isChecked={sourceIsV2}
-          text={'InfluxDB v2 Auth'}
-          onChange={this.changeAuth}
-        />
+        {!env.v3SupportEnabled && !isV3 && (
+          <WizardCheckbox
+            halfWidth={!onBoarding}
+            isChecked={serverType === SOURCE_TYPE_INFLUX_V2}
+            text={'InfluxDB v2 Auth'}
+            onChange={this.changeAuth}
+          />
+        )}
 
         {this.isHTTPS && (
           <WizardCheckbox
@@ -237,14 +375,26 @@ class SourceStep extends PureComponent<Props, State> {
     setError(false)
   }
   private changeAuth = (v2: boolean) => {
+    this.changeSourceType(
+      v2 ? SOURCE_TYPE_INFLUX_V2 : SOURCE_TYPE_INFLUX_V1,
+      v2 ? '2.x' : '1.x'
+    )
+  }
+
+  private changeSourceType = (type: string, version: string) => {
     const {source} = this.state
     this.setState({
+      serverType: type,
       source: {
         ...source,
         username: '',
         password: '',
-        type: v2 ? SOURCE_TYPE_INFLUX_V2 : SOURCE_TYPE_INFLUX_V1,
-        version: v2 ? '2.x' : '1.x',
+        clusterId: '',
+        accountId: '',
+        managementToken: '',
+        databaseToken: '',
+        type,
+        version,
       },
     })
   }
@@ -295,9 +445,61 @@ class SourceStep extends PureComponent<Props, State> {
 
   private get isEnterprise(): boolean {
     const {source} = this.state
-    return _.get(source, 'type', '').includes('enterprise')
+    return source.type === SOURCE_TYPE_INFLUX_V1_ENTERPRISE
+  }
+
+  private getServerTypeFromSource = (source: Partial<Source>): string => {
+    if (
+      source.type === SOURCE_TYPE_INFLUX_V1 ||
+      source.type === SOURCE_TYPE_INFLUX_V2 ||
+      source.type === SOURCE_TYPE_INFLUX_V3_CORE ||
+      source.type === SOURCE_TYPE_INFLUX_V3_ENTERPRISE ||
+      source.type === SOURCE_TYPE_INFLUX_V3_CLUSTERED ||
+      source.type === SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED ||
+      source.type === SOURCE_TYPE_INFLUX_V3_SERVERLESS
+    ) {
+      return source.type
+    }
+    if (
+      source.type === SOURCE_TYPE_INFLUX_V1_ENTERPRISE ||
+      source.type === SOURCE_TYPE_INFLUX_V1_RELAY
+    ) {
+      // Special v1 subtypes are displayed as v1
+      return SOURCE_TYPE_INFLUX_V1
+    }
+    return SOURCE_TYPE_INFLUX_V1
+  }
+
+  private handleServerTypeChange = (value: string) => {
+    switch (value) {
+      case SOURCE_TYPE_INFLUX_V2:
+        this.changeSourceType(value, '2.x')
+        break
+      case SOURCE_TYPE_INFLUX_V3_CORE:
+        this.changeSourceType(value, '3.x')
+        break
+      case SOURCE_TYPE_INFLUX_V3_ENTERPRISE:
+        this.changeSourceType(value, '3.x')
+        break
+      case SOURCE_TYPE_INFLUX_V3_CLUSTERED:
+        this.changeSourceType(value, '3.x')
+        break
+      case SOURCE_TYPE_INFLUX_V3_CLOUD_DEDICATED:
+        this.changeSourceType(value, 'cloud')
+        break
+      case SOURCE_TYPE_INFLUX_V3_SERVERLESS:
+        this.changeSourceType(value, 'cloud')
+        break
+      case SOURCE_TYPE_INFLUX_V1:
+      default:
+        this.changeSourceType(SOURCE_TYPE_INFLUX_V1, '1.x')
+    }
   }
 }
+
+const mstp = ({env}) => ({
+  env,
+})
 
 const mdtp = {
   notify: notifyAction,
@@ -305,6 +507,6 @@ const mdtp = {
   updateSource: updateSourceAction,
 }
 
-export default connect(null, mdtp, null, {forwardRef: true})(
+export default connect(mstp, mdtp, null, {forwardRef: true})(
   ErrorHandling(SourceStep)
 )

@@ -18,6 +18,7 @@ import {
 import {Source} from 'src/types'
 import {Database, RetentionPolicy} from 'src/types/influxAdmin'
 import AdminInfluxDBTabbedPage from './AdminInfluxDBTabbedPage'
+import {isV3Source} from 'src/shared/constants'
 
 interface Props {
   source: Source
@@ -135,11 +136,14 @@ class DatabaseManagerPage extends Component<Props> {
 
   render() {
     const {source, databases, actions} = this.props
+    const isDBReadOnly = isV3Source(source)
     return (
       <AdminInfluxDBTabbedPage activeTab="databases" source={source}>
         <DatabaseManager
           databases={databases}
           isRFDisplayed={!!source.metaUrl}
+          isDBReadOnly={isDBReadOnly}
+          isAddDBDisabled={isDBReadOnly || !!databases.some(db => db.isEditing)}
           addDatabase={actions.addDatabase}
           onEditDatabase={this.handleEditDatabase}
           onCancelDatabase={actions.removeDatabase}
@@ -149,7 +153,6 @@ class DatabaseManagerPage extends Component<Props> {
           onAddRetentionPolicy={this.handleAddRetentionPolicy}
           onRemoveDeleteCode={actions.removeDatabaseDeleteCode}
           onStartDeleteDatabase={this.handleStartDeleteDatabase}
-          isAddDBDisabled={!!databases.some(db => db.isEditing)}
           onRemoveRetentionPolicy={actions.removeRetentionPolicy}
           onDeleteRetentionPolicy={this.handleDeleteRetentionPolicy}
           onDatabaseDeleteConfirm={this.handleDatabaseDeleteConfirm}

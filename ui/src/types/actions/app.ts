@@ -15,6 +15,7 @@ export enum ActionTypes {
   SetTimeZone = 'SET_TIME_ZONE',
   SetTelegrafSystemInterval = 'SET_TELEGRAF_SYSTEM_INTERVAL',
   SetHostPageDisplayStatus = 'SET_HOST_PAGE_DISPLAY_STATUS',
+  SetV3SupportEnabled = 'SET_V3_SUPPORT_ENABLED',
 }
 
 export type Action =
@@ -26,6 +27,7 @@ export type Action =
   | SetTimeZoneAction
   | SetTelegrafSystemIntervalAction
   | SetHostPageDisplayStatusAction
+  | SetV3SupportEnabledAction
   | AddingAnnotationAction
   | SetAnnotationsDisplaySettingAction
 
@@ -81,5 +83,12 @@ export interface SetHostPageDisplayStatusAction {
   type: ActionTypes.SetHostPageDisplayStatus
   payload: {
     hostPageDisabled: boolean
+  }
+}
+
+export interface SetV3SupportEnabledAction {
+  type: ActionTypes.SetV3SupportEnabled
+  payload: {
+    v3SupportEnabled: boolean
   }
 }

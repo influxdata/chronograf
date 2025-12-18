@@ -18,6 +18,7 @@ type Service struct {
 	SuperAdminProviderGroups superAdminProviderGroups
 	Env                      chronograf.Environment
 	Databases                chronograf.Databases
+	V3Config                 chronograf.V3Config
 }
 
 type superAdminProviderGroups struct {
@@ -27,7 +28,7 @@ type superAdminProviderGroups struct {
 // TimeSeriesClient returns the correct client for a time series database.
 // todo(glinton): should this be always reconnecting?
 type TimeSeriesClient interface {
-	New(chronograf.Source, chronograf.Logger) (chronograf.TimeSeries, error)
+	New(chronograf.Source, chronograf.Logger, chronograf.V3Config) (chronograf.TimeSeries, error)
 }
 
 // ErrorMessage is the error response format for all service errors
@@ -38,21 +39,22 @@ type ErrorMessage struct {
 
 // TimeSeries returns a new client connected to a time series database
 func (s *Service) TimeSeries(src chronograf.Source) (chronograf.TimeSeries, error) {
-	return s.TimeSeriesClient.New(src, s.Logger)
+	return s.TimeSeriesClient.New(src, s.Logger, s.V3Config)
 }
 
 // InfluxClient returns a new client to connect to OSS or Enterprise
 type InfluxClient struct{}
 
 // New creates a client to connect to OSS or enterprise
-func (c *InfluxClient) New(src chronograf.Source, logger chronograf.Logger) (chronograf.TimeSeries, error) {
+func (c *InfluxClient) New(src chronograf.Source, logger chronograf.Logger, v3Config chronograf.V3Config) (chronograf.TimeSeries, error) {
 	client := &influx.Client{
-		Logger: logger,
+		Logger:   logger,
+		V3Config: v3Config,
 	}
 	if err := client.Connect(context.TODO(), &src); err != nil {
 		return nil, err
 	}
-	if src.Type == chronograf.InfluxEnterprise && src.MetaURL != "" {
+	if src.Type == chronograf.InfluxDBv1Enterprise && src.MetaURL != "" {
 		tls := strings.Contains(src.MetaURL, "https")
 		insecure := src.InsecureSkipVerify
 		return enterprise.NewClientWithTimeSeries(logger, src.MetaURL, influx.DefaultAuthorization(&src), tls, insecure, client)

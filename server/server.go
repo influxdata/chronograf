@@ -34,6 +34,7 @@ import (
 	"github.com/influxdata/chronograf/oauth2"
 	"github.com/influxdata/chronograf/server/config"
 	"github.com/influxdata/chronograf/util"
+	"github.com/influxdata/influxdb/influxql"
 	client "github.com/influxdata/usage-client/v1"
 	flags "github.com/jessevdk/go-flags"
 )
@@ -58,11 +59,23 @@ type Server struct {
 	Cert flags.Filename `long:"cert" description:"Path to PEM encoded public key certificate. " env:"TLS_CERTIFICATE"`
 	Key  flags.Filename `long:"key" description:"Path to private key associated with given certificate. " env:"TLS_PRIVATE_KEY"`
 
-	InfluxDBURL      string `long:"influxdb-url" description:"Location of your InfluxDB instance" env:"INFLUXDB_URL"`
-	InfluxDBUsername string `long:"influxdb-username" description:"Username for your InfluxDB instance" env:"INFLUXDB_USERNAME"`
-	InfluxDBPassword string `long:"influxdb-password" description:"Password for your InfluxDB instance" env:"INFLUXDB_PASSWORD"`
-	InfluxDBOrg      string `long:"influxdb-org" description:"Organization for your InfluxDB v2 instance" env:"INFLUXDB_ORG"`
-	InfluxDBToken    string `long:"influxdb-token" description:"Token for your InfluxDB v2 instance" env:"INFLUXDB_TOKEN"`
+	InfluxDBType      string `long:"influxdb-type" description:"InfluxDB server type instance. Valid values: influx, influx-enterprise, influx-relay, influx-v2, influx-v3-core, influx-v3-enterprise, influx-v3-clustered, influx-v3-cloud-dedicated, influx-v3-serverless" env:"INFLUXDB_TYPE"`
+	InfluxDBURL       string `long:"influxdb-url" description:"Location of your InfluxDB instance" env:"INFLUXDB_URL"`
+	InfluxDBUsername  string `long:"influxdb-username" description:"Username for your InfluxDB instance" env:"INFLUXDB_USERNAME"`
+	InfluxDBPassword  string `long:"influxdb-password" description:"Password for your InfluxDB instance" env:"INFLUXDB_PASSWORD"`
+	InfluxDBOrg       string `long:"influxdb-org" description:"Organization for your InfluxDB v2 instance" env:"INFLUXDB_ORG"`
+	InfluxDBToken     string `long:"influxdb-token" description:"Token for your InfluxDB v2, v3 Core/Enterprise, Cloud Dedicated or Serverless instance" env:"INFLUXDB_TOKEN"`
+	InfluxDBMgmtToken string `long:"influxdb-mgmt-token" description:"Management token for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_MGMT_TOKEN"`
+	InfluxDBClusterID string `long:"influxdb-cluster-id" description:"Cluster ID for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_CLUSTER_ID"`
+	InfluxDBAccountID string `long:"influxdb-account-id" description:"Account ID for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_ACCOUNT_ID"`
+	TagsCSVPath       string `long:"tags-csv-path" description:"Path to a directory containing CSV files (per db) with tags for InfluxDB v3 sources. Used to populate the tags field in Query Editor for your InfluxDB Cloud Dedicated instance." env:"TAGS_CSV_PATH"`
+	InfluxDBDefaultDB string `long:"influxdb-default-db" description:"Default database for your InfluxDB instance" env:"INFLUXDB_DEFAULT_DB"`
+
+	InfluxDBCloudDedicatedMgmtURL string `long:"influxdb-cloud-dedicated-mgmt-url" description:"Management URL for your InfluxDB Cloud Dedicated instance" env:"INFLUXDB_CLOUD_DEDICATED_MGMT_URL" default:"https://console.influxdata.com"`
+	InfluxDBClusteredClusterID    string `long:"influxdb-clustered-cluster-id" description:"Cluster ID for your InfluxDB v3 Clustered instance" env:"INFLUXDB_CLUSTERED_CLUSTER_ID" default:"11111111-1111-1111-1111-111111111111"`
+	InfluxDBClusteredAccountID    string `long:"influxdb-clustered-account-id" description:"Account ID for your InfluxDB v3 Clustered instance" env:"INFLUXDB_CLUSTERED_ACCOUNT_ID" default:"11111111-1111-1111-1111-111111111111"`
+	InfluxDBV3SupportEnabled      bool   `long:"influxdb-v3-support-enabled" description:"Enable InfluxDB v3 support" env:"INFLUXDB_V3_SUPPORT_ENABLED"`
+	InfluxDBV3TimeCondition       string `long:"influxdb-v3-time-condition" description:"Time condition for SHOW TAG VALUES queries in InfluxDB v3 (e.g., 'time > now() - 1d')" env:"INFLUXDB_V3_TIME_CONDITION" default:"time > now() - 1d"`
 
 	KapacitorURL      string `long:"kapacitor-url" description:"Location of your Kapacitor instance" env:"KAPACITOR_URL"`
 	KapacitorUsername string `long:"kapacitor-username" description:"Username of your Kapacitor instance" env:"KAPACITOR_USERNAME"`
@@ -76,7 +89,7 @@ type Server struct {
 	TokenSecret        string        `short:"t" long:"token-secret" description:"Secret to sign tokens" env:"TOKEN_SECRET"`
 	JwksURL            string        `long:"jwks-url" description:"URL that returns OpenID Key Discovery JWKS document." env:"JWKS_URL"`
 	UseIDToken         bool          `long:"use-id-token" description:"Enable id_token processing." env:"USE_ID_TOKEN"`
-	LoginHint          string        `long:"login-hint" description:"OpenID login_hint paramter to passed to authorization server during authentication" env:"LOGIN_HINT"`
+	LoginHint          string        `long:"login-hint" description:"OpenID login_hint parameter to passed to authorization server during authentication" env:"LOGIN_HINT"`
 	AuthDuration       time.Duration `long:"auth-duration" default:"720h" description:"Total duration of cookie life for authentication (in hours). 0 means authentication expires on browser close." env:"AUTH_DURATION"`
 	InactivityDuration time.Duration `long:"inactivity-duration" default:"5m" description:"Duration for which a token is valid without any new activity." env:"INACTIVITY_DURATION"`
 
@@ -542,14 +555,21 @@ func (s *Server) newBuilders(logger chronograf.Logger) builders {
 			Path:   s.ResourcesPath,
 		},
 		Sources: &MultiSourceBuilder{
-			InfluxDBURL:      s.InfluxDBURL,
-			InfluxDBUsername: s.InfluxDBUsername,
-			InfluxDBPassword: s.InfluxDBPassword,
-			InfluxDBOrg:      s.InfluxDBOrg,
-			InfluxDBToken:    s.InfluxDBToken,
-			Logger:           logger,
-			ID:               idgen.NewTime(),
-			Path:             s.ResourcesPath,
+			InfluxDBType:      s.InfluxDBType,
+			InfluxDBURL:       s.InfluxDBURL,
+			InfluxDBUsername:  s.InfluxDBUsername,
+			InfluxDBPassword:  s.InfluxDBPassword,
+			InfluxDBOrg:       s.InfluxDBOrg,
+			InfluxDBToken:     s.InfluxDBToken,
+			InfluxDBMgmtToken: s.InfluxDBMgmtToken,
+			InfluxDBClusterID: s.InfluxDBClusterID,
+			InfluxDBAccountID: s.InfluxDBAccountID,
+			TagsCSVPath:       s.TagsCSVPath,
+			DefaultDB:         s.InfluxDBDefaultDB,
+
+			Logger: logger,
+			ID:     idgen.NewTime(),
+			Path:   s.ResourcesPath,
 		},
 		Kapacitors: &MultiKapacitorBuilder{
 			KapacitorURL:      s.KapacitorURL,
@@ -606,6 +626,34 @@ func (s *Server) Serve(ctx context.Context) {
 	go rotateSuperAdminNonce(ctx, s.NonceExpiration)
 
 	logger := clog.New(clog.ParseLevel(s.LogLevel))
+	logger.Info("Starting Chronograf ", s.BuildInfo.Version, s.BuildInfo.Commit)
+
+	// Validate InfluxDBType if provided
+	if s.InfluxDBType != "" {
+		validTypes := []string{
+			"influx",
+			"influx-enterprise",
+			"influx-relay",
+			"influx-v2",
+			"influx-v3-core",
+			"influx-v3-enterprise",
+			"influx-v3-clustered",
+			"influx-v3-cloud-dedicated",
+			"influx-v3-serverless",
+		}
+		isValid := false
+		for _, validType := range validTypes {
+			if s.InfluxDBType == validType {
+				isValid = true
+				break
+			}
+		}
+		if !isValid {
+			logger.Error("Invalid --influxdb-type value. Valid values: influx, influx-enterprise, influx-relay, influx-v2, influx-v3-core, influx-v3-enterprise, influx-v3-clustered, influx-v3-cloud-dedicated, influx-v3-serverless")
+			os.Exit(1)
+		}
+	}
+
 	customLinks, err := NewCustomLinks(s.CustomLinks)
 	if err != nil {
 		logger.
@@ -661,7 +709,31 @@ func (s *Server) Serve(ctx context.Context) {
 		}
 	}
 
-	service := openService(ctx, db, s.newBuilders(logger), logger, s.useAuth())
+	// Parse and validate v3 time condition at startup
+	var v3TimeConditionExpr influxql.Expr
+	if s.InfluxDBV3TimeCondition != "" {
+		expr, err := influxql.ParseExpr(s.InfluxDBV3TimeCondition)
+		if err != nil {
+			logger.
+				WithField("component", "server").
+				WithField("time_condition", s.InfluxDBV3TimeCondition).
+				Error(fmt.Errorf("invalid InfluxDB v3 time condition: %w", err))
+			return
+		}
+		v3TimeConditionExpr = expr
+		logger.
+			WithField("component", "server").
+			WithField("time_condition", s.InfluxDBV3TimeCondition).
+			Info("InfluxDB v3 time condition validated and configured")
+	}
+
+	service := openService(ctx, db, s.newBuilders(logger), logger, s.useAuth(),
+		chronograf.V3Config{
+			CloudDedicatedManagementURL: s.InfluxDBCloudDedicatedMgmtURL,
+			ClusteredAccountID:          s.InfluxDBClusteredAccountID,
+			ClusteredClusterID:          s.InfluxDBClusteredClusterID,
+			TimeConditionExpr:           v3TimeConditionExpr,
+		})
 	service.SuperAdminProviderGroups = superAdminProviderGroups{
 		auth0: s.Auth0SuperAdminOrg,
 	}
@@ -669,6 +741,7 @@ func (s *Server) Serve(ctx context.Context) {
 		TelegrafSystemInterval: s.TelegrafSystemInterval,
 		HostPageDisabled:       s.HostPageDisabled,
 		CustomAutoRefresh:      s.CustomAutoRefresh,
+		V3SupportEnabled:       s.InfluxDBV3SupportEnabled,
 	}
 
 	if !validBasepath(s.Basepath) {
@@ -791,7 +864,7 @@ func (s *Server) Serve(ctx context.Context) {
 		Info("Stopped serving chronograf at ", scheme, "://", listener.Addr())
 }
 
-func openService(ctx context.Context, db kv.Store, builder builders, logger chronograf.Logger, useAuth bool) Service {
+func openService(ctx context.Context, db kv.Store, builder builders, logger chronograf.Logger, useAuth bool, v3Config chronograf.V3Config) Service {
 	svc, err := kv.NewService(ctx, db, kv.WithLogger(logger))
 	if err != nil {
 		logger.Error("Unable to create kv service", err)
@@ -813,6 +886,13 @@ func openService(ctx context.Context, db kv.Store, builder builders, logger chro
 			Error("Unable to construct a MultiOrganizationStore", err)
 		os.Exit(1)
 	}
+	defaultOrg, err := organizations.DefaultOrganization(ctx)
+	if err != nil {
+		logger.
+			WithField("component", "OrganizationsStore").
+			Error("Unable to get default organization", err)
+		os.Exit(1)
+	}
 
 	kapacitors, err := builder.Kapacitors.Build(svc.ServersStore())
 	if err != nil {
@@ -822,7 +902,7 @@ func openService(ctx context.Context, db kv.Store, builder builders, logger chro
 		os.Exit(1)
 	}
 
-	sources, err := builder.Sources.Build(svc.SourcesStore())
+	sources, err := builder.Sources.Build(svc.SourcesStore(), defaultOrg.ID)
 	if err != nil {
 		logger.
 			WithField("component", "SourcesStore").
@@ -862,7 +942,8 @@ func openService(ctx context.Context, db kv.Store, builder builders, logger chro
 		},
 		Logger:    logger,
 		UseAuth:   useAuth,
-		Databases: &influx.Client{Logger: logger},
+		V3Config:  v3Config,
+		Databases: &influx.Client{Logger: logger, V3Config: v3Config},
 	}
 }
 
