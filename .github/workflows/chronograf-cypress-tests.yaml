@@ -8,6 +8,7 @@ on:
 
 jobs:
   e2e:
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
