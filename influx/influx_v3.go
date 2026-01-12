@@ -11,7 +11,7 @@ import (
 
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/util"
-	"github.com/influxdata/influxdb/influxql"
+	"github.com/influxdata/influxql"
 )
 
 // v3Database represents a database entry from InfluxDB v3 API response to `SHOW DATABASES`

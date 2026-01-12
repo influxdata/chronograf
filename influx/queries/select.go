@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/influxdata/influxdb/influxql"
+	"github.com/influxdata/influxql"
 )
 
 type literalJSON struct {
@@ -376,6 +376,16 @@ type Limits struct {
 
 type SelectStatement struct {
 	*influxql.SelectStatement
+}
+
+func (s *SelectStatement) HasSubquery() bool {
+	for _, src := range s.Sources {
+		switch src.(type) {
+		case *influxql.SubQuery:
+			return true
+		}
+	}
+	return false
 }
 
 func (s *SelectStatement) MarshalJSON() ([]byte, error) {

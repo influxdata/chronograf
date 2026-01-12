@@ -81,7 +81,9 @@ func (s *Service) Queries(w http.ResponseWriter, r *http.Request) {
 		qr.QueryConfig = qc
 
 		if stmt, err := queries.ParseSelect(q.Query); err == nil {
-			qr.QueryAST = stmt
+			if !stmt.HasSubquery() {
+				qr.QueryAST = stmt
+			}
 		}
 
 		if dur, err := influx.ParseTime(q.Query, time.Now()); err == nil {

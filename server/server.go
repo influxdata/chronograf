@@ -34,7 +34,7 @@ import (
 	"github.com/influxdata/chronograf/oauth2"
 	"github.com/influxdata/chronograf/server/config"
 	"github.com/influxdata/chronograf/util"
-	"github.com/influxdata/influxdb/influxql"
+	"github.com/influxdata/influxql"
 	client "github.com/influxdata/usage-client/v1"
 	flags "github.com/jessevdk/go-flags"
 )
