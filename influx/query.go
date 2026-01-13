@@ -19,17 +19,11 @@ func TimeRangeAsEpochNano(expr influxql.Expr, now time.Time) (min, max int64, er
 	if err != nil {
 		return 0, 0, err
 	}
-	tmin := tr.MinTime()
-	if tmin.IsZero() {
-		min = time.Unix(0, influxql.MinTime).UnixNano()
-	} else {
-		min = tmin.UnixNano()
-	}
-	tmax := tr.MaxTime()
-	if tmax.IsZero() {
+	min = tr.MinTime().UnixNano()
+	if tr.Max.IsZero() {
 		max = now.UnixNano()
 	} else {
-		max = tmax.UnixNano()
+		max = tr.Max.UnixNano()
 	}
 	return
 }

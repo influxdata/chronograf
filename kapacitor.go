@@ -161,7 +161,7 @@ type BigPanda struct {
 
 // Teams properties
 type Teams struct {
-	ChannelURL string `json:"channel-url"` // override configuration
+	ChannelURL string `json:"channel_url"` // override configuration
 }
 
 // Teams properties
