@@ -42,6 +42,24 @@ RUN wget https://golang.org/dl/go${GO_VERSION}.linux-${GO_ARCH}.tar.gz; \
     rm /go${GO_VERSION}.linux-${GO_ARCH}.tar.gz
 ENV PATH /usr/local/go/bin:$PATH
 
+# Install pkg-config and clang (required for Flux CGO)
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    clang \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Rust (required for Flux library with Rust backend)
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH \
+    RUST_VERSION=1.58.0
+
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain ${RUST_VERSION} --profile minimal \
+    && chmod -R a+w $RUSTUP_HOME $CARGO_HOME
+
+# Install influxdata pkg-config for Flux CGO linking
+RUN go install github.com/influxdata/pkg-config@latest
+
 ENV PROJECT_DIR $GOPATH/src/github.com/influxdata/chronograf
 ENV PATH $GOPATH/bin:$PATH
 RUN mkdir -p $PROJECT_DIR
