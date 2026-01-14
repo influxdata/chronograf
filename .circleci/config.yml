@@ -1,4 +1,13 @@
 version: 2.1
+executors:
+  cross-builder:
+    docker:
+      - image: quay.io/influxdb/cross-builder:go1.24.11-latest
+    resource_class: large
+    environment:
+      GOPATH: /root/go
+      GOROOT: /go
+
 orbs:
   browser-tools: circleci/browser-tools@1.1.3
   aws-s3: circleci/aws-s3@2.0.0
@@ -88,20 +97,19 @@ workflows:
 jobs:
   build:
     environment:
-      DOCKER_TAG: chronograf-20260113
       GO111MODULE: "ON"
-    machine:
-      image: ubuntu-2204:current
+    executor: cross-builder
+    working_directory: ~/chronograf
     steps:
       - checkout
       - run: |
           ls -lah
           pwd
-      - run: ./etc/scripts/docker/pull.sh
       - run:
           name: "Run Tests"
+          no_output_timeout: 30m
           command: >
-            ./etc/scripts/docker/run.sh
+            ./etc/build.py
             --debug
             --test
             --no-build
@@ -112,15 +120,14 @@ jobs:
 
   deploy-nightly:
     environment:
-      DOCKER_TAG: chronograf-20260113
       GO111MODULE: "ON"
-    machine:
-      image: ubuntu-2204:current
+    executor: cross-builder
+    working_directory: ~/chronograf
     steps:
       - attach_workspace:
           at: /home/circleci
       - run: |
-          ./etc/scripts/docker/run.sh \
+          ./etc/build.py \
             --debug \
             --clean \
             --package \
@@ -141,15 +148,14 @@ jobs:
 
   build-nightly:
     environment:
-      DOCKER_TAG: chronograf-20260113
       GO111MODULE: "ON"
-    machine:
-      image: ubuntu-2204:current
+    executor: cross-builder
+    working_directory: ~/chronograf
     steps:
       - attach_workspace:
           at: /home/circleci
       - run: |
-          ./etc/scripts/docker/run.sh \
+          ./etc/build.py \
             --debug \
             --clean \
             --package \
@@ -162,15 +168,14 @@ jobs:
 
   deploy-pre-release:
     environment:
-      DOCKER_TAG: chronograf-20260113
       GO111MODULE: "ON"
-    machine:
-      image: ubuntu-2204:current
+    executor: cross-builder
+    working_directory: ~/chronograf
     steps:
       - attach_workspace:
           at: /home/circleci
       - run: |
-          ./etc/scripts/docker/run.sh \
+          ./etc/build.py \
             --clean \
             --debug \
             --release \
@@ -197,15 +202,14 @@ jobs:
 
   deploy-release:
     environment:
-      DOCKER_TAG: chronograf-20260113
       GO111MODULE: "ON"
-    machine:
-      image: ubuntu-2204:current
+    executor: cross-builder
+    working_directory: ~/chronograf
     steps:
       - attach_workspace:
           at: /home/circleci
       - run: |
-          ./etc/scripts/docker/run.sh \
+          ./etc/build.py \
             --clean \
             --debug \
             --release \
