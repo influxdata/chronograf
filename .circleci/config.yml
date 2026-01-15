@@ -8,6 +8,17 @@ executors:
       GOPATH: /root/go
       GOROOT: /go
 
+commands:
+  install_dependencies:
+    description: >
+      Install additional dependencies
+    steps:
+      - run:
+          name: Install additional dependencies
+          command: |
+            ./etc/scripts/install-deps.sh
+            echo 'export PATH=/usr/local/node/bin:$PATH' >> $BASH_ENV            
+
 orbs:
   browser-tools: circleci/browser-tools@1.1.3
   aws-s3: circleci/aws-s3@2.0.0
@@ -105,16 +116,15 @@ jobs:
       - run: |
           ls -lah
           pwd
+      - install_dependencies
       - run:
-          name: "Install Dependencies"
-          command:  |
-            ./etc/scripts/install-deps.sh
-            echo 'export PATH=/usr/local/node/bin:$PATH' >> $BASH_ENV
-      - run: |
-          node --version
-          yarn --version
-          npm --version
-          go version
+          name: "Show Versions"
+          command: |
+            node --version
+            yarn --version
+            npm --version
+            go version
+            go env
       - run:
           name: "Run Tests"
           no_output_timeout: 30m
@@ -136,6 +146,7 @@ jobs:
     steps:
       - attach_workspace:
           at: /root
+      - install_dependencies
       - run: |
           ./etc/build.py \
             --debug \
@@ -164,6 +175,7 @@ jobs:
     steps:
       - attach_workspace:
           at: /root
+      - install_dependencies
       - run: |
           ./etc/build.py \
             --debug \
@@ -184,6 +196,7 @@ jobs:
     steps:
       - attach_workspace:
           at: /root
+      - install_dependencies
       - run: |
           ./etc/build.py \
             --clean \
@@ -218,6 +231,7 @@ jobs:
     steps:
       - attach_workspace:
           at: /root
+      - install_dependencies
       - run: |
           ./etc/build.py \
             --clean \
