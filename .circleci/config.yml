@@ -113,6 +113,7 @@ jobs:
       - run: |
           node --version
           yarn --version
+          npm --version
       - run:
           name: "Run Tests"
           no_output_timeout: 30m

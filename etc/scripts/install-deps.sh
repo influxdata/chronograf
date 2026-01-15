@@ -20,7 +20,7 @@ pip3 install boto requests python-jose --upgrade
 gem install dotenv -v 2.8.1
 gem install fpm
 
-NODE_VERSION v16.14.2
+NODE_VERSION=v16.14.2
 wget -q https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-linux-x64.tar.gz; \
     mkdir /usr/local/node; \
     tar -xvf node-${NODE_VERSION}-linux-x64.tar.gz -C /usr/local/node --strip-components=1; \
