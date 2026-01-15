@@ -147,23 +147,26 @@ jobs:
       - attach_workspace:
           at: /root
       - install_dependencies
-      - run: |
-          ./etc/build.py \
-            --debug \
-            --clean \
-            --package \
-            --platform all \
-            --arch all \
-            --upload \
-            --nightly \
-            --version=nightly \
-            --bucket=dl.influxdata.com/chronograf/releases
-          cp build/linux/amd64/chronograf .
-          cp build/linux/amd64/chronoctl .
-          docker build -t chronograf .
-          docker login -u "$QUAY_USER" -p $QUAY_PASS quay.io
-          docker tag chronograf quay.io/influxdb/chronograf:nightly
-          docker push quay.io/influxdb/chronograf:nightly
+      - run:
+          name: "Deploy Nightly Build"
+          no_output_timeout: 30m
+          command: |
+            ./etc/build.py \
+              --debug \
+              --clean \
+              --package \
+              --platform all \
+              --arch all \
+              --upload \
+              --nightly \
+              --version=nightly \
+              --bucket=dl.influxdata.com/chronograf/releases
+            cp build/linux/amd64/chronograf .
+            cp build/linux/amd64/chronoctl .
+            docker build -t chronograf .
+            docker login -u "$QUAY_USER" -p $QUAY_PASS quay.io
+            docker tag chronograf quay.io/influxdb/chronograf:nightly
+            docker push quay.io/influxdb/chronograf:nightly
       - store_artifacts:
           path: ./build/
 
@@ -176,15 +179,18 @@ jobs:
       - attach_workspace:
           at: /root
       - install_dependencies
-      - run: |
-          ./etc/build.py \
-            --debug \
-            --clean \
-            --package \
-            --platform all \
-            --arch all \
-            --nightly \
-            --version=${CIRCLE_SHA1:0:7}
+      - run:
+          name: "Nightly Build"
+          no_output_timeout: 30m
+          command: |
+            ./etc/build.py \
+              --debug \
+              --clean \
+              --package \
+              --platform all \
+              --arch all \
+              --nightly \
+              --version=${CIRCLE_SHA1:0:7}
       - store_artifacts:
           path: ./build/
 
