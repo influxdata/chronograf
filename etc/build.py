@@ -486,7 +486,8 @@ def build(version=None,
         build_command = ". /root/.cargo/env && "
 
         build_command += "CGO_ENABLED=1 "
-
+        tags = []
+        cc = ""
         # Handle variations in architecture output
         fullarch = arch
         if  arch == "aarch64" or arch == "arm64":
@@ -503,7 +504,10 @@ def build(version=None,
             tags += [ "netgo", "osusergo"]
         elif  platform == "windows" and arch == "amd64":
             cc = "x86_64-w64-mingw32-gcc"
-        build_command += "CC={} GOOS={} GOARCH={} ".format(cc, platform, arch)
+        if cc == "":
+            build_command += "GOOS={} GOARCH={} ".format(platform, arch)
+        else:
+            build_command += "CC={} GOOS={} GOARCH={} ".format(cc, platform, arch)
 
         if "arm" in fullarch:
             if  fullarch != "arm64":
