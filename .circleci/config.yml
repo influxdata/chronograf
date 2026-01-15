@@ -124,9 +124,9 @@ jobs:
             --test
             --no-build
       - persist_to_workspace:
-          root: .
+          root: /root
           paths:
-            - project
+            - chronograf
 
   deploy-nightly:
     environment:
@@ -135,7 +135,7 @@ jobs:
     working_directory: ~/chronograf
     steps:
       - attach_workspace:
-          at: .
+          at: /root
       - run: |
           ./etc/build.py \
             --debug \
@@ -147,8 +147,8 @@ jobs:
             --nightly \
             --version=nightly \
             --bucket=dl.influxdata.com/chronograf/releases
-          cp build/linux/static_amd64/chronograf .
-          cp build/linux/static_amd64/chronoctl .
+          cp build/linux/amd64/chronograf .
+          cp build/linux/amd64/chronoctl .
           docker build -t chronograf .
           docker login -u "$QUAY_USER" -p $QUAY_PASS quay.io
           docker tag chronograf quay.io/influxdb/chronograf:nightly
@@ -163,7 +163,7 @@ jobs:
     working_directory: ~/chronograf
     steps:
       - attach_workspace:
-          at: .
+          at: /root
       - run: |
           ./etc/build.py \
             --debug \
@@ -183,7 +183,7 @@ jobs:
     working_directory: ~/chronograf
     steps:
       - attach_workspace:
-          at: .
+          at: /root
       - run: |
           ./etc/build.py \
             --clean \
@@ -195,8 +195,8 @@ jobs:
             --upload-overwrite \
             --upload \
             --bucket dl.influxdata.com/chronograf/releases
-          cp build/linux/static_amd64/chronograf .
-          cp build/linux/static_amd64/chronoctl .
+          cp build/linux/amd64/chronograf .
+          cp build/linux/amd64/chronoctl .
           docker build -t chronograf .
           docker login -u "$QUAY_USER" -p $QUAY_PASS quay.io
           docker tag chronograf quay.io/influxdb/chronograf:${CIRCLE_SHA1:0:7}
@@ -217,7 +217,7 @@ jobs:
     working_directory: ~/chronograf
     steps:
       - attach_workspace:
-          at: .
+          at: /root
       - run: |
           ./etc/build.py \
             --clean \
@@ -229,8 +229,8 @@ jobs:
             --upload-overwrite \
             --upload \
             --bucket dl.influxdata.com/chronograf/releases
-          cp build/linux/static_amd64/chronograf .
-          cp build/linux/static_amd64/chronoctl .
+          cp build/linux/amd64/chronograf .
+          cp build/linux/amd64/chronoctl .
           docker build -t chronograf .
           docker login -u "$QUAY_USER" -p $QUAY_PASS quay.io
           docker tag chronograf quay.io/influxdb/chronograf:${CIRCLE_SHA1:0:7}

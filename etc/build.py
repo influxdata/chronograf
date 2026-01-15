@@ -90,9 +90,9 @@ targets = {
 }
 
 supported_builds = {
-    'darwin': [ "amd64" , "arm64" ],
+    'darwin': [ "amd64" ],
     'windows': [ "amd64" ],
-    'linux': [ "amd64", "arm64", "static_amd64" ]
+    'linux': [ "amd64", "arm64" ]
 }
 
 supported_packages = {
@@ -483,56 +483,53 @@ def build(version=None,
 
     for target, path in targets.items():
         logging.info("Building target: {}".format(target))
-        build_command = ""
-        build_command_last_options = ""
+        build_command = ". /root/.cargo/env && "
 
-        # Handle static binary output
-        if static is True or "static_" in arch:
-            if "static_" in arch:
-                static = True
-                arch = arch.replace("static_", "")
-            build_command += "CGO_ENABLED=0 "
-            build_command_last_options += "-a -installsuffix cgo "
+        build_command += "CGO_ENABLED=1 "
 
         # Handle variations in architecture output
         fullarch = arch
-        if arch == "i386" or arch == "i686":
-            arch = "386"
-        elif arch == "arm64" or arch == "aarch64":
+        if  arch == "aarch64" or arch == "arm64":
             arch = "arm64"
-        elif "arm" in arch:
-            arch = "arm"
-        build_command += "GOOS={} GOARCH={} ".format(platform, arch)
+
+        if platform == "linux":
+            if arch == "amd64":
+                tags += ["netgo", "osusergo", "static_build"]
+            if arch == "arm64":
+                cc = "/musl/aarch64/bin/musl-gcc"
+                tags += ["netgo", "osusergo", "static_build", "noasm"]
+        elif platform == "darwin" and arch == "amd64":
+            cc = "x86_64-apple-darwin18-clang"
+            tags += [ "netgo", "osusergo"]
+        elif  platform == "windows" and arch == "amd64":
+            cc = "x86_64-w64-mingw32-gcc"
+        build_command += "CC={} GOOS={} GOARCH={} ".format(cc, platform, arch)
 
         if "arm" in fullarch:
-            if fullarch == "armel":
-                build_command += "GOARM=5 "
-                # required because of https://github.com/influxdata/chronograf/issues/5405
-                build_command_last_options += "-installsuffix armv5 "
-            elif fullarch == "armhf" or fullarch == "arm":
-                build_command += "GOARM=6 "
-                # required because of https://github.com/influxdata/chronograf/issues/5405
-                build_command_last_options += "-installsuffix armv6 "
-            elif fullarch == "arm64":
-                pass # No GOARM for arm64
-            else:
-                logging.error("Invalid ARM architecture specified: {}".format(arch))
-                logging.error("Please specify either 'armel', 'armhf', or 'arm64'.")
+            if  fullarch != "arm64":
+                logging.error("Invalid ARM architecture specified: {} only arm64 is supported".format(arch))
                 return False
         if platform == 'windows':
             target = target + '.exe'
-        build_command += "GO111MODULE=on go build -o {} ".format(os.path.join(outdir, target))
+            build_command += "go build -buildmode=exe -o {} ".format(os.path.join(outdir, target))
+        else:
+            build_command += "go build -o {} ".format(os.path.join(outdir, target))
         if race:
             build_command += "-race "
         if len(tags) > 0:
-            build_command += "-tags {} ".format(','.join(tags))
+            build_command += "-tags \"{}\" ".format(' '.join(tags))
+
+            # Starting with Go 1.5, the linker flag arguments changed to 'name=value' from 'name value'
+        build_command += "-ldflags=\""
         if static:
-            build_command += "-ldflags=\"-s -X main.version={} -X main.commit={}\" ".format(version,
-                                                                                            get_current_commit())
-        else:
-            build_command += "-ldflags=\"-X main.version={} -X main.commit={}\" ".format(version,
-                                                                                            get_current_commit())
-        build_command += build_command_last_options
+            build_command +="-s "
+        if platform == "linux":
+            build_command += r'-extldflags \"-fno-PIC -Wl,-z,stack-size=8388608,--allow-multiple-definition\"  '
+        build_command += '-X main.version={} -X main.branch={} -X main.commit={} -X main.platform=OSS" '.format(version,
+                                                                                                                get_current_branch(),
+                                                                                                                get_current_commit())
+        if static:
+            build_command += "-a -installsuffix cgo "
         build_command += path
         start_time = datetime.utcnow()
         run(build_command, shell=True, print_output=True)
@@ -685,9 +682,7 @@ def package(build_output, pkg_name, version, nightly=False, iteration=1, static=
                         logging.info("Skipping package type '{}' for static builds.".format(package_type))
                     else:
                         if package_type == "rpm":
-                            if package_arch == "armhf":
-                                package_arch = "armv7hl"
-                            elif package_arch == "arm64":
+                            if package_arch == "arm64":
                                 package_arch = "aarch64"
                         fpm_command = "fpm {} --name {} -a {} -t {} --version {} --iteration {} -C {} -p {} ".format(
                             fpm_common_args,
@@ -881,12 +876,8 @@ def main(args):
                 regex = r"^.+\.(.+)\.rpm$"
             elif ".tar.gz" in p_name:
                 if "linux" in p_name:
-                    if "static" in p_name:
-                        type = "linux_static"
-                        nice_name = "Linux Static"
-                    else:
-                        type = "linux"
-                        nice_name = "Linux"
+                    type = "linux"
+                    nice_name = "Linux"
                 elif "darwin" in p_name:
                     type = "darwin"
                     nice_name = "Mac OS X"
@@ -907,8 +898,6 @@ def main(args):
                 return 1
             if arch == "x86_64":
                 arch = "amd64"
-            elif arch == "x86_32":
-                arch = "i386"
             package_name = str(arch) + "_" + str(type)
             package_output[package_name] = {
                 "sha256": generate_sha256_from_file(p),
