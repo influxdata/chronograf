@@ -106,6 +106,10 @@ jobs:
           ls -lah
           pwd
       - run:
+          name: "Install Dependencies"
+          command:  >
+            ./scripts/install-deps.sh
+      - run:
           name: "Run Tests"
           no_output_timeout: 30m
           command: >
