@@ -124,7 +124,7 @@ jobs:
             --test
             --no-build
       - persist_to_workspace:
-          root: /home/circleci
+          root: .
           paths:
             - project
 
@@ -135,7 +135,7 @@ jobs:
     working_directory: ~/chronograf
     steps:
       - attach_workspace:
-          at: /home/circleci
+          at: .
       - run: |
           ./etc/build.py \
             --debug \
@@ -163,7 +163,7 @@ jobs:
     working_directory: ~/chronograf
     steps:
       - attach_workspace:
-          at: /home/circleci
+          at: .
       - run: |
           ./etc/build.py \
             --debug \
@@ -183,7 +183,7 @@ jobs:
     working_directory: ~/chronograf
     steps:
       - attach_workspace:
-          at: /home/circleci
+          at: .
       - run: |
           ./etc/build.py \
             --clean \
@@ -217,7 +217,7 @@ jobs:
     working_directory: ~/chronograf
     steps:
       - attach_workspace:
-          at: /home/circleci
+          at: .
       - run: |
           ./etc/build.py \
             --clean \
