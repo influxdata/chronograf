@@ -107,9 +107,12 @@ jobs:
           pwd
       - run:
           name: "Install Dependencies"
-          command:  >
+          command:  |
             ./etc/scripts/install-deps.sh
             echo 'export PATH=/usr/local/node/bin:$PATH' >> $BASH_ENV
+      - run: |
+          node --version
+          yarn --version
       - run:
           name: "Run Tests"
           no_output_timeout: 30m
