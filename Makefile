@@ -29,7 +29,7 @@ all: dep build
 build: assets ${BINARY}
 
 ${BINARY}: $(SOURCES) .bindata .jsdep .godep
-	. $HOME/.cargo/env && CGO_ENABLED=1 go build -o ${BINARY} ${LDFLAGS} ./cmd/chronograf/main.go
+	. $(HOME)/.cargo/env && CGO_ENABLED=1 go build -o ${BINARY} ${LDFLAGS} ./cmd/chronograf/main.go
 	go build -o ${CTLBINARY} ${LDFLAGS} ./cmd/chronoctl
 
 define CHRONOGIRAFFE
