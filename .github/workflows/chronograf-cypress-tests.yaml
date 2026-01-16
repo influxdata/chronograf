@@ -27,9 +27,18 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v2
         with:
-          go-version: '1.25.5'
+          go-version: '1.24.11'
 
-      - uses: actions/setup-node@v2
+      - name: Install pkg-config
+        run: sudo apt-get install -y pkg-config
+
+      - run: go install github.com/influxdata/pkg-config@v0.3.0
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@1.72
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
         with:
           node-version: '16.14.2'
       - run: if [ ! -x "$(command -v yarn)" ]; then npm install -g yarn; fi
