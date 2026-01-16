@@ -161,12 +161,6 @@ jobs:
               --nightly \
               --version=nightly \
               --bucket=dl.influxdata.com/chronograf/releases
-            cp build/linux/amd64/chronograf .
-            cp build/linux/amd64/chronoctl .
-            docker build -t chronograf .
-            docker login -u "$QUAY_USER" -p $QUAY_PASS quay.io
-            docker tag chronograf quay.io/influxdb/chronograf:nightly
-            docker push quay.io/influxdb/chronograf:nightly
       - store_artifacts:
           path: ./build/
 
@@ -217,14 +211,6 @@ jobs:
               --upload-overwrite \
               --upload \
               --bucket dl.influxdata.com/chronograf/releases
-            cp build/linux/amd64/chronograf .
-            cp build/linux/amd64/chronoctl .
-            docker build -t chronograf .
-            docker login -u "$QUAY_USER" -p $QUAY_PASS quay.io
-            docker tag chronograf quay.io/influxdb/chronograf:${CIRCLE_SHA1:0:7}
-            docker push quay.io/influxdb/chronograf:${CIRCLE_SHA1:0:7}
-            docker tag chronograf quay.io/influxdb/chronograf:${CIRCLE_TAG}
-            docker push quay.io/influxdb/chronograf:${CIRCLE_TAG}
       - store_artifacts:
           path: ./build/
       - persist_to_workspace:
@@ -255,16 +241,6 @@ jobs:
               --upload-overwrite \
               --upload \
               --bucket dl.influxdata.com/chronograf/releases
-            cp build/linux/amd64/chronograf .
-            cp build/linux/amd64/chronoctl .
-            docker build -t chronograf .
-            docker login -u "$QUAY_USER" -p $QUAY_PASS quay.io
-            docker tag chronograf quay.io/influxdb/chronograf:${CIRCLE_SHA1:0:7}
-            docker push quay.io/influxdb/chronograf:${CIRCLE_SHA1:0:7}
-            docker tag chronograf quay.io/influxdb/chronograf:${CIRCLE_TAG}
-            docker push quay.io/influxdb/chronograf:${CIRCLE_TAG}
-            docker tag chronograf quay.io/influxdb/chronograf:latest
-            docker push quay.io/influxdb/chronograf:latest
       - store_artifacts:
           path: ./build/
       - persist_to_workspace:
