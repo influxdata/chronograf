@@ -30,9 +30,7 @@ jobs:
           go-version: '1.24.11'
 
       - name: Install pkg-config
-        run: sudo apt-get install -y pkg-config
-
-      - run: go install github.com/influxdata/pkg-config@v0.3.0
+        run: go install github.com/influxdata/pkg-config@v0.3.0
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@1.72
