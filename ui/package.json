@@ -22,14 +22,14 @@
     }
   },
   "scripts": {
-    "start": "parcel serve",
-    "build": "parcel build --log-level error",
+    "start": "APP_VERSION=$npm_package_version PORT=8080 GIT_SHA=$(git rev-parse HEAD) parcel serve",
+    "build": "APP_VERSION=$npm_package_version GIT_SHA=$(git rev-parse HEAD) parcel build --log-level error",
     "build:inspect": "APP_VERSION=$npm_package_version GIT_SHA=$(git rev-parse HEAD) parcel build --log-level verbose --no-optimize",
     "clean": "rm -rf ./build/* && rm -rf ./.cache ../.parcel-cache",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand --watch",
-    "lint": "yarn run eslint && yarn run tsc",
+    "lint": "yarn run eslint; yarn run tsc",
     "test:e2e": "yarn test:oauth-mock:check && CYPRESS_oauth2ServerURL=http://${OAUTH2_HOSTNAME:-localhost}:${OAUTH2_PORT:-8087} cypress run --browser chrome --headless --reporter junit --reporter-options 'mochaFile=cypress/results/results-[hash].xml'",
     "test:e2e:headed": "yarn test:oauth-mock:check && CYPRESS_oauth2ServerURL=http://${OAUTH2_HOSTNAME:-localhost}:${OAUTH2_PORT:-8087} cypress open --browser chrome",
     "test:oauth-mock": "yarn --cwd ../etc/oauth2-server-mock install && yarn --cwd ../etc/oauth2-server-mock start",
@@ -39,7 +39,8 @@
     "eslint:fix": "eslint src --fix",
     "tsc": "tsc -p ./tsconfig.json --noEmit --pretty",
     "tsc:watch": "tsc -p ./tsconfig.json --noEmit --pretty -w",
-    "dev": "yarn clean && yarn start"
+    "dev": "yarn clean && yarn start",
+    "postinstall": "echo \"\" > ../node_modules/go.mod"
    },
   "author": "",
   "devDependencies": {
