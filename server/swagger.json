@@ -4945,7 +4945,7 @@
               "items": {
                 "type": "object",
                 "properties": {
-                  "channel-url": {
+                  "channel_url": {
                     "description": "Channel URL to override global configuration",
                     "type": "string"
                   }
@@ -5204,7 +5204,7 @@
           "type": "string",
           "description": "Format of the data source",
           "readOnly": true,
-          "enum": ["influx", "influx-enterprise", "influx-relay", "influx-v2", "influx-v3-core", "influx-v3-enterprise", "influx-v3-clustered", "influx-v3-cloud-dedicated"]
+          "enum": ["influx", "influx-enterprise", "influx-relay", "influx-v2", "influx-v3-core", "influx-v3-enterprise", "influx-v3-clustered", "influx-v3-cloud-dedicated", "influx-v3-serverless"]
         },
         "username": {
           "type": "string",
@@ -5217,6 +5217,26 @@
         "sharedSecret": {
           "type": "string",
           "description": "JWT signing secret for optional Authorization: Bearer to InfluxDB"
+        },
+        "clusterId": {
+          "type": "string",
+          "description": "Cluster ID for InfluxDB Cloud Dedicated sources"
+        },
+        "accountId": {
+          "type": "string",
+          "description": "Account ID for InfluxDB Cloud Dedicated sources"
+        },
+        "managementToken": {
+          "type": "string",
+          "description": "Management token for InfluxDB Cloud Dedicated sources"
+        },
+        "databaseToken": {
+          "type": "string",
+          "description": "Database token for InfluxDB Cloud Dedicated or other InfluxDB 3 sources"
+        },
+        "tagsCSVPath": {
+          "type": "string",
+          "description": "Path to a directory containing CSV files with tags for InfluxDB Cloud Dedicated sources"
         },
         "url": {
           "type": "string",
@@ -5245,6 +5265,10 @@
           "type": "string",
           "description": "Default retention policy used in Host-related queries proxied to InfluxDB from the Host List and Host pages.",
           "default": ""
+        },
+        "defaultDB": {
+          "type": "string",
+          "description": "Default database used in queries for InfluxDB Cloud Dedicated when database list is not available"
         },
         "organization": {
           "type": "string",
