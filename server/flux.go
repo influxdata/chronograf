@@ -16,7 +16,6 @@ import (
 	"github.com/influxdata/flux/complete"
 	"github.com/influxdata/flux/parser"
 	"github.com/influxdata/flux/runtime"
-	//	_ "github.com/influxdata/flux/builtin"
 )
 
 // Params are params
