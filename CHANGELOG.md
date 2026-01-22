@@ -1,5 +1,7 @@
 ## [unreleased]
 
+⚠️ Removed support for Linux i386, armhf, armel and static build. Removed support for Darwin arm64.
+
 ### Other
 
 1. [#6166](https://github.com/influxdata/chronograf/pull/6166): Upgrade dependencies. Upgrade golang to 1.24.11. Removed support for Linux i386, armhf, armel and static build. Removed support for Darwin arm64
