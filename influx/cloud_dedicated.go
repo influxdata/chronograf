@@ -11,7 +11,7 @@ import (
 
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/util"
-	"github.com/influxdata/influxdb/influxql"
+	"github.com/influxdata/influxql"
 )
 
 type influxResult struct {
@@ -434,7 +434,10 @@ func contains(slice []string, str string) bool {
 func extractTablesAndTags(showStmt *influxql.ShowTagValuesStatement) (tables []string, tags []string) {
 	// Extract table names
 	if showStmt.Sources != nil {
-		tables = showStmt.Sources.Names()
+		tables = make([]string, 0, len(showStmt.Sources.Measurements()))
+		for _, m := range showStmt.Sources.Measurements() {
+			tables = append(tables, m.Name)
+		}
 	}
 
 	// Extract tag keys
@@ -458,7 +461,11 @@ func extractTablesAndTags(showStmt *influxql.ShowTagValuesStatement) (tables []s
 func extractTables(showStmt *influxql.ShowTagKeysStatement) []string {
 	// Extract table names
 	if showStmt.Sources != nil {
-		return showStmt.Sources.Names()
+		tables := make([]string, 0, len(showStmt.Sources.Measurements()))
+		for _, m := range showStmt.Sources.Measurements() {
+			tables = append(tables, m.Name)
+		}
+		return tables
 	}
 	return nil
 }
