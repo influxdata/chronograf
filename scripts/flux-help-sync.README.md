@@ -8,7 +8,8 @@ local docs-v2 repository.
 Files and Paths
 - Script: `scripts/flux-help-sync.py`
 - Input help file: `ui/src/flux/constants/functions.ts`
-- Docs root (default): `../docs-v2/content/flux/v0/stdlib` (override with `--docs-v2-repo-dir`)
+- Docs repo (default): `../docs-v2` (override with `--docs-v2-repo-dir`)
+- Docs stdlib root: `../docs-v2/content/flux/v0/stdlib`
 - Output patch: `flux-help.diff` (repo root)
 
 How it works
@@ -41,7 +42,7 @@ Undocumented stubs
 Pruning
 - `--prune-undocumented` removes entries missing documentation pages.
 - `--prune-removed` removes entries missing documentation pages only if listed as removed
-  in `/data/go/src/github.com/influxdata/docs-v2/content/flux/v0/release-notes.md`.
+  in `content/flux/v0/release-notes.md` under the docs repo root.
 
 Notes and assumptions
 - The docs root defaults to `../docs-v2`. Override it with `--docs-v2-repo-dir`.
@@ -54,7 +55,13 @@ Notes and assumptions
   comment (when setup is present), and the pipeline portion of the example.
   Multi-line examples are preserved and rendered with `\n` escapes. All comments
   (full-line and inline `//` comments) are removed from examples. If an example
-  does not import its package, the script prepends the import line.
+  does not import its package, the script prepends the import line. When setup
+  is omitted, unused imports are dropped unless the package name is referenced
+  in the remaining example.
+- Links are sourced directly from docs-v2 paths (for example,
+  `.../flux/v0/stdlib/universe/...`) and existing entries are updated to match.
+- Strings are quoted using single or double quotes to satisfy Prettier when
+  apostrophes are present.
 - If multiple doc pages share the same function name, the script prefers
   non-deprecated entries. If descriptions differ, it keeps all unless the
   only difference is a contrib variant (for example `from`), in which case it
