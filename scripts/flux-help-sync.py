@@ -647,21 +647,21 @@ def derive_category(tags, package):
     return "Transformations"
 
 
-def escape_js_string(s, quote_char):
+def quote_js(s):
+    if s is None:
+        s = ""
+    sentinel = "__FLUX_HELP_NEWLINE__"
+    s = s.replace("\n", sentinel)
+    quote_char = "'"
+    if "'" in s and '"' not in s:
+        quote_char = '"'
     s = s.replace("\\", "\\\\")
     if quote_char == "'":
         s = s.replace("'", "\\'")
     else:
         s = s.replace('"', '\\"')
-    return s
-
-
-def quote_js(s):
-    s = s.replace("\n", "\\n")
-    quote_char = "'"
-    if "'" in s and '"' not in s:
-        quote_char = '"'
-    return f"{quote_char}{escape_js_string(s, quote_char)}{quote_char}"
+    s = s.replace(sentinel, "\\n")
+    return f"{quote_char}{s}{quote_char}"
 
 
 def format_kv(
@@ -842,7 +842,6 @@ console.log(JSON.stringify(result));
         link = "https://docs.influxdata.com" + str(
             "/flux/v0/stdlib/" + "/".join(rel.parts)
         ).replace(".md", "/")
-        link = link.replace("/flux/v0/", "/flux/latest/")
         doc_map[(name, effective_package)] = {
             "name": name,
             "package": effective_package,
@@ -923,7 +922,7 @@ console.log(JSON.stringify(result));
             "desc": new_desc,
             "example": doc.get("example") or f.get("example", ""),
             "category": f.get("category", doc["category"]),
-            "link": f.get("link", doc["link"]),
+            "link": doc["link"],
         }
         updated_map[key] = updated
 
