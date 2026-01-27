@@ -496,15 +496,6 @@ def normalize_example(text):
     return text.strip("\n")
 
 
-def escape_js_keep_newlines(text):
-    if text is None:
-        return ""
-    sentinel = "__FLUX_HELP_NEWLINE__"
-    text = text.replace("\n", sentinel)
-    text = escape_js(text)
-    return text.replace(sentinel, "\\n")
-
-
 def normalize_doc_desc(desc, name):
     desc = normalize_desc(desc)
     if not desc:
@@ -656,10 +647,21 @@ def derive_category(tags, package):
     return "Transformations"
 
 
-def escape_js(s):
+def escape_js_string(s, quote_char):
     s = s.replace("\\", "\\\\")
-    s = s.replace("'", "\\'")
+    if quote_char == "'":
+        s = s.replace("'", "\\'")
+    else:
+        s = s.replace('"', '\\"')
     return s
+
+
+def quote_js(s):
+    s = s.replace("\n", "\\n")
+    quote_char = "'"
+    if "'" in s and '"' not in s:
+        quote_char = '"'
+    return f"{quote_char}{escape_js_string(s, quote_char)}{quote_char}"
 
 
 def format_kv(
@@ -669,23 +671,28 @@ def format_kv(
     wrap=True,
     max_len=80,
     normalize_fn=normalize_desc,
-    escape_fn=escape_js,
 ):
     ind = " " * indent
     value = normalize_fn(value)
     if not wrap:
-        return [f"{ind}{key}: '{escape_fn(value)}',"]
-    if len(value) <= max_len:
-        return [f"{ind}{key}: '{escape_fn(value)}',"]
-    return [f"{ind}{key}:", f"{ind}  '{escape_fn(value)}',"]
+        return [f"{ind}{key}: {quote_js(value)},"]
+    single_line = f"{ind}{key}: {quote_js(value)},"
+    if len(value) <= max_len and len(single_line) <= 80:
+        return [single_line]
+    return [f"{ind}{key}:", f"{ind}  {quote_js(value)},"]
 
 
 def format_arg(arg, indent):
     ind = " " * indent
     lines = [f"{ind}{{"]
-    lines.append(f"{ind}  name: '{escape_js(arg['name'])}',")
-    lines += format_kv("desc", arg.get("desc", ""), indent + 2)
-    lines.append(f"{ind}  type: '{escape_js(arg.get('type', 'Object'))}',")
+    lines.append(f"{ind}  name: {quote_js(arg['name'])},")
+    lines += format_kv(
+        "desc",
+        arg.get("desc", ""),
+        indent + 2,
+        max_len=WRAP_LEN - 5,
+    )
+    lines.append(f"{ind}  type: {quote_js(arg.get('type', 'Object'))},")
     lines.append(f"{ind}}},")
     return lines
 
@@ -693,7 +700,7 @@ def format_arg(arg, indent):
 def format_entry(entry, indent, trailing_comma=True):
     ind = " " * indent
     lines = [f"{ind}{{"]
-    lines.append(f"{ind}  name: '{escape_js(entry['name'])}',")
+    lines.append(f"{ind}  name: {quote_js(entry['name'])},")
     args = entry.get("args", [])
     if not args:
         lines.append(f"{ind}  args: [],")
@@ -702,7 +709,7 @@ def format_entry(entry, indent, trailing_comma=True):
         for arg in args:
             lines += format_arg(arg, indent + 4)
         lines.append(f"{ind}  ],")
-    lines.append(f"{ind}  package: '{escape_js(entry.get('package', ''))}',")
+    lines.append(f"{ind}  package: {quote_js(entry.get('package', ''))},")
     lines += format_kv("desc", entry.get("desc", ""), indent + 2, max_len=WRAP_LEN)
     lines += format_kv(
         "example",
@@ -710,9 +717,8 @@ def format_entry(entry, indent, trailing_comma=True):
         indent + 2,
         max_len=WRAP_LEN,
         normalize_fn=normalize_example,
-        escape_fn=escape_js_keep_newlines,
     )
-    lines.append(f"{ind}  category: '{escape_js(entry.get('category', ''))}',")
+    lines.append(f"{ind}  category: {quote_js(entry.get('category', ''))},")
     lines += format_kv("link", entry.get("link", ""), indent + 2, max_len=WRAP_LEN)
     lines.append(f"{ind}}}{',' if trailing_comma else ''}")
     return lines
