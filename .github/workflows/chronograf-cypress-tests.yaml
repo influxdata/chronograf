@@ -77,6 +77,43 @@ jobs:
         env:
           INFLUXDB_ENTERPRISE_LICENSE_KEY: "${{ secrets.INFLUXDB_ENTERPRISE_LICENSE_KEY }}"
 
+      - name: Wait for InfluxDB Enterprise readiness
+        run: |
+          echo "Waiting for InfluxDB Enterprise pods..."
+          kubectl wait --for=condition=Ready pods \
+            -l app.kubernetes.io/name=influxdb-enterprise \
+            --timeout=300s || true
+          echo "Checking TLS secrets..."
+          kubectl get secret influxdb-influxdb-enterprise-data-tls -n default || true
+          kubectl get secret influxdb-influxdb-enterprise-meta-tls -n default || true
+
+      # Kubernetes Debugging Step on Failure
+      - name: Capture Kubernetes Logs and Events
+        if: failure()
+        run: |
+          mkdir -p kubernetes-logs
+          echo "Capturing pod states..."
+          kubectl get pods --all-namespaces > kubernetes-logs/pods.log || true
+          echo "Describing pods..."
+          kubectl describe pods --all-namespaces > kubernetes-logs/pods-describe.log || true
+          echo "Fetching logs of InfluxDB-related pods..."
+          kubectl logs -l app=influxdb --all-containers --namespace default > kubernetes-logs/influxdb-pod-logs.log || true
+          echo "Fetching logs of InfluxDB Enterprise data and meta pods..."
+          kubectl logs pod/influxdb-influxdb-enterprise-data-0 --all-containers --namespace default > kubernetes-logs/influxdb-data-0.log || true
+          kubectl logs pod/influxdb-influxdb-enterprise-meta-0 --all-containers --namespace default > kubernetes-logs/influxdb-meta-0.log || true
+          echo "Fetching bootstrap job logs..."
+          kubectl logs job/influxdb-influxdb-enterprise-bootstrap -c auth --namespace default --previous > kubernetes-logs/influxdb-bootstrap-auth.log || true
+          echo "Capturing Kubernetes events..."
+          kubectl get events --all-namespaces > kubernetes-logs/events.log || true
+
+      # Upload Artifact with Logs
+      - name: Upload Kubernetes Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kubernetes-logs
+          path: kubernetes-logs/
+
       - name: OAuth2 Mock Server
         run: |
           yarn
