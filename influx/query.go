@@ -7,24 +7,23 @@ import (
 	"time"
 
 	"github.com/influxdata/chronograf"
-	"github.com/influxdata/influxdb/influxql"
+	"github.com/influxdata/influxql"
 )
 
 // TimeRangeAsEpochNano extracs the min and max epoch times from the expression
 func TimeRangeAsEpochNano(expr influxql.Expr, now time.Time) (min, max int64, err error) {
-	tmin, tmax, err := influxql.TimeRange(expr)
+	nowVal := &influxql.NowValuer{
+		Now: now,
+	}
+	_, tr, err := influxql.ConditionExpr(expr, nowVal)
 	if err != nil {
 		return 0, 0, err
 	}
-	if tmin.IsZero() {
-		min = time.Unix(0, influxql.MinTime).UnixNano()
-	} else {
-		min = tmin.UnixNano()
-	}
-	if tmax.IsZero() {
+	min = tr.MinTime().UnixNano()
+	if tr.Max.IsZero() {
 		max = now.UnixNano()
 	} else {
-		max = tmax.UnixNano()
+		max = tr.Max.UnixNano()
 	}
 	return
 }

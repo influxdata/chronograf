@@ -34,7 +34,7 @@ import (
 	"github.com/influxdata/chronograf/oauth2"
 	"github.com/influxdata/chronograf/server/config"
 	"github.com/influxdata/chronograf/util"
-	"github.com/influxdata/influxdb/influxql"
+	"github.com/influxdata/influxql"
 	client "github.com/influxdata/usage-client/v1"
 	flags "github.com/jessevdk/go-flags"
 )
@@ -711,7 +711,7 @@ func (s *Server) Serve(ctx context.Context) {
 
 	// Parse and validate v3 time condition at startup
 	var v3TimeConditionExpr influxql.Expr
-	if s.InfluxDBV3TimeCondition != "" {
+	if s.InfluxDBV3SupportEnabled && s.InfluxDBV3TimeCondition != "" {
 		expr, err := influxql.ParseExpr(s.InfluxDBV3TimeCondition)
 		if err != nil {
 			logger.

@@ -12,10 +12,10 @@ import (
 
 	"github.com/bouk/httprouter"
 	"github.com/influxdata/chronograf/influx"
-	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/ast"
-	_ "github.com/influxdata/flux/builtin"
 	"github.com/influxdata/flux/complete"
+	"github.com/influxdata/flux/parser"
+	"github.com/influxdata/flux/runtime"
 )
 
 // Params are params
@@ -54,9 +54,13 @@ func (s *Service) Flux(w http.ResponseWriter, r *http.Request) {
 	encodeJSON(w, http.StatusOK, res, s.Logger)
 }
 
+func FluxDefaultCompleter() complete.Completer {
+	return complete.NewCompleter(runtime.Prelude())
+}
+
 // FluxSuggestions returns a list of available Flux functions for the Flux Builder
 func (s *Service) FluxSuggestions(w http.ResponseWriter, r *http.Request) {
-	completer := complete.DefaultCompleter()
+	completer := FluxDefaultCompleter()
 	names := completer.FunctionNames()
 	var functions []SuggestionResponse
 	for _, name := range names {
@@ -89,7 +93,7 @@ func (s *Service) FluxSuggestions(w http.ResponseWriter, r *http.Request) {
 func (s *Service) FluxSuggestion(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	name := httprouter.GetParamFromContext(ctx, "name")
-	completer := complete.DefaultCompleter()
+	completer := FluxDefaultCompleter()
 
 	suggestion, err := completer.FunctionSuggestion(name)
 	if err != nil {
@@ -114,16 +118,19 @@ func (s *Service) FluxAST(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		invalidJSON(w, s.Logger)
+		return
 	}
 
-	parsed, err := flux.Parse(request.Body)
-
+	a := parser.ParseSource(request.Body)
+	if ast.Check(a) > 0 {
+		err = ast.GetError(a)
+	}
 	if err != nil {
 		msg := err.Error()
 		resp := ASTResponse{Valid: true, AST: nil, Error: msg}
 		encodeJSON(w, http.StatusBadRequest, resp, s.Logger)
 	} else {
-		resp := ASTResponse{Valid: true, AST: parsed, Error: ""}
+		resp := ASTResponse{Valid: true, AST: a, Error: ""}
 		encodeJSON(w, http.StatusOK, resp, s.Logger)
 	}
 

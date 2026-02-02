@@ -1,4 +1,24 @@
 version: 2.1
+executors:
+  cross-builder:
+    docker:
+      - image: quay.io/influxdb/cross-builder:go1.24.11-latest
+    resource_class: large
+    environment:
+      GOPATH: /root/go
+      GOROOT: /go
+
+commands:
+  install_dependencies:
+    description: >
+      Install additional dependencies
+    steps:
+      - run:
+          name: Install additional dependencies
+          command: |
+            ./etc/scripts/install-deps.sh
+            echo 'export PATH=/usr/local/node/bin:$PATH' >> $BASH_ENV   
+
 orbs:
   browser-tools: circleci/browser-tools@1.1.3
   aws-s3: circleci/aws-s3@2.0.0
@@ -88,106 +108,109 @@ workflows:
 jobs:
   build:
     environment:
-      DOCKER_TAG: chronograf-20260112
-      GO111MODULE: "ON"
-    machine:
-      image: ubuntu-2204:current
+      GO111MODULE: "on"
+    executor: cross-builder
+    working_directory: ~/chronograf
     steps:
       - checkout
       - run: |
           ls -lah
           pwd
-      - run: ./etc/scripts/docker/pull.sh
+      - install_dependencies
+      - run:
+          name: "Show Versions"
+          command: |
+            node --version
+            yarn --version
+            npm --version
+            go version
+            go env
       - run:
           name: "Run Tests"
+          no_output_timeout: 30m
           command: >
-            ./etc/scripts/docker/run.sh
+            ./etc/build.py
             --debug
             --test
             --no-build
       - persist_to_workspace:
-          root: /home/circleci
+          root: /root
           paths:
-            - project
+            - chronograf
 
   deploy-nightly:
     environment:
-      DOCKER_TAG: chronograf-20260112
-      GO111MODULE: "ON"
-    machine:
-      image: ubuntu-2204:current
+      GO111MODULE: "on"
+    executor: cross-builder
+    working_directory: ~/chronograf
     steps:
       - attach_workspace:
-          at: /home/circleci
-      - run: |
-          ./etc/scripts/docker/run.sh \
-            --debug \
-            --clean \
-            --package \
-            --platform all \
-            --arch all \
-            --upload \
-            --nightly \
-            --version=nightly \
-            --bucket=dl.influxdata.com/chronograf/releases
-          cp build/linux/static_amd64/chronograf .
-          cp build/linux/static_amd64/chronoctl .
-          docker build -t chronograf .
-          docker login -u "$QUAY_USER" -p $QUAY_PASS quay.io
-          docker tag chronograf quay.io/influxdb/chronograf:nightly
-          docker push quay.io/influxdb/chronograf:nightly
+          at: /root
+      - install_dependencies
+      - run:
+          name: "Deploy Nightly Build"
+          no_output_timeout: 30m
+          command: |
+            ./etc/build.py \
+              --debug \
+              --clean \
+              --package \
+              --platform all \
+              --arch all \
+              --upload \
+              --nightly \
+              --version=nightly \
+              --bucket=dl.influxdata.com/chronograf/releases
       - store_artifacts:
           path: ./build/
 
   build-nightly:
     environment:
-      DOCKER_TAG: chronograf-20260112
-      GO111MODULE: "ON"
-    machine:
-      image: ubuntu-2204:current
+      GO111MODULE: "on"
+    executor: cross-builder
+    working_directory: ~/chronograf
     steps:
       - attach_workspace:
-          at: /home/circleci
-      - run: |
-          ./etc/scripts/docker/run.sh \
-            --debug \
-            --clean \
-            --package \
-            --platform all \
-            --arch all \
-            --nightly \
-            --version=${CIRCLE_SHA1:0:7}
+          at: /root
+      - install_dependencies
+      - run:
+          name: "Nightly Build"
+          no_output_timeout: 30m
+          command: |
+            ./etc/build.py \
+              --debug \
+              --clean \
+              --package \
+              --platform all \
+              --arch all \
+              --nightly \
+              --version=${CIRCLE_SHA1:0:7}
       - store_artifacts:
           path: ./build/
 
   deploy-pre-release:
     environment:
-      DOCKER_TAG: chronograf-20260112
-      GO111MODULE: "ON"
-    machine:
-      image: ubuntu-2204:current
+      GO111MODULE: "on"
+    executor: cross-builder
+    working_directory: ~/chronograf
     steps:
       - attach_workspace:
-          at: /home/circleci
-      - run: |
-          ./etc/scripts/docker/run.sh \
-            --clean \
-            --debug \
-            --release \
-            --package \
-            --platform all \
-            --arch all \
-            --upload-overwrite \
-            --upload \
-            --bucket dl.influxdata.com/chronograf/releases
-          cp build/linux/static_amd64/chronograf .
-          cp build/linux/static_amd64/chronoctl .
-          docker build -t chronograf .
-          docker login -u "$QUAY_USER" -p $QUAY_PASS quay.io
-          docker tag chronograf quay.io/influxdb/chronograf:${CIRCLE_SHA1:0:7}
-          docker push quay.io/influxdb/chronograf:${CIRCLE_SHA1:0:7}
-          docker tag chronograf quay.io/influxdb/chronograf:${CIRCLE_TAG}
-          docker push quay.io/influxdb/chronograf:${CIRCLE_TAG}
+          at: /root
+      - install_dependencies
+      - run:
+          name: "Deploy Pre-Release Build"
+          no_output_timeout: 30m
+          command: |
+            ./etc/build.py \
+              --clean \
+              --debug \
+              --release \
+              --package \
+              --platform all \
+              --arch all \
+              --upload-overwrite \
+              --upload \
+              --bucket dl.influxdata.com/chronograf/releases
       - store_artifacts:
           path: ./build/
       - persist_to_workspace:
@@ -197,34 +220,27 @@ jobs:
 
   deploy-release:
     environment:
-      DOCKER_TAG: chronograf-20260112
-      GO111MODULE: "ON"
-    machine:
-      image: ubuntu-2204:current
+      GO111MODULE: "on"
+    executor: cross-builder
+    working_directory: ~/chronograf
     steps:
       - attach_workspace:
-          at: /home/circleci
-      - run: |
-          ./etc/scripts/docker/run.sh \
-            --clean \
-            --debug \
-            --release \
-            --package \
-            --platform all \
-            --arch all \
-            --upload-overwrite \
-            --upload \
-            --bucket dl.influxdata.com/chronograf/releases
-          cp build/linux/static_amd64/chronograf .
-          cp build/linux/static_amd64/chronoctl .
-          docker build -t chronograf .
-          docker login -u "$QUAY_USER" -p $QUAY_PASS quay.io
-          docker tag chronograf quay.io/influxdb/chronograf:${CIRCLE_SHA1:0:7}
-          docker push quay.io/influxdb/chronograf:${CIRCLE_SHA1:0:7}
-          docker tag chronograf quay.io/influxdb/chronograf:${CIRCLE_TAG}
-          docker push quay.io/influxdb/chronograf:${CIRCLE_TAG}
-          docker tag chronograf quay.io/influxdb/chronograf:latest
-          docker push quay.io/influxdb/chronograf:latest
+          at: /root
+      - install_dependencies
+      - run:
+          name: "Deploy Pre-Release Build"
+          no_output_timeout: 30m
+          command: |
+            ./etc/build.py \
+              --clean \
+              --debug \
+              --release \
+              --package \
+              --platform all \
+              --arch all \
+              --upload-overwrite \
+              --upload \
+              --bucket dl.influxdata.com/chronograf/releases
       - store_artifacts:
           path: ./build/
       - persist_to_workspace:

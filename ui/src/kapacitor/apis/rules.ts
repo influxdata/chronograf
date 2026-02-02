@@ -57,6 +57,18 @@ function addUnderscoreType(alertArray: any[]): void {
   }
 }
 
+function convertTeamsChannelUrl(teamsArray: any[]): void {
+  // convert 'channel_url' (from backend) to 'channel-url' (used by UI)
+  // see defect #5768 - the backend uses channel_url, but UI uses channel-url
+  if (Array.isArray(teamsArray)) {
+    teamsArray.forEach(x => {
+      if (x.channel_url !== undefined) {
+        x['channel-url'] = x.channel_url
+      }
+    })
+  }
+}
+
 export async function getRules(
   kapacitor: Kapacitor,
   opts?: {params?: Record<string, string>; signal?: AbortSignal}
@@ -71,6 +83,7 @@ export async function getRules(
     rules.forEach(rule => {
       addUnderscoreType(rule.alertNodes.serviceNow)
       addUnderscoreType(rule.alertNodes.zenoss)
+      convertTeamsChannelUrl(rule.alertNodes.teams)
     })
   }
   return response
@@ -89,6 +102,7 @@ export async function getRule(
     if (alertNodes) {
       addUnderscoreType(alertNodes.serviceNow)
       addUnderscoreType(alertNodes.zenoss)
+      convertTeamsChannelUrl(alertNodes.teams)
     }
     return response
   } catch (error) {
