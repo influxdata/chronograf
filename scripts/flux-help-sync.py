@@ -299,33 +299,121 @@ def map_type(type_str):
     return "Object"
 
 
-def parse_example(body, name, package, tables_piped):
+def strip_line_comment(line):
+    in_string = None
+    i = 0
+    while i < len(line) - 1:
+        ch = line[i]
+        if in_string:
+            if ch == in_string:
+                in_string = None
+            elif ch == "\\":
+                i += 1
+            i += 1
+            continue
+        if ch in ("'", '"'):
+            in_string = ch
+            i += 1
+            continue
+        if ch == "/" and line[i + 1] == "/":
+            return line[:i].rstrip()
+        i += 1
+    return line.rstrip()
+
+
+def in_string_at(text, idx):
+    in_string = None
+    i = 0
+    while i < idx:
+        ch = text[i]
+        if in_string:
+            if ch == in_string:
+                in_string = None
+            elif ch == "\\":
+                i += 1
+            i += 1
+            continue
+        if ch in ("'", '"'):
+            in_string = ch
+        i += 1
+    return in_string is not None
+
+
+def extract_function_call(text, name):
+    target = name + "("
+    idx = 0
+    while True:
+        idx = text.find(target, idx)
+        if idx == -1:
+            return None
+        if in_string_at(text, idx):
+            idx += len(target)
+            continue
+        if idx > 0:
+            prev = text[idx - 1]
+            if prev.isalnum() or prev == "_" or prev == ".":
+                idx += len(target)
+                continue
+        i = idx + len(name)
+        depth = 0
+        in_string = None
+        for j in range(i, len(text)):
+            ch = text[j]
+            if in_string:
+                if ch == in_string:
+                    in_string = None
+                elif ch == "\\":
+                    j += 1
+                continue
+            if ch in ("'", '"'):
+                in_string = ch
+                continue
+            if ch == "(":
+                depth += 1
+            elif ch == ")":
+                depth -= 1
+                if depth == 0:
+                    return text[idx : j + 1]
+        idx += len(target)
+
+
+def squash_ws(text):
+    out = []
+    in_string = None
+    escape = False
+    prev_space = False
+    for ch in text:
+        if in_string:
+            out.append(ch)
+            if escape:
+                escape = False
+            elif ch == "\\":
+                escape = True
+            elif ch == in_string:
+                in_string = None
+            continue
+        if ch in ("'", '"'):
+            in_string = ch
+            out.append(ch)
+            prev_space = False
+            continue
+        if ch.isspace():
+            if not prev_space:
+                out.append(" ")
+                prev_space = True
+            continue
+        out.append(ch)
+        prev_space = False
+    return "".join(out).strip()
+
+
+def parse_example(body, name):
     m = re.search(r"^## Examples\s*$", body, flags=re.M)
     if not m:
-        return f"{name}()"
+        return None
     sub = body[m.end() :]
     for cm in re.finditer(r"```js\n(.*?)```", sub, flags=re.S):
         block = cm.group(1)
-        def strip_line_comment(line):
-            in_string = None
-            i = 0
-            while i < len(line) - 1:
-                ch = line[i]
-                if in_string:
-                    if ch == in_string:
-                        in_string = None
-                    elif ch == "\\":
-                        i += 1
-                    i += 1
-                    continue
-                if ch in ("'", '"'):
-                    in_string = ch
-                    i += 1
-                    continue
-                if ch == "/" and line[i + 1] == "/":
-                    return line[:i].rstrip()
-                i += 1
-            return line.rstrip()
 
         lines = []
         for ln in block.splitlines():
@@ -333,154 +421,13 @@ def parse_example(body, name, package, tables_piped):
             if ln_clean.strip() == "" and ln.lstrip().startswith("//"):
                 continue
             lines.append(ln_clean)
-        import_lines = [ln for ln in lines if ln.strip().startswith("import ")]
-        for idx, line in enumerate(lines):
-            line_strip = line.strip()
-            if not line_strip:
-                continue
-            if name not in line_strip or "(" not in line_strip:
-                continue
-            nonblank_count = sum(1 for ln in lines if ln.strip())
-            if nonblank_count <= 10:
-                example_lines = []
-                if package and not any(package in ln for ln in import_lines):
-                    example_lines.append(f'import "{package}"')
-                    example_lines.append("")
-                example_lines.extend(lines)
-                return "\n".join(example_lines).rstrip()
-            # Capture the full multi-line call by balancing parentheses.
-            snippet_lines = []
-            depth = 0
-            in_string = None
-            for j in range(idx, len(lines)):
-                ln = lines[j].rstrip()
-                if ln.strip() == "" and lines[j].lstrip().startswith("//"):
-                    continue
-                snippet_lines.append(ln)
-                for ch in ln:
-                    if in_string:
-                        if ch == in_string:
-                            in_string = None
-                        elif ch == "\\":
-                            continue
-                        continue
-                    if ch in ("'", '"'):
-                        in_string = ch
-                        continue
-                    if ch == "(":
-                        depth += 1
-                    elif ch == ")":
-                        depth -= 1
-                if depth <= 0 and j > idx:
-                    break
-            snippet = "\n".join(snippet_lines).rstrip()
-            pre_call = lines[:idx]
-            pre_call_lines = [
-                ln for ln in pre_call if not ln.strip().startswith("import ")
-            ]
 
-            def is_assignment(line):
-                return bool(re.match(r"^\s*[A-Za-z_]\w*\s*=", line))
+        code = "\n".join(lines)
 
-            is_setup = [False] * len(pre_call_lines)
-            in_assignment_block = False
-            for i, ln in enumerate(pre_call_lines):
-                stripped = ln.strip()
-                if stripped == "":
-                    in_assignment_block = False
-                    continue
-                if in_assignment_block:
-                    is_setup[i] = True
-                    continue
-                if is_assignment(ln) or stripped.startswith("option "):
-                    is_setup[i] = True
-                    in_assignment_block = True
-                    continue
-
-            call_is_pipeline = line_strip.lstrip().startswith("|>")
-            if not call_is_pipeline:
-                prev_idx = None
-                for i in range(len(pre_call_lines) - 1, -1, -1):
-                    if pre_call_lines[i].strip() and not is_setup[i]:
-                        prev_idx = i
-                        break
-                if prev_idx is not None and pre_call_lines[prev_idx].lstrip().startswith(
-                    "|>"
-                ):
-                    call_is_pipeline = True
-
-            end = None
-            for i in range(len(pre_call_lines) - 1, -1, -1):
-                if pre_call_lines[i].strip() and not is_setup[i]:
-                    end = i
-                    break
-            block_indices = []
-            if end is not None:
-                start = end
-                while start > 0:
-                    if is_setup[start - 1]:
-                        break
-                    start -= 1
-                block_indices = list(range(start, end + 1))
-
-            pipeline_has_operator = call_is_pipeline or any(
-                "|>" in pre_call_lines[i] for i in block_indices
-            )
-            pipeline_indices = set(block_indices) if pipeline_has_operator else set()
-            pipeline_lines = (
-                [pre_call_lines[i] for i in block_indices] if pipeline_has_operator else []
-            )
-            has_setup = any(
-                pre_call_lines[i].strip()
-                for i in range(len(pre_call_lines))
-                if i not in pipeline_indices
-            )
-
-            def import_info(line):
-                m = re.match(r'^\s*import\s+(?:(\w+)\s+)?\"([^\"]+)\"', line)
-                if not m:
-                    return None, None
-                alias, path = m.group(1), m.group(2)
-                name = alias if alias else path.split("/")[-1]
-                return name, path
-
-            if package and not any(package in ln for ln in import_lines):
-                import_lines = [f'import "{package}"'] + import_lines
-            if has_setup and import_lines:
-                remaining_text = "\n".join(pipeline_lines + [snippet])
-                filtered_imports = []
-                for ln in import_lines:
-                    name, path = import_info(ln)
-                    if not name:
-                        filtered_imports.append(ln)
-                        continue
-                    if package and path == package:
-                        filtered_imports.append(ln)
-                        continue
-                    if re.search(rf"\b{re.escape(name)}\.", remaining_text):
-                        filtered_imports.append(ln)
-                import_lines = filtered_imports
-            example_lines = []
-            if import_lines:
-                example_lines.extend(import_lines)
-                example_lines.append("")
-            if has_setup:
-                example_lines.append(
-                    "// setup and processing omitted"
-                )
-                example_lines.append("")
-            if pipeline_lines:
-                example_lines.extend(pipeline_lines)
-            if tables_piped and not pipeline_lines and not has_setup:
-                if snippet.lstrip().startswith("|>"):
-                    snippet = "data\n    " + snippet.lstrip()
-            example_lines.append(snippet)
-            return "\n".join(example_lines).rstrip()
-        for line in lines:
-            line_strip = line.strip()
-            if line_strip:
-                return line_strip
-    return f"{name}()"
+        call = extract_function_call(code, name)
+        if call:
+            return squash_ws(call)
+    return None
 
 
 def normalize_desc(text):
@@ -488,12 +435,6 @@ def normalize_desc(text):
     # Convert markdown links to visible text + URL for plain-text tooltips.
     text = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"\1 (\2)", text)
     return text
-
-
-def normalize_example(text):
-    if text is None:
-        return ""
-    return text.strip("\n")
 
 
 def normalize_doc_desc(desc, name):
@@ -716,7 +657,6 @@ def format_entry(entry, indent, trailing_comma=True):
         entry.get("example", ""),
         indent + 2,
         max_len=WRAP_LEN,
-        normalize_fn=normalize_example,
     )
     lines.append(f"{ind}  category: {quote_js(entry.get('category', ''))},")
     lines += format_kv("link", entry.get("link", ""), indent + 2, max_len=WRAP_LEN)
@@ -838,7 +778,9 @@ console.log(JSON.stringify(result));
         sig, sig_types = parse_signature(body)
         tables_piped = "<-tables" in sig
         type_map = {k: map_type(v) for k, v in sig_types.items()}
-        example = parse_example(body, name, effective_package, tables_piped)
+        example = parse_example(body, name)
+        if not example:
+            example = ""
         link = "https://docs.influxdata.com" + str(
             "/flux/v0/stdlib/" + "/".join(rel.parts)
         ).replace(".md", "/")
@@ -944,7 +886,7 @@ console.log(JSON.stringify(result));
             "args": arg_entries,
             "package": doc["package"],
             "desc": doc["desc"],
-            "example": doc["example"],
+            "example": doc["example"] or f"{doc['name']}()",
             "category": doc["category"],
             "link": doc["link"],
         }

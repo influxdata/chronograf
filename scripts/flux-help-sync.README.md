@@ -50,14 +50,12 @@ Notes and assumptions
 - It omits the `tables` parameter when the signature shows a piped input
   (`<-tables`).
 - Examples are always updated from docs for entries with matching pages.
-  Examples with 10 or fewer non-blank lines are rendered as-is (plus a missing
-  import if needed). Longer examples are shortened to imports, a setup-omitted
-  comment (when setup is present), and the pipeline portion of the example.
-  Multi-line examples are preserved and rendered with `\n` escapes. All comments
-  (full-line and inline `//` comments) are removed from examples. If an example
-  does not import its package, the script prepends the import line. When setup
-  is omitted, unused imports are dropped unless the package name is referenced
-  in the remaining example.
+- Examples are extracted from the first JavaScript example block by locating
+  the first call to the function and reducing it to a single-line call
+  expression (no pipeline, imports, or setup). Full-line and inline `//`
+  comments are removed before extracting the call. If no call is found, new
+  entries default to `functionName()`, and existing entries keep their current
+  example.
 - Links are sourced directly from docs-v2 paths (for example,
   `.../flux/v0/stdlib/universe/...`) and existing entries are updated to match.
 - Strings are quoted using single or double quotes to satisfy Prettier when
