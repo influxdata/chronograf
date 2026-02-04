@@ -282,7 +282,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Retrieves data from a Google Cloud Bigtable (https://cloud.google.com/bigtable/) data source.',
     example:
-      'bigtable.from( token: "example-token", project: "example-project", instance: "example-instance", table: "example-table", )',
+      'bigtable.from( token: "example-token", project: "example-project", instance: "example-instance", table: "example-table")',
     category: 'Inputs',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/experimental/bigtable/from/',
@@ -1036,7 +1036,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Joins two streams of tables on the **group key and `_time` column**.',
     example:
-      'experimental.join( left: left, right: right, fn: (left, right) => ({left with lv: left._value, rv: right._value, diff: left._value - right._value}), )',
+      'experimental.join( left: left, right: right, fn: (left, right) => ({left with lv: left._value, rv: right._value, diff: left._value - right._value}))',
     category: 'Transformations',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/join/',
   },
@@ -1224,7 +1224,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Filters data based on conditions defined in a predicate function (`fn`).',
     example:
-      'filter( fn: (r) => r._measurement == "cpu" and r._field == "usage_system" and r.cpu == "cpu-total", )',
+      'filter( fn: (r) => r._measurement == "cpu" and r._field == "usage_system" and r.cpu == "cpu-total")',
     category: 'Transformations',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/filter/',
   },
@@ -1843,7 +1843,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Submits an HTTP GET request to the specified URL and returns the HTTP status code, response body, and response headers.',
     example:
-      'http.get( url: "http://localhost:8086/health", headers: {Authorization: "Token mY5up3RS3crE7t0k3N", Accept: "application/json"}, )',
+      'http.get( url: "http://localhost:8086/health", headers: {Authorization: "Token mY5up3RS3crE7t0k3N", Accept: "application/json"})',
     category: 'Miscellaneous',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/http/get/',
   },
@@ -1870,7 +1870,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Sends an HTTP POST request to the specified URL with headers and data and returns the HTTP status code.',
     example:
-      'http.post( url: "http://myawsomeurl.com/api/notify", headers: {Authorization: "Bearer mySuPerSecRetTokEn", "Content-type": "application/json"}, data: json.encode(v: lastReported[0]), )',
+      'http.post( url: "http://myawsomeurl.com/api/notify", headers: {Authorization: "Bearer mySuPerSecRetTokEn", "Content-type": "application/json"}, data: json.encode(v: lastReported[0]))',
     category: 'Transformations',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/http/post/',
   },
@@ -1968,7 +1968,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     package: 'json',
     desc: 'Converts a value into JSON bytes.',
-    example: 'json.encode( v: jsonData, )',
+    example: 'json.encode( v: jsonData)',
     category: 'Type Conversions',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/json/encode/',
   },
@@ -2139,7 +2139,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     package: '',
     desc: 'Generates a list of linearly separated float values.',
-    example: 'linearBins( start: 0.0, width: 10.0, count: 10, )',
+    example: 'linearBins( start: 0.0, width: 10.0, count: 10)',
     category: 'Miscellaneous',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/linearbins/',
   },
@@ -2171,7 +2171,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: '',
     desc: 'Generates a list of exponentially separated float values.',
     example:
-      'logarithmicBins( start: 1.0, factor: 2.0, count: 10, infinity: true, )',
+      'logarithmicBins( start: 1.0, factor: 2.0, count: 10, infinity: true)',
     category: 'Miscellaneous',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/universe/logarithmicbins/',
@@ -3438,7 +3438,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Outputs data from a stream of tables to an MQTT broker using MQTT protocol.',
     example:
-      'mqtt.to( broker: "tcp://localhost:8883", topic: "example-topic", clientid: r.id, tagColumns: ["id"], valueColumns: ["_value"], )',
+      'mqtt.to( broker: "tcp://localhost:8883", topic: "example-topic", clientid: r.id, tagColumns: ["id"], valueColumns: ["_value"])',
     category: 'Outputs',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/mqtt/to/',
   },
@@ -3679,7 +3679,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Queries data from a specified InfluxDB bucket within given time bounds, filters data by measurement, field, and optional predicate expressions.',
     example:
-      'query.inBucket( bucket: "example-buckt", start: -1h, measurement: "mem", fields: ["field1", "field2"], predicate: (r) => r.host == "host1", )',
+      'query.inBucket( bucket: "example-buckt", start: -1h, measurement: "mem", fields: ["field1", "field2"], predicate: (r) => r.host == "host1")',
     category: 'Inputs',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/experimental/query/inbucket/',
@@ -4935,7 +4935,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: '',
     desc:
       'Extracts the first table in a stream with group key values that match a specified predicate.',
-    example: 'tableFind( fn: (key) => key.tag == "t2", )',
+    example: 'tableFind( fn: (key) => key.tag == "t2")',
     category: 'Transformations',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/tablefind/',
   },
@@ -5155,7 +5155,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Writes data to an InfluxDB Cloud or 2.x bucket and returns the written data.',
     example:
-      'to( bucket: "example-bucket", org: "example-org", token: "mYSuP3rSecR37t0k3N", host: "http://localhost:8086", )',
+      'to( bucket: "example-bucket", org: "example-org", token: "mYSuP3rSecR37t0k3N", host: "http://localhost:8086")',
     category: 'Outputs',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/to/',
   },
@@ -5657,7 +5657,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'contrib/bonitoo-io/alerta',
     desc: 'Sends an alert to Alerta (https://alerta.io/).',
     example:
-      'alerta.alert( url: "https://alerta.io:8080/alert", apiKey: apiKey, resource: "example-resource", event: "Example event", environment: "Production", severity: severity, service: ["example-service"], group: "example-group", value: string(v: lastReported._value), text: "Service is ${severity}. The last reported value was ${string(v: lastReported._value)}.", tags: ["ex1", "ex2"], attributes: {}, origin: "InfluxDB", type: "exampleAlertType", timestamp: now(), )',
+      'alerta.alert( url: "https://alerta.io:8080/alert", apiKey: apiKey, resource: "example-resource", event: "Example event", environment: "Production", severity: severity, service: ["example-service"], group: "example-group", value: string(v: lastReported._value), text: "Service is ${severity}. The last reported value was ${string(v: lastReported._value)}.", tags: ["ex1", "ex2"], attributes: {}, origin: "InfluxDB", type: "exampleAlertType", timestamp: now())',
     category: 'Notification endpoints',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/alerta/alert/',
@@ -5689,7 +5689,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'contrib/bonitoo-io/alerta',
     desc: 'Sends alerts to Alerta using data from input rows.',
     example:
-      'alerta.endpoint( url: "https://alerta.io:8080/alert", apiKey: apiKey, environment: "Production", origin: "InfluxDB", )',
+      'alerta.endpoint( url: "https://alerta.io:8080/alert", apiKey: apiKey, environment: "Production", origin: "InfluxDB")',
     category: 'Notification endpoints',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/alerta/endpoint/',
@@ -5981,7 +5981,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'contrib/rhajek/bigpanda',
     desc: 'Sends an alert to BigPanda (https://www.bigpanda.io/).',
     example:
-      'bigpanda.sendAlert( token: token, appKey: "example-app-key", status: bigpanda.statusFromLevel(level: "${lastReported.status}"), rec: { tags: json.encode(v: [{"name": "host", "value": "my-host"}]), check: "my-check", description: "${lastReported._field} is ${lastReported.status}: ${string( v: lastReported._value, )}", }, )',
+      'bigpanda.sendAlert( token: token, appKey: "example-app-key", status: bigpanda.statusFromLevel(level: "${lastReported.status}"), rec: { tags: json.encode(v: [{"name": "host", "value": "my-host"}]), check: "my-check", description: "${lastReported._field} is ${lastReported.status}: ${string( v: lastReported._value, )}", })',
     category: 'Notification endpoints',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/contrib/rhajek/bigpanda/sendalert/',
@@ -6675,7 +6675,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Creates a dictionary from a list of records with `key` and `value` properties.',
     example:
-      'dict.fromList( pairs: [{key: 1, value: "foo"}, {key: 2, value: "bar"}], )',
+      'dict.fromList( pairs: [{key: 1, value: "foo"}, {key: 2, value: "bar"}])',
     category: 'Transformations',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/dict/fromlist/',
   },
@@ -6836,7 +6836,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Sends a single message to a Discord channel using a Discord webhook.',
     example:
-      'discord.send( webhookToken: token, webhookID: "1234567890", username: "chobbs", content: "The current status is \\"${lastReported.status}\\".", avatar_url: "https://staff-photos.net/pic.jpg", )',
+      'discord.send( webhookToken: token, webhookID: "1234567890", username: "chobbs", content: "The current status is \\"${lastReported.status}\\".", avatar_url: "https://staff-photos.net/pic.jpg")',
     category: 'Notification endpoints',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/contrib/chobbs/discord/send/',
@@ -7135,7 +7135,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'experimental',
     desc:
       'Approximates the cumulative distribution of a dataset by counting data frequencies for a list of bins.',
-    example: 'experimental.histogram( bins: [ 0.0, 5.0, 10.0, 15.0, 20.0, ], )',
+    example: 'experimental.histogram( bins: [ 0.0, 5.0, 10.0, 15.0, 20.0, ])',
     category: 'Transformations',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/histogram/',
   },
@@ -7444,7 +7444,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: '',
     desc:
       'Returns a row at a specified index as a record from the first table in a stream of tables that matches the specified predicate function.',
-    example: 'findRecord( fn: (key) => key.tag == "t1", idx: 0, )',
+    example: 'findRecord( fn: (key) => key.tag == "t1", idx: 0)',
     category: 'Dynamic queries',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/findrecord/',
   },
@@ -7507,7 +7507,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'generate',
     desc: 'Generates data using the provided parameter values.',
     example:
-      'generate.from( count: 6, fn: (n) => (n + 1) * (n + 2), start: 2021-01-01T00:00:00Z, stop: 2021-01-02T00:00:00Z, )',
+      'generate.from( count: 6, fn: (n) => (n + 1) * (n + 2), start: 2021-01-01T00:00:00Z, stop: 2021-01-02T00:00:00Z)',
     category: 'Inputs',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/generate/from/',
   },
@@ -7909,7 +7909,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'contrib/qxip/hash',
     desc:
       'Converts a string value to a hexadecimal hash using the SHA-1 hash algorithm.',
-    example: 'hash.sha1( v: "Hello, world!", )',
+    example: 'hash.sha1( v: "Hello, world!")',
     category: 'Transformations',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/contrib/qxip/hash/sha1/',
   },
@@ -7925,7 +7925,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'contrib/qxip/hash',
     desc:
       'Converts a string value to a hexadecimal hash using the SHA 256 hash algorithm.',
-    example: 'hash.sha256( v: "Hello, world!", )',
+    example: 'hash.sha256( v: "Hello, world!")',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/contrib/qxip/hash/sha256/',
@@ -8346,7 +8346,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     package: 'experimental/iox',
     desc: 'Converts a duration value to a SQL interval string.',
-    example: 'iox.sqlInterval( d: 1y2mo3w4d5h6m7s8ms, )',
+    example: 'iox.sqlInterval( d: 1y2mo3w4d5h6m7s8ms)',
     category: 'Type Conversions',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/experimental/iox/sqlinterval/',
@@ -8380,7 +8380,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'join',
     desc: 'Performs a full outer join on two table streams.',
     example:
-      'join.full( left: left, right: right, on: (l, r) => l.label == r.id and l._time == r._time, as: (l, r) => { time = if exists l._time then l._time else r._time label = if exists l.label then l.label else r.id return {_time: time, label: label, v_left: l._value, v_right: r._value} }, )',
+      'join.full( left: left, right: right, on: (l, r) => l.label == r.id and l._time == r._time, as: (l, r) => { time = if exists l._time then l._time else r._time label = if exists l.label then l.label else r.id return {_time: time, label: label, v_left: l._value, v_right: r._value} })',
     category: 'Transformations',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/join/full/',
   },
@@ -8413,7 +8413,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'join',
     desc: 'Performs an inner join on two table streams.',
     example:
-      'join.inner( left: ints, right: strings, on: (l, r) => l._time == r._time, as: (l, r) => ({l with label: r._value}), )',
+      'join.inner( left: ints, right: strings, on: (l, r) => l._time == r._time, as: (l, r) => ({l with label: r._value}))',
     category: 'Transformations',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/join/inner/',
   },
@@ -8446,7 +8446,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'join',
     desc: 'Performs a left outer join on two table streams.',
     example:
-      'join.left( left: left, right: right, on: (l, r) => l.label == r.id and l._time == r._time, as: (l, r) => ({_time: l._time, label: l.label, v_left: l._value, v_right: r._value}), )',
+      'join.left( left: left, right: right, on: (l, r) => l.label == r.id and l._time == r._time, as: (l, r) => ({_time: l._time, label: l.label, v_left: l._value, v_right: r._value}))',
     category: 'Transformations',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/join/left/',
   },
@@ -8479,7 +8479,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'join',
     desc: 'Performs a right outer join on two table streams.',
     example:
-      'join.right( left: left, right: right, on: (l, r) => l.label == r.id and l._time == r._time, as: (l, r) => ({_time: r._time, label: r.id, v_left: l._value, v_right: r._value}), )',
+      'join.right( left: left, right: right, on: (l, r) => l.label == r.id and l._time == r._time, as: (l, r) => ({_time: r._time, label: r.id, v_left: l._value, v_right: r._value}))',
     category: 'Transformations',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/join/right/',
   },
@@ -8518,7 +8518,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Joins two input streams together using a specified method, predicate, and a function to join two corresponding records, one from each input stream.',
     example:
-      'join.tables( method: "inner", left: ints, right: strings, on: (l, r) => l._time == r._time, as: (l, r) => ({l with label: r._value}), )',
+      'join.tables( method: "inner", left: ints, right: strings, on: (l, r) => l._time == r._time, as: (l, r) => ({l with label: r._value}))',
     category: 'Transformations',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/join/tables/',
   },
@@ -8616,7 +8616,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'kafka',
     desc: 'Sends data to Apache Kafka (https://kafka.apache.org/) brokers.',
     example:
-      'kafka.to( brokers: ["http://127.0.0.1:9092"], topic: "example-topic", name: "example-metric-name", tagColumns: ["tag"], )',
+      'kafka.to( brokers: ["http://127.0.0.1:9092"], topic: "example-topic", name: "example-metric-name", tagColumns: ["tag"])',
     category: 'Outputs',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/kafka/to/',
   },
@@ -8748,7 +8748,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Checks input data and assigns a level (`ok`, `info`, `warn`, or `crit`) to each row based on predicate functions.',
     example:
-      'monitor.check( crit: (r) => r._value > 90.0, warn: (r) => r._value > 80.0, info: (r) => r._value > 70.0, ok: (r) => r._value <= 60.0, messageFn: (r) => if r._level == "crit" then "Critical alert!! Disk usage is at ${r._value}%!" else if r._level == "warn" then "Warning! Disk usage is at ${r._value}%." else if r._level == "info" then "Disk usage is at ${r._value}%." else "Things are looking good.", data: { _check_name: "Disk Utilization (Used Percentage)", _check_id: "disk_used_percent", _type: "threshold", tags: {}, }, )',
+      'monitor.check( crit: (r) => r._value > 90.0, warn: (r) => r._value > 80.0, info: (r) => r._value > 70.0, ok: (r) => r._value <= 60.0, messageFn: (r) => if r._level == "crit" then "Critical alert!! Disk usage is at ${r._value}%!" else if r._level == "warn" then "Warning! Disk usage is at ${r._value}%." else if r._level == "info" then "Disk usage is at ${r._value}%." else "Things are looking good.", data: { _check_name: "Disk Utilization (Used Percentage)", _check_id: "disk_used_percent", _type: "threshold", tags: {}, })',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/monitor/check/',
@@ -8952,7 +8952,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'experimental/mqtt',
     desc: 'Sends data to an MQTT broker using MQTT protocol.',
     example:
-      'mqtt.publish( broker: "tcp://localhost:8883", topic: "alerts", message: "wake up", clientid: "alert-watcher", retain: true, )',
+      'mqtt.publish( broker: "tcp://localhost:8883", topic: "alerts", message: "wake up", clientid: "alert-watcher", retain: true)',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/experimental/mqtt/publish/',
@@ -9171,7 +9171,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'contrib/sranka/opsgenie',
     desc: 'Sends an alert message to Opsgenie.',
     example:
-      'opsgenie.sendAlert( apiKey: apiKey, message: "Disk usage is: ${lastReported.status}.", alias: "example-disk-usage", responders: ["user:john@example.com", "team:itcrowd"], )',
+      'opsgenie.sendAlert( apiKey: apiKey, message: "Disk usage is: ${lastReported.status}.", alias: "example-disk-usage", responders: ["user:john@example.com", "team:itcrowd"])',
     category: 'Notification endpoints',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/contrib/sranka/opsgenie/sendalert/',
@@ -9320,7 +9320,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Sends an event to PagerDuty and returns the HTTP response code of the request.',
     example:
-      'pagerduty.sendEvent( routingKey: "example-routing-key", client: "example-client", clientURL: "http://example-url.com", dedupKey: "example-dedup-key", class: "example-class", eventAction: "trigger", group: "example-group", severity: "crit", component: "example-component", source: "example-source", summary: "example-summary", timestamp: now(), customDetails: {"example-key": "example value"}, )',
+      'pagerduty.sendEvent( routingKey: "example-routing-key", client: "example-client", clientURL: "http://example-url.com", dedupKey: "example-dedup-key", class: "example-class", eventAction: "trigger", group: "example-group", severity: "crit", component: "example-component", source: "example-source", summary: "example-summary", timestamp: now(), customDetails: {"example-key": "example value"})',
     category: 'Notification endpoints',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/pagerduty/sendevent/',
   },
@@ -9778,7 +9778,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'pushbullet',
     desc: 'Sends a push notification to the Pushbullet API.',
     example:
-      'pushbullet.pushData( token: "mY5up3Rs3Cre7T0k3n", data: { "type": "link", "title": "Example title", "body": "Example nofication body", "url": "http://example-url.com", }, )',
+      'pushbullet.pushData( token: "mY5up3Rs3Cre7T0k3n", data: { "type": "link", "title": "Example title", "body": "Example nofication body", "url": "http://example-url.com", })',
     category: 'Notification endpoints',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/pushbullet/pushdata/',
   },
@@ -9810,7 +9810,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'pushbullet',
     desc: 'Sends a push notification of type "note" to the Pushbullet API.',
     example:
-      'pushbullet.pushNote( token: "mY5up3Rs3Cre7T0k3n", data: {"type": "link", "title": "Example title", "text": "Example note text"}, )',
+      'pushbullet.pushNote( token: "mY5up3Rs3Cre7T0k3n", data: {"type": "link", "title": "Example title", "text": "Example note text"})',
     category: 'Notification endpoints',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/pushbullet/pushnote/',
   },
@@ -9966,7 +9966,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Makes a http POST request. This identical to calling `request.do(method: "POST", ...)`.',
     example:
-      'requests.post( url: "https://goolnk.com/api/v1/shorten", body: json.encode(v: {url: "http://www.influxdata.com"}), headers: ["Content-Type": "application/json"], )',
+      'requests.post( url: "https://goolnk.com/api/v1/shorten", body: json.encode(v: {url: "http://www.influxdata.com"}), headers: ["Content-Type": "application/json"])',
     category: 'Inputs',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/http/requests/post/',
   },
@@ -10235,7 +10235,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'influxdata/influxdb/schema',
     desc: 'Returns a list of tag values for a specific measurement.',
     example:
-      'schema.measurementTagValues( bucket: "example-bucket", measurement: "example-measurement", tag: "example-tag", )',
+      'schema.measurementTagValues( bucket: "example-bucket", measurement: "example-measurement", tag: "example-tag")',
     category: 'Metadata',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/schema/measurementtagvalues/',
@@ -10432,7 +10432,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Sends a single event to the Sensu Events API (https://docs.sensu.io/sensu-go/latest/api/events/#create-a-new-event).',
     example:
-      'sensu.event( url: "http://localhost:8080", apiKey: apiKey, checkName: "diskUsage", text: "Disk usage is **${lastReported.status}**.", )',
+      'sensu.event( url: "http://localhost:8080", apiKey: apiKey, checkName: "diskUsage", text: "Disk usage is **${lastReported.status}**.")',
     category: 'Notification endpoints',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/contrib/sranka/sensu/event/',
@@ -10482,7 +10482,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Sends events to ServiceNow (https://servicenow.com/) using data from input rows.',
     example:
-      'servicenow.endpoint( url: "https://example-tenant.service-now.com/api/global/em/jsonv2", username: username, password: password, )',
+      'servicenow.endpoint( url: "https://example-tenant.service-now.com/api/global/em/jsonv2", username: username, password: password)',
     category: 'Notification endpoints',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/servicenow/endpoint/',
@@ -10555,7 +10555,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'contrib/bonitoo-io/servicenow',
     desc: 'Sends an event to ServiceNow (https://servicenow.com/).',
     example:
-      'servicenow.event( url: "https://tenant.service-now.com/api/global/em/jsonv2", username: username, password: password, node: lastReported.host, metricType: lastReported._measurement, resource: lastReported.instance, metricName: lastReported._field, severity: if lastReported._value < 1.0 then "critical" else if lastReported._value < 5.0 then "warning" else "info", additionalInfo: {"devId": r.dev_id}, )',
+      'servicenow.event( url: "https://tenant.service-now.com/api/global/em/jsonv2", username: username, password: password, node: lastReported.host, metricType: lastReported._measurement, resource: lastReported.instance, metricName: lastReported._field, severity: if lastReported._value < 1.0 then "critical" else if lastReported._value < 5.0 then "warning" else "info", additionalInfo: {"devId": r.dev_id})',
     category: 'Notification endpoints',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/servicenow/event/',
@@ -10615,7 +10615,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Sends a single message to a Slack channel and returns the HTTP response code of the request.',
     example:
-      'slack.message( url: "https://hooks.slack.com/services/EXAMPLE-WEBHOOK-URL", channel: "#example-channel", text: "Example slack message", color: "warning", )',
+      'slack.message( url: "https://hooks.slack.com/services/EXAMPLE-WEBHOOK-URL", channel: "#example-channel", text: "Example slack message", color: "warning")',
     category: 'Notification endpoints',
     link: 'https://docs.influxdata.com/flux/v0/stdlib/slack/message/',
   },
@@ -10775,7 +10775,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Sends a single message to a Microsoft Teams channel using an incoming webhook (https://docs.microsoft.com/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook).',
     example:
-      'teams.message( url: "https://outlook.office.com/webhook/example-webhook", title: "Disk Usage", text: "Disk usage is: *${lastReported.status}*.", summary: "Disk usage is ${lastReported.status}", )',
+      'teams.message( url: "https://outlook.office.com/webhook/example-webhook", title: "Disk Usage", text: "Disk usage is: *${lastReported.status}*.", summary: "Disk usage is ${lastReported.status}")',
     category: 'Notification endpoints',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/contrib/sranka/teams/message/',
@@ -11082,7 +11082,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Identifies events of varying severity levels and writes them to the `statuses` measurement in the InfluxDB `_monitoring` system bucket.',
     example:
-      'tickscript.alert( check: {check with _check_id: "task/${r.service}"}, message: "task/${r.service} is ${r._level} value: ${r._value}", crit: (r) => r._value > 30, warn: (r) => r._value > 20, info: (r) => r._value > 10, )',
+      'tickscript.alert( check: {check with _check_id: "task/${r.service}"}, message: "task/${r.service} is ${r._level} value: ${r._value}", crit: (r) => r._value > 30, warn: (r) => r._value > 20, info: (r) => r._value > 10)',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/tickscript/alert/',
@@ -11154,7 +11154,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Detects low data throughput and writes a point with a critical status to the InfluxDB `_monitoring` system bucket.',
     example:
-      'tickscript.deadman( check: tickscript.defineCheck(id: "000000000000", name: "task/${r.service}"), measurement: "pulse", threshold: 2, )',
+      'tickscript.deadman( check: tickscript.defineCheck(id: "000000000000", name: "task/${r.service}"), measurement: "pulse", threshold: 2)',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/tickscript/deadman/',
@@ -11226,7 +11226,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Merges two input streams into a single output stream based on specified columns with equal values and appends a new measurement name.',
     example:
-      'tickscript.join( tables: {metric: metrics, state: states}, on: ["_time", "host"], measurement: "example-m", )',
+      'tickscript.join( tables: {metric: metrics, state: states}, on: ["_time", "host"], measurement: "example-m")',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/tickscript/join/',
@@ -11624,7 +11624,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'contrib/bonitoo-io/victorops',
     desc: 'Sends an alert to VictorOps.',
     example:
-      'victorops.alert( url: "https://alert.victorops.com/integrations/generic/00000000/alert/${apiKey}/${routingKey}", messageType: if lastReported._value < 1.0 then "CRITICAL" else if lastReported._value < 5.0 then "WARNING" else "INFO", entityID: "example-alert-1", entityDisplayName: "Example Alert 1", stateMessage: "Last reported cpu_idle was ${string(v: r._value)}.", )',
+      'victorops.alert( url: "https://alert.victorops.com/integrations/generic/00000000/alert/${apiKey}/${routingKey}", messageType: if lastReported._value < 1.0 then "CRITICAL" else if lastReported._value < 5.0 then "WARNING" else "INFO", entityID: "example-alert-1", entityDisplayName: "Example Alert 1", stateMessage: "Last reported cpu_idle was ${string(v: r._value)}.")',
     category: 'Notification endpoints',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/victorops/alert/',
@@ -11708,7 +11708,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Sends a single message to Webex using the Webex messages API (https://developer.webex.com/docs/api/v1/messages/create-a-message).',
     example:
-      'webexteams.message( token: apiToken, roomId: "Y2lzY29zcGFyazovL3VzL1JPT00vYmJjZWIxYWQtNDNmMS0zYjU4LTkxNDctZjE0YmIwYzRkMTU0", text: "Disk usage is ${lastReported.status}.", markdown: "Disk usage is **${lastReported.status}**.", )',
+      'webexteams.message( token: apiToken, roomId: "Y2lzY29zcGFyazovL3VzL1JPT00vYmJjZWIxYWQtNDNmMS0zYjU4LTkxNDctZjE0YmIwYzRkMTU0", text: "Disk usage is ${lastReported.status}.", markdown: "Disk usage is **${lastReported.status}**.")',
     category: 'Notification endpoints',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/contrib/sranka/webexteams/message/',
@@ -11859,7 +11859,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'contrib/bonitoo-io/zenoss',
     desc: 'Sends an event to Zenoss (https://www.zenoss.com/).',
     example:
-      'zenoss.event( url: "https://tenant.zenoss.io:8080/zport/dmd/evconsole_router", username: username, username: password, device: lastReported.host, component: "CPU", eventClass: "/App", severity: if lastReported._value < 1.0 then "Critical" else if lastReported._value < 5.0 then "Warning" else if lastReported._value < 20.0 then "Info" else "Clear", )',
+      'zenoss.event( url: "https://tenant.zenoss.io:8080/zport/dmd/evconsole_router", username: username, username: password, device: lastReported.host, component: "CPU", eventClass: "/App", severity: if lastReported._value < 1.0 then "Critical" else if lastReported._value < 5.0 then "Warning" else if lastReported._value < 20.0 then "Info" else "Clear")',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/zenoss/event/',
