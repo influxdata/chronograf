@@ -15,7 +15,7 @@ class TooltipExample extends PureComponent<Props> {
     return (
       <article>
         <div className="flux-functions-toolbar--heading">Example</div>
-        <pre className="flux-functions-toolbar--snippet">{example}</pre>
+        <div className="flux-functions-toolbar--snippet">{example}</div>
       </article>
     )
   }
