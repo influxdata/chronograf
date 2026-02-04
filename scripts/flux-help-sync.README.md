@@ -53,9 +53,9 @@ Notes and assumptions
 - Examples are extracted from the first JavaScript example block by locating
   the first call to the function and reducing it to a single-line call
   expression (no pipeline, imports, or setup). Full-line and inline `//`
-  comments are removed before extracting the call. If no call is found, new
-  entries default to `functionName()`, and existing entries keep their current
-  example.
+  comments are removed before extracting the call. Trailing commas before a
+  closing parenthesis are removed. If no call is found, new entries default to
+  `functionName()`, and existing entries keep their current example.
 - Links are sourced directly from docs-v2 paths (for example,
   `.../flux/v0/stdlib/universe/...`) and existing entries are updated to match.
 - Strings are quoted using single or double quotes to satisfy Prettier when

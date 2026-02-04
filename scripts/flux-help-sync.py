@@ -407,6 +407,40 @@ def squash_ws(text):
     return "".join(out).strip()
 
 
+def remove_trailing_commas(text):
+    out = []
+    in_string = None
+    escape = False
+    i = 0
+    while i < len(text):
+        ch = text[i]
+        if in_string:
+            out.append(ch)
+            if escape:
+                escape = False
+            elif ch == "\\":
+                escape = True
+            elif ch == in_string:
+                in_string = None
+            i += 1
+            continue
+        if ch in ("'", '"'):
+            in_string = ch
+            out.append(ch)
+            i += 1
+            continue
+        if ch == ",":
+            j = i + 1
+            while j < len(text) and text[j].isspace():
+                j += 1
+            if j < len(text) and text[j] == ")":
+                i = j
+                continue
+        out.append(ch)
+        i += 1
+    return "".join(out)
+
+
 def parse_example(body, name):
     m = re.search(r"^## Examples\s*$", body, flags=re.M)
     if not m:
@@ -426,7 +460,7 @@ def parse_example(body, name):
 
         call = extract_function_call(code, name)
         if call:
-            return squash_ws(call)
+            return remove_trailing_commas(squash_ws(call))
     return None
 
 
