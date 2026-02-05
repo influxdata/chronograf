@@ -5,7 +5,6 @@
 ### Other
 
 1. [#6166](https://github.com/influxdata/chronograf/pull/6166): Upgrade dependencies. Upgrade golang to 1.24.11. Removed support for Linux i386, armhf, armel and static build. Removed support for Darwin arm64
-1. [#6165](https://github.com/influxdata/chronograf/pull/6165): Upgrade golang to 1.25.5
 1. [#6170](https://github.com/influxdata/chronograf/pull/6170): Update Flux help in the UI to align with stdlib `0.199`.
 
 ## v1.10.9 [2026-01-07]
