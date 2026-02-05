@@ -14,7 +14,9 @@ apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     zip \
     python3-pip \
     autoconf \
-    libtool
+    libtool \
+    gcc \
+    g++
 
 pip3 install boto requests python-jose --upgrade
 gem install dotenv -v 2.8.1
