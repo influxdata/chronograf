@@ -5,21 +5,40 @@ export const FROM: FluxToolbarFunction = {
   args: [
     {
       name: 'bucket',
-      desc: 'The name of the bucket to query.',
+      desc: 'Name of the bucket to query.',
       type: 'String',
     },
     {
       name: 'bucketID',
-      desc: 'The string-encoded ID of the bucket to query.',
+      desc: 'String-encoded bucket ID to query.',
+      type: 'String',
+    },
+    {
+      name: 'host',
+      desc: 'URL of the InfluxDB instance to query.',
+      type: 'String',
+    },
+    {
+      name: 'org',
+      desc: 'Organization name.',
+      type: 'String',
+    },
+    {
+      name: 'orgID',
+      desc: 'String-encoded organization ID to query.',
+      type: 'String',
+    },
+    {
+      name: 'token',
+      desc: 'InfluxDB API token.',
       type: 'String',
     },
   ],
   package: '',
-  desc:
-    'Used to retrieve data from an InfluxDB data source. It returns a stream of tables from the specified bucket. Each unique series is contained within its own table. Each record in the table represents a single point in the series.',
-  example: 'from(bucket: "db/rp")',
+  desc: 'Queries data from an InfluxDB data source.',
+  example: 'from(bucket: "example-bucket")',
   category: 'Inputs',
-  link: 'https://docs.influxdata.com/flux/latest/stdlib/built-in/inputs/from/',
+  link: 'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/from/',
 }
 
 export const RANGE: FluxToolbarFunction = {
@@ -27,22 +46,20 @@ export const RANGE: FluxToolbarFunction = {
   args: [
     {
       name: 'start',
-      desc: 'The earliest time to include in results.',
+      desc: 'Earliest time to include in results.',
       type: 'Duration | Time',
     },
     {
       name: 'stop',
-      desc: 'The latest time to include in results. Defaults to `now()`.',
+      desc: 'Latest time to include in results. Default is `now()`.',
       type: 'Duration | Time',
     },
   ],
   package: '',
-  desc:
-    "Filters records based on time bounds. Each input table's records are filtered to contain only records that exist within the time bounds. Each input table's group key value is modified to fit within the time bounds. Tables where all records exists outside the time bounds are filtered entirely.",
-  example: 'range(start: -15m, stop: now())',
+  desc: 'Filters rows based on time bounds.',
+  example: 'range(start: -12h)',
   category: 'Transformations',
-  link:
-    'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/range/',
+  link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/range/',
 }
 
 export const MEAN: FluxToolbarFunction = {
@@ -50,16 +67,16 @@ export const MEAN: FluxToolbarFunction = {
   args: [
     {
       name: 'column',
-      desc: 'The column on which to compute the mean. Defaults to `"_value"`',
+      desc: 'Column to use to compute means. Default is `_value`.',
       type: 'String',
     },
   ],
   package: '',
-  desc: 'Computes the mean or average of non-null records in the input table.',
-  example: 'mean(column: "_value")',
+  desc:
+    'Returns the average of non-null values in a specified column from each input table.',
+  example: 'mean()',
   category: 'Aggregates',
-  link:
-    'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/mean/',
+  link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/mean/',
 }
 
 export const UNION: FluxToolbarFunction = {
@@ -67,18 +84,15 @@ export const UNION: FluxToolbarFunction = {
   args: [
     {
       name: 'tables',
-      desc:
-        'Specifies the streams to union together. There must be at least two streams.',
+      desc: 'List of two or more streams of tables to union together.',
       type: 'Array of Strings',
     },
   ],
   package: '',
-  desc:
-    'Concatenates two or more input streams into a single output stream. The output schemas of the `union()` function is the union of all input schemas. A sort operation may be added if a specific sort order is needed.',
-  example: 'union(tables: [table1, table2])',
+  desc: 'Merges two or more input streams into a single output stream.',
+  example: 'union(tables: [t1, t2])',
   category: 'Transformations',
-  link:
-    'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/union/',
+  link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/union/',
 }
 
 export const MATH_ABS: FluxToolbarFunction = {
@@ -86,15 +100,15 @@ export const MATH_ABS: FluxToolbarFunction = {
   args: [
     {
       name: 'x',
-      desc: 'The value used in the operation.',
+      desc: 'Value to operate on.',
       type: 'Float',
     },
   ],
   package: 'math',
-  desc: 'Returns the absolute value of x.',
-  example: 'math.abs(x: r._value)',
+  desc: 'Returns the absolute value of `x`.',
+  example: 'math.abs(x: -1.22)',
   category: 'Transformations',
-  link: 'https://docs.influxdata.com/flux/latest/stdlib/math/abs/',
+  link: 'https://docs.influxdata.com/flux/v0/stdlib/math/abs/',
 }
 
 export const MATH_FLOOR: FluxToolbarFunction = {
@@ -102,15 +116,15 @@ export const MATH_FLOOR: FluxToolbarFunction = {
   args: [
     {
       name: 'x',
-      desc: 'The value used in the operation.',
+      desc: 'Value to operate on.',
       type: 'Float',
     },
   ],
   package: 'math',
-  desc: 'Returns the greatest integer value less than or equal to x.',
-  example: 'math.floor(x: r._value)',
+  desc: 'Returns the greatest integer value less than or equal to `x`.',
+  example: 'math.floor(x: 1.22)',
   category: 'Transformations',
-  link: 'https://docs.influxdata.com/flux/latest/stdlib/math/floor/',
+  link: 'https://docs.influxdata.com/flux/v0/stdlib/math/floor/',
 }
 
 export const STRINGS_TITLE: FluxToolbarFunction = {
@@ -118,7 +132,7 @@ export const STRINGS_TITLE: FluxToolbarFunction = {
   args: [
     {
       name: 'v',
-      desc: 'The string value to convert.',
+      desc: 'String value to convert.',
       type: 'String',
     },
   ],
@@ -126,7 +140,7 @@ export const STRINGS_TITLE: FluxToolbarFunction = {
   desc: 'Converts a string to title case.',
   example: 'strings.title(v: r._value)',
   category: 'Transformations',
-  link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/title/',
+  link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/title/',
 }
 
 export const STRINGS_TRIM: FluxToolbarFunction = {
@@ -134,21 +148,21 @@ export const STRINGS_TRIM: FluxToolbarFunction = {
   args: [
     {
       name: 'v',
-      desc: 'The string value to trim.',
+      desc: 'String to remove characters from.',
       type: 'String',
     },
     {
       name: 'cutset',
-      desc:
-        'The leading and trailing characters to trim from the string value. Only characters that match exactly are trimmed.',
+      desc: 'Leading and trailing characters to remove from the string.',
       type: 'String',
     },
   ],
   package: 'strings',
-  desc: 'Removes specified leading and trailing characters from a string.',
-  example: 'strings.trim(v: r._value, cutset: "_")',
+  desc:
+    'Removes leading and trailing characters specified in the cutset from a string.',
+  example: 'strings.trim(v: r._value, cutset: "smpl_")',
   category: 'Transformations',
-  link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/trim/',
+  link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/trim/',
 }
 
 export const FUNCTIONS: FluxToolbarFunction[] = [
@@ -157,71 +171,87 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     args: [
       {
         name: 'every',
-        desc: 'Duration of windows.',
+        desc: 'Duration of time windows.',
         type: 'Duration',
       },
       {
         name: 'groupColumns',
-        desc: 'List of columns to group by. Defaults to [].',
+        desc: 'List of columns to group by. Default is `[]`.',
         type: 'Array of Strings',
       },
       {
         name: 'unit',
         desc:
-          'Time duration to use when calculating the rate. Defaults to `1s`.',
+          'Time duration to use when calculating the rate. Default is `1s`.',
         type: 'Array of Strings',
       },
     ],
     package: 'experimental/aggregate',
-    desc: 'Calculates the range of change per windows of time.',
-    example: 'aggregate.rate(every: 1m, unit: 1s)',
+    desc:
+      'Calculates the average rate of increase per window of time for each input table.',
+    example: 'aggregate.rate(every: 30s, unit: 1s, groupColumns: ["tag"])',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/aggregate/rate/',
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/aggregate/rate/',
   },
   {
     name: 'aggregateWindow',
     args: [
       {
         name: 'every',
-        desc: 'The duration of windows.',
+        desc: 'Duration of time between windows.',
+        type: 'Duration',
+      },
+      {
+        name: 'period',
+        desc: 'Duration of windows. Default is the `every` value.',
+        type: 'Duration',
+      },
+      {
+        name: 'offset',
+        desc: 'Duration to shift the window boundaries by. Default is `0s`.',
         type: 'Duration',
       },
       {
         name: 'fn',
-        desc: 'The aggregate function used in the operation.',
+        desc: 'Aggregate or selector function to apply to each time window.',
         type: 'Unquoted String',
       },
       {
+        name: 'location',
+        desc:
+          'Location used to determine timezone. Default is the `location` option.',
+        type: 'Object',
+      },
+      {
         name: 'column',
-        desc: 'The column on which to operate. Defaults to `"_value"`.',
+        desc: 'Column to operate on.',
         type: 'String',
       },
       {
         name: 'timeSrc',
         desc:
-          'The "time source" column from which time is copied for the aggregate record. Defaults to `"_stop"`.',
+          'Column to use as the source of the new time value for aggregate values.',
         type: 'String',
       },
       {
         name: 'timeDst',
-        desc:
-          'The "time destination" column to which time is copied for the aggregate record. Defaults to `"_time"`.',
+        desc: 'Column to store time values for aggregate values in.',
         type: 'String',
       },
       {
         name: 'createEmpty',
-        desc:
-          'For windows without data, this will create an empty window and fill it with a `null` aggregate value.',
+        desc: 'Create empty tables for empty window. Default is `true`.',
         type: 'Boolean',
       },
     ],
     package: '',
-    desc: 'Applies an aggregate function to fixed windows of time.',
-    example: 'aggregateWindow(every: 1m, fn: mean)',
+    desc:
+      'Downsamples data by grouping data into fixed windows of time and applying an aggregate or selector function to each window.',
+    example: 'aggregateWindow(every: 20s, fn: mean)',
     category: 'Aggregates',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/aggregatewindow/',
+      'https://docs.influxdata.com/flux/v0/stdlib/universe/aggregatewindow/',
   },
   {
     name: 'bigtable.from',
@@ -229,628 +259,652 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       {
         name: 'token',
         desc:
-          'The Google Cloud IAM token to use to access the Cloud Bigtable database.',
+          'Google Cloud IAM token to use to access the Cloud Bigtable database.',
         type: 'String',
       },
       {
         name: 'project',
-        desc:
-          'The project ID of the Cloud Bigtable project to retrieve data from.',
+        desc: 'Cloud Bigtable project ID.',
         type: 'String',
       },
       {
         name: 'instance',
-        desc:
-          'The instance ID of the Cloud Bigtable instance to retrieve data from.',
+        desc: 'Cloud Bigtable instance ID.',
         type: 'String',
       },
       {
         name: 'table',
-        desc: 'The name of the Cloud Bigtable table to retrieve data from.',
+        desc: 'Cloud Bigtable table name.',
         type: 'String',
       },
     ],
     package: 'experimental/bigtable',
-    desc: 'Retrieves data from a Google Cloud Bigtable data source.',
+    desc:
+      'Retrieves data from a Google Cloud Bigtable (https://cloud.google.com/bigtable/) data source.',
     example:
-      'bigtable.from(token: "mySuPeRseCretTokEn", project: "exampleProjectID", instance: "exampleInstanceID", table: "example-table")',
+      'bigtable.from( token: "example-token", project: "example-project", instance: "example-instance", table: "example-table")',
     category: 'Inputs',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/bigtable/from/',
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/bigtable/from/',
   },
   {
     name: 'bool',
     args: [
       {
         name: 'v',
-        desc: 'The value to convert.',
+        desc: 'Value to convert.',
         type: 'String, Integer, UInteger, Float',
       },
     ],
     package: '',
-    desc: 'Converts a single value to a boolean.',
-    example: 'bool(v: r._value)',
+    desc: 'Converts a value to a boolean type.',
+    example: 'bool(v: "true")',
     category: 'Type Conversions',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/type-conversions/bool/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/bool/',
   },
   {
     name: 'bottom',
     args: [
       {
         name: 'n',
-        desc: 'The number of rows to return.',
+        desc: 'Number of rows to return from each input table.',
         type: 'Integer',
       },
       {
         name: 'columns',
-        desc:
-          'List of columns by which to sort. Sort precedence is determined by list order (left to right) .Default is `["_value"]`',
+        desc: 'List of columns to sort by. Default is `["_value"]`.',
         type: 'Array of Strings',
       },
     ],
     package: '',
-    desc: 'Sorts a table by columns and keeps only the bottom n rows.',
-    example: 'bottom(n:10, columns: ["_value"])',
+    desc:
+      'Sorts each input table by specified columns and keeps the bottom `n` records in each table.',
+    example: 'bottom(n: 2)',
     category: 'Selectors',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/selectors/bottom/',
-  },
-  {
-    name: 'buckets',
-    args: [],
-    package: '',
-    desc: 'Returns a list of buckets in the organization.',
-    example: 'buckets()',
-    category: 'Inputs',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/inputs/buckets/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/bottom/',
   },
   {
     name: 'bytes',
     args: [
       {
         name: 'v',
-        desc: 'The value to convert.',
+        desc: 'Value to convert.',
         type: 'String, Integer, UInteger, Float, Boolean',
       },
     ],
     package: '',
-    desc: 'Converts a single value to bytes.',
-    example: 'bytes(t: r._value)',
+    desc: 'Converts a string value to a bytes type.',
+    example: 'bytes(v: "Example string")',
     category: 'Type Conversions',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/type-conversions/bytes/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/bytes/',
   },
   {
     name: 'chandeMomentumOscillator',
     args: [
       {
         name: 'n',
-        desc: 'The period or number of points to use in the calculation.',
+        desc: 'Period or number of points to use in the calculation.',
         type: 'Integer',
       },
       {
         name: 'columns',
-        desc: 'Columns to operate on. Defaults to `["_value"]`.',
+        desc: 'List of columns to operate on. Default is `["_value"]`.',
         type: 'Array of Strings`',
       },
     ],
     package: '',
     desc:
-      'Applies the technical momentum indicator developed by Tushar Chande.',
-    example: 'chandeMomentumOscillator(n: 10)',
+      'Applies the technical momentum indicator developed by Tushar Chande to input data.',
+    example: 'chandeMomentumOscillator(n: 2)',
     category: 'Aggregates',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/chandemomentumoscillator/',
+      'https://docs.influxdata.com/flux/v0/stdlib/universe/chandemomentumoscillator/',
   },
   {
     name: 'columns',
     args: [
       {
         name: 'column',
-        desc:
-          'The name of the output column in which to store the column labels.',
+        desc: 'Name of the output column to store column labels in.',
         type: 'String',
       },
     ],
     package: '',
-    desc: 'Lists the column labels of input tables.',
-    example: 'columns(column: "_value")',
+    desc: 'Returns the column labels in each input table.',
+    example: 'columns(column: "labels")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/columns/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/columns/',
   },
   {
     name: 'contains',
     args: [
       {
         name: 'value',
-        desc: 'The value to search for.',
+        desc: 'Value to search for.',
         type: 'Boolean, Integer, UInteger, Float, String, Time',
       },
       {
         name: 'set',
-        desc: 'The set of values in which to search.',
+        desc: 'Array to search.',
         type: 'Boolean, Integer, UInteger, Float, String, Time',
       },
     ],
     package: '',
-    desc: 'Tests whether a value is a member of a set.',
-    example: 'contains(value: 1, set: [1,2,3])',
+    desc:
+      'Tests if an array contains a specified value and returns `true` or `false`.',
+    example: 'contains(value: r._field, set: fields)',
     category: 'Tests',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/tests/contains/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/contains/',
   },
   {
     name: 'count',
     args: [
       {
         name: 'column',
-        desc: 'The column on which to operate. Defaults to `"_value"`.',
+        desc: 'Column to count values in and store the total count.',
         type: 'String',
       },
     ],
     package: '',
-    desc: 'Outputs the number of records in the specified column.',
-    example: 'count(column: "_value")',
+    desc: 'Returns the number of records in each input table.',
+    example: 'count()',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/count/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/count/',
   },
   {
     name: 'cov',
     args: [
       {
         name: 'x',
-        desc: 'One input stream used to calculate the covariance.',
+        desc: 'First input stream.',
         type: 'Object',
       },
       {
         name: 'y',
-        desc: 'The other input table used to calculate the covariance.',
+        desc: 'Second input stream.',
         type: 'Object',
       },
       {
         name: 'on',
-        desc: 'The list of columns on which to join.',
+        desc: 'List of columns to join on.',
         type: 'Array of Strings',
       },
       {
         name: 'pearsonr',
         desc:
-          'Indicates whether the result should be normalized to be the Pearson R coefficient',
+          'Normalize results to the Pearson R coefficient. Default is `false`.',
         type: 'Boolean',
       },
     ],
     package: '',
-    desc:
-      'Computes the covariance between two streams by first joining the streams, then performing the covariance operation.',
-    example:
-      'cov(x: table1, y: table2, on: ["_time", "_field"], pearsonr: false)',
+    desc: 'Computes the covariance between two streams of tables.',
+    example: 'cov(x: stream1, y: stream2, on: ["_time"])',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/cov/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/cov/',
   },
   {
     name: 'covariance',
     args: [
       {
         name: 'columns',
-        desc:
-          'A list of columns on which to operate. Exactly two columns must be provided.',
+        desc: 'List of two columns to operate on.',
         type: 'Array of Strings',
       },
       {
         name: 'pearsonr',
         desc:
-          'Indicates whether the result should be normalized to be the Pearson R coefficient',
+          'Normalize results to the Pearson R coefficient. Default is `false`.',
         type: 'Boolean',
       },
       {
         name: 'valueDst',
-        desc:
-          'The column into which the result will be placed. Defaults to `"_value"`.',
+        desc: 'Column to store the result in. Default is `_value`.',
         type: 'String',
       },
     ],
     package: '',
     desc: 'Computes the covariance between two columns.',
-    example:
-      'covariance(columns: ["column_x", "column_y"], pearsonr: false, valueDst: "_value")',
+    example: 'covariance(columns: ["x", "y"])',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/covariance/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/covariance/',
   },
   {
     name: 'csv.from (file)',
     args: [
       {
         name: 'file',
-        desc: 'The file path of the CSV file to query.',
+        desc: 'File path of the CSV file to query.',
         type: 'String',
       },
     ],
     package: 'csv',
-    desc: 'Retrieves data from a comma-separated value (CSV) data source.',
+    desc:
+      'Retrieves data from a comma separated value (CSV) data source and returns a stream of tables.',
     example: 'csv.from(file: path)',
     category: 'Inputs',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/csv/from/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/csv/from/',
   },
   {
     name: 'csv.from (csvData)',
     args: [
       {
         name: 'csv',
-        desc:
-          'Raw CSV-formatted text. CSV data must be in the CSV format produced by the Flux HTTP response standard.',
+        desc: 'CSV data.',
         type: 'String',
       },
     ],
     package: 'csv',
-    desc: 'Retrieves data from a comma-separated value (CSV) data source.',
+    desc:
+      'Retrieves data from a comma separated value (CSV) data source and returns a stream of tables.',
     example: 'csv.from(csv: csvData)',
     category: 'Inputs',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/csv/from/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/csv/from/',
   },
   {
     name: 'csv.from (url)',
     args: [
       {
         name: 'url',
-        desc: 'The URL to retrieve annotated CSV from.',
+        desc: 'URL to retrieve annotated CSV from.',
         type: 'String',
       },
     ],
     package: 'experimental/csv',
-    desc: 'Retrieves annotated CSV data from a URL.',
+    desc:
+      'Retrieves annotated CSV (/influxdb/v2/reference/syntax/annotated-csv/) **from a URL**.',
     example: 'csv.from(url: "http://example.com/data.csv")',
     category: 'Inputs',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/csv/from/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/csv/from/',
   },
   {
     name: 'cumulativeSum',
     args: [
       {
         name: 'columns',
-        desc:
-          'A list of columns on which to operate. Defaults to `["_value"]`.',
+        desc: 'List of columns to operate on. Default is `["_value"]`.',
         type: 'Array of Strings',
       },
     ],
     package: '',
-    desc:
-      'Computes a running sum for non-null records in the table. The output table schema will be the same as the input table.',
-    example: 'cumulativeSum(columns: ["_value"])',
+    desc: 'Computes a running sum for non-null records in a table.',
+    example: 'cumulativeSum()',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/cumulativesum/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/cumulativesum/',
   },
   {
     name: 'date.hour',
     args: [
       {
         name: 't',
-        desc: 'The time to operate on.',
+        desc: 'Time to operate on.',
         type: 'Time',
+      },
+      {
+        name: 'location',
+        desc: 'Location used to determine timezone.',
+        type: 'Object',
       },
     ],
     package: 'date',
-    desc: 'Returns the hour of a specified time. Results range from `[0-23]`.',
-    example: 'date.hour(t: 2019-07-17T12:05:21.012Z)',
+    desc:
+      'Returns the hour of a specified time. Results range from `[0 - 23]`.',
+    example: 'date.hour(t: 2020-02-11T12:21:03.29353494Z)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/hour/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/date/hour/',
   },
   {
     name: 'date.microsecond',
     args: [
       {
         name: 't',
-        desc: 'The time to operate on.',
+        desc: 'Time to operate on.',
         type: 'Time',
       },
     ],
     package: 'date',
     desc:
-      'Returns the microsecond of a specified time. Results range from `[1-999999]`.',
-    example: 'date.microsecond(t: 2019-07-17T12:05:21.012934584Z)',
+      'Returns the microseconds for a specified time. Results range `from [0-999999]`.',
+    example: 'date.microsecond(t: 2020-02-11T12:21:03.29353494Z)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/microsecond/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/date/microsecond/',
   },
   {
     name: 'date.millisecond',
     args: [
       {
         name: 't',
-        desc: 'The time to operate on.',
+        desc: 'Time to operate on.',
         type: 'Time',
       },
     ],
     package: 'date',
     desc:
-      'Returns the millisecond of a specified time. Results range from `[1-999]`.',
-    example: 'date.millisecond(t: 2019-07-17T12:05:21.012934584Z)',
+      'Returns the milliseconds for a specified time. Results range from `[0-999]`.',
+    example: 'date.millisecond(t: 2020-02-11T12:21:03.29353494Z)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/millisecond/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/date/millisecond/',
   },
   {
     name: 'date.minute',
     args: [
       {
         name: 't',
-        desc: 'The time to operate on.',
+        desc: 'Time to operate on.',
         type: 'Time',
+      },
+      {
+        name: 'location',
+        desc: 'Location used to determine timezone.',
+        type: 'Object',
       },
     ],
     package: 'date',
     desc:
-      'Returns the minute of a specified time. Results range from `[0-59]`.',
-    example: 'date.minute(t: 2019-07-17T12:05:21.012Z)',
+      'Returns the minute of a specified time. Results range from `[0 - 59]`.',
+    example: 'date.minute(t: 2020-02-11T12:21:03.29353494Z)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/minute/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/date/minute/',
   },
   {
     name: 'date.month',
     args: [
       {
         name: 't',
-        desc: 'The time to operate on.',
+        desc: 'Time to operate on.',
         type: 'Time',
+      },
+      {
+        name: 'location',
+        desc: 'Location used to determine timezone.',
+        type: 'Object',
       },
     ],
     package: 'date',
-    desc: 'Returns the month of a specified time. Results range from `[1-12]`.',
-    example: 'date.month(t: 2019-07-17T12:05:21.012Z)',
+    desc:
+      'Returns the month of a specified time. Results range from `[1 - 12]`.',
+    example: 'date.month(t: 2020-02-11T12:21:03.29353494Z)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/month/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/date/month/',
   },
   {
     name: 'date.monthDay',
     args: [
       {
         name: 't',
-        desc: 'The time to operate on.',
+        desc: 'Time to operate on.',
         type: 'Time',
+      },
+      {
+        name: 'location',
+        desc: 'Location used to determine timezone.',
+        type: 'Object',
       },
     ],
     package: 'date',
     desc:
-      'Returns the day of the month for a specified time. Results range from `[1-31]`.',
-    example: 'date.monthDay(t: 2019-07-17T12:05:21.012Z)',
+      'Returns the day of the month for a specified time. Results range from `[1 - 31]`.',
+    example: 'date.monthDay(t: 2020-02-11T12:21:03.29353494Z)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/monthday/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/date/monthday/',
   },
   {
     name: 'date.nanosecond',
     args: [
       {
         name: 't',
-        desc: 'The time to operate on.',
+        desc: 'Time to operate on.',
         type: 'Time',
       },
     ],
     package: 'date',
     desc:
-      'Returns the nanosecond of a specified time. Results range from `[1-999999999]`.',
-    example: 'date.nanosecond(t: 2019-07-17T12:05:21.012934584Z)',
+      'Returns the nanoseconds for a specified time. Results range from `[0-999999999]`.',
+    example: 'date.nanosecond(t: 2020-02-11T12:21:03.29353494Z)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/nanosecond/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/date/nanosecond/',
   },
   {
     name: 'date.quarter',
     args: [
       {
         name: 't',
-        desc: 'The time to operate on.',
+        desc: 'Time to operate on.',
         type: 'Time',
+      },
+      {
+        name: 'location',
+        desc: 'Location used to determine timezone.',
+        type: 'Object',
       },
     ],
     package: 'date',
     desc:
-      'Returns the quarter of the year for a specified time. Results range from `[1-4]`.',
-    example: 'date.quarter(t: 2019-07-17T12:05:21.012Z)',
+      'Returns the quarter for a specified time. Results range from `[1-4]`.',
+    example: 'date.quarter(t: 2020-02-11T12:21:03.29353494Z)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/quarter/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/date/quarter/',
   },
   {
     name: 'date.second',
     args: [
       {
         name: 't',
-        desc: 'The time to operate on.',
+        desc: 'Time to operate on.',
         type: 'Time',
       },
     ],
     package: 'date',
     desc:
-      'Returns the second of a specified time. Results range from `[0-59]`.',
-    example: 'date.second(t: 2019-07-17T12:05:21.012Z)',
+      'Returns the second of a specified time. Results range from `[0 - 59]`.',
+    example: 'date.second(t: 2020-02-11T12:21:03.29353494Z)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/second/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/date/second/',
   },
   {
     name: 'date.truncate',
     args: [
       {
         name: 't',
-        desc: 'The time to operate on.',
+        desc: 'Time to operate on.',
         type: 'Time',
       },
       {
         name: 'unit',
-        desc:
-          'The unit time to truncate to. Only use `1` and the unit of time to specify the `unit`. For example, `1s`, `1m`, `1h`.',
+        desc: 'Unit of time to truncate to.',
         type: 'Duration',
+      },
+      {
+        name: 'location',
+        desc: 'Location used to determine timezone.',
+        type: 'Object',
       },
     ],
     package: 'date',
-    desc:
-      'Truncates the time to a specified unit. Results range from `[0-59]`.',
-    example: 'date.truncate(t: 2019-07-17T12:05:21.012Z, unit: 1s)',
+    desc: 'Returns a time truncated to the specified duration unit.',
+    example: 'date.truncate(t: 2019-06-03T13:59:01Z, unit: 1s)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/truncate/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/date/truncate/',
   },
   {
     name: 'date.week',
     args: [
       {
         name: 't',
-        desc: 'The time to operate on.',
+        desc: 'Time to operate on.',
         type: 'Time',
+      },
+      {
+        name: 'location',
+        desc: 'Location used to determine timezone.',
+        type: 'Object',
       },
     ],
     package: 'date',
     desc:
-      'Returns the ISO week of the year for a specified time. Results range from `[1-53]`.',
-    example: 'date.week(t: 2019-07-17T12:05:21.012Z)',
+      'Returns the ISO week of the year for a specified time. Results range from `[1 - 53]`.',
+    example: 'date.week(t: 2020-02-11T12:21:03.29353494Z)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/week/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/date/week/',
   },
   {
     name: 'date.weekDay',
     args: [
       {
         name: 't',
-        desc: 'The time to operate on.',
+        desc: 'Time to operate on.',
         type: 'Time',
+      },
+      {
+        name: 'location',
+        desc: 'Location used to determine timezone.',
+        type: 'Object',
       },
     ],
     package: 'date',
     desc:
-      'Returns the day of the week for a specified time. Results range from `[0-6]`.',
-    example: 'date.weekDay(t: 2019-07-17T12:05:21.012Z)',
+      'Returns the day of the week for a specified time. Results range from `[0 - 6]`.',
+    example: 'date.weekDay(t: 2020-02-11T12:21:03.29353494Z)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/weekday/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/date/weekday/',
   },
   {
     name: 'date.year',
     args: [
       {
         name: 't',
-        desc: 'The time to operate on.',
+        desc: 'Time to operate on.',
         type: 'Time',
+      },
+      {
+        name: 'location',
+        desc: 'Location used to determine timezone.',
+        type: 'Object',
       },
     ],
     package: 'date',
     desc: 'Returns the year of a specified time.',
-    example: 'date.year(t: 2019-07-17T12:05:21.012Z)',
+    example: 'date.year(t: 2020-02-11T12:21:03.29353494Z)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/year/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/date/year/',
   },
   {
     name: 'date.yearDay',
     args: [
       {
         name: 't',
-        desc: 'The time to operate on.',
+        desc: 'Time to operate on.',
         type: 'Time',
+      },
+      {
+        name: 'location',
+        desc: 'Location used to determine timezone.',
+        type: 'Object',
       },
     ],
     package: 'date',
     desc:
-      'Returns the day of the year for a specified time. Results include leap days and range from `[1-366]`.',
-    example: 'date.yearDay(t: 2019-07-17T12:05:21.012Z)',
+      'Returns the day of the year for a specified time. Results can include leap days and range from `[1 - 366]`.',
+    example: 'date.yearDay(t: 2020-02-11T12:21:03.29353494Z)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/yearday/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/date/yearday/',
   },
   {
     name: 'derivative',
     args: [
       {
         name: 'unit',
-        desc: 'The time duration used when creating the derivative.',
+        desc:
+          'Time duration used to calculate the derivative. Default is `1s`.',
         type: 'Duration',
       },
       {
         name: 'nonNegative',
-        desc:
-          'Indicates if the derivative is allowed to be negative. When set to `true`, if a value is less than the previous value, it is assumed the previous value should have been a zero.',
+        desc: 'Disallow negative derivative values. Default is `false`.',
         type: 'Boolean',
       },
       {
         name: 'columns',
-        desc:
-          'A list of columns on which to operate. Defaults to `["_value"]`.',
+        desc: 'List of columns to operate on. Default is `["_value"]`.',
         type: 'Array of Strings',
       },
       {
         name: 'timeColumn',
-        desc: 'The column name for the time values. Defaults to `"_time"`.',
+        desc: 'Column containing time values to use in the calculation.',
         type: 'String',
+      },
+      {
+        name: 'initialZero',
+        desc: 'Use zero (0) as the initial value in the derivative calculation',
+        type: 'Boolean',
       },
     ],
     package: '',
     desc:
-      'Computes the rate of change per unit of time between subsequent non-null records. The output table schema will be the same as the input table.',
-    example:
-      'derivative(unit: 1s, nonNegative: true, columns: ["_value"], timeColumn: "_time")',
+      'Computes the rate of change per unit of time between subsequent non-null records.',
+    example: 'derivative(nonNegative: true)',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/derivative/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/derivative/',
   },
   {
     name: 'difference',
     args: [
       {
         name: 'nonNegative',
-        desc:
-          'Indicates if the derivative is allowed to be negative. When set to `true`, if a value is less than the previous value, it is assumed the previous value should have been a zero.',
+        desc: 'Disallow negative differences. Default is `false`.',
         type: 'Boolean',
       },
       {
         name: 'columns',
-        desc:
-          'The columns to use to compute the difference. Defaults to `"_value"`.',
+        desc: 'List of columns to operate on. Default is `["_value"]`.',
         type: 'Array of Strings',
       },
       {
         name: 'keepFirst',
-        desc:
-          'Indicates the first row should be kept. If `true`, the difference will be `null`. Defaults to `false`.',
+        desc: 'Keep the first row in each input table. Default is `false`.',
+        type: 'Boolean',
+      },
+      {
+        name: 'initialZero',
+        desc: 'Use zero (0) as the initial value in the difference calculation',
         type: 'Boolean',
       },
     ],
     package: '',
-    desc:
-      'Computes the difference between subsequent non-null records in the specified columns.',
-    example: 'difference(nonNegative: false, columns: ["_value"])',
+    desc: 'Returns the difference between subsequent values.',
+    example: 'difference()',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/difference/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/difference/',
   },
   {
     name: 'distinct',
     args: [
       {
         name: 'column',
-        desc: 'Column on which to track unique values.',
+        desc: 'Column to return unique values from. Default is `_value`.',
         type: 'String',
       },
     ],
     package: '',
-    desc: 'Returns the unique values for a given column.',
-    example: 'distinct(column: "host")',
+    desc: 'Returns all unique values in a specified column.',
+    example: 'distinct()',
     category: 'Selectors',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/selectors/distinct/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/distinct/',
   },
   {
     name: 'doubleEMA',
     args: [
       {
         name: 'n',
-        desc: 'The number of points to average.',
+        desc: 'Number of points to average.',
         type: 'Integer',
       },
     ],
     package: '',
     desc:
-      'Calculates the exponential moving average of values in the `_value` column grouped into `n` number of points, giving more weight to recent data at double the rate of `exponentialMovingAverage()`.',
-    example: 'doubleEMA(n: 5)',
+      'Returns the double exponential moving average (DEMA) of values in the `_value` column grouped into `n` number of points, giving more weight to recent data.',
+    example: 'doubleEMA(n: 3)',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/doubleema/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/doubleema/',
   },
   {
     name: 'drop',
@@ -858,82 +912,83 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       {
         name: 'columns',
         desc:
-          'A list of columns to be removed from the table. Cannot be used with `fn`.',
+          'List of columns to remove from input tables. Mutually exclusive with `fn`.',
         type: 'Array of Strings',
       },
       {
         name: 'fn',
         desc:
-          'A function which takes a column name as a parameter and returns a boolean indicating whether or not the column should be removed from the table. Cannot be used with `columns`.',
+          'Predicate function with a `column` parameter that returns a boolean',
         type: 'Function',
       },
     ],
     package: '',
-    desc:
-      'Removes specified columns from a table. Columns can be specified either through a list or a predicate function. When a dropped column is part of the group key, it will be removed from the key.',
-    example: 'drop(columns: ["col1", "col2"])',
+    desc: 'Removes specified columns from a table.',
+    example: 'drop(columns: ["_time", "tag"])',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/drop/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/drop/',
   },
   {
     name: 'duplicate',
     args: [
       {
         name: 'column',
-        desc: 'The column name to duplicate.',
+        desc: 'Column to duplicate.',
         type: 'String',
       },
       {
         name: 'as',
-        desc: 'The name assigned to the duplicate column.',
+        desc: 'Name to assign to the duplicate column.',
         type: 'String',
       },
     ],
     package: '',
     desc: 'Duplicates a specified column in a table.',
-    example: 'duplicate(column: "column-name", as: "duplicate-name")',
+    example: 'duplicate(column: "tag", as: "tag_dup")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/duplicate/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/duplicate/',
   },
   {
     name: 'duration',
     args: [
       {
         name: 'v',
-        desc: 'The value to convert.',
+        desc: 'Value to convert.',
         type: 'String',
       },
     ],
     package: '',
-    desc: 'Converts a single value to a duration.',
-    example: 'duration(v: r._value)',
+    desc: 'Converts a value to a duration type.',
+    example: 'duration(v: "1h20m")',
     category: 'Type Conversions',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/type-conversions/duration/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/duration/',
   },
   {
     name: 'experimental.addDuration',
     args: [
       {
         name: 'd',
-        desc: 'The duration to add.',
+        desc: 'Duration to add.',
         type: 'Duration',
       },
       {
         name: 'to',
-        desc: 'The time to add the duration to.',
+        desc: 'Time to add the duration to.',
         type: 'Time',
+      },
+      {
+        name: 'location',
+        desc: 'Location to use for the time value.',
+        type: 'Object',
       },
     ],
     package: 'experimental',
     desc:
       'Adds a duration to a time value and returns the resulting time value.',
-    example: 'experimental.addDuration(d: 12h, to: now())',
+    example: 'experimental.addDuration(d: 6h, to: 2019-09-16T12:00:00Z)',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/addduration/',
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/addduration/',
   },
   {
     name: 'experimental.group',
@@ -941,22 +996,21 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       {
         name: 'columns',
         desc:
-          'List of columns to use in the grouping operation. Defaults to `[]`.',
+          'List of columns to use in the grouping operation. Default is `[]`.',
         type: 'Array of Strings',
       },
       {
         name: 'mode',
         desc:
-          'The mode used to group columns. Only the `extend` mode is available with this function.',
+          'Grouping mode. `extend` is the only mode available to `experimental.group()`.',
         type: 'String',
       },
     ],
     package: 'experimental',
-    desc: 'Introduces an extend mode to the existing `group()` function.',
-    example:
-      'experimental.group(columns: ["host", "_measurement"], mode: "extend")',
+    desc: 'Introduces an `extend` mode to the existing `group()` function.',
+    example: 'experimental.group(columns: ["region"], mode: "extend")',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/experimental/group/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/group/',
   },
   {
     name: 'experimental.join',
@@ -974,123 +1028,132 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       {
         name: 'fn',
         desc:
-          'A function that maps new output rows using left and right input rows.',
+          'Function with left and right arguments that maps a new output record',
         type: 'Function',
       },
     ],
     package: 'experimental',
     desc:
-      'Joins two streams of tables on the group key and _time column. Use the fn parameter to map output tables.',
+      'Joins two streams of tables on the **group key and `_time` column**.',
     example:
-      'experimental.join(left: left, right: right, fn: (left, right) => ({left with lv: left._value, rv: right._value }))',
+      'experimental.join( left: left, right: right, fn: (left, right) => ({left with lv: left._value, rv: right._value, diff: left._value - right._value}))',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/experimental/join/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/join/',
   },
   {
     name: 'experimental.objectKeys',
     args: [
       {
         name: 'o',
-        desc: 'The object to return keys from.',
+        desc: 'Record to return property keys from.',
         type: 'Object',
       },
     ],
     package: 'experimental',
-    desc: 'Returns an array of keys in a specified object.',
-    example: 'experimental.objectKeys(o: {key1: "value1", key2: "value2"})',
+    desc: 'Returns an array of property keys in a specified record.',
+    example: 'experimental.objectKeys(o: user)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/objectkeys/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/objectkeys/',
   },
   {
     name: 'experimental.set',
     args: [
       {
         name: 'o',
-        desc: 'An object that defines the columns and values to set.',
+        desc: 'Record that defines the columns and values to set.',
         type: 'Object',
       },
     ],
     package: 'experimental',
     desc: 'Sets multiple static column values on all records.',
-    example: 'experimental.set(o: {column1: "value1", column2: "value2"})',
+    example:
+      'experimental.set(o: {_field: "temperature", unit: "°F", location: "San Francisco"})',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/experimental/set/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/set/',
   },
   {
     name: 'experimental.subDuration',
     args: [
       {
+        name: 'from',
+        desc: 'Time to subtract the duration from.',
+        type: 'Time',
+      },
+      {
         name: 'd',
-        desc: 'The duration to subtract.',
+        desc: 'Duration to subtract.',
         type: 'Duration',
       },
       {
-        name: 'from',
-        desc: 'The time to subtract the duration from.',
-        type: 'Time',
+        name: 'location',
+        desc: 'Location to use for the time value.',
+        type: 'Object',
       },
     ],
     package: 'experimental',
     desc:
       'Subtracts a duration from a time value and returns the resulting time value.',
-    example: 'experimental.subDuration(d: 12h, from: now())',
+    example: 'experimental.subDuration(from: 2019-09-16T12:00:00Z, d: 6h)',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/subduration/',
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/subduration/',
   },
   {
     name: 'experimental.to',
     args: [
       {
         name: 'bucket',
-        desc:
-          'The bucket to write data to. `bucket` and `bucketID` are mutually exclusive.',
+        desc: 'Name of the bucket to write to.',
         type: 'String',
       },
       {
         name: 'bucketID',
-        desc:
-          'The ID of the bucket to write data to. `bucketID` and `bucket` are mutually exclusive.',
+        desc: 'String-encoded bucket ID to to write to.',
+        type: 'String',
+      },
+      {
+        name: 'host',
+        desc: 'URL of the InfluxDB instance to write to.',
         type: 'String',
       },
       {
         name: 'org',
-        desc:
-          'The organization name of the specified bucket. `org` and `orgID` are mutually exclusive.',
+        desc: 'Organization name.',
         type: 'String',
       },
       {
         name: 'orgID',
-        desc:
-          'The organization ID of the specified bucket. `orgID` and `org` are mutually exclusive.',
+        desc: 'String-encoded organization ID to query.',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc: 'InfluxDB API token.',
         type: 'String',
       },
     ],
     package: 'experimental',
-    desc:
-      'Writes data to an InfluxDB v2.0 bucket, but in a different structure than the built-in `to()` function.',
-    example: 'experimental.to(bucket: "db/rp", org: "example-org")',
+    desc: 'Writes _pivoted_ data to an InfluxDB 2.x or InfluxDB Cloud bucket.',
+    example: 'experimental.to(bucket: "example-target-bucket")',
     category: 'Outputs',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/experimental/to/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/to/',
   },
   {
     name: 'elapsed',
     args: [
       {
         name: 'unit',
-        desc: 'The unit time to return. Defaults to `1s`.',
+        desc: 'Unit of time used in the calculation. Default is `1s`.',
         type: 'Duration',
       },
       {
         name: 'timeColumn',
-        desc:
-          'The column to use to compute the elapsed time. Defaults to `"_time"`.',
+        desc: 'Column to use to compute the elapsed time. Default is `_time`.',
         type: 'String`',
       },
       {
         name: 'columnName',
-        desc: 'The column to store elapsed times. Defaults to `"elapsed"`.',
+        desc: 'Column to store elapsed times in. Default is `elapsed`.',
         type: 'String',
       },
     ],
@@ -1098,54 +1161,49 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the time between subsequent records.',
     example: 'elapsed(unit: 1s)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/elapsed/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/elapsed/',
   },
   {
     name: 'exponentialMovingAverage',
     args: [
       {
         name: 'n',
-        desc: 'The number of points to average.',
+        desc: 'Number of values to average.',
         type: 'Integer',
       },
     ],
     package: '',
     desc:
-      'Calculates the exponential moving average of values in the `_value` column grouped into `n` number of points, giving more weight to recent data.',
-    example: 'exponentialMovingAverage(n: 5)',
+      'Calculates the exponential moving average of `n` number of values in the `_value` column giving more weight to more recent data.',
+    example: 'exponentialMovingAverage(n: 3)',
     category: 'Aggregates',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/exponentialmovingaverage/',
+      'https://docs.influxdata.com/flux/v0/stdlib/universe/exponentialmovingaverage/',
   },
   {
     name: 'fill',
     args: [
       {
         name: 'column',
-        desc:
-          'The column in which to replace null values. Defaults to `"_value"`.',
+        desc: 'Column to replace null values in. Default is `_value`.',
         type: 'String',
       },
       {
         name: 'value',
-        desc: 'The constant value to use in place of nulls.',
+        desc: 'Constant value to replace null values with.',
         type: 'Value type of `column`',
       },
       {
         name: 'usePrevious',
-        desc:
-          'When `true`, assigns the value set in the previous non-null row.',
+        desc: 'Replace null values with the previous non-null value.',
         type: 'Boolean',
       },
     ],
     package: '',
-    desc:
-      'Replaces all null values in an input stream and replace them with a non-null value.',
-    example: 'fill(column: "_value", usePrevious: true)',
+    desc: 'Replaces all null values in input tables with a non-null value.',
+    example: 'fill(value: 0)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/fill/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/fill/',
   },
   {
     name: 'filter',
@@ -1153,72 +1211,115 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       {
         name: 'fn',
         desc:
-          'A single argument function that evaluates true or false. Records are passed to the function. Those that evaluate to true are included in the output tables.',
+          'Single argument predicate function that evaluates `true` or `false`.',
         type: 'Function',
       },
       {
         name: 'onEmpty',
-        desc:
-          'Defines the behavior for empty tables. Potential values are `keep` and `drop`. Defaults to `drop`.',
+        desc: 'Action to take with empty tables. Default is `drop`.',
         type: 'String',
       },
     ],
     package: '',
     desc:
-      'Filters data based on conditions defined in the function. The output tables have the same schema as the corresponding input tables.',
-    example: 'filter(fn: (r) => r._measurement == "cpu")',
+      'Filters data based on conditions defined in a predicate function (`fn`).',
+    example:
+      'filter( fn: (r) => r._measurement == "cpu" and r._field == "usage_system" and r.cpu == "cpu-total")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/filter/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/filter/',
   },
   {
     name: 'first',
-    args: [],
+    args: [
+      {
+        name: 'column',
+        desc: 'Column to operate on. Default is `_value`.',
+        type: 'String',
+      },
+    ],
     package: '',
-    desc: 'Selects the first non-null record from an input table.',
+    desc: 'Returns the first non-null record from each input table.',
     example: 'first()',
     category: 'Selectors',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/selectors/first/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/first/',
   },
   {
     name: 'float',
     args: [
       {
         name: 'v',
-        desc: 'The value to convert.',
+        desc: 'Value to convert.',
         type: 'String, Integer, UInteger, Boolean',
       },
     ],
     package: '',
-    desc: 'Converts a single value to a float.',
-    example: 'float(v: r._value)',
+    desc: 'Converts a value to a float type.',
+    example: 'float(v: "3.14")',
     category: 'Type Conversions',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/type-conversions/float/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/float/',
   },
-  FROM,
+  {
+    name: 'from',
+    args: [
+      {
+        name: 'bucket',
+        desc: 'Name of the bucket to query.',
+        type: 'String',
+      },
+      {
+        name: 'bucketID',
+        desc: 'String-encoded bucket ID to query.',
+        type: 'String',
+      },
+      {
+        name: 'host',
+        desc: 'URL of the InfluxDB instance to query.',
+        type: 'String',
+      },
+      {
+        name: 'org',
+        desc: 'Organization name.',
+        type: 'String',
+      },
+      {
+        name: 'orgID',
+        desc: 'String-encoded organization ID to query.',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc: 'InfluxDB API token.',
+        type: 'String',
+      },
+    ],
+    package: '',
+    desc: 'Queries data from an InfluxDB data source.',
+    example: 'from(bucket: "example-bucket")',
+    category: 'Inputs',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/from/',
+  },
   {
     name: 'geo.asTracks',
     args: [
       {
         name: 'groupBy',
-        desc: 'Columns to group by. They should uniquely identify each track.',
+        desc:
+          'Columns to group by. These columns should uniquely identify each track.',
         type: 'Array of Strings',
       },
       {
         name: 'orderBy',
-        desc: 'Columns to order results by.',
+        desc: 'Columns to order results by. Default is `["_time"]`.',
         type: 'Array of Strings',
       },
     ],
     package: 'experimental/geo',
-    desc:
-      'Groups geo-temporal data into tracks (sequential, related data points).',
-    example: 'geo.asTracks(groupBy: ["id","tid"], orderBy: ["_time"])',
+    desc: 'Groups rows into tracks (sequential, related data points).',
+    example: 'geo.asTracks()',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/geo/astracks/',
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/astracks/',
   },
   {
     name: 'geo.filterRows',
@@ -1230,35 +1331,29 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       },
       {
         name: 'minSize',
-        desc:
-          'Minimum number of cells that cover the specified region. Default is `24`',
+        desc: 'Minimum number of cells that cover the specified region.',
         type: 'Integer',
       },
       {
         name: 'maxSize',
-        desc:
-          'Maximum number of cells that cover the specified region. Default is `-1`.',
+        desc: 'Maximum number of cells that cover the specified region.',
         type: 'Object',
       },
       {
         name: 'level',
-        desc: 'S2 cell level of grid cells. Default is `-1`',
-        type: 'Integer',
-      },
-      {
-        name: 's2CellIDLevel',
-        desc: 'S2 Cell level used in `s2_cell_id` tag. Default is `-1`.',
-        type: 'Integer',
-      },
-      {
-        name: 'correlationKey',
         desc:
-          'List of columns used to uniquely identify a row for output. Default is `["_time"]`.',
-        type: 'Array of Strings',
+          'S2 cell level (https://s2geometry.io/resources/s2cell_statistics.html)',
+        type: 'Integer',
+      },
+      {
+        name: 's2cellIDLevel',
+        desc:
+          'S2 cell level (https://s2geometry.io/resources/s2cell_statistics.html)',
+        type: 'Integer',
       },
       {
         name: 'strict',
-        desc: 'Enable strict geographic data filtering. Default is `true`',
+        desc: 'Enable strict geographic data filtering. Default is `true`.',
         type: 'Boolean',
       },
     ],
@@ -1266,10 +1361,10 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Filters data by a specified geographic region with the option of strict filtering.',
     example:
-      'geo.filterRows(region: {lat: 37.7858229, lon: -122.4058124, radius: 20.0}, strict: true)',
+      'geo.filterRows(region: {lat: 40.69335938, lon: -73.30078125, radius: 100.0})',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/geo/filterrows/',
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/filterrows/',
   },
   {
     name: 'geo.gridFilter',
@@ -1281,35 +1376,39 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       },
       {
         name: 'minSize',
-        desc:
-          'Minimum number of cells that cover the specified region. Default is `24`',
+        desc: 'Minimum number of cells that cover the specified region.',
         type: 'Integer',
       },
       {
         name: 'maxSize',
-        desc:
-          'Maximum number of cells that cover the specified region. Default is `-1`.',
+        desc: 'Maximum number of cells that cover the specified region.',
         type: 'Object',
       },
       {
         name: 'level',
-        desc: 'S2 cell level of grid cells. Default is `-1`',
+        desc:
+          'S2 cell level (https://s2geometry.io/resources/s2cell_statistics.html)',
         type: 'Integer',
       },
       {
-        name: 's2CellIDLevel',
-        desc: 'S2 Cell level used in `s2_cell_id` tag. Default is `-1`.',
+        name: 's2cellIDLevel',
+        desc:
+          'S2 cell level (https://s2geometry.io/resources/s2cell_statistics.html)',
         type: 'Integer',
+      },
+      {
+        name: 'units',
+        desc: 'Record that defines the unit of measurement for distance.',
+        type: 'Object',
       },
     ],
     package: 'experimental/geo',
-    desc:
-      'Filters data by a specified geographic region using S2 geometry grid cells.',
+    desc: 'Filters data by a specified geographic region.',
     example:
-      'geo.gridFilter(region: {lat: 37.7858229, lon: -122.4058124, radius: 20.0})',
+      'geo.gridFilter(region: {lat: 40.69335938, lon: -73.30078125, radius: 20.0})',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/geo/gridfilter/',
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/gridfilter/',
   },
   {
     name: 'geo.groupByArea',
@@ -1317,89 +1416,87 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       {
         name: 'newColumn',
         desc:
-          'Name of the new column that stores the unique identifier for a geographic area.',
+          'Name of the new column for the unique identifier for each geographic area.',
         type: 'String',
       },
       {
         name: 'level',
         desc:
-          'S2 Cell level used to determine the size of each geographic area.',
+          'S2 Cell level (https://s2geometry.io/resources/s2cell_statistics.html)',
         type: 'Integer',
       },
       {
         name: 's2cellIDLevel',
-        desc: 'S2 Cell level used in `s2_cell_id` tag. Default is `-1`.',
+        desc:
+          'S2 Cell level (https://s2geometry.io/resources/s2cell_statistics.html)',
         type: 'Integer',
       },
     ],
     package: 'experimental/geo',
-    desc: 'Groups rows by geographic area using S2 geometry grid cells.',
-    example: 'geo.groupByArea(newColumn: "geoArea", level: 10)',
+    desc: 'Groups rows by geographic area.',
+    example: 'geo.groupByArea(newColumn: "foo", level: 4)',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/geo/groupbyarea/',
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/groupbyarea/',
   },
   {
     name: 'geo.s2CellIDToken',
     args: [
-      {
-        name: 'point',
-        desc:
-          'Longitude and latitude in decimal degrees (WGS 84) to use when generating the S2 cell ID token. Object must contain `lat` and `lon` properties.',
-        type: 'Object',
-      },
       {
         name: 'token',
         desc: 'S2 cell ID token to update.',
         type: 'String',
       },
       {
+        name: 'point',
+        desc:
+          'Record with `lat` and `lon` properties that specify the latitude and',
+        type: 'Object',
+      },
+      {
         name: 'level',
         desc: 'S2 cell level to use when generating the S2 cell ID token.',
         type: 'Integer',
       },
     ],
     package: 'experimental/geo',
-    desc: 'Returns an S2 cell ID token.',
-    example:
-      'geo.s2CellIDToken(point: {lat: 37.7858229, lon: -122.4058124}, level: 10)',
+    desc:
+      'Returns and S2 cell ID token for given cell or point at a specified S2 cell level.',
+    example: 'geo.s2CellIDToken(point: {lat: r.lat, lon: r.lon}, level: 10)',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/geo/s2cellidtoken/',
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/s2cellidtoken/',
   },
   {
     name: 'geo.shapeData',
     args: [
       {
         name: 'latField',
-        desc: 'Name of existing latitude field.',
+        desc:
+          'Name of the existing field that contains the latitude value in decimal degrees (WGS 84).',
         type: 'String',
       },
       {
         name: 'lonField',
-        desc: 'Name of existing longitude field.',
+        desc:
+          'Name of the existing field that contains the longitude value in decimal degrees (WGS 84).',
         type: 'String',
       },
       {
         name: 'level',
-        desc: 'S2 cell level to use when generating the S2 cell ID token.',
-        type: 'Integer',
-      },
-      {
-        name: 'correlationKey',
         desc:
-          'List of columns used to uniquely identify a row for output. Default is `["_time"]`.',
-        type: 'Array of Strings',
+          'S2 cell level (https://s2geometry.io/resources/s2cell_statistics.html)',
+        type: 'Integer',
       },
     ],
     package: 'experimental/geo',
     desc:
-      'Renames existing latitude and longitude fields to `lat` and `lon` and adds an `s2_cell_id` tag.',
+      'Renames existing latitude and longitude fields to **lat** and **lon** and adds an **s2\\_cell\\_id** tag.',
     example:
       'geo.shapeData(latField: "latitude", lonField: "longitude", level: 10)',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/geo/shapedata/',
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/shapedata/',
   },
   {
     name: 'geo.strictFilter',
@@ -1413,62 +1510,59 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'experimental/geo',
     desc: 'Filters data by latitude and longitude in a specified region.',
     example:
-      'geo.strictFilter(region: {lat: 37.7858229, lon: -122.4058124, radius: 20.0})',
+      'geo.strictFilter(region: {lat: 40.69335938, lon: -73.30078125, radius: 50.0})',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/geo/strictfilter/',
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/strictfilter/',
   },
   {
     name: 'geo.toRows',
-    args: [
-      {
-        name: 'correlationKey',
-        desc:
-          'List of columns used to uniquely identify a row for output. Default is `["_time"]`.',
-        type: 'Array of Strings',
-      },
-    ],
+    args: [],
     package: 'experimental/geo',
-    desc:
-      'Pivots geo-temporal data into row-wise sets based on time and other correlation columns.',
-    example: 'geo.toRows(correlationKey: ["_time"])',
+    desc: 'Pivots fields into columns based on time.',
+    example: 'geo.toRows()',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/geo/torows/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/torows/',
   },
   {
     name: 'getColumn',
     args: [
       {
         name: 'column',
-        desc: 'The name of the column to extract.',
+        desc: 'Column to extract.',
         type: 'String',
+      },
+      {
+        name: 'table',
+        desc: 'Input table. Default is piped-forward data (`<-`).',
+        type: 'Stream of tables',
       },
     ],
     package: '',
-    desc:
-      'Extracts a column from a table given its label. If the label is not present in the set of columns, the function errors.',
+    desc: 'Extracts a specified column from a table as an array.',
     example: 'getColumn(column: "_value")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/stream-table/getcolumn/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/getcolumn/',
   },
   {
     name: 'getRecord',
     args: [
       {
         name: 'idx',
-        desc: 'The index of the record to extract.',
+        desc: 'Index of the record to extract.',
         type: 'Integer',
+      },
+      {
+        name: 'table',
+        desc: 'Input table. Default is piped-forward data (`<-`).',
+        type: 'Stream of tables',
       },
     ],
     package: '',
-    desc:
-      'Extracts a record from a table given the record’s index. If the index is out of bounds, the function errors.',
+    desc: 'Extracts a row at a specified index from a table as a record.',
     example: 'getRecord(idx: 0)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/stream-table/getrecord/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/getrecord/',
   },
   {
     name: 'group',
@@ -1476,23 +1570,20 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       {
         name: 'columns',
         desc:
-          'List of columns to use in the grouping operation. Defaults to `[]`.',
+          'List of columns to use in the grouping operation. Default is `[]`.',
         type: 'Array of Strings',
       },
       {
         name: 'mode',
-        desc:
-          'The mode used to group columns. The following options are available: by, except. Defaults to `"by"`.',
+        desc: 'Grouping mode. Default is `by`.',
         type: 'String',
       },
     ],
     package: '',
-    desc:
-      'Groups records based on their values for specific columns. It produces tables with new group keys based on provided properties.',
-    example: 'group(columns: ["host", "_measurement"], mode:"by")',
+    desc: 'Regroups input data by modifying group key of input tables.',
+    example: 'group(columns: ["_time", "tag"])',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/group/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/group/',
   },
   {
     name: 'highestAverage',
@@ -1504,23 +1595,21 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       },
       {
         name: 'column',
-        desc: 'Column by which to sort. Default is `"_value"`.',
+        desc: 'Column to evaluate. Default is `_value`.',
         type: 'String',
       },
       {
         name: 'groupColumns',
-        desc:
-          'The columns on which to group before performing the aggregation. Default is `[]`.',
+        desc: 'List of columns to group by. Default is `[]`.',
         type: 'Array of Strings',
       },
     ],
     package: '',
     desc:
-      'Returns the top `n` records from all groups using the average of each group.',
-    example: 'highestAverage(n:10, groupColumns: ["host"])',
+      'Calculates the average of each input table and returns the highest `n` averages.',
+    example: 'highestAverage(n: 1, groupColumns: ["tag"])',
     category: 'Selectors',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/selectors/highestaverage/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/highestaverage/',
   },
   {
     name: 'highestCurrent',
@@ -1532,23 +1621,21 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       },
       {
         name: 'column',
-        desc: 'Column by which to sort. Default is `"_value"`.',
+        desc: 'Column to evaluate. Default is `_value`.',
         type: 'String',
       },
       {
         name: 'groupColumns',
-        desc:
-          'The columns on which to group before performing the aggregation. Default is `[]`.',
+        desc: 'List of columns to group by. Default is `[]`.',
         type: 'Array of Strings',
       },
     ],
     package: '',
     desc:
-      'Returns the top `n` records from all groups using the last value of each group.',
-    example: 'highestCurrent(n:10, groupColumns: ["host"])',
+      'Selects the last record from each input table and returns the highest `n` records.',
+    example: 'highestCurrent(n: 1, groupColumns: ["tag"])',
     category: 'Selectors',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/selectors/highestcurrent/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/highestcurrent/',
   },
   {
     name: 'highestMax',
@@ -1560,109 +1647,100 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       },
       {
         name: 'column',
-        desc: 'Column by which to sort. Default is `"_value"`.',
+        desc: 'Column to evaluate. Default is `_value`.',
         type: 'String',
       },
       {
         name: 'groupColumns',
-        desc:
-          'The columns on which to group before performing the aggregation. Default is `[]`.',
+        desc: 'List of columns to group by. Default is `[]`.',
         type: 'Array of Strings',
       },
     ],
     package: '',
     desc:
-      'Returns the top `n` records from all groups using the maximum of each group.',
-    example: 'highestMax(n:10, groupColumns: ["host"])',
+      'Selects the record with the highest value in the specified `column` from each input table and returns the highest `n` records.',
+    example: 'highestMax(n: 2, groupColumns: ["tag"])',
     category: 'Selectors',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/selectors/highestmax/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/highestmax/',
   },
   {
     name: 'histogram',
     args: [
       {
         name: 'column',
-        desc:
-          'The name of a column containing input data values. The column type must be float. Defaults to `"_value"`.',
+        desc: 'Column containing input values. Column must be of type float.',
         type: 'Strings',
       },
       {
         name: 'upperBoundColumn',
-        desc:
-          'The name of the column in which to store the histogram\'s upper bounds. Defaults to `"le"`.',
+        desc: 'Column to store bin upper bounds in. Default is `le`.',
         type: 'String',
       },
       {
         name: 'countColumn',
-        desc:
-          'The name of the column in which to store the histogram counts. Defaults to `"_value"`.',
+        desc: 'Column to store bin counts in. Default is `_value`.',
         type: 'String',
       },
       {
         name: 'bins',
         desc:
-          'A list of upper bounds to use when computing the histogram frequencies. Each element in the array should contain a float value that represents the maximum value for a bin.',
+          'List of upper bounds to use when computing the histogram frequencies.',
         type: 'Array of Floats',
       },
       {
         name: 'normalize',
-        desc:
-          'When `true`, will convert the counts into frequency values between 0 and 1. Defaults to `false`.',
+        desc: 'Convert counts into frequency values between 0 and 1.',
         type: 'Boolean',
       },
     ],
     package: '',
     desc:
-      'Approximates the cumulative distribution function of a dataset by counting data frequencies for a list of buckets.',
-    example:
-      'histogram(column: "_value", upperBoundColumn: "le", countColumn: "_value", bins: [50.0, 75.0, 90.0], normalize: false)',
+      'Approximates the cumulative distribution of a dataset by counting data frequencies for a list of bins.',
+    example: 'histogram(bins: [0.0, 5.0, 10.0, 20.0])',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/histogram/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/histogram/',
   },
   {
     name: 'histogramQuantile',
     args: [
       {
         name: 'quantile',
-        desc:
-          'A value between 0 and 1 indicating the desired quantile to compute.',
+        desc: 'Quantile to compute. Value must be between 0 and 1.',
         type: 'Float',
       },
       {
         name: 'countColumn',
-        desc:
-          'The name of the column in which to store the histogram counts. The count column type must be float. Defaults to `"_value"`.',
+        desc: 'Column containing histogram bin counts. Default is `_value`.',
         type: 'String',
       },
       {
         name: 'upperBoundColumn',
-        desc:
-          'The name of the column in which to store the histogram\'s upper bounds. The count column type must be float. Defaults to `"le"`.',
+        desc: 'Column containing histogram bin upper bounds.',
         type: 'String',
       },
       {
         name: 'valueColumn',
-        desc:
-          'The name of the output column which will contain the computed quantile. Defaults to `"_value"`.',
+        desc: 'Column to store the computed quantile in. Default is `_value.',
         type: 'String',
       },
       {
         name: 'minValue',
-        desc:
-          'The assumed minimum value of the dataset. When the quantile falls below the lowest upper bound, interpolation is performed between `minValue` and the lowest upper bound. When `minValue` is equal to negative infinity, the lowest upper bound is used. Defaults to `0`.',
+        desc: 'Assumed minimum value of the dataset. Default is `0.0`.',
         type: 'Float',
+      },
+      {
+        name: 'onNonmonotonic',
+        desc: 'Describes behavior when counts are not monotonically increasing',
+        type: 'String',
       },
     ],
     package: '',
     desc:
       'Approximates a quantile given a histogram that approximates the cumulative distribution of the dataset.',
-    example:
-      'histogramQuantile(quantile: 0.5, countColumn: "_value", upperBoundColumn: "le", valueColumn: "_value", minValue: 0.0)',
+    example: 'histogramQuantile(quantile: 0.9)',
     category: 'Aggregates',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/histogramquantile/',
+      'https://docs.influxdata.com/flux/v0/stdlib/universe/histogramquantile/',
   },
   {
     name: 'holtWinters',
@@ -1673,39 +1751,41 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
         type: 'Integer',
       },
       {
-        name: 'seasonality',
-        desc: 'Number of points in a season. Defaults to `0`.',
-        type: 'Integer',
-      },
-      {
         name: 'interval',
-        desc: 'The interval between two data points.',
+        desc: 'Interval between two data points.',
         type: 'Duration',
       },
       {
         name: 'withFit',
-        desc:
-          'Returns "fitted" data points in results when `withFit` is set to `true`. Defaults to `false`.',
+        desc: 'Return fitted data in results. Default is `false`.',
         type: 'Boolean',
       },
       {
-        name: 'timeColumn',
-        desc: 'The time column to use. Defaults to `"_time"`.',
+        name: 'column',
+        desc: 'Column to operate on. Default is `_value`.',
         type: 'String',
       },
       {
-        name: 'column',
-        desc: 'The column to operate on. Defaults to `"_value"`.',
+        name: 'timeColumn',
+        desc: 'Column containing time values to use in the calculating.',
         type: 'String',
+      },
+      {
+        name: 'seasonality',
+        desc: 'Number of points in a season. Default is `0`.',
+        type: 'Integer',
+      },
+      {
+        name: 'withMinSSE',
+        desc: 'Return minSSE data in results. Default is `false`.',
+        type: 'Boolean',
       },
     ],
     package: '',
-    desc:
-      'Applies the Holt-Winters forecasting method to input tables. The Holt-Winters method predicts `n` seasonally-adjusted values for the specified `column` at the specified `interval`.',
-    example: 'holtWinters(n: 10, interval: 1d)',
+    desc: 'Applies the Holt-Winters forecasting method to input tables.',
+    example: 'holtWinters(n: 6, interval: 10s)',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/holtwinters/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/holtwinters/',
   },
   {
     name: 'hourSelection',
@@ -1713,35 +1793,39 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       {
         name: 'start',
         desc:
-          'The first hour of the hour range (inclusive). Hours range from `[0-23]`',
+          'First hour of the hour range (inclusive). Hours range from `[0-23]`.',
         type: 'Integer',
       },
       {
         name: 'stop',
         desc:
-          'The last hour of the hour range (inclusive). Hours range from `[0-23]`.',
+          'Last hour of the hour range (inclusive). Hours range from `[0-23]`.',
         type: 'Integer`',
       },
       {
+        name: 'location',
+        desc:
+          'Location used to determine timezone. Default is the `location` option.',
+        type: 'Object',
+      },
+      {
         name: 'timeColumn',
-        desc: 'The column that contains the time value. Default is `"_time"`.',
+        desc: 'Column that contains the time value. Default is `_time`.',
         type: 'String`',
       },
     ],
     package: '',
-    desc:
-      'Retains all rows with time values in a specified hour range. Hours are specified in military time.',
+    desc: 'Filters rows by time values in a specified hour range.',
     example: 'hourSelection(start: 9, stop: 17)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/hourselection/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/hourselection/',
   },
   {
     name: 'http.get',
     args: [
       {
         name: 'url',
-        desc: 'The URL to send the GET request to.',
+        desc: 'URL to send the GET request to.',
         type: 'String',
       },
       {
@@ -1759,17 +1843,16 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Submits an HTTP GET request to the specified URL and returns the HTTP status code, response body, and response headers.',
     example:
-      'http.get(url: "https://v2.docs.influxdata.com/v2.0/", headers: {foo: "bar"})',
+      'http.get( url: "http://localhost:8086/health", headers: {Authorization: "Token mY5up3RS3crE7t0k3N", Accept: "application/json"})',
     category: 'Miscellaneous',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/http/get/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/http/get/',
   },
   {
     name: 'http.post',
     args: [
       {
         name: 'url',
-        desc: 'The URL to POST to.',
+        desc: 'URL to send the POST request to.',
         type: 'String',
       },
       {
@@ -1779,336 +1862,319 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       },
       {
         name: 'data',
-        desc: 'The data body to include with the POST request.',
+        desc: 'Data body to include with the POST request.',
         type: 'Bytes',
       },
     ],
     package: 'http',
     desc:
-      'Submits an HTTP POST request to the specified URL with headers and data and returns the HTTP status code.',
+      'Sends an HTTP POST request to the specified URL with headers and data and returns the HTTP status code.',
     example:
-      'http.post(url: "http://localhost:9999/", headers: {x:"a", y:"b"}, data: bytes(v: "body"))',
+      'http.post( url: "http://myawsomeurl.com/api/notify", headers: {Authorization: "Bearer mySuPerSecRetTokEn", "Content-type": "application/json"}, data: json.encode(v: lastReported[0]))',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/http/post/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/http/post/',
   },
   {
     name: 'increase',
     args: [
       {
         name: 'columns',
-        desc:
-          'List of columns to use in the operation. Defaults to `["_value"]`.',
+        desc: 'List of columns to operate on. Default is `["_value"]`.',
         type: 'Array of Strings',
       },
     ],
     package: '',
     desc:
-      'Computes the total non-negative difference between values in a table.',
-    example: 'increase(columns: ["_value"])',
+      'Returns the cumulative sum of non-negative differences between subsequent values.',
+    example: 'increase()',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/increase/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/increase/',
   },
   {
     name: 'int',
     args: [
       {
         name: 'v',
-        desc: 'The value to convert.',
+        desc: 'Value to convert.',
         type: 'String, Integer, UInteger, Float, Boolean',
       },
     ],
     package: '',
-    desc: 'Converts a single value to a integer.',
-    example: 'int(v: r._value)',
+    desc: 'Converts a value to an integer type.',
+    example: 'int(v: 10.12)',
     category: 'Type Conversions',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/type-conversions/int/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/int/',
   },
   {
     name: 'integral',
     args: [
       {
         name: 'unit',
-        desc: 'The time duration used when computing the integral.',
+        desc: 'Unit of time to use to compute the integral.',
         type: 'Duration',
       },
       {
         name: 'column',
-        desc: 'The column on which to operate. Defaults to `"_value"`.',
+        desc: 'Column to operate on. Default is `_value`.',
+        type: 'String',
+      },
+      {
+        name: 'timeColumn',
+        desc: 'Column that contains time values to use in the operation.',
+        type: 'String',
+      },
+      {
+        name: 'interpolate',
+        desc: 'Type of interpolation to use. Default is `""`.',
         type: 'String',
       },
     ],
     package: '',
     desc:
-      'Computes the area under the curve per unit of time of subsequent non-null records. The curve is defined using `_time` as the domain and record values as the range.',
-    example: 'integral(unit: 10s, column: "_value")',
+      'Computes the area under the curve per unit of time of subsequent non-null records.',
+    example: 'integral(unit: 10s)',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/integral/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/integral/',
   },
   {
     name: 'join',
     args: [
       {
-        name: 'tables',
-        desc: 'The map of streams to be joined.',
-        type: 'Object',
-      },
-      {
         name: 'on',
-        desc: 'The list of columns on which to join.',
+        desc: 'List of columns to join on.',
         type: 'Array of Strings',
       },
       {
         name: 'method',
-        desc:
-          'The method used to join. Possible values are: `inner`, `cross`, `left`, `right`, or `full`. Defaults to `"inner"`.',
+        desc: 'Join method. Default is `inner`.',
         type: 'String',
       },
     ],
     package: '',
     desc:
-      'Merges two or more input streams, whose values are equal on a set of common columns, into a single output stream. The resulting schema is the union of the input schemas. The resulting group key is the union of the input group keys.',
-    example:
-      'join(tables: {key1: table1, key2: table2}, on: ["_time", "_field"], method: "inner")',
+      'Merges two streams of tables into a single output stream based on columns with equal values. Null values are not considered equal when comparing column values. The resulting schema is the union of the input schemas. The resulting group key is the union of the input group keys.',
+    example: 'join(tables: {t1: t1, t2: t2}, on: ["_time", "tag"])',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/join/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/join/',
   },
   {
     name: 'json.encode',
     args: [
       {
         name: 'v',
-        desc: 'The value to encode.',
+        desc: 'Value to convert.',
         type: 'Boolean, Duration, Float, Integer, String, Time, UInteger',
       },
     ],
     package: 'json',
     desc: 'Converts a value into JSON bytes.',
-    example: 'json.encode(v: r._value)',
+    example: 'json.encode( v: jsonData)',
     category: 'Type Conversions',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/json/encode/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/json/encode/',
   },
   {
     name: 'kaufmansAMA',
     args: [
       {
         name: 'n',
-        desc: 'The period or number of points to use in the calculation.',
+        desc: 'Period or number of points to use in the calculation.',
         type: 'Integer',
       },
       {
         name: 'column',
-        desc: 'The column to operate on. Defaults to `"_value"`.',
+        desc: 'Column to operate on. Default is `_value`.',
         type: 'String',
       },
     ],
     package: '',
     desc:
-      'Calculates Kaufman’s Adaptive Moving Average (KAMA) using values in an input table.',
-    example: 'kaufmansAMA(n: 5)',
+      'Calculates the Kaufman’s Adaptive Moving Average (KAMA) using values in input tables.',
+    example: 'kaufmansAMA(n: 3)',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/kaufmansama/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/kaufmansama/',
   },
   {
     name: 'kaufmansER',
     args: [
       {
         name: 'n',
-        desc: 'The period or number of points to use in the calculation.',
+        desc: 'Period or number of points to use in the calculation.',
         type: 'Integer',
       },
     ],
     package: '',
     desc:
-      'Calculates the Kaufman’s Efficiency Ratio (KER) using values in an input table.',
-    example: 'kaufmansER(n: 5)',
+      "Computes the Kaufman's Efficiency Ratio (KER) of values in the `_value` column for each input table.",
+    example: 'kaufmansER(n: 3)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/kaufmanser/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/kaufmanser/',
   },
   {
     name: 'keep',
     args: [
       {
         name: 'columns',
-        desc:
-          'Columns that should be included in the resulting table. Cannot be used with `fn`.',
+        desc: 'Columns to keep in output tables. Cannot be used with `fn`.',
         type: 'Array of Strings',
       },
       {
         name: 'fn',
         desc:
-          'A predicate function which takes a column name as a parameter and returns a boolean indicating whether or not the column should be removed from the table. Cannot be used with `columns`.',
+          'Predicate function that takes a column name as a parameter (column) and',
         type: 'Function',
       },
     ],
     package: '',
-    desc:
-      'Returns a table containing only the specified columns, ignoring all others. Only columns in the group key that are also specified in the `keep()` function will be kept in the resulting group key. It is the inverse of `drop`.',
-    example: 'keep(columns: ["col1", "col2"])',
+    desc: 'Returns a stream of tables containing only the specified columns.',
+    example: 'keep(columns: ["_time", "_value"])',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/keep/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/keep/',
   },
   {
     name: 'keys',
     args: [
       {
         name: 'column',
-        desc:
-          'Column is the name of the output column to store the group key labels. Defaults to `_value`.',
+        desc: 'Column to store group key labels in. Default is `_value`.',
         type: 'String',
       },
     ],
     package: '',
-    desc:
-      "Outputs the group key of input tables. For each input table, it outputs a table with the same group key columns, plus a _value column containing the labels of the input table's group key.",
-    example: 'keys(column: "_value")',
+    desc: 'Returns the columns that are in the group key of each input table.',
+    example: 'keys()',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/keys/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/keys/',
   },
   {
     name: 'keyValues',
     args: [
       {
         name: 'keyColumns',
-        desc:
-          'A list of columns from which values are extracted. All columns indicated must be of the same type.',
+        desc: 'List of columns from which values are extracted.',
         type: 'Array of Strings',
-      },
-      {
-        name: 'fn',
-        desc:
-          'Function used to identify a set of columns. All columns indicated must be of the same type.',
-        type: 'Function',
       },
     ],
     package: '',
     desc:
-      "Returns a table with the input table's group key plus two columns, `_key` and `_value`, that correspond to unique column + value pairs from the input table.",
-    example: 'keyValues(keyColumns: ["usage_idle", "usage_user"])',
+      "Returns a stream of tables with each input tables' group key and two columns, _key and _value, that correspond to unique column label and value pairs for each input table.",
+    example: 'keyValues(keyColumns: ["sensorID", "_field"])',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/keyvalues/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/keyvalues/',
   },
   {
     name: 'last',
-    args: [],
+    args: [
+      {
+        name: 'column',
+        desc: 'Column to use to verify the existence of a value.',
+        type: 'String',
+      },
+    ],
     package: '',
-    desc: 'Selects the last non-null record from an input table.',
+    desc: 'Returns the last row with a non-null value from each input table.',
     example: 'last()',
     category: 'Selectors',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/selectors/last/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/last/',
   },
   {
     name: 'length',
     args: [
       {
         name: 'arr',
-        desc: 'The array to evaluate.',
+        desc: 'Array to evaluate. Default is the piped-forward array (`<-`).',
         type: 'Array',
       },
     ],
     package: '',
-    desc: 'Returns the number of items in an array.',
-    example: 'length(arr: ["john"])',
+    desc: 'Returns the number of elements in an array.',
+    example: 'length()',
     category: 'Miscellaneous',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/misc/length/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/length/',
   },
   {
     name: 'limit',
     args: [
       {
         name: 'n',
-        desc: 'The maximum number of records to output.',
+        desc: 'Maximum number of rows to return.',
         type: 'Integer',
       },
       {
         name: 'offset',
-        desc:
-          'The number of records to skip at the beginning of a table before limiting to `n`. Defaults to `0`.',
+        desc: 'Number of rows to skip per table before limiting to `n`.',
         type: 'Integer',
       },
     ],
     package: '',
     desc:
-      'Limits each output table to the first `n` records, excluding the offset.',
-    example: 'limit(n:10, offset: 0)',
+      'Returns the first `n` rows after the specified `offset` from each input table.',
+    example: 'limit(n: 3)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/limit/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/limit/',
   },
   {
     name: 'linearBins',
     args: [
       {
         name: 'start',
-        desc: 'The first value in the returned list.',
+        desc: 'First value to return in the list.',
         type: 'Float',
       },
       {
         name: 'width',
-        desc: 'The distance between subsequent bin values.',
+        desc: 'Distance between subsequent values.',
         type: 'Float',
       },
       {
         name: 'count',
-        desc: 'The number of bins to create.',
+        desc: 'Number of values to return.',
         type: 'Integer',
       },
       {
         name: 'infinity',
         desc:
-          'When `true`, adds an additional bin with a value of positive infinity. Defaults to `true`.',
+          'Include an infinite value at the end of the list. Default is `true`.',
         type: 'Boolean',
       },
     ],
     package: '',
-    desc: 'Generates a list of linearly separated floats.',
-    example: 'linearBins(start: 0.0, width: 5.0, count: 20, infinity: true)',
+    desc: 'Generates a list of linearly separated float values.',
+    example: 'linearBins( start: 0.0, width: 10.0, count: 10)',
     category: 'Miscellaneous',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/misc/linearbins/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/linearbins/',
   },
   {
     name: 'logarithmicBins',
     args: [
       {
         name: 'start',
-        desc: 'The first value in the returned list.',
+        desc: 'First value to return in the list.',
         type: 'Float',
       },
       {
         name: 'factor',
-        desc: 'The multiplier applied to each subsequent bin.',
+        desc: 'Multiplier to apply to subsequent values.',
         type: 'Float',
       },
       {
         name: 'count',
-        desc: 'The number of bins to create.',
+        desc: 'Number of values to return.',
         type: 'Integer',
       },
       {
         name: 'infinity',
         desc:
-          'When `true`, adds an additional bin with a value of positive infinity. Defaults to `true`.',
+          'Include an infinite value at the end of the list. Default is `true`.',
         type: 'Boolean',
       },
     ],
     package: '',
-    desc: 'Generates a list of exponentially separated floats.',
+    desc: 'Generates a list of exponentially separated float values.',
     example:
-      'logarithmicBins(start: 1.0, factor: 2.0, count: 10, infinity: true)',
+      'logarithmicBins( start: 1.0, factor: 2.0, count: 10, infinity: true)',
     category: 'Miscellaneous',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/misc/logarithmicbins/',
+      'https://docs.influxdata.com/flux/v0/stdlib/universe/logarithmicbins/',
   },
   {
     name: 'lowestAverage',
@@ -2120,23 +2186,21 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       },
       {
         name: 'column',
-        desc: 'Column by which to sort. Default is `"_value"`.',
+        desc: 'Column to evaluate. Default is `_value`.',
         type: 'String',
       },
       {
         name: 'groupColumns',
-        desc:
-          'The columns on which to group before performing the aggregation. Default is `[]`.',
+        desc: 'List of columns to group by. Default is `[]`.',
         type: 'Array of Strings',
       },
     ],
     package: '',
     desc:
-      'Returns the bottom `n` records from all groups using the average of each group.',
-    example: 'lowestAverage(n:10, groupColumns: ["host"])',
+      'Calculates the average of each input table and returns the lowest `n` averages.',
+    example: 'lowestAverage(n: 1, groupColumns: ["tag"])',
     category: 'Selectors',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/selectors/lowestaverage/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/lowestaverage/',
   },
   {
     name: 'lowestCurrent',
@@ -2148,23 +2212,21 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       },
       {
         name: 'column',
-        desc: 'Column by which to sort. Default is `"_value"`.',
+        desc: 'Column to evaluate. Default is `_value`.',
         type: 'String',
       },
       {
         name: 'groupColumns',
-        desc:
-          'The columns on which to group before performing the aggregation. Default is `[]`.',
+        desc: 'List of columns to group by. Default is `[]`.',
         type: 'Array of Strings',
       },
     ],
     package: '',
     desc:
-      'Returns the bottom `n` records from all groups using the last value of each group.',
-    example: 'lowestCurrent(n:10, groupColumns: ["host"])',
+      'Selects the last record from each input table and returns the lowest `n` records.',
+    example: 'lowestCurrent(n: 1, groupColumns: ["tag"])',
     category: 'Selectors',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/selectors/lowestcurrent/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/lowestcurrent/',
   },
   {
     name: 'lowestMin',
@@ -2176,1429 +2238,1522 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       },
       {
         name: 'column',
-        desc: 'Column by which to sort. Default is `"_value"`.',
+        desc: 'Column to evaluate. Default is `_value`.',
         type: 'String',
       },
       {
         name: 'groupColumns',
-        desc:
-          'The columns on which to group before performing the aggregation. Default is `[]`.',
+        desc: 'List of columns to group by. Default is `[]`.',
         type: 'Array of Strings',
       },
     ],
     package: '',
     desc:
-      'Returns the bottom `n` records from all groups using the maximum of each group.',
-    example: 'lowestMin(n:10, groupColumns: ["host"])',
+      'Selects the record with the lowest value in the specified `column` from each input table and returns the bottom `n` records.',
+    example: 'lowestMin(n: 2, groupColumns: ["tag"])',
     category: 'Selectors',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/selectors/lowestmin/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/lowestmin/',
   },
   {
     name: 'map',
     args: [
       {
         name: 'fn',
-        desc:
-          'A single argument function that to apply to each record. The return value must be an object.',
+        desc: 'Single argument function to apply to each record.',
         type: 'Function',
+      },
+      {
+        name: 'mergeKey',
+        desc:
+          '_(Deprecated)_ Merge group keys of mapped records. Default is `false`.',
+        type: 'Boolean',
       },
     ],
     package: '',
-    desc: 'Applies a function to each record in the input tables.',
-    example: 'map(fn: (r) => ({ r with _value: r._value * r._value }))',
+    desc: 'Iterates over and applies a function to input rows.',
+    example: 'map(fn: (r) => ({r with _value: r._value * r._value}))',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/map/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/map/',
   },
-  MATH_ABS,
+  {
+    name: 'math.abs',
+    args: [
+      {
+        name: 'x',
+        desc: 'Value to operate on.',
+        type: 'Float',
+      },
+    ],
+    package: 'math',
+    desc: 'Returns the absolute value of `x`.',
+    example: 'math.abs(x: -1.22)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/abs/',
+  },
   {
     name: 'math.acos',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the arccosine of x in radians.',
-    example: 'math.acos(x: r._value)',
+    desc: 'Returns the acosine of `x` in radians.',
+    example: 'math.acos(x: 0.22)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/acos/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/acos/',
   },
   {
     name: 'math.acosh',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation. Should be greater than 1.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the inverse hyperbolic cosine of x.',
-    example: 'math.acosh(x: r._value)',
+    desc: 'Returns the inverse hyperbolic cosine of `x`.',
+    example: 'math.acosh(x: 1.22)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/acosh/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/acosh/',
   },
   {
     name: 'math.asin',
     args: [
       {
         name: 'x',
-        desc:
-          'The value used in the operation. Should be greater than -1 and less than 1.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the arcsine of x in radians.',
-    example: 'math.asin(x: r._value)',
+    desc: 'Returns the arcsine of `x` in radians.',
+    example: 'math.asin(x: 0.22)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/asin/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/asin/',
   },
   {
     name: 'math.asinh',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the inverse hyperbolic sine of x.',
-    example: 'math.asinh(x: r._value)',
+    desc: 'Returns the inverse hyperbolic sine of `x`.',
+    example: 'math.asinh(x: 3.14)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/asinh/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/asinh/',
   },
   {
     name: 'math.atan',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the arctangent of x in radians.',
-    example: 'math.atan(x: r._value)',
+    desc: 'Returns the arctangent of `x` in radians.',
+    example: 'math.atan(x: 3.14)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/atan/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/atan/',
   },
   {
     name: 'math.atan2',
     args: [
       {
         name: 'y',
-        desc: 'The y coordinate used in the operation.',
+        desc: 'y-coordinate to use in the operation.',
         type: 'Float',
       },
       {
         name: 'x',
-        desc: 'The x coordinate used in the operation.',
+        desc: 'x-coordinate to use in the operation.',
         type: 'Float',
       },
     ],
     package: 'math',
     desc:
-      'Returns the arc tangent of y/x, using the signs of the two to determine the quadrant of the return value.',
+      'Returns the artangent of `x/y`, using the signs of the two to determine the quadrant of the return value.',
     example: 'math.atan2(y: r.y_coord, x: r.x_coord)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/atan2/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/atan2/',
   },
   {
     name: 'math.atanh',
     args: [
       {
         name: 'x',
-        desc:
-          'The value used in the operation. Should be greater than -1 and less than 1.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the inverse hyperbolic tangent of x.',
-    example: 'math.atanh(x: r._value)',
+    desc: 'Returns the inverse hyperbolic tangent of `x`.',
+    example: 'math.atanh(x: 0.22)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/atanh/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/atanh/',
   },
   {
     name: 'math.cbrt',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
     desc: 'Returns the cube root of x.',
-    example: 'math.cbrt(x: r._value)',
+    example: 'math.cbrt(x: 1728.0)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/cbrt/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/cbrt/',
   },
   {
     name: 'math.ceil',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the least integer value greater than or equal to x.',
-    example: 'math.ceil(x: r._value)',
+    desc: 'Returns the least integer value greater than or equal to `x`.',
+    example: 'math.ceil(x: 3.14)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/ceil/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/ceil/',
   },
   {
     name: 'math.copysign',
     args: [
       {
         name: 'x',
-        desc: 'The magnitude used in the operation.',
+        desc: 'Magnitude to use in the operation.',
         type: 'Float',
       },
       {
         name: 'y',
-        desc: 'The sign used in the operation.',
+        desc: 'Sign to use in the operation.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns a value with the magnitude of x and the sign of y.',
-    example: 'math.copysign(x: r._magnitude, r._sign)',
+    desc: 'Returns a value with the magnitude `x` and the sign of `y`.',
+    example: 'math.copysign(x: 1.0, y: 2.0)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/copysign/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/copysign/',
   },
   {
     name: 'math.cos',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the cosine of the radian argument x.',
+    desc: 'Returns the cosine of the radian argument `x`.',
     example: 'math.cos(x: r._value)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/cos/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/cos/',
   },
   {
     name: 'math.cosh',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the hyperbolic cosine of x.',
+    desc: 'Returns the hyperbolic cosine of `x`.',
     example: 'math.cosh(x: r._value)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/cosh/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/cosh/',
   },
   {
     name: 'math.dim',
     args: [
       {
         name: 'x',
-        desc: 'The X value used in the operation.',
+        desc: 'x-value to use in the operation.',
         type: 'Float',
       },
       {
         name: 'y',
-        desc: 'The Y value used in the operation.',
+        desc: 'y-value to use in the operation.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the maximum of (x - y) or 0.',
-    example: 'math.dim(x: r._value1, y: r._value2)',
+    desc: 'Returns the maximum of `x - y` or `0`.',
+    example: 'math.dim(x: 12.2, y: 8.1)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/dim/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/dim/',
   },
   {
     name: 'math.erf',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the error function of x.',
-    example: 'math.erf(x: r._value)',
+    desc: 'Returns the error function of `x`.',
+    example: 'math.erf(x: 22.6)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/erf/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/erf/',
   },
   {
     name: 'math.erfc',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the complementary error function of x.',
-    example: 'math.erfc(x: r._value)',
+    desc: 'Returns the complementary error function of `x`.',
+    example: 'math.erfc(x: 22.6)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/erfc/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/erfc/',
   },
   {
     name: 'math.erfcinv',
     args: [
       {
         name: 'x',
-        desc:
-          'The value used in the operation. Should be greater than 0 and less than 2.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
     desc: 'Returns the inverse of `math.erfc()`.',
-    example: 'math.erfcinv(x: r._value)',
+    example: 'math.erfcinv(x: 0.42345)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/erfcinv/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/erfcinv/',
   },
   {
     name: 'math.erfinv',
     args: [
       {
         name: 'x',
-        desc:
-          'The value used in the operation. Should be greater than -1 and less than 1.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the inverse error function of x.',
-    example: 'math.erfinv(x: r._value)',
+    desc: 'Returns the inverse error function of `x`.',
+    example: 'math.erfinv(x: 0.22)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/erfinv/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/erfinv/',
   },
   {
     name: 'math.exp',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the base-e exponential of x (`e**x`).',
-    example: 'math.exp(x: r._value)',
+    desc: 'Returns `e**x`, the base-e exponential of `x`.',
+    example: 'math.exp(x: 21.0)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/exp/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/exp/',
   },
   {
     name: 'math.exp2',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the base-2 exponential of x (`2**x`).',
-    example: 'math.exp2(x: r._value)',
+    desc: 'Returns `2**x`, the base-2 exponential of `x`.',
+    example: 'math.exp2(x: 21.0)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/exp2/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/exp2/',
   },
   {
     name: 'math.expm1',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the base-e exponential of x minus 1 (`e**x - 1`).',
-    example: 'math.expm1(x: r._value)',
+    desc:
+      'Returns `e**x - 1`, the base-e exponential of `x` minus 1. It is more accurate than `math.exp(x:x) - 1` when `x` is near zero.',
+    example: 'math.expm1(x: 0.022)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/expm1/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/expm1/',
   },
   {
     name: 'math.float64bits',
     args: [
       {
         name: 'f',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
     desc:
-      'Returns the IEEE 754 binary representation of f, with the sign bit of f and the result in the same bit position.',
-    example: 'math.float64bits(f: r._value)',
+      'Returns the IEEE 754 binary representation of `f`, with the sign bit of `f` and the result in the same bit position.',
+    example: 'math.float64bits(f: 1234.56)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/float64bits/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/float64bits/',
   },
-  MATH_FLOOR,
+  {
+    name: 'math.floor',
+    args: [
+      {
+        name: 'x',
+        desc: 'Value to operate on.',
+        type: 'Float',
+      },
+    ],
+    package: 'math',
+    desc: 'Returns the greatest integer value less than or equal to `x`.',
+    example: 'math.floor(x: 1.22)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/floor/',
+  },
   {
     name: 'math.frexp',
     args: [
       {
         name: 'f',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Breaks f into a normalized fraction and an integral power of two.',
-    example: 'math.frexp(f: r._value)',
+    desc: 'Breaks `f` into a normalized fraction and an integral part of two.',
+    example: 'math.frexp(f: 22.0)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/frexp/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/frexp/',
   },
   {
     name: 'math.gamma',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the Gamma function of x.',
-    example: 'math.gamma(x: r._value)',
+    desc: 'Returns the gamma function of `x`.',
+    example: 'math.gamma(x: 2.12)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/gamma/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/gamma/',
   },
   {
     name: 'math.hypot',
     args: [
       {
         name: 'p',
-        desc: 'The p value used in the operation.',
+        desc: 'p-value to use in the operation.',
         type: 'Float',
       },
       {
         name: 'q',
-        desc: 'The q value used in the operation.',
+        desc: 'q-value to use in the operation.',
         type: 'Float',
       },
     ],
     package: 'math',
     desc:
       'Returns the square root of `p*p + q*q`, taking care to avoid overflow and underflow.',
-    example: 'math.hypot(p: r.opp, p: r.adj)',
+    example: 'math.hypot(p: 2.0, q: 5.0)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/hypot/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/hypot/',
   },
   {
     name: 'math.ilogb',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the binary exponent of x as an integer.',
-    example: 'math.ilogb(x: r._value)',
+    desc: 'Returns the binary exponent of `x` as an integer.',
+    example: 'math.ilogb(x: 123.45)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/ilogb/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/ilogb/',
   },
   {
     name: 'math.isInf',
     args: [
       {
         name: 'f',
-        desc: 'The value used in the evaluation.',
+        desc: 'is the value used in the evaluation.',
         type: 'Float',
       },
       {
         name: 'sign',
-        desc: 'The sign used in the evaluation.',
+        desc: 'is the sign used in the evaluation.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Reports whether f is an infinity, according to sign.',
-    example: 'math.isInf(f: r._value, sign: r.sign)',
+    desc: 'Reports whether `f` is an infinity, according to `sign`.',
+    example: 'math.isInf(f: 2.12, sign: 3)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/isinf/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/isinf/',
   },
   {
     name: 'math.isNaN',
     args: [
       {
         name: 'f',
-        desc: 'The value used in the evaluation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Reports whether f is an IEEE 754 NaN value.',
-    example: 'math.isNaN(f: r._value)',
+    desc: 'Reports whether `f` is an IEEE 754 "not-a-number" value.',
+    example: 'math.isNaN(f: 12.345)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/isnan/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/isnan/',
   },
   {
     name: 'math.j0',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
     desc: 'Returns the order-zero Bessel function of the first kind.',
-    example: 'math.j0(x: r._value)',
+    example: 'math.j0(x: 1.23)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/j0/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/j0/',
   },
   {
     name: 'math.j1',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the order-one Bessel function of the first kind.',
-    example: 'math.j1(x: r._value)',
+    desc:
+      'Is a function that returns the order-one Bessel function for the first kind.',
+    example: 'math.j1(x: 1.23)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/j1/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/j1/',
   },
   {
     name: 'math.jn',
     args: [
       {
         name: 'n',
-        desc: 'The order number.',
+        desc: 'Order number.',
         type: 'Float',
       },
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
     desc: 'Returns the order-n Bessel function of the first kind.',
-    example: 'math.jn(n: 2, x: r._value)',
+    example: 'math.jn(n: 2, x: 1.23)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/jn/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/jn/',
   },
   {
     name: 'math.ldexp',
     args: [
       {
         name: 'frac',
-        desc: 'The fraction used in the operation.',
+        desc: 'Fraction to use in the operation.',
         type: 'Float',
       },
       {
         name: 'exp',
-        desc: 'The exponent used in the operation.',
+        desc: 'Exponent to use in the operation.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns `frac × 2**exp`. It is the inverse of `math.frexp()`.',
-    example: 'math.ldexp(frac: r.frac, exp: r.exp)',
+    desc: 'Is the inverse of `math.frexp()`. It returns `frac x 2**exp`.',
+    example: 'math.ldexp(frac: 0.5, exp: 6)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/ldexp/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/ldexp/',
   },
   {
     name: 'math.lgamma',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
     desc:
       'Returns the natural logarithm and sign (-1 or +1) of `math.gamma(x:x)`.',
-    example: 'math.lgamma(x: r._value)',
+    example: 'math.lgamma(x: 3.14)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/lgamma/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/lgamma/',
   },
   {
     name: 'math.log',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the natural logarithm of x.',
-    example: 'math.log(x: r._value)',
+    desc: 'Returns the natural logarithm of `x`.',
+    example: 'math.log(x: 3.14)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/log/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/log/',
   },
   {
     name: 'math.log1p',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the natural logarithm of 1 plus its argument x.',
-    example: 'math.log1p(x: r._value)',
+    desc:
+      'Returns the natural logarithm of 1 plus `x`. This operation is more accurate than `math.log(x: 1 + x)` when `x` is near zero.',
+    example: 'math.log1p(x: 0.56)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/log1p/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/log1p/',
   },
   {
     name: 'math.log2',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'the value used in the operation.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the binary logarithm of x.',
-    example: 'math.log2(x: r._value)',
+    desc: 'Is a function returns the binary logarithm of `x`.',
+    example: 'math.log2(x: 3.14)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/log2/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/log2/',
   },
   {
     name: 'math.logb',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the binary exponent of x.',
-    example: 'math.logb(x: r._value)',
+    desc: 'Returns the binary exponent of `x`.',
+    example: 'math.logb(x: 3.14)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/logb/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/logb/',
   },
   {
     name: 'math.mInf',
     args: [
       {
         name: 'sign',
-        desc: 'The sign value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
     desc:
       'Returns positive infinity if `sign >= 0`, negative infinity if `sign < 0`.',
-    example: 'math.mInf(sign: r._value)',
+    example: 'math.mInf(sign: 1)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/minf/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/minf/',
   },
   {
     name: 'math.mMax',
     args: [
       {
         name: 'x',
-        desc: 'The X value used in the operation.',
+        desc: 'x-value to use in the operation.',
         type: 'Float',
       },
       {
         name: 'y',
-        desc: 'The Y value used in the operation.',
+        desc: 'y-value to use in the operation.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the larger of x or y.',
-    example: 'math.mMax(x: r.x_value, y: r.y_value)',
+    desc: 'Returns the larger of `x` or `y`.',
+    example: 'math.mMax(x: 1.23, y: 4.56)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/mmax/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/mmax/',
   },
   {
     name: 'math.mMin',
     args: [
       {
         name: 'x',
-        desc: 'The X value used in the operation.',
+        desc: 'x-value to use in the operation.',
         type: 'Float',
       },
       {
         name: 'y',
-        desc: 'The Y value used in the operation.',
+        desc: 'y-value to use in the operation.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the smaller of x or y.',
-    example: 'math.mMin(x: r.x_value, y: r.y_value)',
+    desc: 'Is a function that returns the lesser of `x` or `y`.',
+    example: 'math.mMin(x: 1.23, y: 4.56)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/mmin/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/mmin/',
   },
   {
     name: 'math.mod',
     args: [
       {
         name: 'x',
-        desc: 'The X value used in the operation.',
+        desc: 'x-value to use in the operation.',
         type: 'Float',
       },
       {
         name: 'y',
-        desc: 'The Y value used in the operation.',
+        desc: 'y-value to use in the operation.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the floating-point remainder of x/y.',
-    example: 'math.mod(x: r.x_value, y: r.y_value)',
+    desc: 'Returns a floating-point remainder of `x/y`.',
+    example: 'math.mod(x: 4.56, y: 1.23)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/mod/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/mod/',
   },
   {
     name: 'math.modf',
     args: [
       {
         name: 'f',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
     desc:
-      'Returns integer and fractional floating-point numbers that sum to f. Both values have the same sign as f.',
-    example: 'math.modf(f: r._value)',
+      'Returns integer and fractional floating-point numbers that sum to `f`.',
+    example: 'math.modf(f: 3.14)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/modf/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/modf/',
   },
   {
     name: 'math.NaN',
     args: [],
     package: 'math',
-    desc: 'Returns an IEEE 754 NaN value.',
+    desc: 'Returns a IEEE 754 "not-a-number" value.',
     example: 'math.NaN()',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/nan/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/nan/',
   },
   {
     name: 'math.nextafter',
     args: [
       {
         name: 'x',
-        desc: 'The X value used in the operation.',
+        desc: 'x-value to use in the operation.',
         type: 'Float',
       },
       {
         name: 'y',
-        desc: 'The Y value used in the operation.',
+        desc: 'y-value to use in the operation.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the next representable float value after x towards y.',
-    example: 'math.nextafter(x: r.x_value, y: r.y_value)',
+    desc: 'Returns the next representable float value after `x` towards `y`.',
+    example: 'math.nextafter(x: 1.23, y: 4.56)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/nextafter/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/nextafter/',
   },
   {
     name: 'math.pow',
     args: [
       {
         name: 'x',
-        desc: 'The X value used in the operation.',
+        desc: 'Base value to operate on.',
         type: 'Float',
       },
       {
         name: 'y',
-        desc: 'The Y value used in the operation.',
+        desc: 'Exponent value.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the base-x exponential of y, `x**y`.',
-    example: 'math.pow(x: r.x_value, y: r.y_value)',
+    desc: 'Returns `x**y`, the base-x exponential of `y`.',
+    example: 'math.pow(x: 2.0, y: 3.0)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/pow/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/pow/',
   },
   {
     name: 'math.pow10',
     args: [
       {
         name: 'n',
-        desc: 'The value used in the operation.',
+        desc: 'Exponent value.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the base-10 exponential of n, `10**n`.',
-    example: 'math.pow10(n: r._value)',
+    desc: 'Returns 10**n, the base-10 exponential of `n`.',
+    example: 'math.pow10(n: 3)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/pow10/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/pow10/',
   },
   {
     name: 'math.remainder',
     args: [
       {
         name: 'x',
-        desc: 'The numerator used in the operation.',
+        desc: 'Numerator to use in the operation.',
         type: 'Float',
       },
       {
         name: 'y',
-        desc: 'The denominator used in the operation.',
+        desc: 'Denominator to use in the operation.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the IEEE 754 floating-point remainder of `x / y`.',
-    example: 'math.remainder(x: r.numerator, y: r.denominator)',
+    desc: 'Returns the IEEE 754 floating-point remainder of `x/y`.',
+    example: 'math.remainder(x: 21.0, y: 4.0)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/remainder/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/remainder/',
   },
   {
     name: 'math.round',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
     desc: 'Returns the nearest integer, rounding half away from zero.',
-    example: 'math.round(x: r._value)',
+    example: 'math.round(x: 2.12)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/round/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/round/',
   },
   {
     name: 'math.roundtoeven',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
     desc: 'Returns the nearest integer, rounding ties to even.',
-    example: 'math.roundtoeven(x: r._value)',
+    example: 'math.roundtoeven(x: 3.14)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/roundtoeven/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/roundtoeven/',
   },
   {
     name: 'math.signbit',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the evaluation.',
+        desc: 'Value to evaluate.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Reports whether x is negative or negative zero.',
-    example: 'math.signbit(x: r._value)',
+    desc: 'Reports whether `x` is negative or negative zero.',
+    example: 'math.signbit(x: -1.2)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/signbit/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/signbit/',
   },
   {
     name: 'math.sin',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Radian value to use in the operation.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the sine of the radian argument x.',
-    example: 'math.sin(x: r._value)',
+    desc: 'Returns the sine of the radian argument `x`.',
+    example: 'math.sin(x: 3.14)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/sin/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/sin/',
   },
   {
     name: 'math.sincos',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
     desc: 'Returns the values of `math.sin(x:x)` and `math.cos(x:x)`.',
-    example: 'math.sincos(x: r._value)',
+    example: 'math.sincos(x: 1.23)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/sincos/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/sincos/',
   },
   {
     name: 'math.sinh',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the hyperbolic sine of x.',
-    example: 'math.sinh(x: r._value)',
+    desc: 'Returns the hyperbolic sine of `x`.',
+    example: 'math.sinh(x: 1.23)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/sinh/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/sinh/',
   },
   {
     name: 'math.sqrt',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the square root of x.',
-    example: 'math.sqrt(x: r._value)',
+    desc: 'Returns the square root of `x`.',
+    example: 'math.sqrt(x: 4.0)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/sqrt/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/sqrt/',
   },
   {
     name: 'math.tan',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the tangent of the radian argument x.',
-    example: 'math.tan(x: r._value)',
+    desc: 'Returns the tangent of the radian argument `x`.',
+    example: 'math.tan(x: 3.14)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/tan/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/tan/',
   },
   {
     name: 'math.tanh',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the hyperbolic tangent of x.',
-    example: 'math.tanh(x: r._value)',
+    desc: 'Returns the hyperbolic tangent of `x`.',
+    example: 'math.tanh(x: 1.23)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/tanh/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/tanh/',
   },
   {
     name: 'math.trunc',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
-    desc: 'Returns the integer value of x.',
-    example: 'math.trunc(x: r._value)',
+    desc: 'Returns the integer value of `x`.',
+    example: 'math.trunc(x: 3.14)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/trunc/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/trunc/',
   },
   {
     name: 'math.y0',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
     desc: 'Returns the order-zero Bessel function of the second kind.',
-    example: 'math.y0(x: r._value)',
+    example: 'math.y0(x: 3.14)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/y0/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/y0/',
   },
   {
     name: 'math.y1',
     args: [
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
     desc: 'Returns the order-one Bessel function of the second kind.',
-    example: 'math.y1(x: r._value)',
+    example: 'math.y1(x: 3.14)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/y1/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/y1/',
   },
   {
     name: 'math.yn',
     args: [
       {
         name: 'n',
-        desc: 'The order number used in the operation.',
+        desc: 'Order number to use in the operation.',
         type: 'Float',
       },
       {
         name: 'x',
-        desc: 'The value used in the operation.',
+        desc: 'Value to operate on.',
         type: 'Float',
       },
     ],
     package: 'math',
     desc: 'Returns the order-n Bessel function of the second kind.',
-    example: 'math.yn(n: 3, x: r._value)',
+    example: 'math.yn(n: 3, x: 3.14)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/yn/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/yn/',
   },
   {
     name: 'max',
-    args: [],
-    package: '',
-    desc: 'Selects record with the highest `_value` from the input table.',
-    example: 'max()',
-    category: 'Selectors',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/selectors/max/',
-  },
-  MEAN,
-  {
-    name: 'median',
     args: [
       {
         name: 'column',
-        desc: 'The column on which to compute the mean. Defaults to `"_value"`',
+        desc: 'Column to return maximum values from. Default is `_value`.',
         type: 'String',
       },
     ],
     package: '',
     desc:
-      'Returns the median `_value` of an input table. The `median()` function can only be used with float value types.',
-    example: 'median(column: "_value")',
+      'Returns the row with the maximum value in a specified column from each input table.',
+    example: 'max()',
+    category: 'Selectors',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/max/',
+  },
+  {
+    name: 'mean',
+    args: [
+      {
+        name: 'column',
+        desc: 'Column to use to compute means. Default is `_value`.',
+        type: 'String',
+      },
+    ],
+    package: '',
+    desc:
+      'Returns the average of non-null values in a specified column from each input table.',
+    example: 'mean()',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/median/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/mean/',
+  },
+  {
+    name: 'median',
+    args: [
+      {
+        name: 'column',
+        desc: 'Column to use to compute the median. Default is `_value`.',
+        type: 'String',
+      },
+      {
+        name: 'method',
+        desc: 'Computation method. Default is `estimate_tdigest`.',
+        type: 'String',
+      },
+      {
+        name: 'compression',
+        desc: 'Number of centroids to use when compressing the dataset.',
+        type: 'Float',
+      },
+    ],
+    package: '',
+    desc:
+      'Returns the median `_value` of an input table or all non-null records in the input table with values that fall within the 0.5 quantile (50th percentile).',
+    example: 'median()',
+    category: 'Aggregates',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/median/',
   },
   {
     name: 'min',
-    args: [],
+    args: [
+      {
+        name: 'column',
+        desc: 'Column to return minimum values from. Default is `_value`.',
+        type: 'String',
+      },
+    ],
     package: '',
-    desc: 'Selects record with the lowest `_value` from the input table.',
+    desc:
+      'Returns the row with the minimum value in a specified column from each input table.',
     example: 'min()',
     category: 'Selectors',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/selectors/min/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/min/',
   },
   {
     name: 'mode',
     args: [
       {
         name: 'column',
-        desc: 'The column to use to compute the mode. Defaults to `"_value"`.',
+        desc: 'Column to return the mode from. Default is `_value`.',
         type: 'String',
       },
     ],
     package: '',
     desc:
-      'Computes the mode or value that occurs most often in a specified column.',
-    example: 'mode(column: "_value")',
+      'Returns the non-null value or values that occur most often in a specified column in each input table.',
+    example: 'mode()',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/mode/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/mode/',
   },
   {
     name: 'movingAverage',
     args: [
       {
         name: 'n',
-        desc: 'The frequency of time windows.',
+        desc: 'Number of values to average.',
         type: 'Duration',
       },
     ],
     package: '',
-    desc: 'Calculates the mean of values grouped into `n` number of points.',
-    example: 'movingAverage(n: 5)',
+    desc:
+      'Calculates the mean of non-null values using the current value and `n - 1` previous values in the `_values` column.',
+    example: 'movingAverage(n: 3)',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/movingaverage/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/movingaverage/',
   },
   {
     name: 'mqtt.to',
     args: [
       {
         name: 'broker',
-        desc: 'The MQTT broker connection string.',
+        desc: 'MQTT broker connection string.',
         type: 'String',
       },
       {
         name: 'topic',
-        desc: 'The MQTT topic to send data to.',
-        type: 'String',
-      },
-      {
-        name: 'message',
-        desc:
-          'The message or payload to send to the MQTT broker. The default payload is an output table.',
+        desc: 'MQTT topic to send data to.',
         type: 'String',
       },
       {
         name: 'qos',
         desc:
-          'The MQTT Quality of Service (QoS) level. Values range from 0-2. Default is 0.',
+          'MQTT Quality of Service (QoS) level. Values range from `[0-2]`. Default is `0`.',
         type: 'Integer',
       },
       {
+        name: 'retain',
+        desc: 'MQTT retain flag. Default is `false`.',
+        type: 'Boolean',
+      },
+      {
         name: 'clientid',
-        desc: 'The MQTT client ID.',
+        desc: 'MQTT client ID.',
         type: 'String',
       },
       {
         name: 'username',
-        desc: 'The username to send to the MQTT broker.',
+        desc: 'Username to send to the MQTT broker.',
         type: 'String',
       },
       {
         name: 'password',
-        desc: 'The password to send to the MQTT broker.',
+        desc: 'Password to send to the MQTT broker.',
         type: 'String',
       },
       {
         name: 'name',
-        desc: 'The name for the MQTT message.',
+        desc: 'Name for the MQTT message.',
         type: 'String',
       },
       {
         name: 'timeout',
-        desc: 'The MQTT connection timeout. Default is 1s.',
+        desc: 'MQTT connection timeout. Default is `1s`.',
         type: 'Duration',
       },
       {
         name: 'timeColumn',
-        desc:
-          'The column to use as time values in the output line protocol. Default is `"_time"`.',
+        desc: 'Column to use as time values in the output line protocol.',
         type: 'String',
       },
       {
         name: 'tagColumns',
-        desc:
-          'The columns to use as tag sets in the output line protocol. Default is `[]`.',
+        desc: 'Columns to use as tag sets in the output line protocol.',
         type: 'Array of Strings',
       },
       {
         name: 'valueColumns',
-        desc:
-          'The columns to use as field values in the output line protocol. Default is `["_value"]`.',
+        desc: 'Columns to use as field values in the output line protocol.',
         type: 'Array of Strings',
       },
     ],
     package: 'experimental/mqtt',
-    desc: 'Outputs data to an MQTT broker using MQTT protocol.',
+    desc:
+      'Outputs data from a stream of tables to an MQTT broker using MQTT protocol.',
     example:
-      'mqtt.to(broker: "tcp://localhost:8883", topic: "example-topic", clientid: "exampleID", tagColumns: ["exampleTagKey"], valueColumns: ["_value"])',
+      'mqtt.to( broker: "tcp://localhost:8883", topic: "example-topic", clientid: r.id, tagColumns: ["id"], valueColumns: ["_value"])',
     category: 'Outputs',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/mqtt/to/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/mqtt/to/',
   },
   {
     name: 'pearsonr',
     args: [
       {
         name: 'x',
-        desc: 'First input stream used in the operation.',
+        desc: 'First input stream.',
         type: 'Object',
       },
       {
         name: 'y',
-        desc: 'Second input stream used in the operation.',
+        desc: 'Second input stream.',
         type: 'Object',
       },
       {
         name: 'on',
-        desc: 'List of columns on which to join.',
+        desc: 'List of columns to join on.',
         type: 'Array of Strings',
       },
     ],
     package: '',
     desc:
-      'Computes the Pearson R correlation coefficient between two streams by first joining the streams, then performing the covariance operation normalized to compute R.',
-    example: 'pearsonr(x: table1, y: table2, on: ["_time", "_field"])',
+      'Returns the covariance of two streams of tables normalized to the Pearson R coefficient.',
+    example: 'pearsonr(x: stream1, y: stream2, on: ["_time"])',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/pearsonr/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/pearsonr/',
   },
   {
     name: 'pivot',
     args: [
       {
         name: 'rowKey',
-        desc: 'List of columns used to uniquely identify a row for the output.',
+        desc: 'Columns to use to uniquely identify an output row.',
         type: 'Array of Strings',
       },
       {
         name: 'columnKey',
-        desc:
-          'List of columns used to pivot values onto each row identified by the rowKey.',
+        desc: 'Columns to use to identify new output columns.',
         type: 'Array of Strings',
       },
       {
         name: 'valueColumn',
         desc:
-          'The single column that contains the value to be moved around the pivot.',
+          'Column to use to populate the value of pivoted `columnKey` columns.',
         type: 'String',
       },
     ],
     package: '',
     desc:
-      'Collects values stored vertically (column-wise) in a table and aligns them horizontally (row-wise) into logical sets.',
+      'Collects unique values stored vertically (column-wise) and aligns them horizontally (row-wise) into logical sets.',
     example:
-      'pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")',
+      'pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/pivot/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/pivot/',
   },
   {
     name: 'prometheus.histogramQuantile',
     args: [
       {
         name: 'quantile',
-        desc: 'A value between 0.0 and 1.0 indicating the desired quantile.',
+        desc: 'Quantile to compute. Must be a float value between 0.0 and 1.0.',
         type: 'Float',
+      },
+      {
+        name: 'metricVersion',
+        desc:
+          'Prometheus metric parsing format (/influxdb/v2/reference/prometheus-metrics/)',
+        type: 'Object',
+      },
+      {
+        name: 'onNonmonotonic',
+        desc: 'Describes behavior when counts are not monotonically increasing',
+        type: 'String',
       },
     ],
     package: 'experimental/prometheus',
-    desc:
-      'Calculates quantiles on a set of values assuming the histogram data is scraped or read from a Prometheus data source.',
+    desc: 'Calculates a quantile on a set of Prometheus histogram values.',
     example: 'prometheus.histogramQuantile(quantile: 0.99)',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/prometheus/histogramquantile/',
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/prometheus/histogramquantile/',
   },
   {
     name: 'prometheus.scrape',
     args: [
       {
         name: 'url',
-        desc: 'The URL to scrape Prometheus-formatted metrics from.',
+        desc: 'URL to scrape Prometheus metrics from.',
         type: 'String',
       },
     ],
     package: 'experimental/prometheus',
-    desc: 'Retrieves Prometheus-formatted metrics from a specified URL.',
-    example: 'prometheus.scrape(url: "http://localhost:9999/metrics")',
+    desc:
+      'Scrapes Prometheus metrics from an HTTP-accessible endpoint and returns them as a stream of tables.',
+    example: 'prometheus.scrape(url: "http://localhost:8086/metrics")',
     category: 'Inputs',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/prometheus/scrape/',
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/prometheus/scrape/',
   },
   {
     name: 'quantile',
     args: [
       {
         name: 'column',
-        desc:
-          'The column on which to compute the quantile. Defaults to `"_value"`.',
+        desc: 'Column to use to compute the quantile. Default is `_value`.',
         type: 'String',
       },
       {
         name: 'q',
-        desc: 'A value between 0 and 1 indicating the desired quantile.',
+        desc: 'Quantile to compute. Must be between `0.0` and `1.0`.',
         type: 'Float',
       },
       {
         name: 'method',
-        desc:
-          'Defines the method of computation. The available options are: `estimate_tdigest`, `exact_mean`, or `exact_selector`.',
+        desc: 'Computation method. Default is `estimate_tdigest`.',
         type: 'String',
       },
       {
         name: 'compression',
-        desc:
-          'Indicates how many centroids to use when compressing the dataset. A larger number produces a more accurate result at the cost of increased memory requirements. Defaults to 1000.',
+        desc: 'Number of centroids to use when compressing the dataset.',
         type: 'Float',
       },
     ],
     package: '',
     desc:
-      'This is both an aggregate and selector function depending on the `method` used. When using the `estimate_tdigest` or `exact_mean` methods, it outputs non-null records with values that fall within the specified quantile. When using the `exact_selector` method, it outputs the non-null record with the value that represents the specified quantile.',
-    example:
-      'quantile(column: "_value", q: 0.99, method: "estimate_tdigest", compression: 1000.0)',
+      'Returns rows from each input table with values that fall within a specified quantile or returns the row with the value that represents the specified quantile.',
+    example: 'quantile(q: 0.99, method: "estimate_tdigest")',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/quantile/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/quantile/',
   },
   {
     name: 'query.filterFields',
     args: [
       {
         name: 'fields',
-        desc: 'Fields to filter by.',
+        desc: 'Fields to filter by. Default is `[]`.',
         type: 'Array of Strings',
+      },
+      {
+        name: 'table',
+        desc: 'Input data. Default is piped-forward data (`<-`).',
+        type: 'Stream of tables',
       },
     ],
     package: 'experimental/query',
     desc: 'Filters input data by field.',
-    example: 'query.filterFields(fields: ["field_name"])',
+    example:
+      'query.filterFields(fields: ["used_percent", "available_percent"])',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/query/filterfields/',
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/query/filterfields/',
   },
   {
     name: 'query.filterMeasurement',
     args: [
       {
         name: 'measurement',
-        desc: 'Measurement to filter by.',
+        desc: 'InfluxDB measurement name to filter by.',
         type: 'String',
+      },
+      {
+        name: 'table',
+        desc: 'Input data. Default is piped-forward data (`<-`).',
+        type: 'Stream of tables',
       },
     ],
     package: 'experimental/query',
     desc: 'Filters input data by measurement.',
-    example: 'query.filterMeasurement(measurement: "measurement_name")',
+    example: 'query.filterMeasurement(measurement: "example-measurement")',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/query/filtermeasurement/',
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/query/filtermeasurement/',
   },
   {
     name: 'query.fromRange',
     args: [
       {
         name: 'bucket',
-        desc: 'Name of the bucket to query.',
+        desc: 'InfluxDB bucket name.',
         type: 'String',
       },
       {
         name: 'start',
-        desc: 'The earliest time to include in results.',
+        desc: 'Earliest time to include in results.',
         type: 'Duration | Time',
       },
       {
         name: 'stop',
-        desc: 'The latest time to include in results. Defaults to `now()`.',
+        desc: 'Latest time to include in results. Default is `now()`.',
         type: 'Duration | Time',
       },
     ],
     package: 'experimental/query',
     desc: 'Returns all data from a specified bucket within given time bounds.',
-    example: 'query.fromRange(bucket: "db/rp", start: v.timeRangeStart)',
+    example: 'query.fromRange(bucket: "example-bucket", start: -1h)',
     category: 'Inputs',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/query/fromrange/',
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/query/fromrange/',
   },
   {
     name: 'query.inBucket',
     args: [
       {
         name: 'bucket',
-        desc: 'Name of the bucket to query.',
+        desc: 'InfluxDB bucket name.',
+        type: 'String',
+      },
+      {
+        name: 'measurement',
+        desc: 'InfluxDB measurement name to filter by.',
         type: 'String',
       },
       {
         name: 'start',
-        desc: 'The earliest time to include in results.',
+        desc: 'Earliest time to include in results.',
         type: 'Duration | Time',
       },
       {
         name: 'stop',
-        desc: 'The latest time to include in results. Defaults to `now()`.',
+        desc: 'Latest time to include in results. Default is `now()`.',
         type: 'Duration | Time',
       },
       {
-        name: 'measurement',
-        desc: 'Measurement to filter by.',
-        type: 'String',
-      },
-      {
         name: 'fields',
-        desc: 'Fields to filter by.',
+        desc: 'Fields to filter by. Default is `[]`.',
         type: 'Array of Strings',
       },
       {
         name: 'predicate',
-        desc: 'A single argument function that evaluates true or false.',
+        desc:
+          'Predicate function that evaluates column values and returns `true` or `false`.',
         type: 'Function',
       },
     ],
     package: 'experimental/query',
     desc:
-      'Queries data from a specified bucket within given time bounds, filters data by measurement, field, and optional predicate expressions.',
+      'Queries data from a specified InfluxDB bucket within given time bounds, filters data by measurement, field, and optional predicate expressions.',
     example:
-      'query.inBucket(bucket: "db/rp", start: v.timeRangeStart, measurement: "measurement_name", fields: ["field_name"], predicate: (r) => r.host == "host1")',
+      'query.inBucket( bucket: "example-buckt", start: -1h, measurement: "mem", fields: ["field1", "field2"], predicate: (r) => r.host == "host1")',
     category: 'Inputs',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/query/inbucket/',
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/query/inbucket/',
   },
-  RANGE,
+  {
+    name: 'range',
+    args: [
+      {
+        name: 'start',
+        desc: 'Earliest time to include in results.',
+        type: 'Duration | Time',
+      },
+      {
+        name: 'stop',
+        desc: 'Latest time to include in results. Default is `now()`.',
+        type: 'Duration | Time',
+      },
+    ],
+    package: '',
+    desc: 'Filters rows based on time bounds.',
+    example: 'range(start: -12h)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/range/',
+  },
   {
     name: 'reduce',
     args: [
       {
         name: 'fn',
-        desc:
-          'Function to apply to each record with a reducer object. The function expects two objects: `r` and `accumulator`.',
+        desc: 'Reducer function to apply to each row record (`r`).',
         type: 'Function',
       },
       {
         name: 'identity',
         desc:
-          'Defines the reducer object and provides initial values to use when creating a reducer.',
+          'Record that defines the reducer record and provides initial values',
         type: 'Object',
       },
     ],
     package: '',
-    desc: 'Aggregates records in each table according to the reducer, `fn`',
+    desc:
+      'Aggregates rows in each input table using a reducer function (`fn`).',
     example:
-      'reduce(fn: (r, accumulator) => ({ sum: r._value + accumulator.sum }), identity: {sum: 0.0})',
+      'reduce(fn: (r, accumulator) => ({sum: r._value + accumulator.sum}), identity: {sum: 0})',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/reduce/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/reduce/',
   },
   {
     name: 'regexp.compile',
     args: [
       {
         name: 'v',
-        desc: 'The string value to parse into a regular expression.',
+        desc: 'String value to parse into a regular expression.',
         type: 'String',
       },
     ],
     package: 'regexp',
     desc:
-      'Parses a string into a regular expression and returns a regexp object.',
-    example: 'regexp.compile(v: "[a-zA-Z]")',
+      'Parses a string into a regular expression and returns a regexp type that can be used to match against strings.',
+    example: 'regexp.compile(v: "abcd")',
     category: 'Type Conversions',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/regexp/compile/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/regexp/compile/',
   },
   {
     name: 'regexp.findString',
     args: [
       {
         name: 'r',
-        desc: 'The regular expression used to search `v`',
+        desc: 'Regular expression used to search `v`.',
         type: 'Regexp',
       },
       {
         name: 'v',
-        desc: 'The string value to search.',
+        desc: 'String value to search.',
         type: 'String',
       },
     ],
@@ -3606,36 +3761,35 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the left-most regular expression match in a string.',
     example: 'regexp.findString(r: /foo.?/, v: "seafood fool")',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/regexp/findstring/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/regexp/findstring/',
   },
   {
     name: 'regexp.findStringIndex',
     args: [
       {
         name: 'r',
-        desc: 'The regular expression used to search `v`',
+        desc: 'Regular expression used to search `v`.',
         type: 'Regexp',
       },
       {
         name: 'v',
-        desc: 'The string value to search.',
+        desc: 'String value to search.',
         type: 'String',
       },
     ],
     package: 'regexp',
     desc:
-      'Returns a two-element array of integers defining the beginning and ending indexes of the left-most regular expression match in a string.',
+      'Returns a two-element array of integers that represent the beginning and ending indexes of the first regular expression match in a string.',
     example: 'regexp.findStringIndex(r: /ab?/, v: "tablet")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/regexp/findstringindex/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/regexp/findstringindex/',
   },
   {
     name: 'regexp.getString',
     args: [
       {
         name: 'r',
-        desc: 'The regular expression object to convert to a string.',
+        desc: 'Regular expression object to convert to a string.',
         type: 'Regexp',
       },
     ],
@@ -3643,28 +3797,29 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the source string used to compile a regular expression.',
     example: 'regexp.getString(r: /[a-zA-Z]/)',
     category: 'Type Conversions',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/regexp/getstring/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/regexp/getstring/',
   },
   {
     name: 'regexp.matchRegexpString',
     args: [
       {
         name: 'r',
-        desc: 'The regular expression used to search `v`',
+        desc: 'Regular expression used to search `v`.',
         type: 'Regexp',
       },
       {
         name: 'v',
-        desc: 'The string value to search.',
+        desc: 'String value to search.',
         type: 'String',
       },
     ],
     package: 'regexp',
     desc: 'Tests if a string contains any match to a regular expression.',
-    example: 'regexp.matchRegexpString(r: /(go){2}/, v: "gogogopher")',
+    example:
+      'regexp.matchRegexpString(r: /(gopher){2}/, v: "gophergophergopher")',
     category: 'Tests',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/regexp/matchregexpstring/',
+      'https://docs.influxdata.com/flux/v0/stdlib/regexp/matchregexpstring/',
   },
   {
     name: 'regexp.quoteMeta',
@@ -3672,114 +3827,109 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       {
         name: 'v',
         desc:
-          'String value containing regular expression metacharacters to escape.',
+          'String that contains regular expression metacharacters to escape.',
         type: 'String',
       },
     ],
     package: 'regexp',
-    desc: 'Escapes all regular expression metacharacters inside of a string.',
+    desc: 'Escapes all regular expression metacharacters in a string.',
     example: 'regexp.quoteMeta(v: ".+*?()|[]{}^$")',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/regexp/quotemeta/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/regexp/quotemeta/',
   },
   {
     name: 'regexp.replaceAllString',
     args: [
       {
         name: 'r',
-        desc: 'The regular expression used to search `v`',
+        desc: 'Regular expression used to search `v`.',
         type: 'Regexp',
       },
       {
         name: 'v',
-        desc: 'The string value to search.',
+        desc: 'String value to search.',
         type: 'String',
       },
       {
         name: 't',
-        desc: 'The replacement for matches to `r`',
+        desc: 'Replacement for matches to `r`.',
         type: 'String',
       },
     ],
     package: 'regexp',
     desc:
-      'Replaces all regular expression matches in a string with a specified replacement.',
+      'Replaces all reguar expression matches in a string with a specified replacement.',
     example: 'regexp.replaceAllString(r: /a(x*)b/, v: "-ab-axxb-", t: "T")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/regexp/replaceallstring/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/regexp/replaceallstring/',
   },
   {
     name: 'regexp.splitRegexp',
     args: [
       {
         name: 'r',
-        desc: 'The regular expression used to search `v`',
+        desc: 'Regular expression used to search `v`.',
         type: 'Regexp',
       },
       {
         name: 'v',
-        desc: 'The string value to search.',
+        desc: 'String value to be searched.',
         type: 'String',
       },
       {
         name: 'i',
-        desc: 'The number of substrings to return.',
+        desc: 'Maximum number of substrings to return.',
         type: 'Integer',
       },
     ],
     package: 'regexp',
     desc:
       'Splits a string into substrings separated by regular expression matches and returns an array of `i` substrings between matches.',
-    example: 'regexp.splitRegexp(r: /a*/, v: "abaabaccadaaae", i: 5)',
+    example: 'regexp.splitRegexp(r: /a*/, v: "abaabaccadaaae", i: -1)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/regexp/splitregexp/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/regexp/splitregexp/',
   },
   {
     name: 'relativeStrengthIndex',
     args: [
       {
         name: 'n',
-        desc:
-          'The number of values to use to calculate the relative strength index (RSI).',
+        desc: 'Number of values to use to calculate the RSI.',
         type: 'Integer',
       },
       {
         name: 'columns',
-        desc: 'Columns to operate on. Defaults to `["_value"]`.',
+        desc: 'Columns to operate on. Default is `["_value"]`.',
         type: 'Array of Strings`',
       },
     ],
     package: '',
-    desc: 'Measures the relative speed and change of values in an input table.',
-    example: 'relativeStrengthIndex(n: 5)',
+    desc: 'Measures the relative speed and change of values in input tables.',
+    example: 'relativeStrengthIndex(n: 3)',
     category: 'Aggregates',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/relativestrengthindex/',
+      'https://docs.influxdata.com/flux/v0/stdlib/universe/relativestrengthindex/',
   },
   {
     name: 'rename',
     args: [
       {
         name: 'columns',
-        desc:
-          'A map of columns to rename and their corresponding new names. Cannot be used with `fn`.',
+        desc: 'Record that maps old column names to new column names.',
         type: 'Object',
       },
       {
         name: 'fn',
         desc:
-          'A function mapping between old and new column names. Cannot be used with `columns`.',
+          'Function that takes the current column name (`column`) and returns a',
         type: 'Function',
       },
     ],
     package: '',
-    desc:
-      'Renames specified columns in a table. If a column is renamed and is part of the group key, the column name in the group key will be updated.',
-    example: 'rename(columns: {host: "server", _field: "my_field"})',
+    desc: 'Renames columns in a table.',
+    example: 'rename(columns: {tag: "uid", _value: "val"})',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/rename/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/rename/',
   },
   {
     name: 'runtime.version',
@@ -3788,7 +3938,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the current Flux version.',
     example: 'runtime.version()',
     category: 'Miscellaneous',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/runtime/version/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/runtime/version/',
   },
   {
     name: 'sample',
@@ -3801,23 +3951,27 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       {
         name: 'pos',
         desc:
-          'The position offset from the start of results where sampling begins. `pos` must be less than `n`. If `pos` is less than 0, a random offset is used. Defaults to `-1` (random offset).',
+          'Position offset from the start of results where sampling begins.',
         type: 'Integer',
+      },
+      {
+        name: 'column',
+        desc: 'Column to operate on.',
+        type: 'String',
       },
     ],
     package: '',
-    desc: 'Selects a subset of the records from the input table.',
-    example: 'sample(n:5, pos: -1)',
+    desc: 'Selects a subset of the rows from each input table.',
+    example: 'sample(n: 2, pos: 1)',
     category: 'Selectors',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/selectors/sample/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/sample/',
   },
   {
     name: 'secrets.get',
     args: [
       {
         name: 'key',
-        desc: 'The secret key to retrieve.',
+        desc: 'Secret key to retrieve.',
         type: 'String',
       },
     ],
@@ -3825,73 +3979,51 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Retrieves a secret from the InfluxDB secret store.',
     example: 'secrets.get(key: "KEY_NAME")',
     category: 'Miscellaneous',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/secrets/get/',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/secrets/get/',
   },
   {
     name: 'set',
     args: [
       {
         name: 'key',
-        desc: 'The label of the column to modify or set.',
+        desc: 'Label of the column to modify or set.',
         type: 'String',
       },
       {
         name: 'value',
-        desc: 'The string value to set.',
+        desc: 'String value to set.',
         type: 'String',
       },
     ],
     package: '',
-    desc:
-      'Assigns a static value to each record in the input table. The key may modify an existing column or add a new column to the tables. If the modified column is part of the group key, the output tables are regrouped as needed.',
-    example: 'set(key: "_field", value: "my_field")',
+    desc: 'Assigns a static column value to each row in the input tables.',
+    example: 'set(key: "host", value: "prod1")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/set/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/set/',
   },
   {
     name: 'skew',
     args: [
       {
         name: 'column',
-        desc: 'The column on which to operate. Defaults to `"_value"`.',
+        desc: 'Column to operate on. Default is `_value`.',
         type: 'String',
       },
     ],
     package: '',
-    desc: 'Outputs the skew of non-null records as a float.',
-    example: 'skew(column: "_value")',
+    desc:
+      'Returns the skew of non-null records in each input table as a float.',
+    example: 'skew()',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/skew/',
-  },
-  {
-    name: 'sleep',
-    args: [
-      {
-        name: 'v',
-        desc: 'Defines input tables.',
-        type: 'Object',
-      },
-      {
-        name: 'duration',
-        desc: 'The length of time to delay execution.',
-        type: 'Duration',
-      },
-    ],
-    package: '',
-    desc: 'Delays execution by a specified duration.',
-    example: 'sleep(duration: 5s)',
-    category: 'Miscellaneous',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/built-in/misc/sleep/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/skew/',
   },
   {
     name: 'sort',
     args: [
       {
         name: 'columns',
-        desc:
-          'List of columns by which to sort. Sort precedence is determined by list order (left to right). Default is `["_value"]`.',
+        desc: 'List of columns to sort by. Default is `["_value"]`.',
         type: 'Array of Strings',
       },
       {
@@ -3902,46 +4034,43 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     package: '',
     desc:
-      'Orders the records within each table. One output table is produced for each input table. The output tables will have the same schema as their corresponding input tables.',
-    example: 'sort(columns: ["_value"], desc: false)',
+      'Orders rows in each input table based on values in specified columns.',
+    example: 'sort()',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/sort/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/sort/',
   },
   {
     name: 'spread',
     args: [
       {
         name: 'column',
-        desc: 'The column on which to operate. Defaults to `"_value"`.',
+        desc: 'Column to operate on. Default is `_value`.',
         type: 'String',
       },
     ],
     package: '',
     desc:
-      'Outputs the difference between the minimum and maximum values in the specified column. Only `uint`, `int`, and `float` column types can be used.',
-    example: 'spread(column: "_value")',
+      'Returns the difference between the minimum and maximum values in a specified column.',
+    example: 'spread()',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/spread/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/spread/',
   },
   {
     name: 'sql.from',
     args: [
       {
         name: 'driverName',
-        desc: 'The driver used to connect to the SQL database.',
+        desc: 'Driver to use to connect to the SQL database.',
         type: 'String',
       },
       {
         name: 'dataSourceName',
-        desc:
-          'The connection string used to connect to the SQL database. The string’s form and structure depend on the driver.',
+        desc: 'Data source name (DNS) or connection string used to connect',
         type: 'String',
       },
       {
         name: 'query',
-        desc: 'The query to run against the SQL database.',
+        desc: 'Query to run against the SQL database.',
         type: 'String',
       },
     ],
@@ -3950,160 +4079,154 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     example:
       'sql.from(driverName: "postgres", dataSourceName: "postgresql://user:password@localhost", query:"SELECT * FROM example_table")',
     category: 'Inputs',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/sql/from/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/sql/from/',
   },
   {
     name: 'sql.to',
     args: [
       {
         name: 'driverName',
-        desc: 'The driver used to connect to the SQL database.',
+        desc: 'Driver used to connect to the SQL database.',
         type: 'String',
       },
       {
         name: 'dataSourceName',
-        desc:
-          'The connection string used to connect to the SQL database. The string’s form and structure depend on the driver.',
+        desc: 'Data source name (DNS) or connection string used',
         type: 'String',
       },
       {
         name: 'table',
-        desc: 'The destination table.',
+        desc: 'Destination table.',
         type: 'String',
       },
       {
         name: 'batchSize',
-        desc:
-          'The number of parameters or columns that can be queued within each call to `Exec`. Defaults to `10000`.',
+        desc: 'Number of parameters or columns that can be queued within each',
         type: 'Integer',
       },
     ],
     package: 'sql',
-    desc: 'Writes data to a SQL database.',
+    desc: 'Writes data to an SQL database.',
     example:
       'sql.to(driverName: "postgres", dataSourceName: "postgresql://user:password@localhost", table: "example_table")',
     category: 'Outputs',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/sql/to/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/sql/to/',
   },
   {
     name: 'stateCount',
     args: [
       {
         name: 'fn',
-        desc:
-          'A single argument function that evaluates true or false to identify the state of the record.',
+        desc: 'Predicate function that identifies the state of a record.',
         type: 'Function',
       },
       {
         name: 'column',
-        desc:
-          'The name of the column added to each record that contains the incremented state count.',
+        desc: 'Column to store the state count in. Default is `stateCount`.',
         type: 'String',
       },
     ],
     package: '',
-    desc:
-      'Computes the number of consecutive records in a given state and stores the increment in a new column.',
-    example: 'stateCount(fn: (r) => r._field == "state", column: "stateCount")',
+    desc: 'Returns the number of consecutive rows in a given state.',
+    example: 'stateCount(fn: (r) => r._value < 10)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/statecount/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/statecount/',
   },
   {
     name: 'stateDuration',
     args: [
       {
         name: 'fn',
-        desc:
-          'A single argument function that evaluates true or false to identify the state of the record.',
+        desc: 'Predicate function that identifies the state of a record.',
         type: 'Function',
       },
       {
         name: 'column',
         desc:
-          'Name of the column added to each record that contains the incremented state duration.',
+          'Column to store the state duration in. Default is `stateDuration`.',
+        type: 'String',
+      },
+      {
+        name: 'timeColumn',
+        desc: 'Time column to use to calculate elapsed time between rows.',
         type: 'String',
       },
       {
         name: 'unit',
-        desc: 'Unit of time in which the state duration is incremented.',
+        desc:
+          'Unit of time to use to increment state duration. Default is `1s` (seconds).',
         type: 'Duration',
       },
     ],
     package: '',
-    desc:
-      'Computes the duration of a given state and stores the increment in a new column.',
-    example:
-      'stateDuration(fn: (r) => r._measurement == "state", column: "stateDuration", unit: 1s)',
+    desc: 'Returns the cumulative duration of a given state.',
+    example: 'stateDuration(fn: (r) => r._value < 15)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/stateduration/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/stateduration/',
   },
   {
     name: 'stddev',
     args: [
       {
         name: 'column',
-        desc: 'The column on which to operate. Defaults to `"_value"`.',
+        desc: 'Column to operate on. Default is `_value`.',
         type: 'String',
       },
       {
         name: 'mode',
         desc:
-          'The standard deviation mode (sample or population). Defaults to `"sample"`.',
+          'Standard deviation mode or type of standard deviation to calculate.',
         type: 'String',
       },
     ],
     package: '',
     desc:
-      'Computes the standard deviation of non-null records in specified column.',
-    example: 'stddev(column: "_value", mode: "sample")',
+      'Returns the standard deviation of non-null values in a specified column.',
+    example: 'stddev()',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/stddev/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/stddev/',
   },
   {
     name: 'string',
     args: [
       {
         name: 'v',
-        desc: 'The value to convert.',
+        desc: 'Value to convert.',
         type: 'Integer, UInteger, Float, Boolean, Duration, Time',
       },
     ],
     package: '',
-    desc: 'Converts a single value to a string.',
-    example: 'string(v: r._value)',
+    desc: 'Converts a value to a string type.',
+    example: 'string(v: true)',
     category: 'Type Conversions',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/type-conversions/string/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/string/',
   },
   {
     name: 'strings.compare',
     args: [
       {
         name: 'v',
-        desc: 'The string value to compare.',
+        desc: 'String value to compare.',
         type: 'String',
       },
       {
         name: 't',
-        desc: 'The string value to compare against.',
+        desc: 'String value to compare against.',
         type: 'String',
       },
     ],
     package: 'strings',
     desc: 'Compares the lexicographical order of two strings.',
-    example: 'strings.compare(v: "a", t: "b")',
+    example: 'strings.compare(v: r.string1, t: r.string2)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/compare/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/compare/',
   },
   {
     name: 'strings.containsAny',
     args: [
       {
         name: 'v',
-        desc: 'The string value to search.',
+        desc: 'String value to search.',
         type: 'String',
       },
       {
@@ -4115,139 +4238,139 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'strings',
     desc:
       'Reports whether a specified string contains characters from another string.',
-    example: 'strings.containsAny(v: "abc", chars: "and")',
+    example: 'strings.containsAny(v: r._value, chars: "a79")',
     category: 'Tests',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/containsany/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/containsany/',
   },
   {
     name: 'strings.containsStr',
     args: [
       {
         name: 'v',
-        desc: 'The string value to search.',
+        desc: 'String value to search.',
         type: 'String',
       },
       {
         name: 'substr',
-        desc: 'The substring to search for.',
+        desc: 'Substring value to search for.',
         type: 'String',
       },
     ],
     package: 'strings',
     desc: 'Reports whether a string contains a specified substring.',
-    example: 'strings.containsStr(v: "This and that", substr: "and")',
+    example: 'strings.containsStr(v: r._value, substr: "5")',
     category: 'Tests',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/containsstr/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/containsstr/',
   },
   {
     name: 'strings.countStr',
     args: [
       {
         name: 'v',
-        desc: 'The string value to search.',
+        desc: 'String value to search.',
         type: 'String',
       },
       {
         name: 'substr',
-        desc: 'The substring count.',
+        desc: 'Substring to count occurrences of.',
         type: 'String',
       },
     ],
     package: 'strings',
     desc:
       'Counts the number of non-overlapping instances of a substring appears in a string.',
-    example: 'strings.countStr(v: "Hello mellow fellow", substr: "ello")',
+    example: 'strings.countStr(v: r._value, substr: "p")',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/countstr/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/countstr/',
   },
   {
     name: 'strings.equalFold',
     args: [
       {
         name: 'v',
-        desc: 'The string value to compare.',
+        desc: 'String value to compare.',
         type: 'String',
       },
       {
         name: 't',
-        desc: 'The string value to compare against.',
+        desc: 'String value to compare against.',
         type: 'String',
       },
     ],
     package: 'strings',
     desc:
       'Reports whether two UTF-8 strings are equal under Unicode case-folding.',
-    example: 'strings.equalFold(v: "Go", t: "go")',
+    example: 'strings.equalFold(v: r.string1, t: r.string2)',
     category: 'Tests',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/equalfold/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/equalfold/',
   },
   {
     name: 'strings.hasPrefix',
     args: [
       {
         name: 'v',
-        desc: 'The string value to search.',
+        desc: 'String value to search.',
         type: 'String',
       },
       {
-        name: 't',
-        desc: 'The prefix to search for.',
+        name: 'prefix',
+        desc: 'Prefix to search for.',
         type: 'String',
       },
     ],
     package: 'strings',
     desc: 'Indicates if a string begins with a specified prefix.',
-    example: 'strings.hasPrefix(v: "go gopher", t: "go")',
+    example: 'strings.hasPrefix(v: r._value, prefix: "smpl_5")',
     category: 'Tests',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/hasprefix/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/hasprefix/',
   },
   {
     name: 'strings.hasSuffix',
     args: [
       {
         name: 'v',
-        desc: 'The string value to search.',
+        desc: 'String value to search.',
         type: 'String',
       },
       {
-        name: 't',
-        desc: 'The suffix to search for.',
+        name: 'suffix',
+        desc: 'Suffix to search for.',
         type: 'String',
       },
     ],
     package: 'strings',
     desc: 'Indicates if a string ends with a specified suffix.',
-    example: 'strings.hasPrefix(v: "gopher go", t: "go")',
+    example: 'strings.hasSuffix(v: r._value, suffix: "4")',
     category: 'Tests',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/hassuffix/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/hassuffix/',
   },
   {
     name: 'strings.index',
     args: [
       {
         name: 'v',
-        desc: 'The string value to search.',
+        desc: 'String value to search.',
         type: 'String',
       },
       {
         name: 'substr',
-        desc: 'The substring to search for.',
+        desc: 'Substring to search for.',
         type: 'String',
       },
     ],
     package: 'strings',
     desc:
       'Returns the index of the first instance of a substring in a string. If the substring is not present, it returns `-1`.',
-    example: 'strings.index(v: "go gopher", substr: "go")',
+    example: 'strings.index(v: r._value, substr: "g")',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/index-func/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/index-fn/',
   },
   {
     name: 'strings.indexAny',
     args: [
       {
         name: 'v',
-        desc: 'The string value to search.',
+        desc: 'String value to search.',
         type: 'String',
       },
       {
@@ -4258,119 +4381,119 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     package: 'strings',
     desc:
-      'Returns the index of the first instance of specified characters in a string. If none of the specified characters are present, it returns -1.',
-    example: 'strings.indexAny(v: "chicken", chars: "aeiouy")',
+      'Returns the index of the first instance of specified characters in a string. If none of the specified characters are present, it returns `-1`.',
+    example: 'strings.indexAny(v: r._value, chars: "g7t")',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/indexany/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/indexany/',
   },
   {
     name: 'strings.isDigit',
     args: [
       {
         name: 'v',
-        desc: 'The single-character string to test.',
+        desc: 'Single-character string to test.',
         type: 'String',
       },
     ],
     package: 'strings',
     desc: 'Tests if a single-character string is a digit (0-9).',
-    example: 'strings.isDigit(v: "7")',
+    example: 'strings.isDigit(v: r._value)',
     category: 'Tests',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/isdigit/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/isdigit/',
   },
   {
     name: 'strings.isLetter',
     args: [
       {
         name: 'v',
-        desc: 'The single-character string to test.',
+        desc: 'Single-character string to test.',
         type: 'String',
       },
     ],
     package: 'strings',
-    desc: 'Tests if a single-character string is a letter (a-z, A-Z).',
-    example: 'strings.isLetter(v: "A")',
+    desc: 'Tests if a single character string is a letter (a-z, A-Z).',
+    example: 'strings.isLetter(v: r._value)',
     category: 'Tests',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/isletter/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/isletter/',
   },
   {
     name: 'strings.isLower',
     args: [
       {
         name: 'v',
-        desc: 'The single-character string to test.',
+        desc: 'Single-character string value to test.',
         type: 'String',
       },
     ],
     package: 'strings',
     desc: 'Tests if a single-character string is lowercase.',
-    example: 'strings.isLower(v: "a")',
+    example: 'strings.isLower(v: r._value)',
     category: 'Tests',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/islower/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/islower/',
   },
   {
     name: 'strings.isUpper',
     args: [
       {
         name: 'v',
-        desc: 'The single-character string to test.',
+        desc: 'Single-character string value to test.',
         type: 'String',
       },
     ],
     package: 'strings',
-    desc: 'Tests if a single-character string is uppercase.',
-    example: 'strings.isUpper(v: "A")',
+    desc: 'Tests if a single character string is uppercase.',
+    example: 'strings.isUpper(v: r._value)',
     category: 'Tests',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/isupper/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/isupper/',
   },
   {
     name: 'strings.joinStr',
     args: [
       {
         name: 'arr',
-        desc: 'The array of strings to concatenate.',
+        desc: 'Array of strings to concatenate.',
         type: 'Array of Strings',
       },
       {
         name: 'v',
-        desc: 'The separator to use in the concatenated value.',
+        desc: 'Separator to use in the concatenated value.',
         type: 'String',
       },
     ],
     package: 'strings',
     desc:
       'Concatenates elements of a string array into a single string using a specified separator.',
-    example: 'strings.joinStr(arr: ["a", "b", "c"], v: ",")',
+    example: 'strings.joinStr(arr: ["foo", "bar", "baz", "quz"], v: ", ")',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/joinstr/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/joinstr/',
   },
   {
     name: 'strings.lastIndex',
     args: [
       {
         name: 'v',
-        desc: 'The string value to search.',
+        desc: 'String value to search.',
         type: 'String',
       },
       {
         name: 'substr',
-        desc: 'The substring to search for.',
+        desc: 'Substring to search for.',
         type: 'String',
       },
     ],
     package: 'strings',
     desc:
       'Returns the index of the last instance of a substring in a string. If the substring is not present, the function returns -1.',
-    example: 'strings.lastIndex(v: "go gopher", t: "go")',
+    example: 'strings.lastIndex(v: r._value, substr: "g")',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/lastindex/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/lastindex/',
   },
   {
     name: 'strings.lastIndexAny',
     args: [
       {
         name: 'v',
-        desc: 'The string value to search.',
+        desc: 'String value to search.',
         type: 'String',
       },
       {
@@ -4381,337 +4504,372 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     package: 'strings',
     desc:
-      'Returns the index of the last instance of any specified characters in a string. If none of the specified characters are present, the function returns -1.',
-    example: 'strings.lastIndexAny(v: "chicken", chars: "aeiouy")',
+      'Returns the index of the last instance of any specified characters in a string. If none of the specified characters are present, the function returns `-1`.',
+    example: 'strings.lastIndexAny(v: r._value, chars: "g7t")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/lastindexany/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/lastindexany/',
   },
   {
     name: 'strings.repeat',
     args: [
       {
         name: 'v',
-        desc: 'The string value to repeat.',
+        desc: 'String value to repeat.',
         type: 'String',
       },
       {
         name: 'i',
-        desc: 'The number of times to repeat `v`.',
+        desc: 'Number of times to repeat `v`.',
         type: 'Integer',
       },
     ],
     package: 'strings',
     desc: 'Returns a string consisting of `i` copies of a specified string.',
-    example: 'strings.repeat(v: "ha", i: 3)',
+    example: 'strings.repeat(v: "ha", i: r._value)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/repeat/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/repeat/',
   },
   {
     name: 'strings.replace',
     args: [
       {
         name: 'v',
-        desc: 'The string value to search.',
+        desc: 'String value to search.',
         type: 'String',
       },
       {
         name: 't',
-        desc: 'The substring to replace.',
+        desc: 'Substring value to replace.',
         type: 'String',
       },
       {
         name: 'u',
-        desc: 'The replacement for `i` instances of `t`.',
+        desc: 'Replacement for `i` instances of `t`.',
         type: 'String',
       },
       {
         name: 'i',
-        desc: 'The number of non-overlapping `t` matches to replace.',
+        desc: 'Number of non-overlapping `t` matches to replace.',
         type: 'Integer',
       },
     ],
     package: 'strings',
     desc:
       'Replaces the first `i` non-overlapping instances of a substring with a specified replacement.',
-    example: 'strings.replace(v: "oink oink oink", t: "oink", u: "moo", i: 2)',
+    example: 'strings.replace(v: r._value, t: "p", u: "XX", i: 2)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/replace/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/replace/',
   },
   {
     name: 'strings.replaceAll',
     args: [
       {
         name: 'v',
-        desc: 'The string value to search.',
+        desc: 'String value to search.',
         type: 'String',
       },
       {
         name: 't',
-        desc: 'The substring to replace.',
+        desc: 'Substring to replace.',
         type: 'String',
       },
       {
         name: 'u',
-        desc: 'The replacement for all instances of `t`.',
+        desc: 'Replacement for all instances of `t`.',
         type: 'String',
       },
     ],
     package: 'strings',
     desc:
       'Replaces all non-overlapping instances of a substring with a specified replacement.',
-    example: 'strings.replaceAll(v: "oink oink oink", t: "oink", u: "moo")',
+    example: 'strings.replaceAll(v: r._value, t: "p", u: "XX")',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/replaceall/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/replaceall/',
   },
   {
     name: 'strings.split',
     args: [
       {
         name: 'v',
-        desc: 'The string value to split.',
+        desc: 'String value to split.',
         type: 'String',
       },
       {
         name: 't',
-        desc: 'The string value that acts as the separator.',
+        desc: 'String value that acts as the separator.',
         type: 'String',
       },
     ],
     package: 'strings',
     desc:
       'Splits a string on a specified separator and returns an array of substrings.',
-    example: 'strings.split(v: "a flux of foxes", t: " ")',
+    example: 'strings.split(v: "foo, bar, baz, quz", t: ", ")',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/split/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/split/',
   },
   {
     name: 'strings.splitAfter',
     args: [
       {
         name: 'v',
-        desc: 'The string value to split.',
+        desc: 'String value to split.',
         type: 'String',
       },
       {
         name: 't',
-        desc: 'The string value that acts as the separator.',
+        desc: 'String value that acts as the separator.',
         type: 'String',
       },
     ],
     package: 'strings',
     desc:
-      'Splits a string after a specified separator and returns an array of substrings.',
-    example: 'strings.splitAfter(v: "a flux of foxes", t: " ")',
+      'Splits a string after a specified separator and returns an array of substrings. Split substrings include the separator, `t`.',
+    example: 'strings.splitAfter(v: "foo, bar, baz, quz", t: ", ")',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/splitafter/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/splitafter/',
   },
   {
     name: 'strings.splitAfterN',
     args: [
       {
         name: 'v',
-        desc: 'The string value to split.',
+        desc: 'String value to split.',
         type: 'String',
       },
       {
         name: 't',
-        desc: 'The string value that acts as the separator.',
+        desc: 'String value that acts as the separator.',
         type: 'String',
       },
       {
         name: 'i',
-        desc: 'The number of substrings to return.',
+        desc: 'Maximum number of split substrings to return.',
         type: 'Integer',
       },
     ],
     package: 'strings',
     desc:
-      'Splits a string after a specified separator and returns an array of `i` substrings.',
-    example: 'strings.splitAfterN(v: "a flux of foxes", t: " ", i: 2)',
+      'Splits a string after a specified separator and returns an array of `i` substrings. Split substrings include the separator, `t`.',
+    example: 'strings.splitAfterN(v: "foo, bar, baz, quz", t: ", ", i: 3)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/splitaftern/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/splitaftern/',
   },
   {
     name: 'strings.splitN',
     args: [
       {
         name: 'v',
-        desc: 'The string value to split.',
+        desc: 'String value to split.',
         type: 'String',
       },
       {
         name: 't',
-        desc: 'The string value that acts as the separator.',
+        desc: 'String value that acts as the separator.',
         type: 'String',
       },
       {
         name: 'i',
-        desc: 'The number of substrings to return.',
+        desc: 'Maximum number of split substrings to return.',
         type: 'Integer',
       },
     ],
     package: 'strings',
     desc:
       'Splits a string on a specified separator and returns an array of `i` substrings.',
-    example: 'strings.splitN(v: "a flux of foxes", t: " ", i: 2)',
+    example: 'strings.splitN(v: "foo, bar, baz, quz", t: ", ", i: 3)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/splitn/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/splitn/',
   },
   {
     name: 'strings.strlen',
     args: [
       {
         name: 'v',
-        desc: 'The string value to measure.',
+        desc: 'String value to measure.',
         type: 'String',
       },
     ],
     package: 'strings',
-    desc: 'Returns the length of a string.',
-    example: 'strings.strlen(v: "a flux of foxes")',
+    desc:
+      'Returns the length of a string. String length is determined by the number of UTF code points a string contains.',
+    example: 'strings.strlen(v: r._value)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/strlen/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/strlen/',
   },
   {
     name: 'strings.substring',
     args: [
       {
         name: 'v',
-        desc: 'The string value to search.',
+        desc: 'String value to search for.',
         type: 'String',
       },
       {
         name: 'start',
-        desc: 'The starting index of the substring.',
+        desc: 'Starting inclusive index of the substring.',
         type: 'Integer',
       },
       {
         name: 'end',
-        desc: 'The ending index of the substring.',
+        desc: 'Ending exclusive index of the substring.',
         type: 'Integer',
       },
     ],
     package: 'strings',
-    desc: 'Returns a substring based on start and end parameters.',
-    example: 'strings.substring(v: "influx", start: 0, end: 3)',
+    desc:
+      'Returns a substring based on start and end parameters. These parameters are represent indices of UTF code points in the string.',
+    example: 'strings.substring(v: r._value, start: 5, end: 9)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/substring/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/substring/',
   },
-  STRINGS_TITLE,
+  {
+    name: 'strings.title',
+    args: [
+      {
+        name: 'v',
+        desc: 'String value to convert.',
+        type: 'String',
+      },
+    ],
+    package: 'strings',
+    desc: 'Converts a string to title case.',
+    example: 'strings.title(v: r._value)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/title/',
+  },
   {
     name: 'strings.toLower',
     args: [
       {
         name: 'v',
-        desc: 'The string value to convert.',
+        desc: 'String value to convert.',
         type: 'String',
       },
     ],
     package: 'strings',
-    desc: 'Converts a string to lower case.',
+    desc: 'Converts a string to lowercase.',
     example: 'strings.toLower(v: r._value)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/tolower/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/tolower/',
   },
   {
     name: 'strings.toTitle',
     args: [
       {
         name: 'v',
-        desc: 'The string value to convert.',
+        desc: 'String value to convert.',
         type: 'String',
       },
     ],
     package: 'strings',
     desc: 'Converts all characters in a string to title case.',
-    example: 'strings.toTitle(v: "a flux of foxes")',
+    example: 'strings.toTitle(v: r._value)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/totitle/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/totitle/',
   },
   {
     name: 'strings.toUpper',
     args: [
       {
         name: 'v',
-        desc: 'The string value to convert.',
+        desc: 'String value to convert.',
         type: 'String',
       },
     ],
     package: 'strings',
-    desc: 'Converts a string to upper case.',
+    desc: 'Converts a string to uppercase.',
     example: 'strings.toUpper(v: r._value)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/toupper/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/toupper/',
   },
-  STRINGS_TRIM,
+  {
+    name: 'strings.trim',
+    args: [
+      {
+        name: 'v',
+        desc: 'String to remove characters from.',
+        type: 'String',
+      },
+      {
+        name: 'cutset',
+        desc: 'Leading and trailing characters to remove from the string.',
+        type: 'String',
+      },
+    ],
+    package: 'strings',
+    desc:
+      'Removes leading and trailing characters specified in the cutset from a string.',
+    example: 'strings.trim(v: r._value, cutset: "smpl_")',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/trim/',
+  },
   {
     name: 'strings.trimLeft',
     args: [
       {
         name: 'v',
-        desc: 'The string to remove characters from.',
+        desc: 'String to to remove characters from.',
         type: 'String',
       },
       {
         name: 'cutset',
-        desc: 'The leading characters to remove from the string.',
+        desc: 'Leading characters to trim from the string.',
         type: 'String',
       },
     ],
     package: 'strings',
     desc: 'Removes specified leading characters from a string.',
-    example: 'strings.trimLeft(v: ".abc", cutset: ".")',
+    example: 'strings.trimLeft(v: r._value, cutset: ".")',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/trimleft/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/trimleft/',
   },
   {
     name: 'strings.trimPrefix',
     args: [
       {
         name: 'v',
-        desc: 'The string value to trim.',
+        desc: 'String to trim.',
         type: 'String',
       },
       {
         name: 'prefix',
-        desc: 'The prefix to remove.',
+        desc: 'Prefix to remove.',
         type: 'String',
       },
     ],
     package: 'strings',
     desc:
       'Removes a prefix from a string. Strings that do not start with the prefix are returned unchanged.',
-    example: 'strings.trimPrefix(v: r._value, prefix: "abc_")',
+    example: 'strings.trimPrefix(v: r._value, prefix: "smpl_")',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/trimprefix/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/trimprefix/',
   },
   {
     name: 'strings.trimRight',
     args: [
       {
         name: 'v',
-        desc: 'The string to remove characters from.',
+        desc: 'String to to remove characters from.',
         type: 'String',
       },
       {
         name: 'cutset',
-        desc: 'The trailing characters to remove from the string.',
+        desc: 'Trailing characters to trim from the string.',
         type: 'String',
       },
     ],
     package: 'strings',
-    desc: 'Removes specified trailing characters from a string.',
-    example: 'strings.trimRight(v: "abc.", cutset: ".")',
+    desc: 'Removes trailing characters specified in the cutset from a string.',
+    example: 'strings.trimRight(v: r._value, cutset: ".")',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/trimright/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/trimright/',
   },
   {
     name: 'strings.trimSpace',
     args: [
       {
         name: 'v',
-        desc: 'The string value to trim.',
+        desc: 'String to remove spaces from.',
         type: 'String',
       },
     ],
@@ -4719,44 +4877,42 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Removes leading and trailing spaces from a string.',
     example: 'strings.trimSpace(v: r._value)',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/trimspace/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/trimspace/',
   },
   {
     name: 'strings.trimSuffix',
     args: [
       {
         name: 'v',
-        desc: 'The string value to trim.',
+        desc: 'String to trim.',
         type: 'String',
       },
       {
         name: 'suffix',
-        desc: 'The suffix to remove.',
+        desc: 'Suffix to remove.',
         type: 'String',
       },
     ],
     package: 'strings',
-    desc:
-      'Removes a suffix from a string. Strings that do not end with the suffix are returned unchanged.',
-    example: 'strings.trimSuffix(v: r._value, suffix: "_123")',
+    desc: 'Removes a suffix from a string.',
+    example: 'strings.trimSuffix(v: r._value, suffix: "_ex1")',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/trimsuffix/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/strings/trimsuffix/',
   },
   {
     name: 'sum',
     args: [
       {
         name: 'column',
-        desc: 'The column on which to operate. Defaults to `"_value"`.',
+        desc: 'Column to operate on. Default is `_value`.',
         type: 'String',
       },
     ],
     package: '',
-    desc: 'Computes the sum of non-null records in the specified column.',
-    example: 'sum(column: "_value")',
+    desc: 'Returns the sum of non-null values in a specified column.',
+    example: 'sum()',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/sum/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/sum/',
   },
   {
     name: 'system.time',
@@ -4765,146 +4921,158 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the current system time.',
     example: 'system.time()',
     category: 'Miscellaneous',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/system/time/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/system/time/',
   },
   {
     name: 'tableFind',
     args: [
       {
         name: 'fn',
-        desc: 'A predicate function for matching keys in a table group key.',
+        desc: 'Predicate function to evaluate input table group keys.',
         type: 'Function',
       },
     ],
     package: '',
     desc:
-      'Extracts the first table in a stream of tables whose group key values match a predicate. If no table is found, the function errors.',
-    example: 'tableFind(fn: (key) => key._field == "fieldName")',
+      'Extracts the first table in a stream with group key values that match a specified predicate.',
+    example: 'tableFind( fn: (key) => key.tag == "t2")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/stream-table/tablefind/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/tablefind/',
   },
   {
     name: 'tail',
     args: [
       {
         name: 'n',
-        desc: 'The maximum number of records to output.',
+        desc: 'Maximum number of rows to output.',
         type: 'Integer',
       },
       {
         name: 'offset',
-        desc:
-          'The number of records to skip at the end of a table before limiting to `n`. Defaults to `0`.',
+        desc: 'Number of records to skip at the end of a table table before',
         type: 'Integer',
       },
     ],
     package: '',
-    desc:
-      'Limits each output table to the last `n` records, excluding the offset.',
-    example: 'tail(n: 10)',
+    desc: 'Limits each output table to the last `n` rows.',
+    example: 'tail(n: 3)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/tail/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/tail/',
   },
   {
     name: 'testing.assertEmpty',
     args: [],
     package: 'testing',
-    desc: 'Tests if an input stream is empty.',
+    desc:
+      'Tests if an input stream is empty. If not empty, the function returns an error.',
     example: 'testing.assertEmpty()',
     category: 'Tests',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/testing/assertempty/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/testing/assertempty/',
   },
   {
     name: 'testing.assertEquals',
     args: [
       {
         name: 'name',
-        desc: 'Unique name given to the assertion.',
+        desc: 'Unique assertion name.',
         type: 'String',
       },
       {
         name: 'got',
-        desc: 'The stream containing data to test.',
+        desc: 'Data to test. Default is piped-forward data (`<-`).',
         type: 'Stream of tables',
       },
       {
         name: 'want',
-        desc: 'The stream that contains the expected data to test against.',
+        desc: 'Expected data to test against.',
         type: 'Stream of tables',
       },
     ],
     package: 'testing',
-    desc: 'Tests whether two streams have identical data.',
-    example: 'testing.assertEquals(got: got, want: want)',
+    desc: 'Tests whether two streams of tables are identical.',
+    example:
+      'testing.assertEquals(name: "test_equality", got: got, want: want)',
     category: 'Tests',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/testing/assertequals/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/testing/assertequals/',
   },
   {
     name: 'testing.diff',
     args: [
       {
         name: 'got',
-        desc: 'The stream containing data to test.',
+        desc:
+          'Stream containing data to test. Default is piped-forward data (`<-`).',
         type: 'Stream of tables',
       },
       {
         name: 'want',
-        desc: 'The stream that contains the expected data to test against.',
+        desc: 'Stream that contains data to test against.',
         type: 'Stream of tables',
+      },
+      {
+        name: 'epsilon',
+        desc:
+          'Specify how far apart two float values can be, but still considered equal. Defaults to 0.000000001.',
+        type: 'Object',
+      },
+      {
+        name: 'verbose',
+        desc: 'Include detailed differences in output. Default is `false`.',
+        type: 'Object',
+      },
+      {
+        name: 'nansEqual',
+        desc: 'Consider `NaN` float values equal. Default is `false`.',
+        type: 'Object',
       },
     ],
     package: 'testing',
     desc: 'Produces a diff between two streams.',
-    example: 'testing.assertEquals(got: got, want: want)',
+    example: 'testing.diff(got: got, want: want)',
     category: 'Tests',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/testing/diff/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/testing/diff/',
   },
   {
     name: 'time',
     args: [
       {
         name: 'v',
-        desc: 'The value to convert.',
+        desc: 'Value to convert.',
         type: 'String, Integer, UInteger',
       },
     ],
     package: '',
-    desc: 'Converts a single value to a time.',
-    example: 'time(v: r._value)',
+    desc: 'Converts a value to a time type.',
+    example: 'time(v: "2021-01-01T00:00:00Z")',
     category: 'Type Conversions',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/type-conversions/time/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/time/',
   },
   {
     name: 'timedMovingAverage',
     args: [
       {
         name: 'every',
-        desc: 'The frequency of time windows.',
+        desc: 'Frequency of time window.',
         type: 'Duration',
       },
       {
         name: 'period',
-        desc: 'The length of each averaged time window.',
+        desc: 'Length of each averaged time window.',
         type: 'Duration',
       },
       {
         name: 'column',
-        desc:
-          'The column on which to compute the moving average. Defaults to `"_value"`',
+        desc: 'Column to operate on. Default is `_value`.',
         type: 'String',
       },
     ],
     package: '',
     desc:
-      'Calculates the mean of values in a defined time range at a specified frequency.',
-    example: 'timedMovingAverage(every: 1d, period: 5d)',
+      'Returns the mean of values in a defined time range at a specified frequency.',
+    example: 'timedMovingAverage(every: 1y, period: 5y)',
     category: 'Aggregates',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/timedmovingaverage/',
+      'https://docs.influxdata.com/flux/v0/stdlib/universe/timedmovingaverage/',
   },
   {
     name: 'timeShift',
@@ -4912,302 +5080,329 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       {
         name: 'duration',
         desc:
-          'The amount of time to add to each time value. May be a negative duration.',
+          'Amount of time to add to each time value. May be a negative duration.',
         type: 'String',
       },
       {
         name: 'columns',
         desc:
-          'The list of all columns to be shifted. Defaults to `["_start", "_stop", "_time"]`.',
+          'List of time columns to operate on. Default is `["_start", "_stop", "_time"]`.',
         type: 'Array of Strings',
       },
     ],
     package: '',
-    desc:
-      'Adds a fixed duration to time columns. The output table schema is the same as the input table.',
-    example: 'timeShift(duration: 10h, columns: ["_start", "_stop", "_time"])',
+    desc: 'Adds a fixed duration to time columns.',
+    example: 'timeShift(duration: 12h)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/shift/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/timeshift/',
   },
   {
     name: 'to',
     args: [
       {
         name: 'bucket',
-        desc:
-          'The bucket to which data is written. Mutually exclusive with `bucketID`.',
+        desc: 'Name of the bucket to write to.',
         type: 'String',
       },
       {
         name: 'bucketID',
-        desc:
-          'The ID of the bucket to which data is written. Mutually exclusive with `bucket`.',
-        type: 'String',
-      },
-      {
-        name: 'org',
-        desc:
-          'The organization name of the specified `bucket`. Only required when writing to a remote host. Mutually exclusive with `orgID`.',
-        type: 'String',
-      },
-      {
-        name: 'orgID',
-        desc:
-          'The organization ID of the specified `bucket`. Only required when writing to a remote host. Mutually exclusive with `org`.',
+        desc: 'String-encoded bucket ID to to write to.',
         type: 'String',
       },
       {
         name: 'host',
-        desc:
-          'The remote InfluxDB host to which to write. If specified, a `token` is required.',
+        desc: 'URL of the InfluxDB instance to write to.',
+        type: 'String',
+      },
+      {
+        name: 'org',
+        desc: 'Organization name.',
+        type: 'String',
+      },
+      {
+        name: 'orgID',
+        desc: 'String-encoded organization ID to query.',
         type: 'String',
       },
       {
         name: 'token',
-        desc:
-          'The authorization token to use when writing to a remote host. Required when a `host` is specified.',
+        desc: 'InfluxDB API token.',
         type: 'String',
       },
       {
         name: 'timeColumn',
-        desc: 'The time column of the output. Default is `"_time"`.',
+        desc: 'Time column of the output. Default is `"_time"`.',
+        type: 'String',
+      },
+      {
+        name: 'measurementColumn',
+        desc: 'Measurement column of the output. Default is `"_measurement"`.',
         type: 'String',
       },
       {
         name: 'tagColumns',
-        desc:
-          'The tag columns of the output. Defaults to all columns with type `string`, excluding all value columns and the `_field` column if present.',
+        desc: 'Tag columns in the output. Defaults to all columns with type',
         type: 'Array of Strings',
       },
       {
         name: 'fieldFn',
         desc:
-          'Function that takes a record from the input table and returns an object. For each record from the input table, `fieldFn` returns an object that maps output the field key to the output value. Default is `(r) => ({ [r._field]: r._value })`',
+          'Function that maps a field key to a field value and returns a record.',
         type: 'Function',
       },
     ],
     package: '',
-    desc: 'The `to()` function writes data to an InfluxDB v2.0 bucket.',
-    example: 'to(bucket: "db/rp", org: "example-org")',
+    desc:
+      'Writes data to an InfluxDB Cloud or 2.x bucket and returns the written data.',
+    example:
+      'to( bucket: "example-bucket", org: "example-org", token: "mYSuP3rSecR37t0k3N", host: "http://localhost:8086")',
     category: 'Outputs',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/built-in/outputs/to/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/to/',
   },
   {
     name: 'toBool',
     args: [],
     package: '',
-    desc: 'Converts all values in the `_value` column to a boolean.',
+    desc: 'Converts all values in the `_value` column to boolean types.',
     example: 'toBool()',
     category: 'Type Conversions',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/type-conversions/tobool',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/tobool/',
   },
   {
     name: 'toFloat',
     args: [],
     package: '',
-    desc: 'Converts all values in the `_value` column to a float.',
+    desc: 'Converts all values in the `_value` column to float types.',
     example: 'toFloat()',
     category: 'Type Conversions',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/type-conversions/tofloat/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/tofloat/',
   },
   {
     name: 'toInt',
     args: [],
     package: '',
-    desc: 'Converts all values in the `_value` column to a integer.',
+    desc: 'Converts all values in the `_value` column to integer types.',
     example: 'toInt()',
     category: 'Type Conversions',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/type-conversions/toint/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/toint/',
   },
   {
     name: 'toString',
     args: [],
     package: '',
-    desc: 'Converts a value to a string.',
+    desc: 'Converts all values in the `_value` column to string types.',
     example: 'toString()',
     category: 'Type Conversions',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/type-conversions/tostring/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/tostring/',
   },
   {
     name: 'toTime',
     args: [],
     package: '',
-    desc: 'Converts a value to a time.',
+    desc: 'Converts all values in the `_value` column to time types.',
     example: 'toTime()',
     category: 'Type Conversions',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/type-conversions/totime/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/totime/',
   },
   {
     name: 'toUInt',
     args: [],
     package: '',
-    desc: 'Converts a value to an unsigned integer.',
+    desc:
+      'Converts all values in the `_value` column to unsigned integer types.',
     example: 'toUInt()',
     category: 'Type Conversions',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/type-conversions/touint/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/touint/',
   },
   {
     name: 'top',
     args: [
       {
         name: 'n',
-        desc: 'Number of rows to return.',
+        desc: 'Number of rows to return from each input table.',
         type: 'Integer',
       },
       {
         name: 'columns',
-        desc:
-          'List of columns by which to sort. Sort precedence is determined by list order (left to right). Default is `["_value"]`.',
+        desc: 'List of columns to sort by. Default is `["_value"]`.',
         type: 'Array of Strings',
       },
     ],
     package: '',
-    desc: 'Sorts a table by columns and keeps only the top n rows.',
-    example: 'top(n:10, columns: ["_value"])',
+    desc:
+      'Sorts each input table by specified columns and keeps the top `n` records in each table.',
+    example: 'top(n: 3)',
     category: 'Selectors',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/selectors/top/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/top/',
   },
   {
     name: 'tripleEMA',
     args: [
       {
         name: 'n',
-        desc: 'The number of points to average.',
+        desc: 'Number of points to use in the calculation.',
         type: 'Integer',
       },
     ],
     package: '',
     desc:
-      'Calculates the exponential moving average of values in the `_value` column grouped into `n` number of points, giving more weight to recent data at triple the rate of `exponentialMovingAverage()`.',
-    example: 'tripleEMA(n: 5)',
+      'Returns the triple exponential moving average (TEMA) of values in the `_value` column.',
+    example: 'tripleEMA(n: 3)',
     category: 'Aggregates',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/tripleema/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/tripleema/',
   },
   {
     name: 'tripleExponentialDerivative',
     args: [
       {
         name: 'n',
-        desc: 'The number of points to use in the calculation.',
+        desc: 'Number of points to use in the calculation.',
         type: 'Integer',
       },
     ],
     package: '',
     desc:
-      'Calculates a triple exponential derivative (TRIX) of input tables using n points.',
-    example: 'tripleExponentialDerivative(n: 5)',
+      'Returns the triple exponential derivative (TRIX) values using `n` points.',
+    example: 'tripleExponentialDerivative(n: 2)',
     category: 'Aggregates',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/tripleexponentialderivative/',
+      'https://docs.influxdata.com/flux/v0/stdlib/universe/tripleexponentialderivative/',
   },
   {
     name: 'truncateTimeColumn',
     args: [
       {
         name: 'unit',
-        desc: 'The unit of time to truncate to.',
+        desc: 'Unit of time to truncate to.',
         type: 'Duration',
+      },
+      {
+        name: 'timeColumn',
+        desc: 'Time column to truncate. Default is `_time`.',
+        type: 'Object',
       },
     ],
     package: '',
-    desc: 'Truncates all `_time` values to a specified unit.',
+    desc: 'Truncates all input time values in the `_time` to a specified unit.',
     example: 'truncateTimeColumn(unit: 1m)',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/truncatetimecolumn/',
+      'https://docs.influxdata.com/flux/v0/stdlib/universe/truncatetimecolumn/',
   },
   {
     name: 'uint',
     args: [
       {
         name: 'v',
-        desc: 'The value to convert.',
+        desc: 'Value to convert.',
         type: 'String, Integer, Boolean',
       },
     ],
     package: '',
-    desc: 'Converts a single value to a uinteger.',
-    example: 'uint(v: r._value)',
+    desc: 'Converts a value to an unsigned integer type.',
+    example: 'uint(v: "3")',
     category: 'Type Conversions',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/type-conversions/uint/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/uint/',
   },
-  UNION,
+  {
+    name: 'union',
+    args: [
+      {
+        name: 'tables',
+        desc: 'List of two or more streams of tables to union together.',
+        type: 'Array of Strings',
+      },
+    ],
+    package: '',
+    desc: 'Merges two or more input streams into a single output stream.',
+    example: 'union(tables: [t1, t2])',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/union/',
+  },
   {
     name: 'unique',
     args: [
       {
         name: 'column',
-        desc: 'The column searched for unique values. Defaults to `"_value"`.',
+        desc: 'Column to search for unique values. Default is `_value`.',
         type: 'String',
       },
     ],
     package: '',
-    desc: 'Returns all rows containing unique values in a specified column.',
-    example: 'unique(column: "_value")',
+    desc: 'Returns all records containing unique values in a specified column.',
+    example: 'unique()',
     category: 'Selectors',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/selectors/unique/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/unique/',
   },
   {
     name: 'v1.fieldsAsCols',
     args: [],
     package: 'influxdata/influxdb/v1',
-    desc: 'Aligns fields within each input table that have the same timestamp.',
+    desc:
+      'Is a special application of `pivot()` that pivots input data on `_field` and `_time` columns to align fields within each input table that have the same timestamp.',
     example: 'v1.fieldsAsCols()',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/influxdb-v1/fieldsascols/',
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/v1/fieldsascols/',
   },
   {
     name: 'v1.measurementTagKeys',
     args: [
       {
         name: 'bucket',
-        desc:
-          'The bucket from which to return tag keys for a specific measurement.',
+        desc: 'Bucket to return tag keys from for a specific measurement.',
         type: 'String',
       },
       {
         name: 'measurement',
-        desc: 'The measurement from which to return tag keys.',
+        desc: 'Measurement to return tag keys from.',
         type: 'String',
+      },
+      {
+        name: 'start',
+        desc: 'Oldest time to include in results. Default is `-30d`.',
+        type: 'Object',
+      },
+      {
+        name: 'stop',
+        desc: 'Newest time include in results.',
+        type: 'Object',
       },
     ],
     package: 'influxdata/influxdb/v1',
-    desc: 'Returns a list of tag keys for a specific measurement.',
+    desc: 'Returns the list of tag keys for a specific measurement.',
     example: 'v1.measurementTagKeys(bucket: "db/rp", measurement: "mem")',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/influxdb-v1/measurementtagkeys/',
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/v1/measurementtagkeys/',
   },
   {
     name: 'v1.measurementTagValues',
     args: [
       {
         name: 'bucket',
-        desc:
-          'The bucket from which to return tag keys for a specific measurement.',
+        desc: 'Bucket to return tag values from for a specific measurement.',
         type: 'String',
       },
       {
         name: 'measurement',
-        desc: 'The measurement from which to return tag values.',
+        desc: 'Measurement to return tag values from.',
         type: 'String',
       },
       {
         name: 'tag',
-        desc: 'The tag from which to return all unique values.',
+        desc: 'Tag to return all unique values from.',
         type: 'String',
+      },
+      {
+        name: 'start',
+        desc: 'Oldest time to include in results. Default is `-30d`.',
+        type: 'Object',
+      },
+      {
+        name: 'stop',
+        desc: 'Newest time include in results.',
+        type: 'Object',
       },
     ],
     package: 'influxdata/influxdb/v1',
@@ -5216,15 +5411,25 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'v1.measurementTagValues(bucket: "db/rp", measurement: "mem", tag: "host")',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/influxdb-v1/measurementtagvalues/',
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/v1/measurementtagvalues/',
   },
   {
     name: 'v1.measurements',
     args: [
       {
         name: 'bucket',
-        desc: 'The bucket from which to list measurements.',
+        desc: 'Bucket to retrieve measurements from.',
         type: 'String',
+      },
+      {
+        name: 'start',
+        desc: 'Oldest time to include in results. Default is `-30d`.',
+        type: 'Object',
+      },
+      {
+        name: 'stop',
+        desc: 'Newest time include in results.',
+        type: 'Object',
       },
     ],
     package: 'influxdata/influxdb/v1',
@@ -5232,135 +5437,6431 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     example: 'v1.measurements(bucket: "db/rp")',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/influxdb-v1/measurements/',
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/v1/measurements/',
   },
   {
     name: 'v1.tagKeys',
     args: [
       {
         name: 'bucket',
-        desc: 'The bucket from which to list tag keys.',
+        desc: 'Bucket to return tag keys from.',
         type: 'String',
       },
       {
         name: 'predicate',
-        desc:
-          'The predicate function that filters tag keys. Defaults to `(r) => true.`',
+        desc: 'Predicate function that filters tag keys.',
         type: 'Function',
       },
       {
         name: 'start',
-        desc:
-          'Specifies the oldest time to be included in the results. Defaults to `-30d`.',
+        desc: 'Oldest time to include in results. Default is `-30d`.',
         type: 'Duration | Time',
+      },
+      {
+        name: 'stop',
+        desc: 'Newest time include in results.',
+        type: 'Object',
       },
     ],
     package: 'influxdata/influxdb/v1',
-    desc: 'Returns a list of tag keys for all series that match the predicate.',
-    example: 'v1.tagKeys(bucket: "db/rp")',
+    desc:
+      'Returns a list of tag keys for all series that match the `predicate`.',
+    example: 'v1.tagKeys(bucket: "example-bucket")',
     category: 'Transformations',
-    link: 'https://docs.influxdata.com/flux/latest/stdlib/influxdb-v1/tagkeys/',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/v1/tagkeys/',
   },
   {
     name: 'v1.tagValues',
     args: [
       {
         name: 'bucket',
-        desc: 'The bucket from which to list tag values.',
+        desc: 'Bucket to return unique tag values from.',
         type: 'String',
       },
       {
         name: 'tag',
-        desc: 'The tag for which to return unique values.',
+        desc: 'Tag to return unique values from.',
         type: 'String',
       },
       {
         name: 'predicate',
-        desc:
-          'The predicate function that filters tag values. Defaults to `(r) => true.`',
+        desc: 'Predicate function that filters tag values.',
         type: 'Function',
       },
       {
         name: 'start',
-        desc:
-          'Specifies the oldest time to be included in the results. Defaults to `-30d`.',
+        desc: 'Oldest time to include in results. Default is `-30d`.',
         type: 'Duration | Time',
+      },
+      {
+        name: 'stop',
+        desc: 'Newest time include in results.',
+        type: 'Object',
       },
     ],
     package: 'influxdata/influxdb/v1',
     desc: 'Returns a list of unique values for a given tag.',
-    example: 'v1.tagValues(bucket: "db/rp")',
+    example: 'v1.tagValues(bucket: "example-bucket", tag: "host")',
     category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/influxdb-v1/tagvalues/',
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/v1/tagvalues/',
   },
   {
     name: 'window',
     args: [
       {
         name: 'every',
-        desc: 'Duration of time between windows. Defaults to `period` value.',
+        desc: 'Duration of time between windows.',
         type: 'Duration',
       },
       {
         name: 'period',
-        desc:
-          'Duration of the window. Period is the length of each interval. It can be negative, indicating the start and stop boundaries are reversed. Defaults to `every` value.',
+        desc: 'Duration of windows. Default is the `every` value.',
         type: 'Duration',
       },
       {
         name: 'offset',
-        desc:
-          'The offset duration relative to the `location` offset. It can be negative, indicating that the offset goes backwards in time. The default aligns the window boundaries with `now`.',
+        desc: 'Duration to shift the window boundaries by. Default is `0s`.',
         type: 'Duration',
       },
       {
-        name: 'intervals',
+        name: 'location',
         desc:
-          'A function that returns an interval generator, a set of intervals used as windows. See docs for an example.',
-        type: 'Function',
+          'Location used to determine timezone. Default is the `location` option.',
+        type: 'Object',
       },
       {
         name: 'timeColumn',
-        desc: 'The column containing time. Defaults to `"_time"`.',
+        desc: 'Column that contains time values. Default is `_time`.',
         type: 'String',
       },
       {
         name: 'startColumn',
-        desc:
-          'The column containing the window start time. Defaults to `"_start"`.',
+        desc: 'Column to store the window start time in. Default is `_start`.',
         type: 'String',
       },
       {
         name: 'stopColumn',
-        desc:
-          'The column containing the window stop time. Defaults to `"_stop"`.',
+        desc: 'Column to store the window stop time in. Default is `_stop`.',
         type: 'String',
+      },
+      {
+        name: 'createEmpty',
+        desc: 'Create empty tables for empty window. Default is `false`.',
+        type: 'Boolean',
       },
     ],
     package: '',
-    desc:
-      'Groups records based on a time value. New columns are added to uniquely identify each window. Those columns are added to the group key of the output tables. A single input record will be placed into zero or more output tables, depending on the specific windowing function.',
-    example: 'window(every: 1m)',
+    desc: 'Groups records using regular time intervals.',
+    example: 'window(every: 30s)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/window/',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/window/',
   },
   {
     name: 'yield',
     args: [
       {
         name: 'name',
-        desc: 'A unique name for the yielded results.',
+        desc: 'Unique name for the yielded results. Default is `_results`.',
+        type: 'String',
+      },
+    ],
+    package: '',
+    desc: 'Delivers input data as a result of the query.',
+    example: 'yield(name: "unmodified")',
+    category: 'Outputs',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/yield/',
+  },
+  {
+    name: 'alerta.alert',
+    args: [
+      {
+        name: 'url',
+        desc: '(Required) Alerta URL.',
+        type: 'String',
+      },
+      {
+        name: 'apiKey',
+        desc: '(Required) Alerta API key.',
+        type: 'String',
+      },
+      {
+        name: 'resource',
+        desc: '(Required) Resource associated with the alert.',
+        type: 'Object',
+      },
+      {
+        name: 'event',
+        desc: '(Required) Event name.',
+        type: 'Object',
+      },
+      {
+        name: 'environment',
+        desc:
+          'Alerta environment. Valid values: "Production", "Development" or empty string (default).',
+        type: 'Object',
+      },
+      {
+        name: 'severity',
+        desc:
+          '(Required) Event severity. See Alerta severities (https://docs.alerta.io/en/latest/api/alert.html#alert-severities).',
+        type: 'Object',
+      },
+      {
+        name: 'service',
+        desc: 'List of affected services. Default is `[]`.',
+        type: 'Object',
+      },
+      {
+        name: 'group',
+        desc: 'Alerta event group. Default is `""`.',
+        type: 'Object',
+      },
+      {
+        name: 'value',
+        desc: 'Event value. Default is `""`.',
+        type: 'Object',
+      },
+      {
+        name: 'text',
+        desc: 'Alerta text description. Default is `""`.',
+        type: 'Object',
+      },
+      {
+        name: 'tags',
+        desc: 'List of event tags. Default is `[]`.',
+        type: 'Object',
+      },
+      {
+        name: 'attributes',
+        desc: '(Required) Alert attributes.',
+        type: 'Object',
+      },
+      {
+        name: 'origin',
+        desc: 'monitoring component.',
+        type: 'Object',
+      },
+      {
+        name: 'type',
+        desc: 'Event type. Default is `""`.',
+        type: 'Object',
+      },
+      {
+        name: 'timestamp',
+        desc: 'time alert was generated. Default is `now()`.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/bonitoo-io/alerta',
+    desc: 'Sends an alert to Alerta (https://alerta.io/).',
+    example:
+      'alerta.alert( url: "https://alerta.io:8080/alert", apiKey: apiKey, resource: "example-resource", event: "Example event", environment: "Production", severity: severity, service: ["example-service"], group: "example-group", value: string(v: lastReported._value), text: "Service is ${severity}. The last reported value was ${string(v: lastReported._value)}.", tags: ["ex1", "ex2"], attributes: {}, origin: "InfluxDB", type: "exampleAlertType", timestamp: now())',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/alerta/alert/',
+  },
+  {
+    name: 'alerta.endpoint',
+    args: [
+      {
+        name: 'url',
+        desc: '(Required) Alerta URL.',
+        type: 'String',
+      },
+      {
+        name: 'apiKey',
+        desc: '(Required) Alerta API key.',
+        type: 'String',
+      },
+      {
+        name: 'environment',
+        desc: 'Alert environment. Default is `""`.',
+        type: 'Object',
+      },
+      {
+        name: 'origin',
+        desc: 'Alert origin. Default is `"InfluxDB"`.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/bonitoo-io/alerta',
+    desc: 'Sends alerts to Alerta using data from input rows.',
+    example:
+      'alerta.endpoint( url: "https://alerta.io:8080/alert", apiKey: apiKey, environment: "Production", origin: "InfluxDB")',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/alerta/endpoint/',
+  },
+  {
+    name: 'anomalydetection.mad',
+    args: [
+      {
+        name: 'threshold',
+        desc: 'Deviation threshold for anomalies.',
+        type: 'Object',
+      },
+      {
+        name: 'table',
+        desc: 'Input data. Default is piped-forward data (`<-`).',
+        type: 'Stream of tables',
+      },
+    ],
+    package: 'contrib/anaisdg/anomalydetection',
+    desc:
+      'Uses the median absolute deviation (MAD) algorithm to detect anomalies in a data set.',
+    example: 'anomalydetection.mad(threshold: 1.0)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/anaisdg/anomalydetection/mad/',
+  },
+  {
+    name: 'array.concat',
+    args: [
+      {
+        name: 'arr',
+        desc: 'First array. Default is the piped-forward array (`<-`).',
+        type: 'Array',
+      },
+      {
+        name: 'v',
+        desc: 'Array to append to the first array.',
+        type: 'Array',
+      },
+    ],
+    package: 'array',
+    desc: 'Appends two arrays and returns a new array.',
+    example: 'array.concat(v: b)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/array/concat/',
+  },
+  {
+    name: 'array.filter',
+    args: [
+      {
+        name: 'arr',
+        desc: 'Array to filter. Default is the piped-forward array (`<-`).',
+        type: 'Array',
+      },
+      {
+        name: 'fn',
+        desc: 'Predicate function to evaluate on each element.',
+        type: 'Function',
+      },
+    ],
+    package: 'array',
+    desc:
+      'Iterates over an array, evaluates each element with a predicate function, and then returns a new array with only elements that match the predicate.',
+    example: 'array.filter(fn: (x) => x >= 3)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/array/filter/',
+  },
+  {
+    name: 'array.from',
+    args: [
+      {
+        name: 'rows',
+        desc:
+          'Array of records to construct a table with. Default is the piped-forward array (`<-`).',
+        type: 'Array',
+      },
+    ],
+    package: 'array',
+    desc: 'Constructs a table from an array of records.',
+    example: 'array.from(rows: rows)',
+    category: 'Inputs',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/array/from/',
+  },
+  {
+    name: 'array.map',
+    args: [
+      {
+        name: 'arr',
+        desc:
+          'Array to operate on. Defaults is the piped-forward array (`<-`).',
+        type: 'Array',
+      },
+      {
+        name: 'fn',
+        desc:
+          'Function to apply to elements. The element is represented by `x` in the function.',
+        type: 'Function',
+      },
+    ],
+    package: 'array',
+    desc:
+      'Iterates over an array, applies a function to each element to produce a new element, and then returns a new array.',
+    example: 'array.map(fn: (x) => ({_value: x}))',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/array/map/',
+  },
+  {
+    name: 'array.toBool',
+    args: [
+      {
+        name: 'arr',
+        desc:
+          'Array of values to convert. Default is the piped-forward array (`<-`).',
+        type: 'Array',
+      },
+    ],
+    package: 'experimental/array',
+    desc: 'Converts all values in an array to booleans.',
+    example: 'array.toBool(arr: arr)',
+    category: 'Type Conversions',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/array/tobool/',
+  },
+  {
+    name: 'array.toDuration',
+    args: [
+      {
+        name: 'arr',
+        desc:
+          'Array of values to convert. Default is the piped-forward array (`<-`).',
+        type: 'Array',
+      },
+    ],
+    package: 'experimental/array',
+    desc: 'Converts all values in an array to durations.',
+    example: 'array.toDuration(arr: arr)',
+    category: 'Type Conversions',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/array/toduration/',
+  },
+  {
+    name: 'array.toFloat',
+    args: [
+      {
+        name: 'arr',
+        desc:
+          'Array of values to convert. Default is the piped-forward array (`<-`).',
+        type: 'Array',
+      },
+    ],
+    package: 'experimental/array',
+    desc: 'Converts all values in an array to floats.',
+    example: 'array.toFloat(arr: arr)',
+    category: 'Type Conversions',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/array/tofloat/',
+  },
+  {
+    name: 'array.toInt',
+    args: [
+      {
+        name: 'arr',
+        desc:
+          'Array of values to convert. Default is the piped-forward array (`<-`).',
+        type: 'Array',
+      },
+    ],
+    package: 'experimental/array',
+    desc: 'Converts all values in an array to integers.',
+    example: 'array.toInt(arr: arr)',
+    category: 'Type Conversions',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/array/toint/',
+  },
+  {
+    name: 'array.toString',
+    args: [
+      {
+        name: 'arr',
+        desc:
+          'Array of values to convert. Default is the piped-forward array (`<-`).',
+        type: 'Array',
+      },
+    ],
+    package: 'experimental/array',
+    desc: 'Converts all values in an array to strings.',
+    example: 'array.toString(arr: arr)',
+    category: 'Type Conversions',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/array/tostring/',
+  },
+  {
+    name: 'array.toTime',
+    args: [
+      {
+        name: 'arr',
+        desc:
+          'Array of values to convert. Default is the piped-forward array (`<-`).',
+        type: 'Array',
+      },
+    ],
+    package: 'experimental/array',
+    desc: 'Converts all values in an array to times.',
+    example: 'array.toTime(arr: arr)',
+    category: 'Type Conversions',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/array/totime/',
+  },
+  {
+    name: 'array.toUInt',
+    args: [
+      {
+        name: 'arr',
+        desc:
+          'Array of values to convert. Default is the piped-forward array (`<-`).',
+        type: 'Array',
+      },
+    ],
+    package: 'experimental/array',
+    desc: 'Converts all values in an array to unsigned integers.',
+    example: 'array.toUInt()',
+    category: 'Type Conversions',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/array/touint/',
+  },
+  {
+    name: 'bigpanda.endpoint',
+    args: [
+      {
+        name: 'url',
+        desc:
+          'BigPanda alerts API URL (https://docs.bigpanda.io/reference#alerts-how-it-works).',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc:
+          'BigPanda API Authorization token (API key) (https://docs.bigpanda.io/docs/api-key-management).',
+        type: 'String',
+      },
+      {
+        name: 'appKey',
+        desc:
+          'BigPanda App Key (https://docs.bigpanda.io/reference#integrating-monitoring-systems).',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/rhajek/bigpanda',
+    desc: 'Sends alerts to BigPanda using data from input rows.',
+    example: 'bigpanda.endpoint(token: token, appKey: "example-app-key")',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/rhajek/bigpanda/endpoint/',
+  },
+  {
+    name: 'bigpanda.sendAlert',
+    args: [
+      {
+        name: 'url',
+        desc:
+          'BigPanda alerts API URL (https://docs.bigpanda.io/reference#alerts-how-it-works).',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc:
+          'BigPanda API Authorization token (API key) (https://docs.bigpanda.io/docs/api-key-management).',
+        type: 'String',
+      },
+      {
+        name: 'appKey',
+        desc:
+          'BigPanda App Key (https://docs.bigpanda.io/reference#integrating-monitoring-systems).',
+        type: 'Object',
+      },
+      {
+        name: 'status',
+        desc:
+          'BigPanda alert status (https://docs.bigpanda.io/reference#alerts).',
+        type: 'Object',
+      },
+      {
+        name: 'rec',
+        desc:
+          'Additional alert parameters (https://docs.bigpanda.io/reference#alert-object) to send to the BigPanda alert API.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/rhajek/bigpanda',
+    desc: 'Sends an alert to BigPanda (https://www.bigpanda.io/).',
+    example:
+      'bigpanda.sendAlert( token: token, appKey: "example-app-key", status: bigpanda.statusFromLevel(level: "${lastReported.status}"), rec: { tags: json.encode(v: [{"name": "host", "value": "my-host"}]), check: "my-check", description: "${lastReported._field} is ${lastReported.status}: ${string( v: lastReported._value, )}", })',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/rhajek/bigpanda/sendalert/',
+  },
+  {
+    name: 'bigpanda.statusFromLevel',
+    args: [
+      {
+        name: 'level',
+        desc: 'Alert level.',
+        type: 'String',
+      },
+    ],
+    package: 'contrib/rhajek/bigpanda',
+    desc: 'Converts an alert level to a BigPanda status.',
+    example: 'bigpanda.statusFromLevel(level: "crit")',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/rhajek/bigpanda/statusfromlevel/',
+  },
+  {
+    name: 'bitwise.sand',
+    args: [
+      {
+        name: 'a',
+        desc: 'Left hand operand.',
+        type: 'Integer',
+      },
+      {
+        name: 'b',
+        desc: 'Right hand operand.',
+        type: 'Integer',
+      },
+    ],
+    package: 'bitwise',
+    desc: 'Performs the bitwise operation, `a AND b`, with integers.',
+    example: 'bitwise.sand(a: 1234, b: 4567)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/bitwise/sand/',
+  },
+  {
+    name: 'bitwise.sclear',
+    args: [
+      {
+        name: 'a',
+        desc: 'Left hand operand.',
+        type: 'Integer',
+      },
+      {
+        name: 'b',
+        desc: 'Bits to clear.',
+        type: 'Integer',
+      },
+    ],
+    package: 'bitwise',
+    desc:
+      'Performs the bitwise operation `a AND NOT b`. Both `a` and `b` are integers.',
+    example: 'bitwise.sclear(a: 1234, b: 4567)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/bitwise/sclear/',
+  },
+  {
+    name: 'bitwise.slshift',
+    args: [
+      {
+        name: 'a',
+        desc: 'Left hand operand.',
+        type: 'Integer',
+      },
+      {
+        name: 'b',
+        desc: 'Number of bits to shift.',
+        type: 'Integer',
+      },
+    ],
+    package: 'bitwise',
+    desc:
+      'Shifts the bits in `a` left by `b` bits. Both `a` and `b` are integers.',
+    example: 'bitwise.slshift(a: 1234, b: 2)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/bitwise/slshift/',
+  },
+  {
+    name: 'bitwise.snot',
+    args: [
+      {
+        name: 'a',
+        desc: 'Integer to invert.',
+        type: 'Integer',
+      },
+    ],
+    package: 'bitwise',
+    desc: 'Inverts every bit in `a`, an integer.',
+    example: 'bitwise.snot(a: 1234)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/bitwise/snot/',
+  },
+  {
+    name: 'bitwise.sor',
+    args: [
+      {
+        name: 'a',
+        desc: 'Left hand operand.',
+        type: 'Integer',
+      },
+      {
+        name: 'b',
+        desc: 'Right hand operand.',
+        type: 'Integer',
+      },
+    ],
+    package: 'bitwise',
+    desc: 'Performs the bitwise operation, `a OR b`, with integers.',
+    example: 'bitwise.sor(a: 1234, b: 4567)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/bitwise/sor/',
+  },
+  {
+    name: 'bitwise.srshift',
+    args: [
+      {
+        name: 'a',
+        desc: 'Left hand operand.',
+        type: 'Integer',
+      },
+      {
+        name: 'b',
+        desc: 'Number of bits to shift.',
+        type: 'Integer',
+      },
+    ],
+    package: 'bitwise',
+    desc:
+      'Shifts the bits in `a` right by `b` bits. Both `a` and `b` are integers.',
+    example: 'bitwise.srshift(a: 1234, b: 2)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/bitwise/srshift/',
+  },
+  {
+    name: 'bitwise.sxor',
+    args: [
+      {
+        name: 'a',
+        desc: 'Left hand operand.',
+        type: 'Integer',
+      },
+      {
+        name: 'b',
+        desc: 'Right hand operand.',
+        type: 'Integer',
+      },
+    ],
+    package: 'bitwise',
+    desc: 'Performs the bitwise operation, `a XOR b`, with integers.',
+    example: 'bitwise.sxor(a: 1234, b: 4567)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/bitwise/sxor/',
+  },
+  {
+    name: 'bitwise.uand',
+    args: [
+      {
+        name: 'a',
+        desc: 'Left hand operand.',
+        type: 'UInteger',
+      },
+      {
+        name: 'b',
+        desc: 'Right hand operand.',
+        type: 'UInteger',
+      },
+    ],
+    package: 'bitwise',
+    desc: 'Performs the bitwise operation, `a AND b`, with unsigned integers.',
+    example: 'bitwise.uand(a: uint(v: 1234), b: uint(v: 4567))',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/bitwise/uand/',
+  },
+  {
+    name: 'bitwise.uclear',
+    args: [
+      {
+        name: 'a',
+        desc: 'Left hand operand.',
+        type: 'UInteger',
+      },
+      {
+        name: 'b',
+        desc: 'Bits to clear.',
+        type: 'UInteger',
+      },
+    ],
+    package: 'bitwise',
+    desc:
+      'Performs the bitwise operation `a AND NOT b`, with unsigned integers.',
+    example: 'bitwise.uclear(a: uint(v: 1234), b: uint(v: 4567))',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/bitwise/uclear/',
+  },
+  {
+    name: 'bitwise.ulshift',
+    args: [
+      {
+        name: 'a',
+        desc: 'Left hand operand.',
+        type: 'UInteger',
+      },
+      {
+        name: 'b',
+        desc: 'Number of bits to shift.',
+        type: 'UInteger',
+      },
+    ],
+    package: 'bitwise',
+    desc:
+      'Shifts the bits in `a` left by `b` bits. Both `a` and `b` are unsigned integers.',
+    example: 'bitwise.ulshift(a: uint(v: 1234), b: uint(v: 2))',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/bitwise/ulshift/',
+  },
+  {
+    name: 'bitwise.unot',
+    args: [
+      {
+        name: 'a',
+        desc: 'Unsigned integer to invert.',
+        type: 'UInteger',
+      },
+    ],
+    package: 'bitwise',
+    desc: 'Inverts every bit in `a`, an unsigned integer.',
+    example: 'bitwise.unot(a: uint(v: 1234))',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/bitwise/unot/',
+  },
+  {
+    name: 'bitwise.uor',
+    args: [
+      {
+        name: 'a',
+        desc: 'Left hand operand.',
+        type: 'UInteger',
+      },
+      {
+        name: 'b',
+        desc: 'Right hand operand.',
+        type: 'UInteger',
+      },
+    ],
+    package: 'bitwise',
+    desc: 'Performs the bitwise operation, `a OR b`, with unsigned integers.',
+    example: 'bitwise.uor(a: uint(v: 1234), b: uint(v: 4567))',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/bitwise/uor/',
+  },
+  {
+    name: 'bitwise.urshift',
+    args: [
+      {
+        name: 'a',
+        desc: 'Left hand operand.',
+        type: 'UInteger',
+      },
+      {
+        name: 'b',
+        desc: 'Number of bits to shift.',
+        type: 'UInteger',
+      },
+    ],
+    package: 'bitwise',
+    desc:
+      'Shifts the bits in `a` right by `b` bits. Both `a` and `b` are unsigned integers.',
+    example: 'bitwise.urshift(a: uint(v: 1234), b: uint(v: 2))',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/bitwise/urshift/',
+  },
+  {
+    name: 'bitwise.uxor',
+    args: [
+      {
+        name: 'a',
+        desc: 'Left hand operand.',
+        type: 'UInteger',
+      },
+      {
+        name: 'b',
+        desc: 'Right hand operand.',
+        type: 'UInteger',
+      },
+    ],
+    package: 'bitwise',
+    desc: 'Performs the bitwise operation, `a XOR b`, with unsigned integers.',
+    example: 'bitwise.uxor(a: uint(v: 1234), b: uint(v: 4567))',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/bitwise/uxor/',
+  },
+  {
+    name: 'boundaries.friday',
+    args: [],
+    package: 'experimental/date/boundaries',
+    desc:
+      'Returns a record with `start` and `stop` boundary timestamps for last Friday.',
+    example: 'boundaries.friday()',
+    category: 'Date/time',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/date/boundaries/friday/',
+  },
+  {
+    name: 'boundaries.monday',
+    args: [],
+    package: 'experimental/date/boundaries',
+    desc:
+      'Returns a record with `start` and `stop` boundary timestamps of last Monday. Last Monday is relative to `now()`. If today is Monday, the function returns boundaries for the previous Monday.',
+    example: 'boundaries.monday()',
+    category: 'Date/time',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/date/boundaries/monday/',
+  },
+  {
+    name: 'boundaries.month',
+    args: [
+      {
+        name: 'month_offset',
+        desc:
+          'Number of months to offset from the current month. Default is `0`.',
+        type: 'Integer',
+      },
+    ],
+    package: 'experimental/date/boundaries',
+    desc:
+      'Returns a record with `start` and `stop` boundary timestamps for the current month.',
+    example: 'boundaries.month( )',
+    category: 'Date/time',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/date/boundaries/month/',
+  },
+  {
+    name: 'boundaries.saturday',
+    args: [],
+    package: 'experimental/date/boundaries',
+    desc:
+      'Returns a record with `start` and `stop` boundary timestamps for last Saturday.',
+    example: 'boundaries.saturday()',
+    category: 'Date/time',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/date/boundaries/saturday/',
+  },
+  {
+    name: 'boundaries.sunday',
+    args: [],
+    package: 'experimental/date/boundaries',
+    desc:
+      'Returns a record with `start` and `stop` boundary timestamps for last Sunday.',
+    example: 'boundaries.sunday()',
+    category: 'Date/time',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/date/boundaries/sunday/',
+  },
+  {
+    name: 'boundaries.thursday',
+    args: [],
+    package: 'experimental/date/boundaries',
+    desc:
+      'Returns a record with `start` and `stop` boundary timestamps for last Thursday.',
+    example: 'boundaries.thursday()',
+    category: 'Date/time',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/date/boundaries/thursday/',
+  },
+  {
+    name: 'boundaries.tuesday',
+    args: [],
+    package: 'experimental/date/boundaries',
+    desc:
+      'Returns a record with `start` and `stop` boundary timestamps of last Tuesday.',
+    example: 'boundaries.tuesday()',
+    category: 'Date/time',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/date/boundaries/tuesday/',
+  },
+  {
+    name: 'boundaries.wednesday',
+    args: [],
+    package: 'experimental/date/boundaries',
+    desc:
+      'Returns a record with `start` and `stop` boundary timestamps for last Wednesday.',
+    example: 'boundaries.wednesday()',
+    category: 'Date/time',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/date/boundaries/wednesday/',
+  },
+  {
+    name: 'boundaries.week',
+    args: [
+      {
+        name: 'start_sunday',
+        desc: 'Indicate if the week starts on Sunday. Default is `false`.',
+        type: 'Boolean',
+      },
+      {
+        name: 'week_offset',
+        desc:
+          'Number of weeks to offset from the current week. Default is `0`.',
+        type: 'Integer',
+      },
+    ],
+    package: 'experimental/date/boundaries',
+    desc:
+      'Returns a record with `start` and `stop` boundary timestamps of the current week. By default, weeks start on Monday.',
+    example: 'boundaries.week( )',
+    category: 'Date/time',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/date/boundaries/week/',
+  },
+  {
+    name: 'boundaries.yesterday',
+    args: [],
+    package: 'experimental/date/boundaries',
+    desc:
+      'Returns a record with `start` and `stop` boundary timestamps for yesterday.',
+    example: 'boundaries.yesterday( )',
+    category: 'Date/time',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/date/boundaries/yesterday/',
+  },
+  {
+    name: 'buckets',
+    args: [
+      {
+        name: 'org',
+        desc: 'Organization name. Default is the current organization.',
+        type: 'String',
+      },
+      {
+        name: 'orgID',
+        desc: 'Organization ID. Default is the ID of the current organization.',
+        type: 'String',
+      },
+      {
+        name: 'host',
+        desc: 'URL of the InfluxDB instance.',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc: 'InfluxDB API token.',
+        type: 'String',
+      },
+    ],
+    package: 'influxdata/influxdb',
+    desc: 'Returns a list of buckets in the specified organization.',
+    example:
+      'buckets(org: "example-org", host: "http://localhost:8086", token: "mYSuP3rSecR37t0k3N")',
+    category: 'Metadata',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/buckets/',
+  },
+  {
+    name: 'clickhouse.query',
+    args: [
+      {
+        name: 'url',
+        desc: 'ClickHouse HTTP API URL. Default is `http://127.0.0.1:8123`.',
+        type: 'String',
+      },
+      {
+        name: 'query',
+        desc: 'ClickHouse query to execute.',
+        type: 'String',
+      },
+      {
+        name: 'limit',
+        desc: 'Query rows limit. Defaults is `100`.',
+        type: 'Object',
+      },
+      {
+        name: 'cors',
+        desc: 'Request remote CORS headers. Defaults is `1`.',
+        type: 'String',
+      },
+      {
+        name: 'max_bytes',
+        desc: 'Query bytes limit. Default is `10000000`.',
+        type: 'Object',
+      },
+      {
+        name: 'format',
+        desc: 'Query format. Default is `CSVWithNames`.',
+        type: 'String',
+      },
+    ],
+    package: 'contrib/qxip/clickhouse',
+    desc: 'Queries data from ClickHouse using specified parameters.',
+    example: 'clickhouse.query(query: "SELECT version()")',
+    category: 'Inputs',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/qxip/clickhouse/query/',
+  },
+  {
+    name: 'date.add',
+    args: [
+      {
+        name: 'd',
+        desc: 'Duration to add.',
+        type: 'Duration',
+      },
+      {
+        name: 'to',
+        desc: 'Time to add the duration to.',
+        type: 'Object',
+      },
+      {
+        name: 'location',
+        desc: 'Location to use for the time value.',
+        type: 'Object',
+      },
+    ],
+    package: 'date',
+    desc:
+      'Adds a duration to a time value and returns the resulting time value.',
+    example: 'date.add(d: 6h, to: 2019-09-16T12:00:00Z)',
+    category: 'Date/time',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/date/add/',
+  },
+  {
+    name: 'date.scale',
+    args: [
+      {
+        name: 'd',
+        desc: 'Duration to scale.',
+        type: 'Duration',
+      },
+      {
+        name: 'n',
+        desc: 'Amount to scale the duration by.',
+        type: 'Integer',
+      },
+    ],
+    package: 'date',
+    desc: 'Will multiply the duration by the given value.',
+    example: 'date.scale(d: 1h, n: n)',
+    category: 'Date/time',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/date/scale/',
+  },
+  {
+    name: 'date.sub',
+    args: [
+      {
+        name: 'from',
+        desc: 'Time to subtract the duration from.',
+        type: 'Object',
+      },
+      {
+        name: 'd',
+        desc: 'Duration to subtract.',
+        type: 'Duration',
+      },
+      {
+        name: 'location',
+        desc: 'Location to use for the time value.',
+        type: 'Object',
+      },
+    ],
+    package: 'date',
+    desc:
+      'Subtracts a duration from a time value and returns the resulting time value.',
+    example: 'date.sub(from: 2019-09-16T12:00:00Z, d: 6h)',
+    category: 'Date/time',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/date/sub/',
+  },
+  {
+    name: 'date.time',
+    args: [
+      {
+        name: 't',
+        desc: 'Duration or time value.',
+        type: 'Object',
+      },
+      {
+        name: 'location',
+        desc: 'Location used to determine timezone.',
+        type: 'Object',
+      },
+    ],
+    package: 'date',
+    desc: 'Returns the time value of a specified relative duration or time.',
+    example: 'date.time(t: 2020-02-11T12:21:03.29353494Z)',
+    category: 'Date/time',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/date/time/',
+  },
+  {
+    name: 'debug.feature',
+    args: [
+      {
+        name: 'key',
+        desc: 'Feature flag name.',
+        type: 'String',
+      },
+    ],
+    package: 'internal/debug',
+    desc: 'Returns the value associated with the given feature flag.',
+    example: 'debug.feature()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/internal/debug/feature/',
+  },
+  {
+    name: 'debug.getOption',
+    args: [
+      {
+        name: 'pkg',
+        desc: 'Full path of the package.',
+        type: 'String',
+      },
+      {
+        name: 'name',
+        desc: 'Option name.',
+        type: 'String',
+      },
+    ],
+    package: 'internal/debug',
+    desc: 'Gets the value of an option using a form of reflection.',
+    example: 'debug.getOption()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/debug/getoption/',
+  },
+  {
+    name: 'debug.null',
+    args: [
+      {
+        name: 'type',
+        desc: 'Null type.',
+        type: 'String',
+      },
+    ],
+    package: 'internal/debug',
+    desc: 'Returns the null value with a given type.',
+    example: 'debug.null(type: "int")',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/internal/debug/null/',
+  },
+  {
+    name: 'debug.opaque',
+    args: [],
+    package: 'internal/debug',
+    desc:
+      'Works like `pass` in that it passes any incoming tables directly to the following transformation, save for its type signature does not indicate that the input type has any correlation with the output type.',
+    example: 'debug.opaque()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/internal/debug/opaque/',
+  },
+  {
+    name: 'debug.pass',
+    args: [],
+    package: 'internal/debug',
+    desc:
+      'Will pass any incoming tables directly next to the following transformation. It is best used to interrupt any planner rules that rely on a specific ordering.',
+    example: 'debug.pass()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/internal/debug/pass/',
+  },
+  {
+    name: 'debug.sink',
+    args: [],
+    package: 'internal/debug',
+    desc: 'Will discard all data that comes into it.',
+    example: 'debug.sink()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/internal/debug/sink/',
+  },
+  {
+    name: 'debug.slurp',
+    args: [],
+    package: 'internal/debug',
+    desc:
+      'Will read the incoming tables and concatenate buffers with the same group key into a single in memory table buffer. This is useful for testing the performance impact of multiple buffers versus a single buffer.',
+    example: 'debug.slurp()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/internal/debug/slurp/',
+  },
+  {
+    name: 'dict.fromList',
+    args: [
+      {
+        name: 'pairs',
+        desc: 'List of records with `key` and `value` properties.',
+        type: 'Array',
+      },
+    ],
+    package: 'dict',
+    desc:
+      'Creates a dictionary from a list of records with `key` and `value` properties.',
+    example:
+      'dict.fromList( pairs: [{key: 1, value: "foo"}, {key: 2, value: "bar"}])',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/dict/fromlist/',
+  },
+  {
+    name: 'dict.get',
+    args: [
+      {
+        name: 'dict',
+        desc: 'Dictionary to return a value from.',
+        type: 'Array',
+      },
+      {
+        name: 'key',
+        desc: 'Key to return from the dictionary.',
+        type: 'Object',
+      },
+      {
+        name: 'default',
+        desc: 'Default value to return if the key does not exist in the',
+        type: 'Object',
+      },
+    ],
+    package: 'dict',
+    desc:
+      'Returns the value of a specified key in a dictionary or a default value if the key does not exist.',
+    example: 'dict.get(dict: d, key: 1, default: "")',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/dict/get/',
+  },
+  {
+    name: 'dict.insert',
+    args: [
+      {
+        name: 'dict',
+        desc: 'Dictionary to update.',
+        type: 'Array',
+      },
+      {
+        name: 'key',
+        desc: 'Key to insert into the dictionary.',
+        type: 'Object',
+      },
+      {
+        name: 'value',
+        desc: 'Value to insert into the dictionary.',
+        type: 'Object',
+      },
+    ],
+    package: 'dict',
+    desc:
+      'Inserts a key-value pair into a dictionary and returns a new, updated dictionary.',
+    example: 'dict.insert(dict: d, key: 3, value: "baz")',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/dict/insert/',
+  },
+  {
+    name: 'dict.remove',
+    args: [
+      {
+        name: 'dict',
+        desc: 'Dictionary to remove the key-value pair from.',
+        type: 'Array',
+      },
+      {
+        name: 'key',
+        desc: 'Key to remove from the dictionary.',
+        type: 'Object',
+      },
+    ],
+    package: 'dict',
+    desc:
+      'Removes a key value pair from a dictionary and returns an updated dictionary.',
+    example: 'dict.remove(dict: d, key: 1)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/dict/remove/',
+  },
+  {
+    name: 'die',
+    args: [
+      {
+        name: 'msg',
+        desc: 'Error message to return.',
+        type: 'String',
+      },
+    ],
+    package: '',
+    desc: 'Stops the Flux script execution and returns an error message.',
+    example: 'die(msg: "This is an error message")',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/die/',
+  },
+  {
+    name: 'discord.endpoint',
+    args: [
+      {
+        name: 'webhookToken',
+        desc:
+          'Discord webhook token (https://discord.com/developers/docs/resources/webhook).',
+        type: 'String',
+      },
+      {
+        name: 'webhookID',
+        desc:
+          'Discord webhook ID (https://discord.com/developers/docs/resources/webhook).',
+        type: 'String',
+      },
+      {
+        name: 'username',
+        desc: 'Override the Discord webhook’s default username.',
+        type: 'Object',
+      },
+      {
+        name: 'avatar_url',
+        desc: 'Override the Discord webhook’s default avatar.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/chobbs/discord',
+    desc:
+      'Sends a single message to a Discord channel using a Discord webhook (https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks&?page=3) and data from table rows.',
+    example: 'discord.endpoint()',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/chobbs/discord/endpoint/',
+  },
+  {
+    name: 'discord.send',
+    args: [
+      {
+        name: 'webhookToken',
+        desc:
+          'Discord webhook token (https://discord.com/developers/docs/resources/webhook).',
+        type: 'String',
+      },
+      {
+        name: 'webhookID',
+        desc:
+          'Discord webhook ID (https://discord.com/developers/docs/resources/webhook).',
+        type: 'String',
+      },
+      {
+        name: 'username',
+        desc: 'Override the Discord webhook’s default username.',
+        type: 'Object',
+      },
+      {
+        name: 'content',
+        desc: 'Message to send to Discord (2000 character limit).',
+        type: 'Object',
+      },
+      {
+        name: 'avatar_url',
+        desc: 'Override the Discord webhook’s default avatar.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/chobbs/discord',
+    desc:
+      'Sends a single message to a Discord channel using a Discord webhook.',
+    example:
+      'discord.send( webhookToken: token, webhookID: "1234567890", username: "chobbs", content: "The current status is \\"${lastReported.status}\\".", avatar_url: "https://staff-photos.net/pic.jpg")',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/chobbs/discord/send/',
+  },
+  {
+    name: 'display',
+    args: [
+      {
+        name: 'v',
+        desc: 'Value to convert for display.',
+        type: 'Object',
+      },
+    ],
+    package: '',
+    desc: 'Returns the Flux literal representation of any value as a string.',
+    example: 'display(v: ["a": 1, "b": 2])',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/display/',
+  },
+  {
+    name: 'dynamic.asArray',
+    args: [
+      {
+        name: 'v',
+        desc:
+          'Dynamic value to convert. Default is the piped-forward value (`<-`).',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/dynamic',
+    desc: 'Converts a dynamic value into an array of dynamic elements.',
+    example: 'dynamic.asArray()',
+    category: 'Type Conversions',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/dynamic/asarray/',
+  },
+  {
+    name: 'dynamic.dynamic',
+    args: [
+      {
+        name: 'v',
+        desc: 'Value to wrap as dynamic.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/dynamic',
+    desc: 'Wraps a value so it can be used as a `dynamic` value.',
+    example: 'dynamic.dynamic()',
+    category: 'Type Conversions',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/dynamic/dynamic/',
+  },
+  {
+    name: 'dynamic.isType',
+    args: [
+      {
+        name: 'v',
+        desc: 'Value to test.',
+        type: 'Object',
+      },
+      {
+        name: 'type',
+        desc: 'String describing the type to check against.',
+        type: 'String',
+      },
+    ],
+    package: 'experimental/dynamic',
+    desc: 'Tests if a dynamic type holds a value of a specified type.',
+    example: 'dynamic.isType()',
+    category: 'Tests',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/dynamic/istype/',
+  },
+  {
+    name: 'dynamic.jsonEncode',
+    args: [
+      {
+        name: 'v',
+        desc: 'Value to encode into JSON.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/dynamic',
+    desc: 'Converts a dynamic value into JSON bytes.',
+    example: 'dynamic.jsonEncode()',
+    category: 'Type Conversions',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/dynamic/jsonencode/',
+  },
+  {
+    name: 'dynamic.jsonParse',
+    args: [
+      {
+        name: 'data',
+        desc: 'JSON data (as bytes) to parse.',
+        type: 'Bytes',
+      },
+    ],
+    package: 'experimental/dynamic',
+    desc: 'Takes JSON data as bytes and returns dynamic values.',
+    example: 'dynamic.jsonParse()',
+    category: 'Type Conversions',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/dynamic/jsonparse/',
+  },
+  {
+    name: 'events.duration',
+    args: [
+      {
+        name: 'unit',
+        desc: 'Duration unit of the calculated state duration.',
+        type: 'Duration',
+      },
+      {
+        name: 'columnName',
+        desc: 'Name of the result column.',
+        type: 'String',
+      },
+      {
+        name: 'timeColumn',
+        desc: 'Name of the time column.',
+        type: 'String',
+      },
+      {
+        name: 'stopColumn',
+        desc: 'Name of the stop column.',
+        type: 'String',
+      },
+      {
+        name: 'stop',
+        desc: 'The latest time to use when calculating results.',
+        type: 'Time',
+      },
+    ],
+    package: 'contrib/tomhollingworth/events',
+    desc: 'Calculates the duration of events.',
+    example: 'events.duration(unit: 1m, stop: 2020-01-02T00:00:00Z)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/tomhollingworth/events/duration/',
+  },
+  {
+    name: 'expect.planner',
+    args: [
+      {
+        name: 'rules',
+        desc: 'Mapping of rules names to expected counts.',
+        type: 'Array',
+      },
+    ],
+    package: 'testing/expect',
+    desc:
+      'Will cause the present testcase to expect the given planner rules will be invoked exactly as many times as the number given.',
+    example: 'expect.planner()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/testing/expect/planner/',
+  },
+  {
+    name: 'experimental.alignTime',
+    args: [
+      {
+        name: 'alignTo',
+        desc: 'Time to align tables to. Default is `1970-01-01T00:00:00Z`.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental',
+    desc:
+      'Shifts time values in input tables to all start at a common start time.',
+    example: 'experimental.alignTime(alignTo: 2021-01-01T00:00:00Z)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/aligntime/',
+  },
+  {
+    name: 'experimental.catch',
+    args: [
+      {
+        name: 'fn',
+        desc: 'Function to call.',
+        type: 'Function',
+      },
+    ],
+    package: 'experimental',
+    desc:
+      'Calls a function and returns any error as a string value. If the function does not error the returned value is made into a string and returned.',
+    example: 'experimental.catch(fn: () => die(msg: "error message"))',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/catch/',
+  },
+  {
+    name: 'experimental.chain',
+    args: [
+      {
+        name: 'first',
+        desc: 'First query to execute.',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'second',
+        desc: 'Second query to execute.',
+        type: 'Stream of tables',
+      },
+    ],
+    package: 'experimental',
+    desc:
+      'Runs two queries in a single Flux script sequentially and outputs the results of the second query.',
+    example: 'experimental.chain(first: downsampled_max, second: average_max)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/chain/',
+  },
+  {
+    name: 'experimental.count',
+    args: [],
+    package: 'experimental',
+    desc: 'Returns the number of records in each input table.',
+    example: 'experimental.count()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/count/',
+  },
+  {
+    name: 'experimental.diff',
+    args: [
+      {
+        name: 'want',
+        desc: 'Input stream for the `-` side of the diff.',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'got',
+        desc: 'Input stream for the `+` side of the diff.',
+        type: 'Stream of tables',
+      },
+    ],
+    package: 'experimental',
+    desc: 'Takes two table streams as input and produces a diff.',
+    example: 'experimental.diff(got: got, want: want)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/diff/',
+  },
+  {
+    name: 'experimental.distinct',
+    args: [],
+    package: 'experimental',
+    desc: 'Returns unique values from the `_value` column.',
+    example: 'experimental.distinct()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/distinct/',
+  },
+  {
+    name: 'experimental.fill',
+    args: [
+      {
+        name: 'value',
+        desc: 'Value to replace null values with.',
+        type: 'Object',
+      },
+      {
+        name: 'usePrevious',
+        desc:
+          'Replace null values with the value of the previous non-null row.',
+        type: 'Boolean',
+      },
+    ],
+    package: 'experimental',
+    desc:
+      'Replaces all null values in the `_value` column with a non-null value.',
+    example: 'experimental.fill(value: 0)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/fill/',
+  },
+  {
+    name: 'experimental.first',
+    args: [],
+    package: 'experimental',
+    desc:
+      'Returns the first record with a non-null value in the `_value` column for each input table.',
+    example: 'experimental.first()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/first/',
+  },
+  {
+    name: 'experimental.histogram',
+    args: [
+      {
+        name: 'bins',
+        desc:
+          'List of upper bounds to use when computing histogram frequencies,',
+        type: 'Array',
+      },
+      {
+        name: 'normalize',
+        desc: 'Convert count values into frequency values between 0 and 1.',
+        type: 'Boolean',
+      },
+    ],
+    package: 'experimental',
+    desc:
+      'Approximates the cumulative distribution of a dataset by counting data frequencies for a list of bins.',
+    example: 'experimental.histogram( bins: [ 0.0, 5.0, 10.0, 15.0, 20.0, ])',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/histogram/',
+  },
+  {
+    name: 'experimental.histogramQuantile',
+    args: [
+      {
+        name: 'quantile',
+        desc: 'Quantile to compute (`[0.0 - 1.0]`).',
+        type: 'Float',
+      },
+      {
+        name: 'minValue',
+        desc: 'Assumed minimum value of the dataset. Default is `0.0`.',
+        type: 'Float',
+      },
+    ],
+    package: 'experimental',
+    desc:
+      'Approximates a quantile given a histogram with the cumulative distribution of the dataset.',
+    example: 'experimental.histogramQuantile(quantile: 0.9)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/histogramquantile/',
+  },
+  {
+    name: 'experimental.integral',
+    args: [
+      {
+        name: 'unit',
+        desc: 'Time duration used to compute the integral.',
+        type: 'Duration',
+      },
+      {
+        name: 'interpolate',
+        desc:
+          'Type of interpolation to use. Default is `""` (no interpolation).',
+        type: 'String',
+      },
+    ],
+    package: 'experimental',
+    desc:
+      'Computes the area under the curve per unit of time of subsequent non-null records.',
+    example: 'experimental.integral(unit: 20s)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/integral/',
+  },
+  {
+    name: 'experimental.kaufmansAMA',
+    args: [
+      {
+        name: 'n',
+        desc: 'Period or number of points to use in the calculation.',
+        type: 'Integer',
+      },
+    ],
+    package: 'experimental',
+    desc:
+      "Calculates the Kaufman's Adaptive Moving Average (KAMA) of input tables using the `_value` column in each table.",
+    example: 'experimental.kaufmansAMA(n: 3)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/kaufmansama/',
+  },
+  {
+    name: 'experimental.last',
+    args: [],
+    package: 'experimental',
+    desc:
+      'Returns the last record with a non-null value in the `_value` column for each input table.',
+    example: 'experimental.last()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/last/',
+  },
+  {
+    name: 'experimental.max',
+    args: [],
+    package: 'experimental',
+    desc:
+      'Returns the record with the highest value in the `_value` column for each input table.',
+    example: 'experimental.max()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/max/',
+  },
+  {
+    name: 'experimental.mean',
+    args: [],
+    package: 'experimental',
+    desc:
+      'Computes the mean or average of non-null values in the `_value` column of each input table.',
+    example: 'experimental.mean()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/mean/',
+  },
+  {
+    name: 'experimental.min',
+    args: [],
+    package: 'experimental',
+    desc:
+      'Returns the record with the lowest value in the `_value` column for each input table.',
+    example: 'experimental.min()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/min/',
+  },
+  {
+    name: 'experimental.mode',
+    args: [],
+    package: 'experimental',
+    desc:
+      'Computes the mode or value that occurs most often in the `_value` column in each input table.',
+    example: 'experimental.mode()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/mode/',
+  },
+  {
+    name: 'experimental.preview',
+    args: [
+      {
+        name: 'nrows',
+        desc: 'Maximum number of rows per table to return. Default is `5`.',
+        type: 'Integer',
+      },
+      {
+        name: 'ntables',
+        desc: 'Maximum number of tables to return.',
+        type: 'Integer',
+      },
+    ],
+    package: 'experimental',
+    desc: 'Limits the number of rows and tables in the stream.',
+    example: 'experimental.preview()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/preview/',
+  },
+  {
+    name: 'experimental.quantile',
+    args: [
+      {
+        name: 'q',
+        desc: 'Quantile to compute (`[0 - 1]`).',
+        type: 'Float',
+      },
+      {
+        name: 'method',
+        desc: 'Computation method. Default is `estimate_tdigest`.',
+        type: 'String',
+      },
+      {
+        name: 'compression',
+        desc: 'Number of centroids to use when compressing the dataset.',
+        type: 'Float',
+      },
+    ],
+    package: 'experimental',
+    desc:
+      'Returns non-null records with values in the `_value` column that fall within the specified quantile or represent the specified quantile.',
+    example: 'experimental.quantile(q: 0.5)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/quantile/',
+  },
+  {
+    name: 'experimental.skew',
+    args: [],
+    package: 'experimental',
+    desc:
+      'Returns the skew of non-null values in the `_value` column for each input table as a float.',
+    example: 'experimental.skew()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/skew/',
+  },
+  {
+    name: 'experimental.spread',
+    args: [],
+    package: 'experimental',
+    desc:
+      'Returns the difference between the minimum and maximum values in the `_value` column for each input table.',
+    example: 'experimental.spread()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/spread/',
+  },
+  {
+    name: 'experimental.stddev',
+    args: [
+      {
+        name: 'mode',
+        desc:
+          'Standard deviation mode or type of standard deviation to calculate.',
+        type: 'String',
+      },
+    ],
+    package: 'experimental',
+    desc:
+      'Returns the standard deviation of non-null values in the `_value` column for each input table.',
+    example: 'experimental.stddev()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/stddev/',
+  },
+  {
+    name: 'experimental.sum',
+    args: [],
+    package: 'experimental',
+    desc:
+      'Returns the sum of non-null values in the `_value` column for each input table.',
+    example: 'experimental.sum()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/sum/',
+  },
+  {
+    name: 'experimental.unique',
+    args: [],
+    package: 'experimental',
+    desc:
+      'Returns all records containing unique values in the `_value` column.',
+    example: 'experimental.unique()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/unique/',
+  },
+  {
+    name: 'experimental.unpivot',
+    args: [
+      {
+        name: 'otherColumns',
+        desc:
+          'List of column names that are not in the group key but are also not field columns. Default is `["_time"]`.',
+        type: 'Array',
+      },
+    ],
+    package: 'experimental',
+    desc:
+      'Creates `_field` and `_value` columns pairs using all columns (other than `_time`) _not_ in the group key. The `_field` column contains the original column label and the `_value` column contains the original column value.',
+    example: 'experimental.unpivot()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/unpivot/',
+  },
+  {
+    name: 'experimental.window',
+    args: [
+      {
+        name: 'every',
+        desc: 'Duration of time between windows. Default is the `0s`.',
+        type: 'Duration',
+      },
+      {
+        name: 'period',
+        desc: 'Duration of the window. Default is `0s`.',
+        type: 'Duration',
+      },
+      {
+        name: 'offset',
+        desc: 'Duration to shift the window boundaries by. Default is 0s.',
+        type: 'Duration',
+      },
+      {
+        name: 'location',
+        desc:
+          'Location used to determine timezone. Default is the `location` option.',
+        type: 'Object',
+      },
+      {
+        name: 'createEmpty',
+        desc: 'Create empty tables for empty windows. Default is `false`.',
+        type: 'Boolean',
+      },
+    ],
+    package: 'experimental',
+    desc: 'Groups records based on time.',
+    example: 'experimental.window(every: 30s)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/window/',
+  },
+  {
+    name: 'findColumn',
+    args: [
+      {
+        name: 'column',
+        desc: 'Column to extract.',
+        type: 'String',
+      },
+      {
+        name: 'fn',
+        desc: 'Predicate function to evaluate input table group keys.',
+        type: 'Function',
+      },
+    ],
+    package: '',
+    desc:
+      'Returns an array of values in a specified column from the first table in a stream of tables that matches the specified predicate function.',
+    example: 'findColumn(fn: (key) => key.tag == "t1", column: "_value")',
+    category: 'Dynamic queries',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/findcolumn/',
+  },
+  {
+    name: 'findRecord',
+    args: [
+      {
+        name: 'idx',
+        desc: 'Index of the record to extract.',
+        type: 'Integer',
+      },
+      {
+        name: 'fn',
+        desc: 'Predicate function to evaluate input table group keys.',
+        type: 'Function',
+      },
+    ],
+    package: '',
+    desc:
+      'Returns a row at a specified index as a record from the first table in a stream of tables that matches the specified predicate function.',
+    example: 'findRecord( fn: (key) => key.tag == "t1", idx: 0)',
+    category: 'Dynamic queries',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/findrecord/',
+  },
+  {
+    name: 'gen.tables',
+    args: [
+      {
+        name: 'n',
+        desc: 'Number of rows to generate.',
+        type: 'Integer',
+      },
+      {
+        name: 'nulls',
+        desc:
+          'Percentage chance that a null value will be used in the input. Valid value range is `[0.0 - 1.0]`.',
+        type: 'Float',
+      },
+      {
+        name: 'tags',
+        desc: 'Set of tags with their cardinality to generate.',
+        type: 'Array',
+      },
+      {
+        name: 'seed',
+        desc:
+          'Pass seed to tables generator to get the very same sequence each time.',
+        type: 'Integer',
+      },
+    ],
+    package: 'internal/gen',
+    desc: 'Generates a stream of table data.',
+    example: 'gen.tables()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/internal/gen/tables/',
+  },
+  {
+    name: 'generate.from',
+    args: [
+      {
+        name: 'count',
+        desc: 'Number of rows to generate.',
+        type: 'Integer',
+      },
+      {
+        name: 'fn',
+        desc: 'Function used to generate values.',
+        type: 'Function',
+      },
+      {
+        name: 'start',
+        desc: 'Beginning of the time range to generate values in.',
+        type: 'Object',
+      },
+      {
+        name: 'stop',
+        desc: 'End of the time range to generate values in.',
+        type: 'Object',
+      },
+    ],
+    package: 'generate',
+    desc: 'Generates data using the provided parameter values.',
+    example:
+      'generate.from( count: 6, fn: (n) => (n + 1) * (n + 2), start: 2021-01-01T00:00:00Z, stop: 2021-01-02T00:00:00Z)',
+    category: 'Inputs',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/generate/from/',
+  },
+  {
+    name: 'geo.ST_Contains',
+    args: [
+      {
+        name: 'region',
+        desc: 'Region to test. Specify record properties for the shape.',
+        type: 'Object',
+      },
+      {
+        name: 'geometry',
+        desc:
+          'GIS geometry to test. Can be either point or linestring geometry.',
+        type: 'Object',
+      },
+      {
+        name: 'units',
+        desc: 'Record that defines the unit of measurement for distance.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/geo',
+    desc:
+      'Returns boolean indicating whether the defined region contains a specified GIS geometry.',
+    example: 'geo.ST_Contains()',
+    category: 'Geotemporal',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/st_contains/',
+  },
+  {
+    name: 'geo.ST_DWithin',
+    args: [
+      {
+        name: 'region',
+        desc: 'Region to test. Specify record properties for the shape.',
+        type: 'Object',
+      },
+      {
+        name: 'geometry',
+        desc:
+          'GIS geometry to test. Can be either point or linestring geometry.',
+        type: 'Object',
+      },
+      {
+        name: 'distance',
+        desc: 'Maximum distance allowed between the region and geometry.',
+        type: 'Object',
+      },
+      {
+        name: 'units',
+        desc: 'Record that defines the unit of measurement for distance.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/geo',
+    desc:
+      'Tests if the specified region is within a defined distance from the specified GIS geometry and returns `true` or `false`.',
+    example: 'geo.ST_DWithin()',
+    category: 'Geotemporal',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/st_dwithin/',
+  },
+  {
+    name: 'geo.ST_Distance',
+    args: [
+      {
+        name: 'region',
+        desc: 'Region to test. Specify record properties for the shape.',
+        type: 'Object',
+      },
+      {
+        name: 'geometry',
+        desc:
+          'GIS geometry to test. Can be either point or linestring geometry.',
+        type: 'Object',
+      },
+      {
+        name: 'units',
+        desc: 'Record that defines the unit of measurement for distance.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/geo',
+    desc:
+      'Returns the distance from a given region to a specified GIS geometry.',
+    example: 'geo.ST_Distance()',
+    category: 'Geotemporal',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/st_distance/',
+  },
+  {
+    name: 'geo.ST_Intersects',
+    args: [
+      {
+        name: 'region',
+        desc: 'Region to test. Specify record properties for the shape.',
+        type: 'Object',
+      },
+      {
+        name: 'geometry',
+        desc:
+          'GIS geometry to test. Can be either point or linestring geometry.',
+        type: 'Object',
+      },
+      {
+        name: 'units',
+        desc: 'Record that defines the unit of measurement for distance.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/geo',
+    desc:
+      'Tests if the specified GIS geometry intersects with the specified region and returns `true` or `false`.',
+    example: 'geo.ST_Intersects()',
+    category: 'Geotemporal',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/st_intersects/',
+  },
+  {
+    name: 'geo.ST_Length',
+    args: [
+      {
+        name: 'geometry',
+        desc:
+          'GIS geometry to test. Can be either point or linestring geometry.',
+        type: 'Object',
+      },
+      {
+        name: 'units',
+        desc: 'Record that defines the unit of measurement for distance.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/geo',
+    desc:
+      'Returns the spherical length or distance (https://mathworld.wolfram.com/SphericalDistance.html) of the specified GIS geometry.',
+    example: 'geo.ST_Length()',
+    category: 'Geotemporal',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/st_length/',
+  },
+  {
+    name: 'geo.ST_LineString',
+    args: [],
+    package: 'experimental/geo',
+    desc: 'Converts a series of geographic points into linestring.',
+    example: 'geo.ST_LineString()',
+    category: 'Geotemporal',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/st_linestring/',
+  },
+  {
+    name: 'geo.getGrid',
+    args: [
+      {
+        name: 'region',
+        desc: 'Region used to return S2 cell ID tokens.',
+        type: 'Object',
+      },
+      {
+        name: 'minSize',
+        desc: 'Minimum number of cells that cover the specified region.',
+        type: 'Integer',
+      },
+      {
+        name: 'maxSize',
+        desc: 'Minimum number of cells that cover the specified region.',
+        type: 'Integer',
+      },
+      {
+        name: 'level',
+        desc: 'S2 cell level of grid cells.',
+        type: 'Integer',
+      },
+      {
+        name: 'maxLevel',
+        desc: 'Maximumn S2 cell level of grid cells.',
+        type: 'Integer',
+      },
+      {
+        name: 'units',
+        desc: 'Record that defines the unit of measurement for distance.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/geo',
+    desc: 'Calculates a grid or set of cell ID tokens for a specified region.',
+    example: 'geo.getGrid()',
+    category: 'Geotemporal',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/getgrid/',
+  },
+  {
+    name: 'geo.getLevel',
+    args: [
+      {
+        name: 'token',
+        desc: 'S2 cell ID token.',
+        type: 'String',
+      },
+    ],
+    package: 'experimental/geo',
+    desc: 'Returns the S2 cell level of specified cell ID token.',
+    example: 'geo.getLevel(token: "166b59")',
+    category: 'Geotemporal',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/getlevel/',
+  },
+  {
+    name: 'geo.s2CellLatLon',
+    args: [
+      {
+        name: 'token',
+        desc: 'S2 cell ID token.',
+        type: 'String',
+      },
+    ],
+    package: 'experimental/geo',
+    desc: 'Returns the latitude and longitude of the center of an S2 cell.',
+    example: 'geo.s2CellLatLon(token: "89c284")',
+    category: 'Geotemporal',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/s2celllatlon/',
+  },
+  {
+    name: 'geo.stContains',
+    args: [
+      {
+        name: 'region',
+        desc: 'Region to test. Specify record properties for the shape.',
+        type: 'Object',
+      },
+      {
+        name: 'geometry',
+        desc:
+          'GIS geometry to test. Can be either point or linestring geometry.',
+        type: 'Object',
+      },
+      {
+        name: 'units',
+        desc: 'Record that defines the unit of measurement for distance.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/geo',
+    desc:
+      'Returns boolean indicating whether the defined region contains a specified GIS geometry.',
+    example: 'geo.stContains()',
+    category: 'Geotemporal',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/stcontains/',
+  },
+  {
+    name: 'geo.stDistance',
+    args: [
+      {
+        name: 'region',
+        desc: 'Region to test. Specify record properties for the shape.',
+        type: 'Object',
+      },
+      {
+        name: 'geometry',
+        desc:
+          'GIS geometry to test. Can be either point or linestring geometry.',
+        type: 'Object',
+      },
+      {
+        name: 'units',
+        desc: 'Record that defines the unit of measurement for distance.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/geo',
+    desc:
+      'Returns the distance from a given region to a specified GIS geometry.',
+    example: 'geo.stDistance()',
+    category: 'Geotemporal',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/stdistance/',
+  },
+  {
+    name: 'geo.stLength',
+    args: [
+      {
+        name: 'geometry',
+        desc:
+          'GIS geometry to test. Can be either point or linestring geometry.',
+        type: 'Object',
+      },
+      {
+        name: 'units',
+        desc: 'Record that defines the unit of measurement for distance.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/geo',
+    desc:
+      'Returns the spherical length or distance (https://mathworld.wolfram.com/SphericalDistance.html) of the specified GIS geometry.',
+    example: 'geo.stLength()',
+    category: 'Geotemporal',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/stlength/',
+  },
+  {
+    name: 'geo.totalDistance',
+    args: [
+      {
+        name: 'outputColumn',
+        desc: 'Total distance output column. Default is `_value`.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/geo',
+    desc:
+      'Calculates the total distance covered by subsequent points in each input table.',
+    example: 'geo.totalDistance()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/geo/totaldistance/',
+  },
+  {
+    name: 'hash.b64',
+    args: [
+      {
+        name: 'v',
+        desc: 'String to hash.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/qxip/hash',
+    desc: 'Converts a string value to a Base64 string.',
+    example: 'hash.b64(v: "Hello, world!")',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/contrib/qxip/hash/b64/',
+  },
+  {
+    name: 'hash.cityhash64',
+    args: [
+      {
+        name: 'v',
+        desc: 'String to hash.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/qxip/hash',
+    desc:
+      'Converts a string value to a 64-bit hexadecimal hash using the CityHash64 algorithm.',
+    example: 'hash.cityhash64(v: "Hello, world!")',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/qxip/hash/cityhash64/',
+  },
+  {
+    name: 'hash.hmac',
+    args: [
+      {
+        name: 'v',
+        desc: 'String to hash.',
+        type: 'Object',
+      },
+      {
+        name: 'k',
+        desc: 'Key to sign hash.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/qxip/hash',
+    desc: 'Converts a string value to an MD5-signed SHA-1 hash.',
+    example: 'hash.hmac(v: "helloworld", k: "123456")',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/contrib/qxip/hash/hmac/',
+  },
+  {
+    name: 'hash.md5',
+    args: [
+      {
+        name: 'v',
+        desc: 'String to hash.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/qxip/hash',
+    desc: 'Converts a string value to an MD5 hash.',
+    example: 'hash.md5(v: "Hello, world!")',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/contrib/qxip/hash/md5/',
+  },
+  {
+    name: 'hash.sha1',
+    args: [
+      {
+        name: 'v',
+        desc: 'String to hash.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/qxip/hash',
+    desc:
+      'Converts a string value to a hexadecimal hash using the SHA-1 hash algorithm.',
+    example: 'hash.sha1( v: "Hello, world!")',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/contrib/qxip/hash/sha1/',
+  },
+  {
+    name: 'hash.sha256',
+    args: [
+      {
+        name: 'v',
+        desc: 'String to hash.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/qxip/hash',
+    desc:
+      'Converts a string value to a hexadecimal hash using the SHA 256 hash algorithm.',
+    example: 'hash.sha256( v: "Hello, world!")',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/qxip/hash/sha256/',
+  },
+  {
+    name: 'hash.xxhash64',
+    args: [
+      {
+        name: 'v',
+        desc: 'String to hash.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/qxip/hash',
+    desc:
+      'Converts a string value to a 64-bit hexadecimal hash using the xxHash algorithm.',
+    example: 'hash.xxhash64(v: "Hello, world!")',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/qxip/hash/xxhash64/',
+  },
+  {
+    name: 'hex.bytes',
+    args: [
+      {
+        name: 'v',
+        desc: 'String to convert.',
+        type: 'String',
+      },
+    ],
+    package: 'contrib/bonitoo-io/hex',
+    desc: 'Converts a hexadecimal string to bytes.',
+    example: 'hex.bytes(v: "FF5733")',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/hex/bytes/',
+  },
+  {
+    name: 'hex.int',
+    args: [
+      {
+        name: 'v',
+        desc: 'String to convert.',
+        type: 'String',
+      },
+    ],
+    package: 'contrib/bonitoo-io/hex',
+    desc: 'Converts a hexadecimal string to an integer.',
+    example: 'hex.int(v: "4d2")',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/hex/int/',
+  },
+  {
+    name: 'hex.string',
+    args: [
+      {
+        name: 'v',
+        desc: 'Value to convert.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/bonitoo-io/hex',
+    desc: 'Converts a Flux basic type to a hexadecimal string.',
+    example: 'hex.string(v: 1234)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/hex/string/',
+  },
+  {
+    name: 'hex.uint',
+    args: [
+      {
+        name: 'v',
+        desc: 'String to convert.',
+        type: 'String',
+      },
+    ],
+    package: 'contrib/bonitoo-io/hex',
+    desc: 'Converts a hexadecimal string to an unsigned integer.',
+    example: 'hex.uint(v: "4d2")',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/hex/uint/',
+  },
+  {
+    name: 'http.basicAuth',
+    args: [
+      {
+        name: 'u',
+        desc: 'Username to use in the basic authentication header.',
+        type: 'String',
+      },
+      {
+        name: 'p',
+        desc: 'Password to use in the basic authentication header.',
+        type: 'String',
+      },
+    ],
+    package: 'http',
+    desc:
+      'Returns a Base64-encoded basic authentication header using a specified username and password combination.',
+    example: 'http.basicAuth(u: username, p: password)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/http/basicauth/',
+  },
+  {
+    name: 'http.endpoint',
+    args: [
+      {
+        name: 'url',
+        desc: 'URL to send the POST request to.',
+        type: 'String',
+      },
+    ],
+    package: 'http',
+    desc:
+      'Iterates over input data and sends a single POST request per input row to a specified URL.',
+    example: 'http.endpoint(url: "http://example.com/")',
+    category: 'Notification endpoints',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/http/endpoint/',
+  },
+  {
+    name: 'http.pathEscape',
+    args: [
+      {
+        name: 'inputString',
+        desc: 'String to escape.',
+        type: 'String',
+      },
+    ],
+    package: 'http',
+    desc:
+      'Escapes special characters in a string (including `/`) and replaces non-ASCII characters with hexadecimal representations (`%XX`).',
+    example: 'http.pathEscape(inputString: "Hello world!")',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/http/pathescape/',
+  },
+  {
+    name: 'influxdb.api',
+    args: [
+      {
+        name: 'method',
+        desc: 'HTTP request method.',
+        type: 'String',
+      },
+      {
+        name: 'path',
+        desc: 'InfluxDB API path.',
+        type: 'String',
+      },
+      {
+        name: 'host',
+        desc:
+          'InfluxDB host URL _(Required when executed outside of InfluxDB)_.',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc: 'InfluxDB API token (/influxdb/cloud/admin/tokens/)',
+        type: 'String',
+      },
+      {
+        name: 'headers',
+        desc: 'HTTP request headers.',
+        type: 'Array',
+      },
+      {
+        name: 'query',
+        desc: 'URL query parameters.',
+        type: 'Array',
+      },
+      {
+        name: 'timeout',
+        desc: 'HTTP request timeout. Default is `30s`.',
+        type: 'Duration',
+      },
+      {
+        name: 'body',
+        desc: 'HTTP request body as bytes.',
+        type: 'Bytes',
+      },
+    ],
+    package: 'experimental/influxdb',
+    desc:
+      'Submits an HTTP request to the specified InfluxDB API path and returns a record containing the HTTP status code, response headers, and the response body.',
+    example:
+      'influxdb.api(method: "get", path: "/health", host: "http://localhost:8086", token: token)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/influxdb/api/',
+  },
+  {
+    name: 'influxdb.cardinality',
+    args: [
+      {
+        name: 'bucket',
+        desc: 'Bucket to query cardinality from.',
+        type: 'String',
+      },
+      {
+        name: 'bucketID',
+        desc: 'String-encoded bucket ID to query cardinality from.',
+        type: 'String',
+      },
+      {
+        name: 'org',
+        desc: 'Organization name.',
+        type: 'String',
+      },
+      {
+        name: 'orgID',
+        desc: 'String-encoded organization ID.',
+        type: 'String',
+      },
+      {
+        name: 'host',
+        desc: 'URL of the InfluxDB instance to query.',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc: 'InfluxDB API token.',
+        type: 'String',
+      },
+      {
+        name: 'start',
+        desc: 'Earliest time to include when calculating cardinality.',
+        type: 'Object',
+      },
+      {
+        name: 'stop',
+        desc: 'Latest time to include when calculating cardinality.',
+        type: 'Object',
+      },
+      {
+        name: 'predicate',
+        desc: 'Predicate function that filters records.',
+        type: 'Function',
+      },
+    ],
+    package: 'influxdata/influxdb',
+    desc: 'Returns the series cardinality of data retrieved from InfluxDB.',
+    example:
+      'influxdb.cardinality(bucket: "example-bucket", start: time(v: 1))',
+    category: 'Metadata',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/cardinality/',
+  },
+  {
+    name: 'influxdb.select',
+    args: [
+      {
+        name: 'from',
+        desc: 'Name of the bucket to query.',
+        type: 'String',
+      },
+      {
+        name: 'start',
+        desc: 'Earliest time to include in results.',
+        type: 'Object',
+      },
+      {
+        name: 'stop',
+        desc: 'Latest time to include in results. Default is `now()`.',
+        type: 'Object',
+      },
+      {
+        name: 'm',
+        desc: 'Name of the measurement to query.',
+        type: 'Object',
+      },
+      {
+        name: 'fields',
+        desc: 'List of fields to query. Default is`[]`.',
+        type: 'Array',
+      },
+      {
+        name: 'where',
+        desc:
+          'Single argument predicate function that evaluates `true` or `false`',
+        type: 'Function',
+      },
+      {
+        name: 'host',
+        desc: 'URL of the InfluxDB instance to query.',
+        type: 'String',
+      },
+      {
+        name: 'org',
+        desc: 'Organization name.',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc: 'InfluxDB API token (/influxdb/v2/security/tokens/).',
+        type: 'String',
+      },
+    ],
+    package: 'contrib/jsternberg/influxdb',
+    desc:
+      'Is an alternate implementation of `from()`, `range()`, `filter()` and `pivot()` that returns pivoted query results and masks the `_measurement`, `_start`, and `_stop` columns. Results are similar to those returned by InfluxQL `SELECT` statements.',
+    example:
+      'influxdb.select(from: "example-bucket", start: -1d, m: "example-measurement", fields: ["field1"])',
+    category: 'Inputs',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/jsternberg/influxdb/select/',
+  },
+  {
+    name: 'influxdb.wideTo',
+    args: [
+      {
+        name: 'bucket',
+        desc: 'Name of the bucket to write to.',
+        type: 'String',
+      },
+      {
+        name: 'bucketID',
+        desc: 'String-encoded bucket ID to to write to.',
+        type: 'String',
+      },
+      {
+        name: 'host',
+        desc: 'URL of the InfluxDB instance to write to.',
+        type: 'String',
+      },
+      {
+        name: 'org',
+        desc: 'Organization name.',
+        type: 'String',
+      },
+      {
+        name: 'orgID',
+        desc: 'String-encoded organization ID to query.',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc: 'InfluxDB API token.',
+        type: 'String',
+      },
+    ],
+    package: 'influxdata/influxdb',
+    desc:
+      'Writes wide data to an InfluxDB 2.x or InfluxDB Cloud bucket. Wide data is _pivoted_ in that its fields are represented as columns making the table wider.',
+    example: 'influxdb.wideTo()',
+    category: 'Outputs',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/wideto/',
+  },
+  {
+    name: 'interpolate.linear',
+    args: [
+      {
+        name: 'every',
+        desc: 'Duration of time between interpolated points.',
+        type: 'Duration',
+      },
+    ],
+    package: 'interpolate',
+    desc:
+      'Inserts rows at regular intervals using linear interpolation to determine values for inserted rows.',
+    example: 'interpolate.linear(every: 1d)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/interpolate/linear/',
+  },
+  {
+    name: 'iox.from',
+    args: [
+      {
+        name: 'bucket',
+        desc: 'IOx bucket to read data from.',
+        type: 'String',
+      },
+      {
+        name: 'measurement',
+        desc: 'Measurement to read data from.',
+        type: 'String',
+      },
+    ],
+    package: 'experimental/iox',
+    desc:
+      'Reads from the selected bucket and measurement in an IOx storage node.',
+    example:
+      'iox.from(bucket: "example-bucket", measurement: "example-measurement")',
+    category: 'Inputs',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/iox/from/',
+  },
+  {
+    name: 'iox.sql',
+    args: [
+      {
+        name: 'bucket',
+        desc: 'IOx bucket to read data from.',
+        type: 'String',
+      },
+      {
+        name: 'query',
+        desc: 'SQL query to execute.',
+        type: 'String',
+      },
+    ],
+    package: 'experimental/iox',
+    desc: 'Executes an SQL query against a bucket in an IOx storage node.',
+    example:
+      'iox.sql(bucket: "example-bucket", query: "SELECT * FROM measurement")',
+    category: 'Inputs',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/iox/sql/',
+  },
+  {
+    name: 'iox.sqlInterval',
+    args: [
+      {
+        name: 'd',
+        desc: 'Duration value to convert to SQL interval string.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/iox',
+    desc: 'Converts a duration value to a SQL interval string.',
+    example: 'iox.sqlInterval( d: 1y2mo3w4d5h6m7s8ms)',
+    category: 'Type Conversions',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/iox/sqlinterval/',
+  },
+  {
+    name: 'join.full',
+    args: [
+      {
+        name: 'left',
+        desc: 'Left input stream. Default is piped-forward data (<-).',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'right',
+        desc: 'Right input stream.',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'on',
+        desc:
+          'Function that takes a left and right record (`l`, and `r` respectively), and returns a boolean.',
+        type: 'Function',
+      },
+      {
+        name: 'as',
+        desc:
+          'Function that takes a left and a right record (`l` and `r` respectively), and returns a record.',
+        type: 'Function',
+      },
+    ],
+    package: 'join',
+    desc: 'Performs a full outer join on two table streams.',
+    example:
+      'join.full( left: left, right: right, on: (l, r) => l.label == r.id and l._time == r._time, as: (l, r) => { time = if exists l._time then l._time else r._time label = if exists l.label then l.label else r.id return {_time: time, label: label, v_left: l._value, v_right: r._value} })',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/join/full/',
+  },
+  {
+    name: 'join.inner',
+    args: [
+      {
+        name: 'left',
+        desc: 'Left input stream. Default is piped-forward data (<-).',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'right',
+        desc: 'Right input stream.',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'on',
+        desc:
+          'Function that takes a left and right record (`l`, and `r` respectively), and returns a boolean.',
+        type: 'Function',
+      },
+      {
+        name: 'as',
+        desc:
+          'Function that takes a left and a right record (`l` and `r` respectively), and returns a record.',
+        type: 'Function',
+      },
+    ],
+    package: 'join',
+    desc: 'Performs an inner join on two table streams.',
+    example:
+      'join.inner( left: ints, right: strings, on: (l, r) => l._time == r._time, as: (l, r) => ({l with label: r._value}))',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/join/inner/',
+  },
+  {
+    name: 'join.left',
+    args: [
+      {
+        name: 'left',
+        desc: 'Left input stream. Default is piped-forward data (<-).',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'right',
+        desc: 'Right input stream.',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'on',
+        desc:
+          'Function that takes a left and right record (`l`, and `r` respectively), and returns a boolean.',
+        type: 'Function',
+      },
+      {
+        name: 'as',
+        desc:
+          'Function that takes a left and a right record (`l` and `r` respectively), and returns a record.',
+        type: 'Function',
+      },
+    ],
+    package: 'join',
+    desc: 'Performs a left outer join on two table streams.',
+    example:
+      'join.left( left: left, right: right, on: (l, r) => l.label == r.id and l._time == r._time, as: (l, r) => ({_time: l._time, label: l.label, v_left: l._value, v_right: r._value}))',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/join/left/',
+  },
+  {
+    name: 'join.right',
+    args: [
+      {
+        name: 'left',
+        desc: 'Left input stream. Default is piped-forward data (<-).',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'right',
+        desc: 'Right input stream.',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'on',
+        desc:
+          'Function that takes a left and right record (`l`, and `r` respectively), and returns a boolean.',
+        type: 'Function',
+      },
+      {
+        name: 'as',
+        desc:
+          'Function that takes a left and a right record (`l` and `r` respectively), and returns a record.',
+        type: 'Function',
+      },
+    ],
+    package: 'join',
+    desc: 'Performs a right outer join on two table streams.',
+    example:
+      'join.right( left: left, right: right, on: (l, r) => l.label == r.id and l._time == r._time, as: (l, r) => ({_time: r._time, label: r.id, v_left: l._value, v_right: r._value}))',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/join/right/',
+  },
+  {
+    name: 'join.tables',
+    args: [
+      {
+        name: 'left',
+        desc: 'Left input stream. Default is piped-forward data (`<-`).',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'right',
+        desc: 'Right input stream.',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'on',
+        desc:
+          'Function that takes a left and right record (`l`, and `r` respectively), and returns a boolean.',
+        type: 'Function',
+      },
+      {
+        name: 'as',
+        desc:
+          'Function that takes a left and a right record (`l` and `r` respectively), and returns a record.',
+        type: 'Function',
+      },
+      {
+        name: 'method',
+        desc: 'String that specifies the join method.',
+        type: 'String',
+      },
+    ],
+    package: 'join',
+    desc:
+      'Joins two input streams together using a specified method, predicate, and a function to join two corresponding records, one from each input stream.',
+    example:
+      'join.tables( method: "inner", left: ints, right: strings, on: (l, r) => l._time == r._time, as: (l, r) => ({l with label: r._value}))',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/join/tables/',
+  },
+  {
+    name: 'join.time',
+    args: [
+      {
+        name: 'left',
+        desc: 'Left input stream. Default is piped-forward data (<-).',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'right',
+        desc: 'Right input stream.',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'as',
+        desc:
+          'Function that takes a left and a right record (`l` and `r` respectively), and returns a record.',
+        type: 'Function',
+      },
+      {
+        name: 'method',
+        desc: 'String that specifies the join method. Default is `inner`.',
+        type: 'String',
+      },
+    ],
+    package: 'join',
+    desc: 'Joins two table streams together exclusively on the `_time` column.',
+    example:
+      'join.time(left: ints, right: strings, as: (l, r) => ({l with label: r._value}))',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/join/time/',
+  },
+  {
+    name: 'json.parse',
+    args: [
+      {
+        name: 'data',
+        desc: 'JSON data (as bytes) to parse.',
+        type: 'Bytes',
+      },
+    ],
+    package: 'experimental/json',
+    desc: 'Takes JSON data as bytes and returns a value.',
+    example: 'json.parse(data: bytes(v: r._value))',
+    category: 'Type Conversions',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/json/parse/',
+  },
+  {
+    name: 'kafka.to',
+    args: [
+      {
+        name: 'brokers',
+        desc: 'List of Kafka brokers to send data to.',
+        type: 'Array',
+      },
+      {
+        name: 'topic',
+        desc: 'Kafka topic to send data to.',
+        type: 'String',
+      },
+      {
+        name: 'balancer',
+        desc: 'Kafka load balancing strategy. Default is `hash`.',
+        type: 'String',
+      },
+      {
+        name: 'name',
+        desc: 'Kafka metric name. Default is the value of the `nameColumn`.',
+        type: 'String',
+      },
+      {
+        name: 'nameColumn',
+        desc: 'Column to use as the Kafka metric name.',
+        type: 'String',
+      },
+      {
+        name: 'timeColumn',
+        desc: 'Time column. Default is `_time`.',
+        type: 'String',
+      },
+      {
+        name: 'tagColumns',
+        desc: 'List of tag columns in input data.',
+        type: 'Array',
+      },
+      {
+        name: 'valueColumns',
+        desc: 'List of value columns in input data. Default is `["_value"]`.',
+        type: 'Array',
+      },
+    ],
+    package: 'kafka',
+    desc: 'Sends data to Apache Kafka (https://kafka.apache.org/) brokers.',
+    example:
+      'kafka.to( brokers: ["http://127.0.0.1:9092"], topic: "example-topic", name: "example-metric-name", tagColumns: ["tag"])',
+    category: 'Outputs',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/kafka/to/',
+  },
+  {
+    name: 'logql.query_range',
+    args: [
+      {
+        name: 'url',
+        desc: 'LogQL/qryn URL and port. Default is `http://qryn:3100`.',
+        type: 'String',
+      },
+      {
+        name: 'path',
+        desc: 'LogQL query_range API path.',
+        type: 'String',
+      },
+      {
+        name: 'limit',
+        desc: 'Query limit. Default is 100.',
+        type: 'Object',
+      },
+      {
+        name: 'query',
+        desc: 'LogQL query to execute.',
+        type: 'String',
+      },
+      {
+        name: 'start',
+        desc: 'Earliest time to include in results. Default is `-1h`.',
+        type: 'Object',
+      },
+      {
+        name: 'end',
+        desc: 'Latest time to include in results. Default is `now()`.',
+        type: 'Object',
+      },
+      {
+        name: 'step',
+        desc: 'Query resolution step width in seconds. Default is 10.',
+        type: 'Object',
+      },
+      {
+        name: 'orgid',
+        desc:
+          'Optional Loki organization ID for partitioning. Default is `""`.',
+        type: 'String',
+      },
+    ],
+    package: 'contrib/qxip/logql',
+    desc:
+      'Queries data from a specified LogQL query within given time bounds, filters data by query, timerange, and optional limit expressions. All values are returned as string values (using `raw` mode in `csv.from`)',
+    example:
+      'logql.query_range(query: "{job=\\"dummy-server\\"}", start: -1h, end: now(), limit: 100)',
+    category: 'Inputs',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/qxip/logql/query_range/',
+  },
+  {
+    name: 'math.float64frombits',
+    args: [
+      {
+        name: 'b',
+        desc: 'Value to operate on.',
+        type: 'UInteger',
+      },
+    ],
+    package: 'math',
+    desc:
+      'Returns the floating-point number corresponding to the IEE 754 binary representation `b`, with the sign bit of `b` and the result in the same bit position.',
+    example: 'math.float64frombits(b: uint(v: 4))',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/float64frombits/',
+  },
+  {
+    name: 'math.log10',
+    args: [
+      {
+        name: 'x',
+        desc: 'Value to operate on.',
+        type: 'Float',
+      },
+    ],
+    package: 'math',
+    desc: 'Returns the decimal logarithm of x.',
+    example: 'math.log10(x: 3.14)',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/math/log10/',
+  },
+  {
+    name: 'monitor.check',
+    args: [
+      {
+        name: 'crit',
+        desc:
+          'Predicate function that determines `crit` status. Default is `(r) => false`.',
+        type: 'Function',
+      },
+      {
+        name: 'warn',
+        desc:
+          'Predicate function that determines `warn` status. Default is `(r) => false`.',
+        type: 'Function',
+      },
+      {
+        name: 'info',
+        desc:
+          'Predicate function that determines `info` status. Default is `(r) => false`.',
+        type: 'Function',
+      },
+      {
+        name: 'ok',
+        desc:
+          'Predicate function that determines `ok` status. `Default is (r) => true`.',
+        type: 'Function',
+      },
+      {
+        name: 'messageFn',
+        desc:
+          'Predicate function that constructs a message to append to each row.',
+        type: 'Function',
+      },
+      {
+        name: 'data',
+        desc: 'Check data to append to output used to identify this check.',
+        type: 'Object',
+      },
+    ],
+    package: 'influxdata/influxdb/monitor',
+    desc:
+      'Checks input data and assigns a level (`ok`, `info`, `warn`, or `crit`) to each row based on predicate functions.',
+    example:
+      'monitor.check( crit: (r) => r._value > 90.0, warn: (r) => r._value > 80.0, info: (r) => r._value > 70.0, ok: (r) => r._value <= 60.0, messageFn: (r) => if r._level == "crit" then "Critical alert!! Disk usage is at ${r._value}%!" else if r._level == "warn" then "Warning! Disk usage is at ${r._value}%." else if r._level == "info" then "Disk usage is at ${r._value}%." else "Things are looking good.", data: { _check_name: "Disk Utilization (Used Percentage)", _check_id: "disk_used_percent", _type: "threshold", tags: {}, })',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/monitor/check/',
+  },
+  {
+    name: 'monitor.deadman',
+    args: [
+      {
+        name: 't',
+        desc: 'Time threshold for the deadman check.',
+        type: 'Object',
+      },
+    ],
+    package: 'influxdata/influxdb/monitor',
+    desc:
+      'Detects when a group stops reporting data. It takes a stream of tables and reports if groups have been observed since time `t`.',
+    example: 'monitor.deadman(t: 2021-01-01T00:05:00Z)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/monitor/deadman/',
+  },
+  {
+    name: 'monitor.from',
+    args: [
+      {
+        name: 'start',
+        desc: 'Earliest time to include in results.',
+        type: 'Object',
+      },
+      {
+        name: 'stop',
+        desc: 'Latest time to include in results. Default is `now()`.',
+        type: 'Object',
+      },
+      {
+        name: 'fn',
+        desc: 'Predicate function that evaluates true or false.',
+        type: 'Function',
+      },
+    ],
+    package: 'influxdata/influxdb/monitor',
+    desc:
+      'Retrieves check statuses stored in the `statuses` measurement in the `_monitoring` bucket.',
+    example: 'monitor.from(start: -1h, fn: (r) => r._level == "crit")',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/monitor/from/',
+  },
+  {
+    name: 'monitor.log',
+    args: [],
+    package: 'influxdata/influxdb/monitor',
+    desc: 'Persists notification events to an InfluxDB bucket.',
+    example: 'monitor.log()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/monitor/log/',
+  },
+  {
+    name: 'monitor.logs',
+    args: [
+      {
+        name: 'start',
+        desc: 'Earliest time to include in results.',
+        type: 'Object',
+      },
+      {
+        name: 'stop',
+        desc: 'Latest time to include in results. Default is `now()`.',
+        type: 'Object',
+      },
+      {
+        name: 'fn',
+        desc: 'Predicate function that evaluates true or false.',
+        type: 'Function',
+      },
+    ],
+    package: 'influxdata/influxdb/monitor',
+    desc:
+      'Retrieves notification events stored in the `notifications` measurement in the `_monitoring` bucket.',
+    example: 'monitor.logs(start: -2h, fn: (r) => true)',
+    category: 'Inputs',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/monitor/logs/',
+  },
+  {
+    name: 'monitor.notify',
+    args: [
+      {
+        name: 'endpoint',
+        desc:
+          'A function that constructs and sends the notification to an endpoint.',
+        type: 'Function',
+      },
+      {
+        name: 'data',
+        desc: 'Notification data to append to the output.',
+        type: 'Object',
+      },
+    ],
+    package: 'influxdata/influxdb/monitor',
+    desc:
+      'Sends a notification to an endpoint and logs it in the `notifications` measurement in the `_monitoring` bucket.',
+    example: 'monitor.notify(endpoint: endpoint, data: notification_data)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/monitor/notify/',
+  },
+  {
+    name: 'monitor.stateChanges',
+    args: [
+      {
+        name: 'fromLevel',
+        desc: 'Level to detect a change from. Default is `"any"`.',
+        type: 'Object',
+      },
+      {
+        name: 'toLevel',
+        desc: 'Level to detect a change to. Default is `"any"`.',
+        type: 'Object',
+      },
+    ],
+    package: 'influxdata/influxdb/monitor',
+    desc:
+      'Detects state changes in a stream of data with a `_level` column and outputs records that change from `fromLevel` to `toLevel`.',
+    example: 'monitor.stateChanges(toLevel: "crit")',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/monitor/statechanges/',
+  },
+  {
+    name: 'monitor.stateChangesOnly',
+    args: [],
+    package: 'influxdata/influxdb/monitor',
+    desc:
+      'Takes a stream of tables that contains a _level column and returns a stream of tables grouped by `_level` where each record represents a state change.',
+    example: 'monitor.stateChangesOnly()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/monitor/statechangesonly/',
+  },
+  {
+    name: 'monitor.write',
+    args: [],
+    package: 'influxdata/influxdb/monitor',
+    desc: 'Persists check statuses to an InfluxDB bucket.',
+    example: 'monitor.write()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/monitor/write/',
+  },
+  {
+    name: 'mqtt.publish',
+    args: [
+      {
+        name: 'broker',
+        desc: 'MQTT broker connection string.',
+        type: 'String',
+      },
+      {
+        name: 'topic',
+        desc: 'MQTT topic to send data to.',
+        type: 'String',
+      },
+      {
+        name: 'message',
+        desc: 'Message to send to the MQTT broker.',
+        type: 'String',
+      },
+      {
+        name: 'qos',
+        desc: 'MQTT Quality of Service (QoS) level. Values range from `[0-2]`.',
+        type: 'Integer',
+      },
+      {
+        name: 'retain',
+        desc: 'MQTT retain flag. Default is `false`.',
+        type: 'Boolean',
+      },
+      {
+        name: 'clientid',
+        desc: 'MQTT client ID.',
+        type: 'String',
+      },
+      {
+        name: 'username',
+        desc: 'Username to send to the MQTT broker.',
+        type: 'String',
+      },
+      {
+        name: 'password',
+        desc: 'Password to send to the MQTT broker.',
+        type: 'String',
+      },
+      {
+        name: 'timeout',
+        desc: 'MQTT connection timeout. Default is `1s`.',
+        type: 'Duration',
+      },
+    ],
+    package: 'experimental/mqtt',
+    desc: 'Sends data to an MQTT broker using MQTT protocol.',
+    example:
+      'mqtt.publish( broker: "tcp://localhost:8883", topic: "alerts", message: "wake up", clientid: "alert-watcher", retain: true)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/mqtt/publish/',
+  },
+  {
+    name: 'naiveBayesClassifier.naiveBayes',
+    args: [
+      {
+        name: 'myMeasurement',
+        desc: 'Measurement to use as training data.',
+        type: 'Object',
+      },
+      {
+        name: 'myField',
+        desc: 'Field to use as training data.',
+        type: 'Object',
+      },
+      {
+        name: 'myClass',
+        desc: 'Class to classify against.',
+        type: 'String',
+      },
+    ],
+    package: 'contrib/RohanSreerama5/naiveBayesClassifier',
+    desc: 'Performs a naive Bayes classification.',
+    example: 'naiveBayesClassifier.naiveBayes()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/RohanSreerama5/naiveBayesClassifier/naivebayes/',
+  },
+  {
+    name: 'now',
+    args: [],
+    package: '',
+    desc:
+      'Is a function option that, by default, returns the current system time.',
+    example: 'now()',
+    category: 'Date/time',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/now/',
+  },
+  {
+    name: 'oee.APQ',
+    args: [
+      {
+        name: 'runningState',
+        desc: 'State value that represents a running state.',
+        type: 'Object',
+      },
+      {
+        name: 'plannedTime',
+        desc: 'Total time that equipment is expected to produce parts.',
+        type: 'Object',
+      },
+      {
+        name: 'idealCycleTime',
+        desc: 'Ideal minimum time to produce one part.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/oee',
+    desc:
+      'Computes availability, performance, quality (APQ) and overall equipment effectiveness (OEE) in producing parts.',
+    example: 'oee.APQ()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/oee/apq/',
+  },
+  {
+    name: 'oee.computeAPQ',
+    args: [
+      {
+        name: 'productionEvents',
+        desc: 'Production events stream that contains the production',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'partEvents',
+        desc:
+          'Part events that contains the running totals of parts produced and',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'runningState',
+        desc: 'State value that represents a running state.',
+        type: 'Object',
+      },
+      {
+        name: 'plannedTime',
+        desc: 'Total time that equipment is expected to produce parts.',
+        type: 'Object',
+      },
+      {
+        name: 'idealCycleTime',
+        desc: 'Ideal minimum time to produce one part.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/oee',
+    desc:
+      'Computes availability, performance, and quality (APQ) and overall equipment effectiveness (OEE) using two separate input streams: **production events** and **part events**.',
+    example: 'oee.computeAPQ()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/oee/computeapq/',
+  },
+  {
+    name: 'opsgenie.endpoint',
+    args: [
+      {
+        name: 'url',
+        desc:
+          'Opsgenie API URL. Defaults to `https://api.opsgenie.com/v2/alerts`.',
+        type: 'String',
+      },
+      {
+        name: 'apiKey',
+        desc: '(Required) Opsgenie API authorization key.',
+        type: 'String',
+      },
+      {
+        name: 'entity',
+        desc: 'Alert entity used to specify the alert domain.',
+        type: 'String',
+      },
+    ],
+    package: 'contrib/sranka/opsgenie',
+    desc: 'Sends an alert message to Opsgenie using data from table rows.',
+    example: 'opsgenie.endpoint(apiKey: apiKey)',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/sranka/opsgenie/endpoint/',
+  },
+  {
+    name: 'opsgenie.respondersToJSON',
+    args: [
+      {
+        name: 'v',
+        desc: '(Required) Array of Opsgenie responder strings.',
+        type: 'Array',
+      },
+    ],
+    package: 'contrib/sranka/opsgenie',
+    desc:
+      'Converts an array of Opsgenie responder strings to a string-encoded JSON array that can be embedded in an alert message.',
+    example: 'opsgenie.respondersToJSON()',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/sranka/opsgenie/responderstojson/',
+  },
+  {
+    name: 'opsgenie.sendAlert',
+    args: [
+      {
+        name: 'url',
+        desc:
+          'Opsgenie API URL. Defaults to `https://api.opsgenie.com/v2/alerts`.',
+        type: 'String',
+      },
+      {
+        name: 'apiKey',
+        desc: '(Required) Opsgenie API authorization key.',
+        type: 'String',
+      },
+      {
+        name: 'message',
+        desc: '(Required) Alert message text.',
+        type: 'String',
+      },
+      {
+        name: 'alias',
+        desc: 'Opsgenie alias usee to de-deduplicate alerts.',
+        type: 'String',
+      },
+      {
+        name: 'description',
+        desc: 'Alert description. 15000 characters or less.',
+        type: 'String',
+      },
+      {
+        name: 'priority',
+        desc: 'Opsgenie alert priority.',
+        type: 'String',
+      },
+      {
+        name: 'responders',
+        desc: 'List of responder teams or users.',
+        type: 'Array',
+      },
+      {
+        name: 'tags',
+        desc: 'Alert tags.',
+        type: 'Object',
+      },
+      {
+        name: 'entity',
+        desc: 'Alert entity used to specify the alert domain.',
+        type: 'String',
+      },
+      {
+        name: 'actions',
+        desc: 'List of actions available for the alert.',
+        type: 'Object',
+      },
+      {
+        name: 'details',
+        desc:
+          'Additional alert details. Must be a JSON-encoded map of key-value string pairs.',
+        type: 'Object',
+      },
+      {
+        name: 'visibleTo',
+        desc:
+          'List of teams and users the alert will be visible to without sending notifications.',
+        type: 'Array',
+      },
+    ],
+    package: 'contrib/sranka/opsgenie',
+    desc: 'Sends an alert message to Opsgenie.',
+    example:
+      'opsgenie.sendAlert( apiKey: apiKey, message: "Disk usage is: ${lastReported.status}.", alias: "example-disk-usage", responders: ["user:john@example.com", "team:itcrowd"])',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/sranka/opsgenie/sendalert/',
+  },
+  {
+    name: 'pagerduty.actionFromLevel',
+    args: [
+      {
+        name: 'level',
+        desc: 'Monitoring level to convert to a PagerDuty action.',
+        type: 'String',
+      },
+    ],
+    package: 'pagerduty',
+    desc: 'Converts a monitoring level to a PagerDuty action.',
+    example: 'pagerduty.actionFromLevel(level: "crit")',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/pagerduty/actionfromlevel/',
+  },
+  {
+    name: 'pagerduty.actionFromSeverity',
+    args: [
+      {
+        name: 'severity',
+        desc: 'Severity to convert to a PagerDuty action.',
+        type: 'String',
+      },
+    ],
+    package: 'pagerduty',
+    desc: 'Converts a severity to a PagerDuty action.',
+    example: 'pagerduty.actionFromSeverity(severity: "crit")',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/pagerduty/actionfromseverity/',
+  },
+  {
+    name: 'pagerduty.dedupKey',
+    args: [
+      {
+        name: 'exclude',
+        desc:
+          'Group key columns to exclude when generating the deduplication key.',
+        type: 'Array',
+      },
+    ],
+    package: 'pagerduty',
+    desc:
+      'Uses the group key of an input table to generate and store a deduplication key in the `_pagerdutyDedupKey`column. The function sorts, newline-concatenates, SHA256-hashes, and hex-encodes the group key to create a unique deduplication key for each input table.',
+    example: 'pagerduty.dedupKey()',
+    category: 'Notification endpoints',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/pagerduty/dedupkey/',
+  },
+  {
+    name: 'pagerduty.endpoint',
+    args: [
+      {
+        name: 'url',
+        desc: 'PagerDuty v2 Events API URL.',
+        type: 'String',
+      },
+    ],
+    package: 'pagerduty',
+    desc:
+      'Returns a function that sends a message to PagerDuty that includes output data.',
+    example: 'pagerduty.endpoint()',
+    category: 'Notification endpoints',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/pagerduty/endpoint/',
+  },
+  {
+    name: 'pagerduty.sendEvent',
+    args: [
+      {
+        name: 'pagerdutyURL',
+        desc: 'PagerDuty endpoint URL.',
+        type: 'String',
+      },
+      {
+        name: 'routingKey',
+        desc: 'Routing key generated from your PagerDuty integration.',
+        type: 'Object',
+      },
+      {
+        name: 'client',
+        desc: 'Name of the client sending the alert.',
+        type: 'Object',
+      },
+      {
+        name: 'clientURL',
+        desc: 'URL of the client sending the alert.',
+        type: 'Object',
+      },
+      {
+        name: 'dedupKey',
+        desc: 'Per-alert ID that acts as deduplication key and allows you to',
+        type: 'Object',
+      },
+      {
+        name: 'class',
+        desc: 'Class or type of the event.',
+        type: 'Object',
+      },
+      {
+        name: 'group',
+        desc: 'Logical grouping used by PagerDuty.',
+        type: 'Object',
+      },
+      {
+        name: 'severity',
+        desc: 'Severity of the event.',
+        type: 'Object',
+      },
+      {
+        name: 'eventAction',
+        desc: 'Event type to send to PagerDuty.',
+        type: 'Object',
+      },
+      {
+        name: 'source',
+        desc: 'Unique location of the affected system.',
+        type: 'Object',
+      },
+      {
+        name: 'component',
+        desc: 'Component responsible for the event.',
+        type: 'Object',
+      },
+      {
+        name: 'summary',
+        desc:
+          'Brief text summary of the event used as the summaries or titles of associated alerts.',
+        type: 'String',
+      },
+      {
+        name: 'timestamp',
+        desc: 'Time the detected event occurred in RFC3339nano format.',
+        type: 'Object',
+      },
+      {
+        name: 'customDetails',
+        desc: 'Record with additional details about the event.',
+        type: 'Object',
+      },
+    ],
+    package: 'pagerduty',
+    desc:
+      'Sends an event to PagerDuty and returns the HTTP response code of the request.',
+    example:
+      'pagerduty.sendEvent( routingKey: "example-routing-key", client: "example-client", clientURL: "http://example-url.com", dedupKey: "example-dedup-key", class: "example-class", eventAction: "trigger", group: "example-group", severity: "crit", component: "example-component", source: "example-source", summary: "example-summary", timestamp: now(), customDetails: {"example-key": "example value"})',
+    category: 'Notification endpoints',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/pagerduty/sendevent/',
+  },
+  {
+    name: 'pagerduty.severityFromLevel',
+    args: [
+      {
+        name: 'level',
+        desc: 'InfluxDB status level to convert to a PagerDuty severity.',
+        type: 'String',
+      },
+    ],
+    package: 'pagerduty',
+    desc: 'Converts an InfluxDB status level to a PagerDuty severity.',
+    example: 'pagerduty.severityFromLevel(level: "crit")',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/pagerduty/severityfromlevel/',
+  },
+  {
+    name: 'polyline.rdp',
+    args: [
+      {
+        name: 'valColumn',
+        desc:
+          'Column with Y axis values of the given curve. Default is `_value`.',
+        type: 'String',
+      },
+      {
+        name: 'timeColumn',
+        desc:
+          'Column with X axis values of the given curve. Default is `_time`.',
+        type: 'String',
+      },
+      {
+        name: 'epsilon',
+        desc:
+          'Maximum tolerance value that determines the amount of compression.',
+        type: 'Float',
+      },
+      {
+        name: 'retention',
+        desc: 'Percentage of points to retain after downsampling.',
+        type: 'Float',
+      },
+    ],
+    package: 'experimental/polyline',
+    desc:
+      'Applies the Ramer Douglas Peucker (RDP) algorithm to input data to downsample curves composed of line segments into visually indistinguishable curves with fewer points.',
+    example: 'polyline.rdp()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/polyline/rdp/',
+  },
+  {
+    name: 'promql.changes',
+    args: [],
+    package: 'internal/promql',
+    desc:
+      "Implements functionality equivalent to PromQL's `changes()` function (https://prometheus.io/docs/prometheus/latest/querying/functions/#changes).",
+    example: 'promql.changes()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/changes/',
+  },
+  {
+    name: 'promql.emptyTable',
+    args: [],
+    package: 'internal/promql',
+    desc:
+      "Returns an empty table, which is used as a helper function to implement PromQL's `time()` (https://prometheus.io/docs/prometheus/latest/querying/functions/#time) and `vector()` (https://prometheus.io/docs/prometheus/latest/querying/functions/#vector) functions.",
+    example: 'promql.emptyTable()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/emptytable/',
+  },
+  {
+    name: 'promql.extrapolatedRate',
+    args: [
+      {
+        name: 'isCounter',
+        desc: 'Data represents a counter.',
+        type: 'Boolean',
+      },
+      {
+        name: 'isRate',
+        desc: 'Data represents a rate.',
+        type: 'Boolean',
+      },
+    ],
+    package: 'internal/promql',
+    desc:
+      "Is a helper function that calculates extrapolated rates over counters and is used to implement PromQL's `rate()` (https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), `delta()` (https://prometheus.io/docs/prometheus/latest/querying/functions/#increase), and `increase()` (https://prometheus.io/docs/prometheus/latest/querying/functions/#delta) functions.",
+    example: 'promql.extrapolatedRate()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/extrapolatedrate/',
+  },
+  {
+    name: 'promql.holtWinters',
+    args: [
+      {
+        name: 'smoothingFactor',
+        desc: 'Exponential smoothing factor.',
+        type: 'Float',
+      },
+      {
+        name: 'trendFactor',
+        desc: 'Trend factor.',
+        type: 'Float',
+      },
+    ],
+    package: 'internal/promql',
+    desc:
+      "Implements functionality equivalent to PromQL's `holt_winters()` function (https://prometheus.io/docs/prometheus/latest/querying/functions/#holt_winters).",
+    example: 'promql.holtWinters()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/holtwinters/',
+  },
+  {
+    name: 'promql.instantRate',
+    args: [
+      {
+        name: 'isRate',
+        desc: 'Data represents a rate.',
+        type: 'Boolean',
+      },
+    ],
+    package: 'internal/promql',
+    desc:
+      "Is a helper function that calculates instant rates over counters and is used to implement PromQL's `irate()` (https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and `idelta()` (https://prometheus.io/docs/prometheus/latest/querying/functions/#idelta) functions.",
+    example: 'promql.instantRate()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/instantrate/',
+  },
+  {
+    name: 'promql.join',
+    args: [
+      {
+        name: 'left',
+        desc: 'First of two streams of tables to join.',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'right',
+        desc: 'Second of two streams of tables to join.',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'fn',
+        desc:
+          'Function with left and right arguments that maps a new output record',
+        type: 'Function',
+      },
+    ],
+    package: 'internal/promql',
+    desc:
+      'Joins two streams of tables on the **group key and `_time` column**. See `experimental.join` (/flux/v0/stdlib/experimental/join/).',
+    example: 'promql.join()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/join/',
+  },
+  {
+    name: 'promql.labelReplace',
+    args: [
+      {
+        name: 'source',
+        desc: 'Input label.',
+        type: 'String',
+      },
+      {
+        name: 'destination',
+        desc: 'Output label.',
+        type: 'String',
+      },
+      {
+        name: 'regex',
+        desc: 'Pattern as a regex string.',
+        type: 'String',
+      },
+      {
+        name: 'replacement',
+        desc: 'Replacement value.',
+        type: 'String',
+      },
+    ],
+    package: 'internal/promql',
+    desc:
+      "Implements functionality equivalent to PromQL's `label_replace()` function (https://prometheus.io/docs/prometheus/latest/querying/functions/#label_replace).",
+    example: 'promql.labelReplace()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/labelreplace/',
+  },
+  {
+    name: 'promql.linearRegression',
+    args: [
+      {
+        name: 'predict',
+        desc: 'Output should contain a prediction.',
+        type: 'Boolean',
+      },
+      {
+        name: 'fromNow',
+        desc: 'Time as a floating point value.',
+        type: 'Float',
+      },
+    ],
+    package: 'internal/promql',
+    desc:
+      "Implements linear regression functionality required to implement PromQL's `deriv()` (https://prometheus.io/docs/prometheus/latest/querying/functions/#deriv) and `predict_linear()` (https://prometheus.io/docs/prometheus/latest/querying/functions/#predict_linear) functions.",
+    example: 'promql.linearRegression()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/linearregression/',
+  },
+  {
+    name: 'promql.promHistogramQuantile',
+    args: [
+      {
+        name: 'quantile',
+        desc: 'Quantile to compute (`[0.0 - 1.0]`).',
+        type: 'Float',
+      },
+      {
+        name: 'countColumn',
+        desc: 'Count column name.',
+        type: 'String',
+      },
+      {
+        name: 'upperBoundColumn',
+        desc: 'Upper bound column name.',
+        type: 'String',
+      },
+      {
+        name: 'valueColumn',
+        desc: 'Output value column name.',
+        type: 'String',
+      },
+    ],
+    package: 'internal/promql',
+    desc:
+      "Implements functionality equivalent to PromQL's `histogram_quantile()` function (https://prometheus.io/docs/prometheus/latest/querying/functions/#histogram_quantile).",
+    example: 'promql.promHistogramQuantile()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/promhistogramquantile/',
+  },
+  {
+    name: 'promql.promqlDayOfMonth',
+    args: [
+      {
+        name: 'timestamp',
+        desc: 'Time as a floating point value.',
+        type: 'Float',
+      },
+    ],
+    package: 'internal/promql',
+    desc:
+      "Implements functionality equivalent to PromQL's `day_of_month()` function (https://prometheus.io/docs/prometheus/latest/querying/functions/#day_of_month).",
+    example: 'promql.promqlDayOfMonth()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/promqldayofmonth/',
+  },
+  {
+    name: 'promql.promqlDayOfWeek',
+    args: [
+      {
+        name: 'timestamp',
+        desc: 'Time as a floating point value.',
+        type: 'Float',
+      },
+    ],
+    package: 'internal/promql',
+    desc:
+      "Implements functionality equivalent to PromQL's `day_of_week()` function (https://prometheus.io/docs/prometheus/latest/querying/functions/#day_of_week).",
+    example: 'promql.promqlDayOfWeek()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/promqldayofweek/',
+  },
+  {
+    name: 'promql.promqlDaysInMonth',
+    args: [
+      {
+        name: 'timestamp',
+        desc: 'Time as a floating point value.',
+        type: 'Float',
+      },
+    ],
+    package: 'internal/promql',
+    desc:
+      "Implements functionality equivalent to PromQL's `days_in_month()` function (https://prometheus.io/docs/prometheus/latest/querying/functions/#days_in_month).",
+    example: 'promql.promqlDaysInMonth()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/promqldaysinmonth/',
+  },
+  {
+    name: 'promql.promqlHour',
+    args: [
+      {
+        name: 'timestamp',
+        desc: 'Time as a floating point value.',
+        type: 'Float',
+      },
+    ],
+    package: 'internal/promql',
+    desc:
+      "Implements functionality equivalent to PromQL's `hour()` function (https://prometheus.io/docs/prometheus/latest/querying/functions/#hour).",
+    example: 'promql.promqlHour()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/promqlhour/',
+  },
+  {
+    name: 'promql.promqlMinute',
+    args: [
+      {
+        name: 'timestamp',
+        desc: 'Time as a floating point value.',
+        type: 'Float',
+      },
+    ],
+    package: 'internal/promql',
+    desc:
+      "Implements functionality equivalent to PromQL's `minute()` function ( https://prometheus.io/docs/prometheus/latest/querying/functions/#minute).",
+    example: 'promql.promqlMinute()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/promqlminute/',
+  },
+  {
+    name: 'promql.promqlMonth',
+    args: [
+      {
+        name: 'timestamp',
+        desc: 'Time as a floating point value.',
+        type: 'Float',
+      },
+    ],
+    package: 'internal/promql',
+    desc:
+      "Implements functionality equivalent to PromQL's `month()` function (https://prometheus.io/docs/prometheus/latest/querying/functions/#month).",
+    example: 'promql.promqlMonth()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/promqlmonth/',
+  },
+  {
+    name: 'promql.promqlYear',
+    args: [
+      {
+        name: 'timestamp',
+        desc: 'Time as a floating point value.',
+        type: 'Float',
+      },
+    ],
+    package: 'internal/promql',
+    desc:
+      "Implements functionality equivalent to PromQL's `year()` function (https://prometheus.io/docs/prometheus/latest/querying/functions/#year).",
+    example: 'promql.promqlYear()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/promqlyear/',
+  },
+  {
+    name: 'promql.quantile',
+    args: [
+      {
+        name: 'q',
+        desc: 'Quantile to compute (`[0.0 - 1.0]`).',
+        type: 'Float',
+      },
+      {
+        name: 'method',
+        desc: 'Quantile method to use.',
+        type: 'String',
+      },
+    ],
+    package: 'internal/promql',
+    desc:
+      'Accounts checks for quantile values that are out of range, above 1.0 or below 0.0, by either returning positive infinity or negative infinity in the `_value` column respectively. `q` must be a float.',
+    example: 'promql.quantile()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/quantile/',
+  },
+  {
+    name: 'promql.resets',
+    args: [],
+    package: 'internal/promql',
+    desc:
+      "Implements functionality equivalent to PromQL's `resets()` function (https://prometheus.io/docs/prometheus/latest/querying/functions/#resets).",
+    example: 'promql.resets()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/resets/',
+  },
+  {
+    name: 'promql.timestamp',
+    args: [],
+    package: 'internal/promql',
+    desc:
+      "Implements functionality equivalent to PromQL's `timestamp()` function (https://prometheus.io/docs/prometheus/latest/querying/functions/#timestamp).",
+    example: 'promql.timestamp()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/promql/timestamp/',
+  },
+  {
+    name: 'pushbullet.endpoint',
+    args: [
+      {
+        name: 'url',
+        desc:
+          'PushBullet API endpoint URL. Default is `"https://api.pushbullet.com/v2/pushes"`.',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc: 'Pushbullet API token string. Default is `""`.',
+        type: 'Object',
+      },
+    ],
+    package: 'pushbullet',
+    desc:
+      'Creates the endpoint for the Pushbullet API and sends a notification of type note.',
+    example: 'pushbullet.endpoint(token: token)',
+    category: 'Notification endpoints',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/pushbullet/endpoint/',
+  },
+  {
+    name: 'pushbullet.pushData',
+    args: [
+      {
+        name: 'url',
+        desc:
+          'URL of the PushBullet endpoint. Default is `"https://api.pushbullet.com/v2/pushes"`.',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc: 'API token string. Default is `""`.',
+        type: 'Object',
+      },
+      {
+        name: 'data',
+        desc:
+          "Data to send to the endpoint. Data is JSON-encoded and sent to the Pushbullet's endpoint.",
+        type: 'Object',
+      },
+    ],
+    package: 'pushbullet',
+    desc: 'Sends a push notification to the Pushbullet API.',
+    example:
+      'pushbullet.pushData( token: "mY5up3Rs3Cre7T0k3n", data: { "type": "link", "title": "Example title", "body": "Example nofication body", "url": "http://example-url.com", })',
+    category: 'Notification endpoints',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/pushbullet/pushdata/',
+  },
+  {
+    name: 'pushbullet.pushNote',
+    args: [
+      {
+        name: 'url',
+        desc:
+          'URL of the PushBullet endpoint. Default is `"https://api.pushbullet.com/v2/pushes"`.',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc: 'API token string. Defaults to: `""`.',
+        type: 'Object',
+      },
+      {
+        name: 'title',
+        desc: 'Title of the notification.',
+        type: 'Object',
+      },
+      {
+        name: 'text',
+        desc: 'Text to display in the notification.',
+        type: 'Object',
+      },
+    ],
+    package: 'pushbullet',
+    desc: 'Sends a push notification of type "note" to the Pushbullet API.',
+    example:
+      'pushbullet.pushNote( token: "mY5up3Rs3Cre7T0k3n", data: {"type": "link", "title": "Example title", "text": "Example note text"})',
+    category: 'Notification endpoints',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/pushbullet/pushnote/',
+  },
+  {
+    name: 'record.get',
+    args: [
+      {
+        name: 'r',
+        desc: 'Record to retrieve the value from.',
+        type: 'Object',
+      },
+      {
+        name: 'key',
+        desc: 'Property key to retrieve.',
+        type: 'String',
+      },
+      {
+        name: 'default',
+        desc:
+          'Default value to return if the specified key does not exist in the record.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/record',
+    desc:
+      'Returns a value from a record by key name or a default value if the key doesn’t exist in the record.',
+    example: 'record.get(r: exampleRecord, key: key, default: "")',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/record/get/',
+  },
+  {
+    name: 'requests.do',
+    args: [
+      {
+        name: 'method',
+        desc: 'method of the http request.',
+        type: 'String',
+      },
+      {
+        name: 'url',
+        desc: 'URL to request. This should not include any query parameters.',
+        type: 'String',
+      },
+      {
+        name: 'params',
+        desc: 'Set of key value pairs to add to the URL as query parameters.',
+        type: 'Array',
+      },
+      {
+        name: 'headers',
+        desc: 'Set of key values pairs to include on the request.',
+        type: 'Array',
+      },
+      {
+        name: 'body',
+        desc: 'Data to send with the request.',
+        type: 'Bytes',
+      },
+      {
+        name: 'config',
+        desc: 'Set of options to control how the request should be performed.',
+        type: 'Object',
+      },
+    ],
+    package: 'http/requests',
+    desc: 'Makes an http request.',
+    example: 'requests.do(url: "http://example.com", method: "GET")',
+    category: 'Inputs',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/http/requests/do/',
+  },
+  {
+    name: 'requests.get',
+    args: [
+      {
+        name: 'url',
+        desc: 'URL to request. This should not include any query parameters.',
+        type: 'String',
+      },
+      {
+        name: 'params',
+        desc: 'Set of key value pairs to add to the URL as query parameters.',
+        type: 'Array',
+      },
+      {
+        name: 'headers',
+        desc: 'Set of key values pairs to include on the request.',
+        type: 'Array',
+      },
+      {
+        name: 'body',
+        desc: 'Data to send with the request.',
+        type: 'Bytes',
+      },
+      {
+        name: 'config',
+        desc: 'Set of options to control how the request should be performed.',
+        type: 'Object',
+      },
+    ],
+    package: 'http/requests',
+    desc:
+      'Makes a http GET request. This identical to calling `request.do(method: "GET", ...)`.',
+    example: 'requests.get(url: "http://example.com")',
+    category: 'Inputs',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/http/requests/get/',
+  },
+  {
+    name: 'requests.peek',
+    args: [
+      {
+        name: 'response',
+        desc: 'Response data from an HTTP request.',
+        type: 'Object',
+      },
+    ],
+    package: 'http/requests',
+    desc: 'Converts an HTTP response into a table for easy inspection.',
+    example:
+      'requests.peek(response: requests.get(url: "https://api.agify.io", params: ["name": ["natalie"]]))',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/http/requests/peek/',
+  },
+  {
+    name: 'requests.post',
+    args: [
+      {
+        name: 'url',
+        desc: 'URL to request. This should not include any query parameters.',
+        type: 'String',
+      },
+      {
+        name: 'params',
+        desc: 'Set of key value pairs to add to the URL as query parameters.',
+        type: 'Array',
+      },
+      {
+        name: 'headers',
+        desc: 'Set of key values pairs to include on the request.',
+        type: 'Array',
+      },
+      {
+        name: 'body',
+        desc: 'Data to send with the request.',
+        type: 'Bytes',
+      },
+      {
+        name: 'config',
+        desc: 'Set of options to control how the request should be performed.',
+        type: 'Object',
+      },
+    ],
+    package: 'http/requests',
+    desc:
+      'Makes a http POST request. This identical to calling `request.do(method: "POST", ...)`.',
+    example:
+      'requests.post( url: "https://goolnk.com/api/v1/shorten", body: json.encode(v: {url: "http://www.influxdata.com"}), headers: ["Content-Type": "application/json"])',
+    category: 'Inputs',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/http/requests/post/',
+  },
+  {
+    name: 'sample.alignToNow',
+    args: [],
+    package: 'influxdata/influxdb/sample',
+    desc:
+      'Shifts time values in input data to align the chronological last point to _now_.',
+    example: 'sample.alignToNow()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/sample/aligntonow/',
+  },
+  {
+    name: 'sample.data',
+    args: [
+      {
+        name: 'set',
+        desc: 'Sample data set to download and output.',
+        type: 'String',
+      },
+    ],
+    package: 'influxdata/influxdb/sample',
+    desc: 'Downloads a specified InfluxDB sample dataset.',
+    example: 'sample.data()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/sample/data/',
+  },
+  {
+    name: 'sample.list',
+    args: [],
+    package: 'influxdata/influxdb/sample',
+    desc: 'Outputs information about available InfluxDB sample datasets.',
+    example: 'sample.list()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/sample/list/',
+  },
+  {
+    name: 'sampledata.bool',
+    args: [
+      {
+        name: 'includeNull',
+        desc: 'Include null values in the returned dataset.',
+        type: 'Boolean',
+      },
+    ],
+    package: 'sampledata',
+    desc: 'Returns a sample data set with boolean values.',
+    example: 'sampledata.bool()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/sampledata/bool/',
+  },
+  {
+    name: 'sampledata.float',
+    args: [
+      {
+        name: 'includeNull',
+        desc: 'Include null values in the returned dataset.',
+        type: 'Boolean',
+      },
+    ],
+    package: 'sampledata',
+    desc: 'Returns a sample data set with float values.',
+    example: 'sampledata.float()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/sampledata/float/',
+  },
+  {
+    name: 'sampledata.int',
+    args: [
+      {
+        name: 'includeNull',
+        desc: 'Include null values in the returned dataset.',
+        type: 'Boolean',
+      },
+    ],
+    package: 'sampledata',
+    desc: 'Returns a sample data set with integer values.',
+    example: 'sampledata.int()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/sampledata/int/',
+  },
+  {
+    name: 'sampledata.numericBool',
+    args: [
+      {
+        name: 'includeNull',
+        desc: 'Include null values in the returned dataset.',
+        type: 'Boolean',
+      },
+    ],
+    package: 'sampledata',
+    desc: 'Returns a sample data set with numeric (integer) boolean values.',
+    example: 'sampledata.numericBool()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/sampledata/numericbool/',
+  },
+  {
+    name: 'sampledata.string',
+    args: [
+      {
+        name: 'includeNull',
+        desc: 'Include null values in the returned dataset.',
+        type: 'Boolean',
+      },
+    ],
+    package: 'sampledata',
+    desc: 'Returns a sample data set with string values.',
+    example: 'sampledata.string()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/sampledata/string/',
+  },
+  {
+    name: 'sampledata.uint',
+    args: [
+      {
+        name: 'includeNull',
+        desc: 'Include null values in the returned dataset.',
+        type: 'Boolean',
+      },
+    ],
+    package: 'sampledata',
+    desc: 'Returns a sample data set with unsigned integer values.',
+    example: 'sampledata.uint()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/sampledata/uint/',
+  },
+  {
+    name: 'schema.fieldKeys',
+    args: [
+      {
+        name: 'bucket',
+        desc: 'Bucket to list field keys from.',
+        type: 'String',
+      },
+      {
+        name: 'predicate',
+        desc: 'Predicate function that filters field keys.',
+        type: 'Function',
+      },
+      {
+        name: 'start',
+        desc: 'Oldest time to include in results. Default is `-30d`.',
+        type: 'Object',
+      },
+      {
+        name: 'stop',
+        desc: 'Newest time include in results.',
+        type: 'Object',
+      },
+    ],
+    package: 'influxdata/influxdb/schema',
+    desc: 'Returns field keys in a bucket.',
+    example: 'schema.fieldKeys(bucket: "example-bucket")',
+    category: 'Metadata',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/schema/fieldkeys/',
+  },
+  {
+    name: 'schema.fieldsAsCols',
+    args: [],
+    package: 'influxdata/influxdb/schema',
+    desc:
+      'Is a special application of `pivot()` that pivots input data on `_field` and `_time` columns to align fields within each input table that have the same timestamp.',
+    example: 'schema.fieldsAsCols()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/schema/fieldsascols/',
+  },
+  {
+    name: 'schema.measurementFieldKeys',
+    args: [
+      {
+        name: 'bucket',
+        desc: 'Bucket to retrieve field keys from.',
+        type: 'String',
+      },
+      {
+        name: 'measurement',
+        desc: 'Measurement to list field keys from.',
+        type: 'Object',
+      },
+      {
+        name: 'start',
+        desc: 'Oldest time to include in results. Default is `-30d`.',
+        type: 'Object',
+      },
+      {
+        name: 'stop',
+        desc: 'Newest time include in results.',
+        type: 'Object',
+      },
+    ],
+    package: 'influxdata/influxdb/schema',
+    desc: 'Returns a list of fields in a measurement.',
+    example:
+      'schema.measurementFieldKeys(bucket: "example-bucket", measurement: "example-measurement")',
+    category: 'Metadata',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/schema/measurementfieldkeys/',
+  },
+  {
+    name: 'schema.measurementTagKeys',
+    args: [
+      {
+        name: 'bucket',
+        desc: 'Bucket to return tag keys from for a specific measurement.',
+        type: 'String',
+      },
+      {
+        name: 'measurement',
+        desc: 'Measurement to return tag keys from.',
+        type: 'Object',
+      },
+      {
+        name: 'start',
+        desc: 'Oldest time to include in results. Default is `-30d`.',
+        type: 'Object',
+      },
+      {
+        name: 'stop',
+        desc: 'Newest time include in results.',
+        type: 'Object',
+      },
+    ],
+    package: 'influxdata/influxdb/schema',
+    desc: 'Returns the list of tag keys for a specific measurement.',
+    example:
+      'schema.measurementTagKeys(bucket: "example-bucket", measurement: "example-measurement")',
+    category: 'Metadata',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/schema/measurementtagkeys/',
+  },
+  {
+    name: 'schema.measurementTagValues',
+    args: [
+      {
+        name: 'bucket',
+        desc: 'Bucket to return tag values from for a specific measurement.',
+        type: 'String',
+      },
+      {
+        name: 'measurement',
+        desc: 'Measurement to return tag values from.',
+        type: 'Object',
+      },
+      {
+        name: 'tag',
+        desc: 'Tag to return all unique values from.',
+        type: 'String',
+      },
+      {
+        name: 'start',
+        desc: 'Oldest time to include in results. Default is `-30d`.',
+        type: 'Object',
+      },
+      {
+        name: 'stop',
+        desc: 'Newest time include in results.',
+        type: 'Object',
+      },
+    ],
+    package: 'influxdata/influxdb/schema',
+    desc: 'Returns a list of tag values for a specific measurement.',
+    example:
+      'schema.measurementTagValues( bucket: "example-bucket", measurement: "example-measurement", tag: "example-tag")',
+    category: 'Metadata',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/schema/measurementtagvalues/',
+  },
+  {
+    name: 'schema.measurements',
+    args: [
+      {
+        name: 'bucket',
+        desc: 'Bucket to retrieve measurements from.',
+        type: 'String',
+      },
+      {
+        name: 'start',
+        desc: 'Oldest time to include in results. Default is `-30d`.',
+        type: 'Object',
+      },
+      {
+        name: 'stop',
+        desc: 'Newest time include in results.',
+        type: 'Object',
+      },
+    ],
+    package: 'influxdata/influxdb/schema',
+    desc: 'Returns a list of measurements in a specific bucket.',
+    example: 'schema.measurements(bucket: "example-bucket")',
+    category: 'Metadata',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/schema/measurements/',
+  },
+  {
+    name: 'schema.tagKeys',
+    args: [
+      {
+        name: 'bucket',
+        desc: 'Bucket to return tag keys from.',
+        type: 'String',
+      },
+      {
+        name: 'predicate',
+        desc: 'Predicate function that filters tag keys.',
+        type: 'Function',
+      },
+      {
+        name: 'start',
+        desc: 'Oldest time to include in results. Default is `-30d`.',
+        type: 'Object',
+      },
+      {
+        name: 'stop',
+        desc: 'Newest time include in results.',
+        type: 'Object',
+      },
+    ],
+    package: 'influxdata/influxdb/schema',
+    desc:
+      'Returns a list of tag keys for all series that match the `predicate`.',
+    example: 'schema.tagKeys(bucket: "example-bucket")',
+    category: 'Metadata',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/schema/tagkeys/',
+  },
+  {
+    name: 'schema.tagValues',
+    args: [
+      {
+        name: 'bucket',
+        desc: 'Bucket to return unique tag values from.',
+        type: 'String',
+      },
+      {
+        name: 'tag',
+        desc: 'Tag to return unique values from.',
+        type: 'String',
+      },
+      {
+        name: 'predicate',
+        desc: 'Predicate function that filters tag values.',
+        type: 'Function',
+      },
+      {
+        name: 'start',
+        desc: 'Oldest time to include in results. Default is `-30d`.',
+        type: 'Object',
+      },
+      {
+        name: 'stop',
+        desc: 'Newest time include in results.',
+        type: 'Object',
+      },
+    ],
+    package: 'influxdata/influxdb/schema',
+    desc: 'Returns a list of unique values for a given tag.',
+    example: 'schema.tagValues(bucket: "example-bucket", tag: "host")',
+    category: 'Metadata',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/schema/tagvalues/',
+  },
+  {
+    name: 'sensu.endpoint',
+    args: [
+      {
+        name: 'url',
+        desc:
+          'Base URL of Sensu API (https://docs.sensu.io/sensu-go/latest/migrate/#architecture)',
+        type: 'String',
+      },
+      {
+        name: 'apiKey',
+        desc:
+          'Sensu API Key (https://docs.sensu.io/sensu-go/latest/operations/control-access/).',
+        type: 'String',
+      },
+      {
+        name: 'handlers',
+        desc:
+          'Sensu handlers (https://docs.sensu.io/sensu-go/latest/reference/handlers/) to execute.',
+        type: 'Object',
+      },
+      {
+        name: 'namespace',
+        desc:
+          'Sensu namespace (https://docs.sensu.io/sensu-go/latest/reference/rbac/).',
+        type: 'String',
+      },
+      {
+        name: 'entityName',
+        desc: 'Event source.',
+        type: 'String',
+      },
+    ],
+    package: 'contrib/sranka/sensu',
+    desc:
+      'Sends an event to the Sensu Events API (https://docs.sensu.io/sensu-go/latest/api/events/#create-a-new-event) using data from table rows.',
+    example: 'sensu.endpoint(url: "http://localhost:8080", apiKey: apiKey)',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/sranka/sensu/endpoint/',
+  },
+  {
+    name: 'sensu.event',
+    args: [
+      {
+        name: 'url',
+        desc:
+          'Base URL of Sensu API (https://docs.sensu.io/sensu-go/latest/migrate/#architecture)',
+        type: 'String',
+      },
+      {
+        name: 'apiKey',
+        desc:
+          'Sensu API Key (https://docs.sensu.io/sensu-go/latest/operations/control-access/).',
+        type: 'String',
+      },
+      {
+        name: 'checkName',
+        desc: 'Check name.',
+        type: 'String',
+      },
+      {
+        name: 'text',
+        desc: 'Event text.',
+        type: 'Object',
+      },
+      {
+        name: 'handlers',
+        desc: 'Sensu handlers to execute. Default is `[]`.',
+        type: 'Object',
+      },
+      {
+        name: 'status',
+        desc:
+          'Event status code that indicates state (/flux/v0/stdlib/contrib/sranka/sensu/event/#state).',
+        type: 'Object',
+      },
+      {
+        name: 'state',
+        desc: 'Event state.',
+        type: 'String',
+      },
+      {
+        name: 'namespace',
+        desc:
+          'Sensu namespace (https://docs.sensu.io/sensu-go/latest/reference/rbac/).',
+        type: 'String',
+      },
+      {
+        name: 'entityName',
+        desc: 'Event source.',
+        type: 'String',
+      },
+    ],
+    package: 'contrib/sranka/sensu',
+    desc:
+      'Sends a single event to the Sensu Events API (https://docs.sensu.io/sensu-go/latest/api/events/#create-a-new-event).',
+    example:
+      'sensu.event( url: "http://localhost:8080", apiKey: apiKey, checkName: "diskUsage", text: "Disk usage is **${lastReported.status}**.")',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/sranka/sensu/event/',
+  },
+  {
+    name: 'sensu.toSensuName',
+    args: [
+      {
+        name: 'v',
+        desc: 'String to operate on.',
+        type: 'String',
+      },
+    ],
+    package: 'contrib/sranka/sensu',
+    desc:
+      'Translates a string value to a Sensu name by replacing non-alphanumeric characters (`[a-zA-Z0-9_.-]`) with underscores (`_`).',
+    example: 'sensu.toSensuName(v: "Example name conversion")',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/sranka/sensu/tosensuname/',
+  },
+  {
+    name: 'servicenow.endpoint',
+    args: [
+      {
+        name: 'url',
+        desc: 'ServiceNow web service URL.',
+        type: 'String',
+      },
+      {
+        name: 'username',
+        desc: 'ServiceNow username to use for HTTP BASIC authentication.',
+        type: 'String',
+      },
+      {
+        name: 'password',
+        desc: 'ServiceNow password to use for HTTP BASIC authentication.',
+        type: 'String',
+      },
+      {
+        name: 'source',
+        desc: 'Source name. Default is `"Flux"`.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/bonitoo-io/servicenow',
+    desc:
+      'Sends events to ServiceNow (https://servicenow.com/) using data from input rows.',
+    example:
+      'servicenow.endpoint( url: "https://example-tenant.service-now.com/api/global/em/jsonv2", username: username, password: password)',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/servicenow/endpoint/',
+  },
+  {
+    name: 'servicenow.event',
+    args: [
+      {
+        name: 'url',
+        desc: 'ServiceNow web service URL.',
+        type: 'String',
+      },
+      {
+        name: 'username',
+        desc: 'ServiceNow username to use for HTTP BASIC authentication.',
+        type: 'String',
+      },
+      {
+        name: 'password',
+        desc: 'ServiceNow password to use for HTTP BASIC authentication.',
+        type: 'String',
+      },
+      {
+        name: 'description',
+        desc: 'Event description.',
+        type: 'Object',
+      },
+      {
+        name: 'severity',
+        desc: 'Severity of the event.',
+        type: 'Object',
+      },
+      {
+        name: 'source',
+        desc: 'Source name. Default is `"Flux"`.',
+        type: 'Object',
+      },
+      {
+        name: 'node',
+        desc: 'Node name or IP address related to the event.',
+        type: 'Object',
+      },
+      {
+        name: 'metricType',
+        desc: 'Metric type related to the event (for example, `CPU`).',
+        type: 'Object',
+      },
+      {
+        name: 'resource',
+        desc: 'Resource related to the event (for example, `CPU-1`).',
+        type: 'Object',
+      },
+      {
+        name: 'metricName',
+        desc: 'Metric name related to the event (for example, `usage_idle`).',
+        type: 'Object',
+      },
+      {
+        name: 'messageKey',
+        desc:
+          'Unique identifier of the event (for example, the InfluxDB alert ID).',
+        type: 'Object',
+      },
+      {
+        name: 'additionalInfo',
+        desc: 'Additional information to include with the event.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/bonitoo-io/servicenow',
+    desc: 'Sends an event to ServiceNow (https://servicenow.com/).',
+    example:
+      'servicenow.event( url: "https://tenant.service-now.com/api/global/em/jsonv2", username: username, password: password, node: lastReported.host, metricType: lastReported._measurement, resource: lastReported.instance, metricName: lastReported._field, severity: if lastReported._value < 1.0 then "critical" else if lastReported._value < 5.0 then "warning" else "info", additionalInfo: {"devId": r.dev_id})',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/servicenow/event/',
+  },
+  {
+    name: 'slack.endpoint',
+    args: [
+      {
+        name: 'url',
+        desc:
+          'Slack API URL. Default is `https://slack.com/api/chat.postMessage`.',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc: 'Slack API token. Default is `""`.',
+        type: 'String',
+      },
+    ],
+    package: 'slack',
+    desc:
+      'Returns a function that can be used to send a message to Slack per input row.',
+    example: 'slack.endpoint(token: "mY5uP3rSeCr37T0kEN")',
+    category: 'Notification endpoints',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/slack/endpoint/',
+  },
+  {
+    name: 'slack.message',
+    args: [
+      {
+        name: 'url',
+        desc: 'Slack API URL.',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc: 'Slack API token. Default is `""`.',
+        type: 'String',
+      },
+      {
+        name: 'channel',
+        desc: 'Slack channel or user to send the message to.',
+        type: 'Object',
+      },
+      {
+        name: 'text',
+        desc: 'Message text.',
+        type: 'Object',
+      },
+      {
+        name: 'color',
+        desc: 'Slack message color.',
+        type: 'String',
+      },
+    ],
+    package: 'slack',
+    desc:
+      'Sends a single message to a Slack channel and returns the HTTP response code of the request.',
+    example:
+      'slack.message( url: "https://hooks.slack.com/services/EXAMPLE-WEBHOOK-URL", channel: "#example-channel", text: "Example slack message", color: "warning")',
+    category: 'Notification endpoints',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/slack/message/',
+  },
+  {
+    name: 'slack.validateColorString',
+    args: [
+      {
+        name: 'color',
+        desc: 'Hex color code.',
+        type: 'String',
+      },
+    ],
+    package: 'slack',
+    desc: 'Ensures a string contains a valid hex color code.',
+    example: 'slack.validateColorString(color: "#fff")',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/slack/validatecolorstring/',
+  },
+  {
+    name: 'socket.from',
+    args: [
+      {
+        name: 'url',
+        desc: 'URL to return data from.',
+        type: 'String',
+      },
+      {
+        name: 'decoder',
+        desc: 'Decoder to use to parse returned data into a stream of tables.',
+        type: 'String',
+      },
+    ],
+    package: 'socket',
+    desc:
+      'Returns data from a socket connection and outputs a stream of tables given a specified decoder.',
+    example: 'socket.from(url: "tcp://127.0.0.1:1234", decoder: "csv")',
+    category: 'Inputs',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/socket/from/',
+  },
+  {
+    name: 'stateTracking',
+    args: [
+      {
+        name: 'fn',
+        desc: 'Predicate function to determine state.',
+        type: 'Function',
+      },
+      {
+        name: 'countColumn',
+        desc: 'Column to store state count in.',
+        type: 'String',
+      },
+      {
+        name: 'durationColumn',
+        desc: 'Column to store state duration in.',
+        type: 'String',
+      },
+      {
+        name: 'durationUnit',
+        desc: 'Unit of time to report state duration in. Default is `1s`.',
+        type: 'Duration',
+      },
+      {
+        name: 'timeColumn',
+        desc: 'Column with time values used to calculate state duration.',
         type: 'String',
       },
     ],
     package: '',
     desc:
-      'Indicates the input tables received should be delivered as a result of the query. Yield outputs the input stream unmodified. A query may have multiple results, each identified by the name provided to the `yield()` function.',
-    example: 'yield(name: "custom-name")',
-    category: 'Outputs',
+      'Returns the cumulative count and duration of consecutive rows that match a predicate function that defines a state.',
+    example:
+      'stateTracking(fn: (r) => r.state == "crit", countColumn: "count")',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/statetracking/',
+  },
+  {
+    name: 'statsmodels.linearRegression',
+    args: [],
+    package: 'contrib/anaisdg/statsmodels',
+    desc: 'Performs a linear regression.',
+    example: 'statsmodels.linearRegression()',
+    category: 'Transformations',
     link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/outputs/yield/',
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/anaisdg/statsmodels/linearregression/',
+  },
+  {
+    name: 'table.fill',
+    args: [],
+    package: 'experimental/table',
+    desc: 'Adds a single row to empty tables in a stream of tables.',
+    example: 'table.fill()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/table/fill/',
+  },
+  {
+    name: 'tasks.lastSuccess',
+    args: [
+      {
+        name: 'orTime',
+        desc:
+          'Default time value returned if the task has never successfully run.',
+        type: 'Object',
+      },
+    ],
+    package: 'influxdata/influxdb/tasks',
+    desc:
+      'Returns the time of the last successful run of the InfluxDB task or the value of the `orTime` parameter if the task has never successfully run.',
+    example: 'tasks.lastSuccess(orTime: 2020-01-01T00:00:00Z)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/tasks/lastsuccess/',
+  },
+  {
+    name: 'teams.endpoint',
+    args: [
+      {
+        name: 'url',
+        desc: 'Incoming webhook URL.',
+        type: 'String',
+      },
+    ],
+    package: 'contrib/sranka/teams',
+    desc:
+      'Sends a message to a Microsoft Teams channel using data from table rows.',
+    example: 'teams.endpoint(url: url)',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/sranka/teams/endpoint/',
+  },
+  {
+    name: 'teams.message',
+    args: [
+      {
+        name: 'url',
+        desc: 'Incoming webhook URL.',
+        type: 'String',
+      },
+      {
+        name: 'title',
+        desc: 'Message card title.',
+        type: 'Object',
+      },
+      {
+        name: 'text',
+        desc: 'Message card text.',
+        type: 'String',
+      },
+      {
+        name: 'summary',
+        desc: 'Message card summary.',
+        type: 'String',
+      },
+    ],
+    package: 'contrib/sranka/teams',
+    desc:
+      'Sends a single message to a Microsoft Teams channel using an incoming webhook (https://docs.microsoft.com/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook).',
+    example:
+      'teams.message( url: "https://outlook.office.com/webhook/example-webhook", title: "Disk Usage", text: "Disk usage is: *${lastReported.status}*.", summary: "Disk usage is ${lastReported.status}")',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/sranka/teams/message/',
+  },
+  {
+    name: 'telegram.endpoint',
+    args: [
+      {
+        name: 'url',
+        desc:
+          'URL of the Telegram bot endpoint. Default is `https://api.telegram.org/bot`.',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc: 'Telegram bot token.',
+        type: 'String',
+      },
+      {
+        name: 'parseMode',
+        desc:
+          'Parse mode (https://core.telegram.org/bots/api#formatting-options)',
+        type: 'Object',
+      },
+      {
+        name: 'disableWebPagePreview',
+        desc: 'Disable preview of web links in the sent message.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/sranka/telegram',
+    desc: 'Sends a message to a Telegram channel using data from table rows.',
+    example: 'telegram.endpoint(token: token)',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/sranka/telegram/endpoint/',
+  },
+  {
+    name: 'telegram.message',
+    args: [
+      {
+        name: 'url',
+        desc:
+          'URL of the Telegram bot endpoint. Default is `https://api.telegram.org/bot`.',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc: 'Telegram bot token.',
+        type: 'String',
+      },
+      {
+        name: 'channel',
+        desc: 'Telegram channel ID.',
+        type: 'Object',
+      },
+      {
+        name: 'text',
+        desc: 'Message text.',
+        type: 'Object',
+      },
+      {
+        name: 'parseMode',
+        desc:
+          'Parse mode (https://core.telegram.org/bots/api#formatting-options)',
+        type: 'Object',
+      },
+      {
+        name: 'disableWebPagePreview',
+        desc: 'Disable preview of web links in the sent message.',
+        type: 'Object',
+      },
+      {
+        name: 'silent',
+        desc:
+          'Send message silently (https://telegram.org/blog/channels-2-0#silent-messages).',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/sranka/telegram',
+    desc:
+      'Sends a single message to a Telegram channel using the `sendMessage` (https://core.telegram.org/bots/api#sendmessage) method of the Telegram Bot API.',
+    example:
+      'telegram.message(token: token, channel: "-12345", text: "Disk usage is **${lastReported.status}**.")',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/sranka/telegram/message/',
+  },
+  {
+    name: 'testing.assertEqualValues',
+    args: [
+      {
+        name: 'got',
+        desc: 'Value to test.',
+        type: 'Object',
+      },
+      {
+        name: 'want',
+        desc: 'Expected value to test against.',
+        type: 'Object',
+      },
+    ],
+    package: 'testing',
+    desc: 'Tests whether two values are equal.',
+    example: 'testing.assertEqualValues(got: 5, want: 12)',
+    category: 'Tests',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/testing/assertequalvalues/',
+  },
+  {
+    name: 'testing.assertMatches',
+    args: [
+      {
+        name: 'got',
+        desc: 'Value to test.',
+        type: 'String',
+      },
+      {
+        name: 'want',
+        desc: 'Regex to test against.',
+        type: 'Regexp',
+      },
+    ],
+    package: 'internal/testing',
+    desc: 'Tests whether a string matches a given regex.',
+    example: 'testing.assertMatches(got: "123", want: /12/)',
+    category: 'Tests',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/testing/assertmatches/',
+  },
+  {
+    name: 'testing.load',
+    args: [],
+    package: 'testing',
+    desc: 'Loads test data from a stream of tables.',
+    example: 'testing.load(tables: got)',
+    category: 'Tests',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/testing/load/',
+  },
+  {
+    name: 'testing.shouldError',
+    args: [
+      {
+        name: 'fn',
+        desc: 'Function to call.',
+        type: 'Function',
+      },
+      {
+        name: 'want',
+        desc: 'Regular expression to match the expected error.',
+        type: 'Regexp',
+      },
+    ],
+    package: 'testing',
+    desc:
+      'Calls a function that catches any error and checks that the error matches the expected value.',
+    example:
+      'testing.shouldError(fn: () => die(msg: "error message"), want: /error message/)',
+    category: 'Tests',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/testing/shoulderror/',
+  },
+  {
+    name: 'testing.shouldErrorWithCode',
+    args: [
+      {
+        name: 'fn',
+        desc: 'Function to call.',
+        type: 'Function',
+      },
+      {
+        name: 'want',
+        desc: 'Regular expression to match the expected error.',
+        type: 'Regexp',
+      },
+      {
+        name: 'code',
+        desc: 'Which flux error code to expect',
+        type: 'UInteger',
+      },
+    ],
+    package: 'internal/testing',
+    desc:
+      'Calls a function that catches any error and checks that the error matches the expected value.',
+    example:
+      'testing.shouldErrorWithCode(fn: () => die(msg: "error message"), want: /error message/, code: 3)',
+    category: 'Tests',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/testing/shoulderrorwithcode/',
+  },
+  {
+    name: 'testutil.fail',
+    args: [],
+    package: 'internal/testutil',
+    desc: 'Causes the current script to fail.',
+    example: 'testutil.fail()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/internal/testutil/fail/',
+  },
+  {
+    name: 'testutil.makeAny',
+    args: [
+      {
+        name: 'typ',
+        desc: 'Description of the type to create.',
+        type: 'String',
+      },
+    ],
+    package: 'internal/testutil',
+    desc: 'Constructs any value based on a type description as a string.',
+    example: 'testutil.makeAny()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/testutil/makeany/',
+  },
+  {
+    name: 'testutil.makeRecord',
+    args: [
+      {
+        name: 'o',
+        desc: 'Record value.',
+        type: 'Object',
+      },
+    ],
+    package: 'internal/testutil',
+    desc:
+      'Is the identity function, but breaks the type connection from input to output.',
+    example: 'testutil.makeRecord()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/internal/testutil/makerecord/',
+  },
+  {
+    name: 'testutil.yield',
+    args: [
+      {
+        name: 'v',
+        desc: 'Any value.',
+        type: 'Object',
+      },
+    ],
+    package: 'internal/testutil',
+    desc: 'Is the identity function.',
+    example: 'testutil.yield()',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/internal/testutil/yield/',
+  },
+  {
+    name: 'tickscript.alert',
+    args: [
+      {
+        name: 'check',
+        desc: 'InfluxDB check data.',
+        type: 'Object',
+      },
+      {
+        name: 'id',
+        desc:
+          'Function that returns the InfluxDB check ID provided by the check record.',
+        type: 'Function',
+      },
+      {
+        name: 'details',
+        desc:
+          'Function to return the InfluxDB check details using data from input rows.',
+        type: 'Function',
+      },
+      {
+        name: 'message',
+        desc:
+          'Function to return the InfluxDB check message using data from input rows.',
+        type: 'Function',
+      },
+      {
+        name: 'crit',
+        desc:
+          'Predicate function to determine `crit` status. Default is `(r) => false`.',
+        type: 'Function',
+      },
+      {
+        name: 'warn',
+        desc:
+          'Predicate function to determine `warn` status. Default is `(r) => false`.',
+        type: 'Function',
+      },
+      {
+        name: 'info',
+        desc:
+          'Predicate function to determine `info` status. Default is `(r) => false`.',
+        type: 'Function',
+      },
+      {
+        name: 'ok',
+        desc:
+          'Predicate function to determine `ok` status. Default is `(r) => true`.',
+        type: 'Function',
+      },
+      {
+        name: 'topic',
+        desc: 'Check topic. Default is `""`.',
+        type: 'String',
+      },
+    ],
+    package: 'contrib/bonitoo-io/tickscript',
+    desc:
+      'Identifies events of varying severity levels and writes them to the `statuses` measurement in the InfluxDB `_monitoring` system bucket.',
+    example:
+      'tickscript.alert( check: {check with _check_id: "task/${r.service}"}, message: "task/${r.service} is ${r._level} value: ${r._value}", crit: (r) => r._value > 30, warn: (r) => r._value > 20, info: (r) => r._value > 10)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/tickscript/alert/',
+  },
+  {
+    name: 'tickscript.compute',
+    args: [
+      {
+        name: 'as',
+        desc: 'New column name.',
+        type: 'String',
+      },
+      {
+        name: 'column',
+        desc: 'Column to operate on. Default is `_value`.',
+        type: 'Object',
+      },
+      {
+        name: 'fn',
+        desc: 'Aggregate or selector function to apply.',
+        type: 'Function',
+      },
+    ],
+    package: 'contrib/bonitoo-io/tickscript',
+    desc:
+      'Is an alias for `tickscript.select()` that changes a column’s name and optionally applies an aggregate or selector function.',
+    example: 'tickscript.compute()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/tickscript/compute/',
+  },
+  {
+    name: 'tickscript.deadman',
+    args: [
+      {
+        name: 'check',
+        desc: 'InfluxDB check data. See `tickscript.defineCheck()`.',
+        type: 'Object',
+      },
+      {
+        name: 'measurement',
+        desc: 'Measurement name. Should match the queried measurement.',
+        type: 'String',
+      },
+      {
+        name: 'threshold',
+        desc: 'Count threshold. Default is `0`.',
+        type: 'Object',
+      },
+      {
+        name: 'id',
+        desc:
+          'Function that returns the InfluxDB check ID provided by the check record.',
+        type: 'Function',
+      },
+      {
+        name: 'message',
+        desc:
+          'Function that returns the InfluxDB check message using data from input rows.',
+        type: 'Function',
+      },
+      {
+        name: 'topic',
+        desc: 'Check topic. Default is `""`.',
+        type: 'String',
+      },
+    ],
+    package: 'contrib/bonitoo-io/tickscript',
+    desc:
+      'Detects low data throughput and writes a point with a critical status to the InfluxDB `_monitoring` system bucket.',
+    example:
+      'tickscript.deadman( check: tickscript.defineCheck(id: "000000000000", name: "task/${r.service}"), measurement: "pulse", threshold: 2)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/tickscript/deadman/',
+  },
+  {
+    name: 'tickscript.defineCheck',
+    args: [
+      {
+        name: 'id',
+        desc: 'InfluxDB check ID.',
+        type: 'Object',
+      },
+      {
+        name: 'name',
+        desc: 'InfluxDB check name.',
+        type: 'Object',
+      },
+      {
+        name: 'type',
+        desc: 'InfluxDB check type. Default is `custom`.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/bonitoo-io/tickscript',
+    desc: 'Creates custom check data required by `alert()` and `deadman()`.',
+    example:
+      'tickscript.defineCheck(id: "000000000000", name: "Example check name")',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/tickscript/definecheck/',
+  },
+  {
+    name: 'tickscript.groupBy',
+    args: [
+      {
+        name: 'columns',
+        desc: 'List of columns to group by.',
+        type: 'Array',
+      },
+    ],
+    package: 'contrib/bonitoo-io/tickscript',
+    desc:
+      'Groups results by the `_measurement` column and other specified columns.',
+    example: 'tickscript.groupBy(columns: ["host", "region"])',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/tickscript/groupby/',
+  },
+  {
+    name: 'tickscript.join',
+    args: [
+      {
+        name: 'tables',
+        desc: 'Map of two streams to join.',
+        type: 'Object',
+      },
+      {
+        name: 'on',
+        desc: 'List of columns to join on. Default is `["_time"]`.',
+        type: 'Array',
+      },
+      {
+        name: 'measurement',
+        desc: 'Measurement name to use in results.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/bonitoo-io/tickscript',
+    desc:
+      'Merges two input streams into a single output stream based on specified columns with equal values and appends a new measurement name.',
+    example:
+      'tickscript.join( tables: {metric: metrics, state: states}, on: ["_time", "host"], measurement: "example-m")',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/tickscript/join/',
+  },
+  {
+    name: 'tickscript.select',
+    args: [
+      {
+        name: 'column',
+        desc: 'Column to operate on. Default is `_value`.',
+        type: 'Object',
+      },
+      {
+        name: 'fn',
+        desc: 'Aggregate or selector function to apply.',
+        type: 'Function',
+      },
+      {
+        name: 'as',
+        desc: 'New column name.',
+        type: 'String',
+      },
+    ],
+    package: 'contrib/bonitoo-io/tickscript',
+    desc:
+      'Changes a column’s name and optionally applies an aggregate or selector function to values in the column.',
+    example: 'tickscript.select(as: "example-name")',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/tickscript/select/',
+  },
+  {
+    name: 'tickscript.selectWindow',
+    args: [
+      {
+        name: 'column',
+        desc: 'Column to operate on. Default is _value.',
+        type: 'String',
+      },
+      {
+        name: 'fn',
+        desc: 'Aggregate or selector function to apply.',
+        type: 'Function',
+      },
+      {
+        name: 'as',
+        desc: 'New column name.',
+        type: 'String',
+      },
+      {
+        name: 'every',
+        desc: 'Duration of windows.',
+        type: 'Duration',
+      },
+      {
+        name: 'defaultValue',
+        desc: 'Default fill value for null values in column.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/bonitoo-io/tickscript',
+    desc:
+      'Changes a column’s name, windows rows by time, and then applies an aggregate or selector function the specified column for each window of time.',
+    example:
+      'tickscript.selectWindow(fn: sum, as: "example-name", every: 1h, defaultValue: 0)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/tickscript/selectwindow/',
+  },
+  {
+    name: 'timeWeightedAvg',
+    args: [
+      {
+        name: 'unit',
+        desc: 'Unit of time to use to compute the time-weighted average.',
+        type: 'Duration',
+      },
+    ],
+    package: '',
+    desc:
+      'Returns the time-weighted average of non-null values in `_value` column as a float for each input table.',
+    example: 'timeWeightedAvg(unit: 1s)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/universe/timeweightedavg/',
+  },
+  {
+    name: 'timezone.fixed',
+    args: [
+      {
+        name: 'offset',
+        desc: 'Fixed duration for the location offset.',
+        type: 'Object',
+      },
+    ],
+    package: 'timezone',
+    desc: 'Returns a location record with a fixed offset.',
+    example: 'timezone.fixed(offset: -8h)',
+    category: 'Date/time',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/timezone/fixed/',
+  },
+  {
+    name: 'timezone.location',
+    args: [
+      {
+        name: 'name',
+        desc:
+          'Location name (as defined by your operating system timezone database).',
+        type: 'String',
+      },
+    ],
+    package: 'timezone',
+    desc: 'Returns a location record based on a location or timezone name.',
+    example: 'timezone.location(name: "America/Los_Angeles")',
+    category: 'Date/time',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/timezone/location/',
+  },
+  {
+    name: 'today',
+    args: [],
+    package: '',
+    desc: 'Returns the now() timestamp truncated to the day unit.',
+    example: 'today()',
+    category: 'Date/time',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/universe/today/',
+  },
+  {
+    name: 'types.isNumeric',
+    args: [
+      {
+        name: 'v',
+        desc: 'Value to test.',
+        type: 'Object',
+      },
+    ],
+    package: 'types',
+    desc: 'Tests if a value is a numeric type (int, uint, or float).',
+    example: 'types.isNumeric(v: r._value)',
+    category: 'Tests',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/types/isnumeric/',
+  },
+  {
+    name: 'types.isType',
+    args: [
+      {
+        name: 'v',
+        desc: 'Value to test.',
+        type: 'Object',
+      },
+      {
+        name: 'type',
+        desc: 'String describing the type to check against.',
+        type: 'String',
+      },
+    ],
+    package: 'types',
+    desc: 'Tests if a value is a specified type.',
+    example: 'types.isType(v: r._value, type: "string")',
+    category: 'Tests',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/types/istype/',
+  },
+  {
+    name: 'usage.from',
+    args: [
+      {
+        name: 'start',
+        desc: 'Earliest time to include in results.',
+        type: 'Object',
+      },
+      {
+        name: 'stop',
+        desc: 'Latest time to include in results.',
+        type: 'Object',
+      },
+      {
+        name: 'host',
+        desc: 'InfluxDB Cloud region URL (/influxdb/cloud/reference/regions/).',
+        type: 'String',
+      },
+      {
+        name: 'orgID',
+        desc: 'InfluxDB Cloud organization ID. Default is `""`.',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc: 'InfluxDB Cloud API token (/influxdb/cloud/admin/tokens/).',
+        type: 'String',
+      },
+      {
+        name: 'raw',
+        desc:
+          'Return raw, high resolution usage data instead of downsampled usage data.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/usage',
+    desc: 'Returns usage data from an **InfluxDB Cloud** organization.',
+    example: 'usage.from(start: -30d, stop: now())',
+    category: 'Inputs',
+    link: 'https://docs.influxdata.com/flux/v0/stdlib/experimental/usage/from/',
+  },
+  {
+    name: 'usage.limits',
+    args: [
+      {
+        name: 'host',
+        desc: 'InfluxDB Cloud region URL (/influxdb/cloud/reference/regions/).',
+        type: 'String',
+      },
+      {
+        name: 'orgID',
+        desc: 'InfluxDB Cloud organization ID. Default is `""`.',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc: 'InfluxDB Cloud API token (/influxdb/cloud/admin/tokens/).',
+        type: 'String',
+      },
+    ],
+    package: 'experimental/usage',
+    desc:
+      'Returns a record containing usage limits for an **InfluxDB Cloud** organization.',
+    example: 'usage.limits()',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/experimental/usage/limits/',
+  },
+  {
+    name: 'v1.databases',
+    args: [
+      {
+        name: 'org',
+        desc: 'Organization name.',
+        type: 'String',
+      },
+      {
+        name: 'orgID',
+        desc: 'Organization ID.',
+        type: 'String',
+      },
+      {
+        name: 'host',
+        desc: 'InfluxDB URL. Default is `http://localhost:8086`.',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc: 'InfluxDB API token.',
+        type: 'String',
+      },
+    ],
+    package: 'influxdata/influxdb/v1',
+    desc: 'Returns a list of databases in an InfluxDB 1.x (1.7+) instance.',
+    example: 'v1.databases()',
+    category: 'Metadata',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/v1/databases/',
+  },
+  {
+    name: 'v1.fieldKeys',
+    args: [
+      {
+        name: 'bucket',
+        desc: 'Bucket to list field keys from.',
+        type: 'String',
+      },
+      {
+        name: 'predicate',
+        desc: 'Predicate function that filters field keys.',
+        type: 'Function',
+      },
+      {
+        name: 'start',
+        desc: 'Oldest time to include in results. Default is `-30d`.',
+        type: 'Object',
+      },
+      {
+        name: 'stop',
+        desc: 'Newest time include in results.',
+        type: 'Object',
+      },
+    ],
+    package: 'influxdata/influxdb/v1',
+    desc: 'Returns field keys in a bucket.',
+    example: 'v1.fieldKeys()',
+    category: 'Metadata',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/v1/fieldkeys/',
+  },
+  {
+    name: 'v1.json (file)',
+    args: [
+      {
+        name: 'file',
+        desc:
+          'File path to file containing InfluxDB 1.x query results in JSON format.',
+        type: 'String',
+      },
+    ],
+    package: 'influxdata/influxdb/v1',
+    desc: 'Parses an InfluxDB 1.x JSON result into a stream of tables.',
+    example: 'v1.json(file: path)',
+    category: 'Inputs',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/v1/json/',
+  },
+  {
+    name: 'v1.json (jsonData)',
+    args: [
+      {
+        name: 'json',
+        desc: 'InfluxDB 1.x query results in JSON format.',
+        type: 'String',
+      },
+    ],
+    package: 'influxdata/influxdb/v1',
+    desc: 'Parses an InfluxDB 1.x JSON result into a stream of tables.',
+    example: 'v1.json(json: jsonData)',
+    category: 'Inputs',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/v1/json/',
+  },
+  {
+    name: 'v1.measurementFieldKeys',
+    args: [
+      {
+        name: 'bucket',
+        desc: 'Bucket to retrieve field keys from.',
+        type: 'String',
+      },
+      {
+        name: 'measurement',
+        desc: 'Measurement to list field keys from.',
+        type: 'Object',
+      },
+      {
+        name: 'start',
+        desc: 'Oldest time to include in results. Default is `-30d`.',
+        type: 'Object',
+      },
+      {
+        name: 'stop',
+        desc: 'Newest time include in results.',
+        type: 'Object',
+      },
+    ],
+    package: 'influxdata/influxdb/v1',
+    desc: 'Returns a list of fields in a measurement.',
+    example: 'v1.measurementFieldKeys()',
+    category: 'Metadata',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/influxdata/influxdb/v1/measurementfieldkeys/',
+  },
+  {
+    name: 'victorops.alert',
+    args: [
+      {
+        name: 'url',
+        desc: 'VictorOps REST endpoint integration URL.',
+        type: 'String',
+      },
+      {
+        name: 'monitoringTool',
+        desc: 'Monitoring agent name. Default is `""`.',
+        type: 'Object',
+      },
+      {
+        name: 'messageType',
+        desc: 'VictorOps message type (alert behavior).',
+        type: 'Object',
+      },
+      {
+        name: 'entityID',
+        desc: 'Incident ID. Default is `""`.',
+        type: 'Object',
+      },
+      {
+        name: 'entityDisplayName',
+        desc: 'Incident display name or summary. Default is `""`.',
+        type: 'Object',
+      },
+      {
+        name: 'stateMessage',
+        desc: 'Verbose incident message. Default is `""`.',
+        type: 'Object',
+      },
+      {
+        name: 'timestamp',
+        desc: 'Incident start time. Default is `now()`.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/bonitoo-io/victorops',
+    desc: 'Sends an alert to VictorOps.',
+    example:
+      'victorops.alert( url: "https://alert.victorops.com/integrations/generic/00000000/alert/${apiKey}/${routingKey}", messageType: if lastReported._value < 1.0 then "CRITICAL" else if lastReported._value < 5.0 then "WARNING" else "INFO", entityID: "example-alert-1", entityDisplayName: "Example Alert 1", stateMessage: "Last reported cpu_idle was ${string(v: r._value)}.")',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/victorops/alert/',
+  },
+  {
+    name: 'victorops.endpoint',
+    args: [
+      {
+        name: 'url',
+        desc: 'VictorOps REST endpoint integration URL.',
+        type: 'String',
+      },
+      {
+        name: 'monitoringTool',
+        desc: 'Tool to use for monitoring.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/bonitoo-io/victorops',
+    desc: 'Sends events to VictorOps using data from input rows.',
+    example: 'victorops.endpoint(url: url)',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/victorops/endpoint/',
+  },
+  {
+    name: 'webexteams.endpoint',
+    args: [
+      {
+        name: 'url',
+        desc: 'Base URL of Webex API endpoint (without a trailing slash).',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc:
+          'Webex API access token (https://developer.webex.com/docs/api/getting-started).',
+        type: 'String',
+      },
+    ],
+    package: 'contrib/sranka/webexteams',
+    desc:
+      'Returns a function that sends a message that includes data from input rows to a Webex room.',
+    example: 'webexteams.endpoint(token: token)',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/sranka/webexteams/endpoint/',
+  },
+  {
+    name: 'webexteams.message',
+    args: [
+      {
+        name: 'url',
+        desc: 'Base URL of Webex API endpoint (without a trailing slash).',
+        type: 'String',
+      },
+      {
+        name: 'token',
+        desc:
+          'Webex API access token (https://developer.webex.com/docs/api/getting-started).',
+        type: 'String',
+      },
+      {
+        name: 'roomId',
+        desc: 'Room ID to send the message to.',
+        type: 'Object',
+      },
+      {
+        name: 'text',
+        desc: 'Plain text message.',
+        type: 'Object',
+      },
+      {
+        name: 'markdown',
+        desc:
+          'Markdown formatted message (https://developer.webex.com/docs/api/basics#formatting-messages).',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/sranka/webexteams',
+    desc:
+      'Sends a single message to Webex using the Webex messages API (https://developer.webex.com/docs/api/v1/messages/create-a-message).',
+    example:
+      'webexteams.message( token: apiToken, roomId: "Y2lzY29zcGFyazovL3VzL1JPT00vYmJjZWIxYWQtNDNmMS0zYjU4LTkxNDctZjE0YmIwYzRkMTU0", text: "Disk usage is ${lastReported.status}.", markdown: "Disk usage is **${lastReported.status}**.")',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/sranka/webexteams/message/',
+  },
+  {
+    name: 'zenoss.endpoint',
+    args: [
+      {
+        name: 'url',
+        desc:
+          'Zenoss router endpoint URL (https://help.zenoss.com/zsd/RM/configuring-resource-manager/enabling-access-to-browser-interfaces/creating-and-changing-public-endpoints).',
+        type: 'String',
+      },
+      {
+        name: 'username',
+        desc: 'Zenoss username to use for HTTP BASIC authentication.',
+        type: 'String',
+      },
+      {
+        name: 'password',
+        desc: 'Zenoss password to use for HTTP BASIC authentication.',
+        type: 'String',
+      },
+      {
+        name: 'apiKey',
+        desc: 'Zenoss cloud API key.',
+        type: 'Object',
+      },
+      {
+        name: 'action',
+        desc: 'Zenoss router name.',
+        type: 'Object',
+      },
+      {
+        name: 'method',
+        desc: 'EventsRouter method.',
+        type: 'Object',
+      },
+      {
+        name: 'type',
+        desc: 'Event type. Default is `"rpc"`.',
+        type: 'Object',
+      },
+      {
+        name: 'tid',
+        desc: 'Temporary request transaction ID.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/bonitoo-io/zenoss',
+    desc: 'Sends events to Zenoss using data from input rows.',
+    example:
+      'zenoss.endpoint(url: url, username: username, password: password)',
+    category: 'Notification endpoints',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/zenoss/endpoint/',
+  },
+  {
+    name: 'zenoss.event',
+    args: [
+      {
+        name: 'url',
+        desc:
+          'Zenoss router endpoint URL (https://help.zenoss.com/zsd/RM/configuring-resource-manager/enabling-access-to-browser-interfaces/creating-and-changing-public-endpoints).',
+        type: 'String',
+      },
+      {
+        name: 'username',
+        desc: 'Zenoss username to use for HTTP BASIC authentication.',
+        type: 'String',
+      },
+      {
+        name: 'password',
+        desc: 'Zenoss password to use for HTTP BASIC authentication.',
+        type: 'String',
+      },
+      {
+        name: 'apiKey',
+        desc: 'Zenoss cloud API key.',
+        type: 'Object',
+      },
+      {
+        name: 'action',
+        desc: 'Zenoss router name.',
+        type: 'Object',
+      },
+      {
+        name: 'method',
+        desc:
+          'EventsRouter method (https://help.zenoss.com/dev/collection-zone-and-resource-manager-apis/codebase/routers/router-reference/eventsrouter).',
+        type: 'Object',
+      },
+      {
+        name: 'type',
+        desc: 'Event type.',
+        type: 'Object',
+      },
+      {
+        name: 'tid',
+        desc: 'Temporary request transaction ID.',
+        type: 'Object',
+      },
+      {
+        name: 'summary',
+        desc: 'Event summary.',
+        type: 'Object',
+      },
+      {
+        name: 'device',
+        desc: 'Related device.',
+        type: 'Object',
+      },
+      {
+        name: 'component',
+        desc: 'Related component.',
+        type: 'Object',
+      },
+      {
+        name: 'severity',
+        desc:
+          'Event severity level (https://help.zenoss.com/zsd/RM/administering-resource-manager/event-management/event-severity-levels).',
+        type: 'Object',
+      },
+      {
+        name: 'eventClass',
+        desc:
+          'Event class (https://help.zenoss.com/zsd/RM/administering-resource-manager/event-management/understanding-event-classes).',
+        type: 'Object',
+      },
+      {
+        name: 'eventClassKey',
+        desc:
+          'Event class key (https://help.zenoss.com/zsd/RM/administering-resource-manager/event-management/event-fields).',
+        type: 'Object',
+      },
+      {
+        name: 'collector',
+        desc:
+          'Zenoss collector (https://help.zenoss.com/zsd/RM/administering-resource-manager/event-management/event-fields).',
+        type: 'Object',
+      },
+      {
+        name: 'message',
+        desc: 'Related message.',
+        type: 'Object',
+      },
+    ],
+    package: 'contrib/bonitoo-io/zenoss',
+    desc: 'Sends an event to Zenoss (https://www.zenoss.com/).',
+    example:
+      'zenoss.event( url: "https://tenant.zenoss.io:8080/zport/dmd/evconsole_router", username: username, username: password, device: lastReported.host, component: "CPU", eventClass: "/App", severity: if lastReported._value < 1.0 then "Critical" else if lastReported._value < 5.0 then "Warning" else if lastReported._value < 20.0 then "Info" else "Clear")',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/v0/stdlib/contrib/bonitoo-io/zenoss/event/',
   },
 ]
