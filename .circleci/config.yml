@@ -123,6 +123,7 @@ jobs:
             node --version
             yarn --version
             npm --version
+            gcc --version
             go version
             go env
       - run:
