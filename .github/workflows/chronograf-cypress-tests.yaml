@@ -38,7 +38,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16.14.2'
+          node-version: '24'
       - run: if [ ! -x "$(command -v yarn)" ]; then npm install -g yarn; fi
       - run: yarn node --version
 
