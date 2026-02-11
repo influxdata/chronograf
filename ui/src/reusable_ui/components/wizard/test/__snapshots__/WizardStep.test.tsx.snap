@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`WizardStep matches snapshot 1`] = `
 <Fragment>
@@ -13,7 +13,7 @@ exports[`WizardStep matches snapshot 1`] = `
       autoHide={false}
       maxHeight={345.6}
       setScrollTop={[Function]}
-      style={Object {}}
+      style={{}}
     >
       <div
         className="wizard-step--child"

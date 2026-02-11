@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`WizardController with multiple children matches snapshot with two children 1`] = `
 <div
@@ -16,12 +16,12 @@ exports[`WizardController with multiple children matches snapshot with two child
       currentStepIndex={0}
       handleJump={[Function]}
       steps={
-        Array [
-          Object {
+        [
+          {
             "stepStatus": "circle-thick",
             "title": "wizard step 1",
           },
-          Object {
+          {
             "stepStatus": "circle-thick",
             "title": "wizard step 2",
           },
@@ -66,12 +66,12 @@ exports[`WizardController with multiple children with first step complete matche
       currentStepIndex={1}
       handleJump={[Function]}
       steps={
-        Array [
-          Object {
+        [
+          {
             "stepStatus": "checkmark",
             "title": "complete wizard step 1",
           },
-          Object {
+          {
             "stepStatus": "circle-thick",
             "title": "wizard step 2",
           },
@@ -115,8 +115,8 @@ exports[`WizardController with one child matches snapshot with one child 1`] = `
       currentStepIndex={0}
       handleJump={[Function]}
       steps={
-        Array [
-          Object {
+        [
+          {
             "stepStatus": "circle-thick",
             "title": "only wizard step",
           },

@@ -59,17 +59,17 @@ describe('WizardStep', () => {
     it('calls onPrevious on handleClickPrevious', () => {
       const spy = jest.spyOn(newProps, 'onPrevious')
 
-      expect(spy).not.toBeCalled()
+      expect(spy).not.toHaveBeenCalled()
       wrapper.instance().handleClickPrevious()
-      expect(spy).toBeCalled()
+      expect(spy).toHaveBeenCalled()
     })
 
     it('calls decrement on handleClickPrevious', async () => {
       const spy = jest.spyOn(newProps, 'decrement')
 
-      expect(spy).not.toBeCalled()
+      expect(spy).not.toHaveBeenCalled()
       await wrapper.instance().handleClickPrevious()
-      expect(spy).toBeCalled()
+      expect(spy).toHaveBeenCalled()
     })
   })
 })

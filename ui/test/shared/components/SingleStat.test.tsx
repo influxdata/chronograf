@@ -82,9 +82,9 @@ describe('SingleStat', () => {
           suffix: ' battle power!',
         })
 
-        expect(mockFluxToSingleStat).toBeCalledWith(data)
-        await expect(mockFluxToSingleStat).toReturn()
-        await wrapper.update()
+        expect(mockFluxToSingleStat).toHaveBeenCalledWith(data)
+        expect(mockFluxToSingleStat).toHaveReturned()
+        wrapper.update()
         expect(wrapper.find(StatSelector).exists()).toBe(true)
         expect(wrapper.find(StatSelector).text()).toBe(
           'Over 9,000.12 battle power!'
