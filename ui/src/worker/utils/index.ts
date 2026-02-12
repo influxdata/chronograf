@@ -14,7 +14,7 @@ export const error = (msg: Message, err: Error) => {
     id,
     origin: msg.id,
     result: 'error',
-    error: err.toString(),
+    error: err.toString(), // eslint-disable-line @typescript-eslint/no-base-to-string
   })
 }
 

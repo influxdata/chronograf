@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 import * as React from 'react'
 import _ from 'lodash'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'

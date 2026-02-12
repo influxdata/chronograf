@@ -467,6 +467,7 @@ class LogsTable extends Component<Props, State> {
     }
   }
 
+  /* eslint-disable @typescript-eslint/no-base-to-string */
   private cellRenderer = ({key, style, rowIndex, columnIndex}) => {
     const {severityFormat, severityLevelColors} = this.props
 

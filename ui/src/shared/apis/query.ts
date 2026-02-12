@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 import {getDeep} from 'src/utils/wrappers'
 import {analyzeQueries} from 'src/shared/apis'
 import {TEMP_VAR_INTERVAL, DEFAULT_DURATION_MS} from 'src/shared/constants'

@@ -1,6 +1,5 @@
 import {CancellationError} from 'src/types/promises'
 
-/* eslint-disable @typescript-eslint/ban-types */
 let links
 export const setAJAXLinks = ({updatedLinks}): void => {
   links = updatedLinks
@@ -154,7 +153,7 @@ async function AJAX<T = any>(
 
   const retVal = links ? generateResponseWithLinks(response, links) : response
   if (!fetchResponse.ok) {
-    throw retVal // eslint-disable-line no-throw-literal
+    throw retVal // eslint-disable-line @typescript-eslint/only-throw-error
   }
   return retVal
 }

@@ -2,6 +2,7 @@
 tslint:disable no-console
 tslint:disable max-classes-per-file
 */
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 
 import React, {ComponentClass, Component} from 'react'
 import {VERSION} from 'src/shared/constants'

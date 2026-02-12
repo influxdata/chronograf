@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 import _ from 'lodash'
 import {Dispatch} from 'redux'
 import {ThunkDispatch} from 'redux-thunk'

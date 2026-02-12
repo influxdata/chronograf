@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 import {Dispatch} from 'react'
 import {
   BuilderAggregateFunctionType,
