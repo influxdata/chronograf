@@ -92,7 +92,7 @@ describe('Dashboards.Components.GraphOptionsTimeFormat', () => {
 
           instance.handleChooseFormat('blah')
           expect(instance.state.customFormat).toBe(false)
-          expect(onTimeFormatChange).toBeCalledWith('blah')
+          expect(onTimeFormatChange).toHaveBeenCalledWith('blah')
           expect(onTimeFormatChange).toHaveBeenCalledTimes(1)
         })
       })
@@ -108,7 +108,7 @@ describe('Dashboards.Components.GraphOptionsTimeFormat', () => {
 
         instance.handleChangeFormat({target: {value: format}})
         expect(instance.state.format).toBe(format)
-        expect(onTimeFormatChange).toBeCalledWith(format)
+        expect(onTimeFormatChange).toHaveBeenCalledWith(format)
         expect(onTimeFormatChange).toHaveBeenCalledTimes(1)
       })
     })

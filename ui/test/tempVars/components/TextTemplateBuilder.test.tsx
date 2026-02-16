@@ -36,7 +36,7 @@ describe('TextTemplateBuilder', () => {
 
     wrapper.find('input').simulate('change', {target: {value: 'new value'}})
 
-    expect(onUpdateTemplateMock).toBeCalledWith({
+    expect(onUpdateTemplateMock).toHaveBeenCalledWith({
       id: '0',
       tempVar: ':my-var:',
       label: '',

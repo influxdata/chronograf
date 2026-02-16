@@ -1,10 +1,10 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`HistogramChart displays a HistogramChartSkeleton if empty data is passed 1`] = `
 <HistogramChart
   colorScale={[Function]}
-  colors={Array []}
-  data={Array []}
+  colors={[]}
+  data={[]}
   dataStatus="Done"
   height={400}
   sortBarGroups={[Function]}
@@ -13,7 +13,7 @@ exports[`HistogramChart displays a HistogramChartSkeleton if empty data is passe
   <HistogramChartSkeleton
     height={400}
     margins={
-      Object {
+      {
         "bottom": 20,
         "left": 11,
         "right": 0,
@@ -75,12 +75,12 @@ exports[`HistogramChart displays a HistogramChartSkeleton if empty data is passe
 exports[`HistogramChart displays a HistogramChartTooltip when hovering over bars 1`] = `
 <HistogramChartTooltip
   colorScale={[Function]}
-  colors={Array []}
+  colors={[]}
   data={
-    Object {
+    {
       "anchor": "left",
-      "data": Array [
-        Object {
+      "data": [
+        {
           "group": "a",
           "key": "1",
           "time": 1,
@@ -95,7 +95,7 @@ exports[`HistogramChart displays a HistogramChartTooltip when hovering over bars
   <div
     className="histogram-chart-tooltip"
     style={
-      Object {
+      {
         "left": 5,
         "position": "fixed",
         "top": 0,
@@ -108,7 +108,7 @@ exports[`HistogramChart displays a HistogramChartTooltip when hovering over bars
       <div
         key="1"
         style={
-          Object {
+          {
             "color": "blue",
           }
         }
@@ -122,7 +122,7 @@ exports[`HistogramChart displays a HistogramChartTooltip when hovering over bars
       <div
         key="1"
         style={
-          Object {
+          {
             "color": "blue",
           }
         }
@@ -137,8 +137,8 @@ exports[`HistogramChart displays a HistogramChartTooltip when hovering over bars
 exports[`HistogramChart displays a nothing if passed width and height of 0 1`] = `
 <HistogramChart
   colorScale={[Function]}
-  colors={Array []}
-  data={Array []}
+  colors={[]}
+  data={[]}
   dataStatus="Done"
   height={0}
   sortBarGroups={[Function]}
@@ -149,22 +149,22 @@ exports[`HistogramChart displays a nothing if passed width and height of 0 1`] =
 exports[`HistogramChart displays the visualization with bars if nonempty data is passed 1`] = `
 <HistogramChart
   colorScale={[Function]}
-  colors={Array []}
+  colors={[]}
   data={
-    Array [
-      Object {
+    [
+      {
         "group": "a",
         "key": "0",
         "time": 0,
         "value": 0,
       },
-      Object {
+      {
         "group": "a",
         "key": "1",
         "time": 1,
         "value": 1,
       },
-      Object {
+      {
         "group": "b",
         "key": "2",
         "time": 2,
@@ -203,7 +203,7 @@ exports[`HistogramChart displays the visualization with bars if nonempty data is
         <HistogramChartAxes
           height={400}
           margins={
-            Object {
+            {
               "bottom": 20,
               "left": 25,
               "right": 0,
@@ -319,22 +319,22 @@ exports[`HistogramChart displays the visualization with bars if nonempty data is
       >
         <HistogramChartBars
           colorScale={[Function]}
-          colors={Array []}
+          colors={[]}
           data={
-            Array [
-              Object {
+            [
+              {
                 "group": "a",
                 "key": "0",
                 "time": 0,
                 "value": 0,
               },
-              Object {
+              {
                 "group": "a",
                 "key": "1",
                 "time": 1,
                 "value": 1,
               },
-              Object {
+              {
                 "group": "b",
                 "key": "2",
                 "time": 2,

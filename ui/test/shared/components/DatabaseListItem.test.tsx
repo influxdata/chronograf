@@ -53,7 +53,7 @@ describe('Shared.Components.DatabaseListItem', () => {
         item.simulate('click')
 
         expect(onChooseNamespace).toHaveBeenCalledTimes(1)
-        expect(onChooseNamespace).toBeCalledWith(namespace)
+        expect(onChooseNamespace).toHaveBeenCalledWith(namespace)
       })
     })
   })

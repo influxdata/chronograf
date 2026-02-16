@@ -39,7 +39,7 @@ describe('TextTemplateSelector', () => {
       },
     })
 
-    expect(onPickValueMock).toBeCalledWith({
+    expect(onPickValueMock).toHaveBeenCalledWith({
       value: 'new value',
       type: TemplateValueType.Constant,
       selected: true,

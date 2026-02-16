@@ -311,7 +311,6 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
   private changeStartTime = () => {
     const {startTimeInput} = this.state
 
-    // eslint-disable-next-line @typescript-eslint/ban-types
     let nextState: object = {
       startTime: getTime(startTimeInput),
       startTimeError: null,
@@ -349,7 +348,6 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
   private changeEndTime = () => {
     const {startTime, endTimeInput} = this.state
 
-    // eslint-disable-next-line @typescript-eslint/ban-types
     let nextState: object = {
       endTime: getTime(endTimeInput),
       endTimeError: null,

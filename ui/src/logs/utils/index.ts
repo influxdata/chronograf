@@ -105,6 +105,7 @@ const operatorMapping = (operator: string): string => {
   }
 }
 
+/* eslint-disable @typescript-eslint/no-base-to-string */
 const valueMapping = (operator: string, value): string => {
   if (operator === '=~' || operator === '!~') {
     return `${new RegExp(value)}`
@@ -159,6 +160,7 @@ export function buildInfiniteScrollWhereClause({
   return ` WHERE ${subClauses.join(' AND ')}`
 }
 
+/* eslint-disable @typescript-eslint/no-base-to-string */
 function buildGeneralLogQuery(
   condition: string,
   config: QueryConfig,
@@ -181,6 +183,7 @@ function buildGeneralLogQuery(
   return `${select}${condition}${dimensions}${fillClause}`
 }
 
+/* eslint-disable @typescript-eslint/no-base-to-string */
 export async function getQueryResultsCountForBounds(
   lower: string,
   upper: string,
@@ -236,6 +239,7 @@ export function buildInfiniteScrollLogQuery(
   return buildGeneralLogQuery(condition, config, filters, searchTerm)
 }
 
+/* eslint-disable @typescript-eslint/no-base-to-string */
 export function buildLogQuery(
   timeRange: TimeRange,
   config: QueryConfig,

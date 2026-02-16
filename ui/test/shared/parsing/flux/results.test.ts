@@ -51,7 +51,7 @@ describe('Flux results parser', () => {
 
   describe('error responses', () => {
     it('should throw an error if an error csv ', () => {
-      expect(() => parseResponse(ERROR_RESPONSE)).toThrowError(ERROR)
+      expect(() => parseResponse(ERROR_RESPONSE)).toThrow(ERROR)
     })
   })
 })

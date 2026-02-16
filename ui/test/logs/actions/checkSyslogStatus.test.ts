@@ -61,7 +61,7 @@ describe('Logs.Actions.checkSyslogStatus', () => {
 
     getSyslogMeasurement.mockResolvedValue(Promise.resolve(response))
     mockActionHandler(fetchNamespaceSyslogStatusAsync(namespace))
-    expect(getSyslogMeasurement).toBeCalledWith(proxy, namespace)
+    expect(getSyslogMeasurement).toHaveBeenCalledWith(proxy, namespace)
   })
 
   const missingSyslogStatus: SetSearchStatusAction = {
@@ -78,7 +78,7 @@ describe('Logs.Actions.checkSyslogStatus', () => {
 
     getSyslogMeasurement.mockResolvedValue(Promise.resolve(response))
     await mockActionHandler(fetchNamespaceSyslogStatusAsync(namespace))
-    await expect(dispatch).toBeCalledWith(missingSyslogStatus)
+    expect(dispatch).toHaveBeenCalledWith(missingSyslogStatus)
   })
 
   it('can update for querying errors', async () => {
@@ -89,6 +89,6 @@ describe('Logs.Actions.checkSyslogStatus', () => {
     })
 
     await mockActionHandler(fetchNamespaceSyslogStatusAsync(namespace))
-    await expect(dispatch).toBeCalledWith(missingSyslogStatus)
+    expect(dispatch).toHaveBeenCalledWith(missingSyslogStatus)
   })
 })

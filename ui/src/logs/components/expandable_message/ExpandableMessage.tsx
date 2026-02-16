@@ -54,6 +54,7 @@ class ExpandableMessage extends Component<Props, State> {
     )
   }
 
+  /* eslint-disable @typescript-eslint/no-base-to-string */
   private get message(): JSX.Element {
     const {notify, searchPattern, formattedValue} = this.props
     const valueString = `${formattedValue}`

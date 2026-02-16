@@ -403,7 +403,6 @@ export type ConfigKeyMaps =
   | PushoverConfigKeyMap
   | TelegramConfigKeyMap
   | VictorOpsConfigKeyMap
-  // eslint-disable-next-line @typescript-eslint/ban-types
   | {}
 
 export interface AlertaProperties {

@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`MultiSelectDropdown matches snapshot with minimal props 1`] = `
 <ClickOutside
@@ -7,7 +7,7 @@ exports[`MultiSelectDropdown matches snapshot with minimal props 1`] = `
   <div
     className="dropdown dropdown-sm dropdown-default"
     style={
-      Object {
+      {
         "width": "100%",
       }
     }
@@ -32,7 +32,7 @@ exports[`MultiSelectDropdown with menu expanded matches snapshot 1`] = `
   <div
     className="dropdown dropdown-sm dropdown-default"
     style={
-      Object {
+      {
         "width": "100%",
       }
     }
@@ -49,7 +49,7 @@ exports[`MultiSelectDropdown with menu expanded matches snapshot 1`] = `
     <div
       className="dropdown--menu-container dropdown--sapphire"
       style={
-        Object {
+        {
           "minWidth": "100%",
         }
       }
@@ -59,7 +59,7 @@ exports[`MultiSelectDropdown with menu expanded matches snapshot 1`] = `
         autoHide={false}
         maxHeight={250}
         setScrollTop={[Function]}
-        style={Object {}}
+        style={{}}
       >
         <div
           className="dropdown--menu"
@@ -72,7 +72,7 @@ exports[`MultiSelectDropdown with menu expanded matches snapshot 1`] = `
             onClick={[Function]}
             selected={true}
             value={
-              Object {
+              {
                 "id": "item-a",
                 "text": "A",
               }
@@ -87,7 +87,7 @@ exports[`MultiSelectDropdown with menu expanded matches snapshot 1`] = `
             onClick={[Function]}
             selected={false}
             value={
-              Object {
+              {
                 "id": "item-b",
                 "text": "B",
               }
@@ -102,7 +102,7 @@ exports[`MultiSelectDropdown with menu expanded matches snapshot 1`] = `
             onClick={[Function]}
             selected={false}
             value={
-              Object {
+              {
                 "id": "item-c",
                 "text": "C",
               }

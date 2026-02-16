@@ -76,9 +76,9 @@ describe('GaugeChart', () => {
           fluxTablesToSingleStat: mockFluxToSingleStat,
         })
 
-        expect(mockFluxToSingleStat).toBeCalledWith(data)
-        await expect(mockFluxToSingleStat).toReturn()
-        await wrapper.update()
+        expect(mockFluxToSingleStat).toHaveBeenCalledWith(data)
+        expect(mockFluxToSingleStat).toHaveReturned()
+        wrapper.update()
         expect(wrapper.find(Gauge).exists()).toBe(true)
         expect(wrapper.find(Gauge).props().gaugePosition).toBe(67.3901637395223)
       })
