@@ -4,7 +4,7 @@
 
 ### Other
 
-1. [#6166](https://github.com/influxdata/chronograf/pull/6166): Upgrade dependencies. Upgrade golang to 1.24.13. Removed support for Linux i386, armhf, armel and static build. Removed support for Darwin arm64
+1. [#6166](https://github.com/influxdata/chronograf/pull/6166), [#6176](https://github.com/influxdata/chronograf/pull/6176): Upgrade dependencies. Upgrade golang to 1.24.13. Removed support for Linux i386, armhf, armel and static build. Removed support for Darwin arm64
 1. [#6170](https://github.com/influxdata/chronograf/pull/6170): Update Flux help in the UI to align with stdlib `0.199`.
 1. [#6171](https://github.com/influxdata/chronograf/pull/6171): Upgrade dependencies. Upgrade typescript to 4.9.5. Upgrade jest to 30.2.0. Upgrade eslint to 9.34.0.  Reconfigure eslint.
 1. [#6174](https://github.com/influxdata/chronograf/pull/6174): Upgrade dependencies. Upgrade nodejs to v24.13.0. Upgrade sass to 1.97.3. Remove dependency on node-sass.
