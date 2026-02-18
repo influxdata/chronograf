@@ -27,7 +27,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v2
         with:
-          go-version: '1.24.11'
+          go-version: '1.24.13'
 
       - name: Install pkg-config
         run: go install github.com/influxdata/pkg-config@v0.3.0
