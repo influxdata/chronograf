@@ -1,4 +1,4 @@
-## [unreleased]
+## v1.11.0 [2026-02-19]
 
 ⚠️ Removed support for Linux i386, armhf, armel and static build. Removed support for Darwin arm64.
 
