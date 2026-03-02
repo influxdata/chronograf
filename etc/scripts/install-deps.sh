@@ -16,7 +16,7 @@ apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     autoconf \
     libtool
 
-pip3 install boto requests python-jose --upgrade
+pip3 install boto3 requests python-jose --upgrade
 gem install dotenv -v 2.8.1
 gem install fpm
 
