@@ -16,9 +16,12 @@ apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     autoconf \
     libtool
 
-pip3 install boto requests python-jose --upgrade
+pip3 install boto3 requests python-jose --upgrade
 gem install dotenv -v 2.8.1
 gem install fpm
+
+# TODO - can this be automatically included in Cross-Builder?
+rustup target install aarch64-apple-darwin
 
 NODE_VERSION=v24.13.0
 wget -q https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-linux-x64.tar.gz; \
