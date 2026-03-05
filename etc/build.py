@@ -529,6 +529,10 @@ def build(version=None,
                 tags += [ "netgo", "osusergo"]
             if arch == "arm64":
                 cc = "aarch64-apple-darwin23.5-clang"
+                # TODO - see if the following can't be added to cross-builder in `/root/.cargo/config` as
+                # [target.aarch64-apple-darwin]
+                # linker = "aarch64-apple-darwin23.5-clang"
+                build_command += "CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER=aarch64-apple-darwin23.5-clang "
                 tags += [ "netgo", "osusergo", "noasm"]
         elif  platform == "windows" and arch == "amd64":
             cc = "x86_64-w64-mingw32-gcc"
