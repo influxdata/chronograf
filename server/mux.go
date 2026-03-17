@@ -198,12 +198,22 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	router.GET("/chronograf/v1/flux/suggestions/:name", EnsureViewer(service.FluxSuggestion))
 
 	// Source Proxy to Influx; Has gzip compression around the handler
-	influx := gziphandler.GzipHandler(http.HandlerFunc(EnsureReader(service.Influx)))
+	influx := RequireRequestedWithXMLHttpRequest(
+		opts.Logger,
+		gziphandler.GzipHandler(http.HandlerFunc(EnsureReader(service.Influx))),
+	)
 	router.Handler("POST", "/chronograf/v1/sources/:id/proxy", influx)
 
 	// Source Proxy to Influx's flux endpoint; compression because the responses from
 	// flux could be large.
-	router.Handler("POST", "/chronograf/v1/sources/:id/proxy/flux", EnsureReader(service.ProxyFlux))
+	router.Handler(
+		"POST",
+		"/chronograf/v1/sources/:id/proxy/flux",
+		RequireRequestedWithXMLHttpRequest(
+			opts.Logger,
+			http.HandlerFunc(EnsureReader(service.ProxyFlux)),
+		),
+	)
 	router.Handler("GET", "/chronograf/v1/sources/:id/proxy/flux", EnsureReader(service.ProxyFlux))
 
 	// Write proxies line protocol write requests to InfluxDB
@@ -215,7 +225,14 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	//
 	// Admins should ensure that the InfluxDB source as the proper permissions
 	// intended for Chronograf Users with the Viewer Role type.
-	router.POST("/chronograf/v1/sources/:id/queries", EnsureReader(service.Queries))
+	router.Handler(
+		"POST",
+		"/chronograf/v1/sources/:id/queries",
+		RequireRequestedWithXMLHttpRequest(
+			opts.Logger,
+			http.HandlerFunc(EnsureReader(service.Queries)),
+		),
+	)
 
 	// Annotations are user-defined events associated with this source
 	router.GET("/chronograf/v1/sources/:id/annotations", EnsureReader(service.Annotations))

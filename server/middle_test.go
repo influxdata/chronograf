@@ -194,3 +194,43 @@ func TestRouteMatchesPrincipal(t *testing.T) {
 		})
 	}
 }
+
+func TestRequireRequestedWithXMLHttpRequest(t *testing.T) {
+	logger := log.New(log.DebugLevel)
+	protected := RequireRequestedWithXMLHttpRequest(
+		logger,
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusNoContent)
+		}),
+	)
+
+	tests := []struct {
+		name     string
+		header   string
+		expected int
+	}{
+		{name: "missing header", expected: http.StatusForbidden},
+		{name: "invalid header", header: "fetch", expected: http.StatusForbidden},
+		{
+			name:     "valid header",
+			header:   "XMLHttpRequest",
+			expected: http.StatusNoContent,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodPost, "http://chronograf.test/query", nil)
+			if tt.header != "" {
+				req.Header.Set("X-Requested-With", tt.header)
+			}
+
+			rec := httptest.NewRecorder()
+			protected.ServeHTTP(rec, req)
+
+			if rec.Code != tt.expected {
+				t.Fatalf("status=%d, want=%d", rec.Code, tt.expected)
+			}
+		})
+	}
+}

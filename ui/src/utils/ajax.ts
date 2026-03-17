@@ -122,10 +122,15 @@ async function AJAX<T = any>(
         : JSON.stringify(requestData)
   }
 
+  const requestHeadersWithRequestedWith =
+    method === 'GET'
+      ? requestHeaders
+      : {'X-Requested-With': 'XMLHttpRequest', ...requestHeaders}
+
   const fetchResponse = await fetch(url, {
     method: method as string,
     body,
-    headers: requestHeaders,
+    headers: requestHeadersWithRequestedWith,
     signal,
   }).catch(e =>
     e.name === 'AbortError'
