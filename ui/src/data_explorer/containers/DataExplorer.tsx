@@ -2,15 +2,9 @@
 import React, {PureComponent} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
 import {withRouter, WithRouterProps} from 'react-router'
-import qs from 'qs'
-import uuid from 'uuid'
-import _ from 'lodash'
 
 // Utils
-import {stripPrefix} from 'src/utils/basepath'
 import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
-import {getConfig} from 'src/dashboards/utils/cellGetters'
-import {defaultQueryDraft} from 'src/shared/utils/timeMachine'
 import {
   TimeMachineContainer,
   TimeMachineContextConsumer,
@@ -136,8 +130,6 @@ class DataExplorer extends PureComponent<Props, State> {
   public async componentDidMount() {
     const {autoRefresh} = this.props
 
-    await this.resolveQueryParams()
-
     GlobalAutoRefresher.poll(autoRefresh)
 
     this.setState({isComponentMounted: true})
@@ -148,13 +140,6 @@ class DataExplorer extends PureComponent<Props, State> {
 
     if (autoRefresh !== prevProps.autoRefresh) {
       GlobalAutoRefresher.poll(autoRefresh)
-    }
-
-    if (
-      prevProps.location === this.props.location &&
-      this.state.isComponentMounted
-    ) {
-      this.writeQueryParams()
     }
   }
 
@@ -219,84 +204,6 @@ class DataExplorer extends PureComponent<Props, State> {
         </div>
       </>
     )
-  }
-
-  private async resolveQueryParams() {
-    const {
-      source,
-      sourceLink,
-      queryDrafts,
-      onUpdateQueryDrafts,
-      onInitFluxScript,
-    } = this.props
-    const {query, script} = this.readQueryParams()
-
-    if (script) {
-      onInitFluxScript(script)
-      return
-    }
-
-    if (query) {
-      if (queryDrafts.find(q => q.query === query)) {
-        // Has matching query draft already loaded
-        return
-      }
-
-      const id = uuid.v4()
-      const queryConfig = await getConfig(
-        source.links.queries,
-        id,
-        query,
-        this.templates
-      )
-
-      const queryDraft = {
-        id,
-        query,
-        queryConfig,
-        source: sourceLink,
-        type: QueryType.InfluxQL,
-      }
-
-      onUpdateQueryDrafts([queryDraft])
-      return
-    }
-
-    if (!queryDrafts.length) {
-      const queryDraft = defaultQueryDraft(QueryType.InfluxQL)
-
-      onUpdateQueryDrafts([queryDraft])
-      return
-    }
-  }
-
-  private readQueryParams(): {query?: string; script?: string} {
-    const {query, script} = qs.parse(location.search, {
-      ignoreQueryPrefix: true,
-    })
-
-    return {query: query as string, script: script as string}
-  }
-
-  private writeQueryParams() {
-    const {router, queryDrafts, script, queryType} = this.props
-    const query = _.get(queryDrafts, '0.query')
-    const isFlux = queryType === QueryType.Flux
-
-    let queryParams
-
-    if (isFlux && script) {
-      queryParams = {script}
-    } else if (!isFlux && query) {
-      queryParams = {query}
-    }
-
-    const pathname = stripPrefix(location.pathname)
-    const search = queryParams ? `?${qs.stringify(queryParams)}` : ''
-
-    if (location.search !== search) {
-      router.push(pathname + search)
-    }
   }
 
   private get writeDataForm(): JSX.Element {
