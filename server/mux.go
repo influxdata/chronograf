@@ -411,6 +411,7 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 		out = router
 	}
 	out = SecurityHeaders(out)
+	out = RequireSameOriginForSessionAuth(opts.Logger, out)
 	out = Logger(opts.Logger, FlushingHandler(out))
 
 	return out

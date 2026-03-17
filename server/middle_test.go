@@ -253,3 +253,94 @@ func TestSecurityHeaders(t *testing.T) {
 		t.Fatalf("Cross-Origin-Resource-Policy=%q, want %q", got, "same-origin")
 	}
 }
+
+func TestRequireSameOriginForSessionAuth(t *testing.T) {
+	logger := log.New(log.DebugLevel)
+	protected := RequireSameOriginForSessionAuth(
+		logger,
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusNoContent)
+		}),
+	)
+
+	tests := []struct {
+		name       string
+		method     string
+		host       string
+		origin     string
+		referer    string
+		hasSession bool
+		expected   int
+	}{
+		{
+			name:       "unsafe with matching origin is allowed",
+			method:     http.MethodPost,
+			host:       "chronograf.test",
+			origin:     "https://chronograf.test",
+			hasSession: true,
+			expected:   http.StatusNoContent,
+		},
+		{
+			name:       "unsafe with mismatched origin is blocked",
+			method:     http.MethodPost,
+			host:       "chronograf.test",
+			origin:     "https://attacker.test",
+			hasSession: true,
+			expected:   http.StatusForbidden,
+		},
+		{
+			name:       "unsafe with matching referer is allowed",
+			method:     http.MethodPatch,
+			host:       "chronograf.test",
+			referer:    "https://chronograf.test/path",
+			hasSession: true,
+			expected:   http.StatusNoContent,
+		},
+		{
+			name:       "unsafe missing origin and referer is blocked with session",
+			method:     http.MethodDelete,
+			host:       "chronograf.test",
+			hasSession: true,
+			expected:   http.StatusForbidden,
+		},
+		{
+			name:       "unsafe without session bypasses origin guard",
+			method:     http.MethodPost,
+			host:       "chronograf.test",
+			origin:     "https://attacker.test",
+			hasSession: false,
+			expected:   http.StatusNoContent,
+		},
+		{
+			name:       "safe method bypasses origin guard",
+			method:     http.MethodGet,
+			host:       "chronograf.test",
+			origin:     "https://attacker.test",
+			hasSession: true,
+			expected:   http.StatusNoContent,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(tt.method, "http://chronograf.test/test", nil)
+			req.Host = tt.host
+			if tt.origin != "" {
+				req.Header.Set("Origin", tt.origin)
+			}
+			if tt.referer != "" {
+				req.Header.Set("Referer", tt.referer)
+			}
+			if tt.hasSession {
+				req.AddCookie(&http.Cookie{Name: "session", Value: "token"})
+			}
+
+			rec := httptest.NewRecorder()
+			protected.ServeHTTP(rec, req)
+
+			if rec.Code != tt.expected {
+				t.Fatalf("status=%d, want=%d", rec.Code, tt.expected)
+			}
+		})
+	}
+}
