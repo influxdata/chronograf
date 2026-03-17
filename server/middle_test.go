@@ -234,3 +234,22 @@ func TestRequireRequestedWithXMLHttpRequest(t *testing.T) {
 		})
 	}
 }
+
+func TestSecurityHeaders(t *testing.T) {
+	protected := SecurityHeaders(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNoContent)
+	}))
+
+	req := httptest.NewRequest(http.MethodGet, "http://chronograf.test/", nil)
+	rec := httptest.NewRecorder()
+
+	protected.ServeHTTP(rec, req)
+
+	if got := rec.Header().Get("X-Frame-Options"); got != "SAMEORIGIN" {
+		t.Fatalf("X-Frame-Options=%q, want %q", got, "SAMEORIGIN")
+	}
+
+	if got := rec.Header().Get("Cross-Origin-Resource-Policy"); got != "same-origin" {
+		t.Fatalf("Cross-Origin-Resource-Policy=%q, want %q", got, "same-origin")
+	}
+}

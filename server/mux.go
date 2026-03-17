@@ -410,6 +410,7 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	} else {
 		out = router
 	}
+	out = SecurityHeaders(out)
 	out = Logger(opts.Logger, FlushingHandler(out))
 
 	return out
