@@ -214,7 +214,14 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 			http.HandlerFunc(EnsureReader(service.ProxyFlux)),
 		),
 	)
-	router.Handler("GET", "/chronograf/v1/sources/:id/proxy/flux", EnsureReader(service.ProxyFlux))
+	router.Handler(
+		"GET",
+		"/chronograf/v1/sources/:id/proxy/flux",
+		RequireRequestedWithXMLHttpRequest(
+			opts.Logger,
+			http.HandlerFunc(EnsureReader(service.ProxyFlux)),
+		),
+	)
 
 	// Write proxies line protocol write requests to InfluxDB
 	router.POST("/chronograf/v1/sources/:id/write", EnsureViewer(service.Write))

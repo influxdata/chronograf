@@ -122,8 +122,10 @@ async function AJAX<T = any>(
         : JSON.stringify(requestData)
   }
 
+  const isFluxProxyGet =
+    method === 'GET' && typeof url === 'string' && url.includes('/proxy/flux')
   const requestHeadersWithRequestedWith =
-    method === 'GET'
+    method === 'GET' && !isFluxProxyGet
       ? requestHeaders
       : {'X-Requested-With': 'XMLHttpRequest', ...requestHeaders}
 
