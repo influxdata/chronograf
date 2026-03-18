@@ -332,7 +332,7 @@ func TestRequireSameOriginForSessionAuth(t *testing.T) {
 				req.Header.Set("Referer", tt.referer)
 			}
 			if tt.hasSession {
-				req.AddCookie(&http.Cookie{Name: "session", Value: "token"})
+				req.AddCookie(&http.Cookie{Name: oauth2.DefaultCookieName, Value: "token"})
 			}
 
 			rec := httptest.NewRecorder()
