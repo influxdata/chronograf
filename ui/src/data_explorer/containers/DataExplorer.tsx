@@ -96,10 +96,7 @@ type ReduxDispatchProps = ResolveThunks<{
   onSetTimeZone: typeof setTimeZoneAction
 }>
 
-type Props = PassedProps &
-  ConnectedProps &
-  ReduxStateProps &
-  ReduxDispatchProps
+type Props = PassedProps & ConnectedProps & ReduxStateProps & ReduxDispatchProps
 
 interface State {
   isWriteFormVisible: boolean
