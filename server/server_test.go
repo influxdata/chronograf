@@ -83,9 +83,9 @@ func Test_validBasepath(t *testing.T) {
 
 func Test_useSecureCookies(t *testing.T) {
 	tests := []struct {
-		name      string
-		server    Server
-		expected  bool
+		name     string
+		server   Server
+		expected bool
 	}{
 		{
 			name: "secure when tls is enabled",
@@ -116,8 +116,8 @@ func Test_useSecureCookies(t *testing.T) {
 			expected: false,
 		},
 		{
-			name: "not secure when no tls and no public url",
-			server: Server{},
+			name:     "not secure when no tls and no public url",
+			server:   Server{},
 			expected: false,
 		},
 	}
