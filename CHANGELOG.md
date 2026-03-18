@@ -1,3 +1,9 @@
+## Unreleased
+
+### Security Fixes
+
+1. [#6186](https://github.com/influxdata/chronograf/pull/6186): Hardened CSRF protections on Data Explorer and unsafe query endpoints.
+
 ## v1.11.0 [2026-02-19]
 
 ⚠️ Removed support for Linux i386, armhf, armel and static build. Removed support for Darwin arm64.
