@@ -269,6 +269,7 @@ func TestRequireSameOriginForSessionAuth(t *testing.T) {
 		host       string
 		origin     string
 		referer    string
+		forwarded  string
 		hasSession bool
 		expected   int
 	}{
@@ -276,7 +277,7 @@ func TestRequireSameOriginForSessionAuth(t *testing.T) {
 			name:       "unsafe with matching origin is allowed",
 			method:     http.MethodPost,
 			host:       "chronograf.test",
-			origin:     "https://chronograf.test",
+			origin:     "http://chronograf.test",
 			hasSession: true,
 			expected:   http.StatusNoContent,
 		},
@@ -292,7 +293,24 @@ func TestRequireSameOriginForSessionAuth(t *testing.T) {
 			name:       "unsafe with matching referer is allowed",
 			method:     http.MethodPatch,
 			host:       "chronograf.test",
-			referer:    "https://chronograf.test/path",
+			referer:    "http://chronograf.test/path",
+			hasSession: true,
+			expected:   http.StatusNoContent,
+		},
+		{
+			name:       "unsafe with scheme mismatch is blocked",
+			method:     http.MethodPost,
+			host:       "chronograf.test",
+			origin:     "https://chronograf.test",
+			hasSession: true,
+			expected:   http.StatusForbidden,
+		},
+		{
+			name:       "unsafe with forwarded proto https allows https origin",
+			method:     http.MethodPost,
+			host:       "chronograf.test",
+			origin:     "https://chronograf.test",
+			forwarded:  "https",
 			hasSession: true,
 			expected:   http.StatusNoContent,
 		},
@@ -330,6 +348,9 @@ func TestRequireSameOriginForSessionAuth(t *testing.T) {
 			}
 			if tt.referer != "" {
 				req.Header.Set("Referer", tt.referer)
+			}
+			if tt.forwarded != "" {
+				req.Header.Set("X-Forwarded-Proto", tt.forwarded)
 			}
 			if tt.hasSession {
 				req.AddCookie(&http.Cookie{Name: oauth2.DefaultCookieName, Value: "token"})

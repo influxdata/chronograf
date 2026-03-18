@@ -1,6 +1,7 @@
 package server
 
 import (
+	"net"
 	"net/http"
 	"net/url"
 	"strings"
@@ -50,27 +51,71 @@ func hasSessionCookie(r *http.Request) bool {
 }
 
 func isRequestSameOrigin(r *http.Request) bool {
+	expectedScheme := requestScheme(r)
 	expectedHost := r.Host
 	if expectedHost == "" {
 		return false
 	}
 
 	if origin := r.Header.Get("Origin"); origin != "" {
-		return sameHost(origin, expectedHost)
+		return sameHost(origin, expectedScheme, expectedHost)
 	}
 
 	if referer := r.Header.Get("Referer"); referer != "" {
-		return sameHost(referer, expectedHost)
+		return sameHost(referer, expectedScheme, expectedHost)
 	}
 
 	return false
 }
 
-func sameHost(rawURL, expectedHost string) bool {
+func requestScheme(r *http.Request) string {
+	if xfp := strings.TrimSpace(r.Header.Get("X-Forwarded-Proto")); xfp != "" {
+		return strings.ToLower(strings.TrimSpace(strings.Split(xfp, ",")[0]))
+	}
+	if r.TLS != nil {
+		return "https"
+	}
+	return "http"
+}
+
+func sameHost(rawURL, expectedScheme, expectedHost string) bool {
 	u, err := url.Parse(rawURL)
-	if err != nil {
+	if err != nil || u.Scheme == "" || u.Host == "" {
+		return false
+	}
+	if !strings.EqualFold(u.Scheme, expectedScheme) {
 		return false
 	}
 
-	return strings.EqualFold(u.Host, expectedHost)
+	originHost := u.Hostname()
+	originPort := u.Port()
+	if originPort == "" {
+		originPort = defaultPort(u.Scheme)
+	}
+
+	hostOnly := expectedHost
+	expectedPort := ""
+	if h, p, err := net.SplitHostPort(expectedHost); err == nil {
+		hostOnly = h
+		expectedPort = p
+	} else {
+		expectedPort = defaultPort(expectedScheme)
+	}
+
+	if originPort == "" || expectedPort == "" {
+		return false
+	}
+
+	return strings.EqualFold(originHost, hostOnly) && originPort == expectedPort
+}
+
+func defaultPort(scheme string) string {
+	switch strings.ToLower(scheme) {
+	case "http":
+		return "80"
+	case "https":
+		return "443"
+	default:
+		return ""
+	}
 }
