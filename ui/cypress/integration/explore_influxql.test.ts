@@ -131,7 +131,7 @@ describe('InfluxQL', () => {
     cy.get('.CodeMirror-code')
       .invoke('text')
       .then(queryText => {
-        const match = queryText.match(/CREATE DATABASE\\s+\"([^\"]+)\"/i)
+        const match = queryText.match(/CREATE DATABASE\s+"([^"]+)"/i)
         if (match && match[1]) {
           targetDatabase = match[1]
         }
