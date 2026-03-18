@@ -81,6 +81,56 @@ func Test_validBasepath(t *testing.T) {
 	}
 }
 
+func Test_useSecureCookies(t *testing.T) {
+	tests := []struct {
+		name      string
+		server    Server
+		expected  bool
+	}{
+		{
+			name: "secure when tls is enabled",
+			server: Server{
+				Cert: "server.crt",
+			},
+			expected: true,
+		},
+		{
+			name: "secure when public url is https",
+			server: Server{
+				PublicURL: "https://chronograf.example.com",
+			},
+			expected: true,
+		},
+		{
+			name: "not secure when public url is http",
+			server: Server{
+				PublicURL: "http://chronograf.example.com",
+			},
+			expected: false,
+		},
+		{
+			name: "not secure when public url is invalid",
+			server: Server{
+				PublicURL: "://bad",
+			},
+			expected: false,
+		},
+		{
+			name: "not secure when no tls and no public url",
+			server: Server{},
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.server.useSecureCookies(); got != tt.expected {
+				t.Fatalf("useSecureCookies() = %v, want %v", got, tt.expected)
+			}
+		})
+	}
+}
+
 func TestValidAuth(t *testing.T) {
 	tests := []struct {
 		desc string
