@@ -1,7 +1,6 @@
 // Libraries
 import React, {PureComponent} from 'react'
 import {connect, ResolveThunks} from 'react-redux'
-import {withRouter, WithRouterProps} from 'react-router'
 
 // Utils
 import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
@@ -100,8 +99,7 @@ type ReduxDispatchProps = ResolveThunks<{
 type Props = PassedProps &
   ConnectedProps &
   ReduxStateProps &
-  ReduxDispatchProps &
-  WithRouterProps
+  ReduxDispatchProps
 
 interface State {
   isWriteFormVisible: boolean
@@ -340,7 +338,7 @@ class DataExplorer extends PureComponent<Props, State> {
 const DataExplorer2 = ErrorHandling(DataExplorer)
 
 const ConnectedDataExplorer = (
-  props: PassedProps & WithRouterProps & ReduxStateProps & ReduxDispatchProps
+  props: PassedProps & ReduxStateProps & ReduxDispatchProps
 ) => {
   return (
     <TimeMachineContextConsumer>
@@ -400,4 +398,4 @@ const mdtp = {
   onSetTimeZone: setTimeZoneAction,
 }
 
-export default withRouter(connect(mstp, mdtp)(ConnectedDataExplorer))
+export default connect(mstp, mdtp)(ConnectedDataExplorer)
