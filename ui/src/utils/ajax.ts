@@ -127,7 +127,7 @@ async function AJAX<T = any>(
   const requestHeadersWithRequestedWith =
     method === 'GET' && !isFluxProxyGet
       ? requestHeaders
-      : {'X-Requested-With': 'XMLHttpRequest', ...requestHeaders}
+      : {...requestHeaders, 'X-Requested-With': 'XMLHttpRequest'}
 
   const fetchResponse = await fetch(url, {
     method: method as string,
