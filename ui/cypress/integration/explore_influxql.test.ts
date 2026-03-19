@@ -121,19 +121,31 @@ describe('InfluxQL', () => {
   })
 
   it('create and delete a database with use of metaquery templates', () => {
+    let targetDatabase = 'db_name'
+
     cy.intercept(`chronograf/v1/sources/${source.id}/queries`).as('postQuery')
     cy.get('.query-editor--status-actions').within(() => {
       cy.get('.dropdown').contains('Metaquery Templates').click()
       cy.getByTestID('dropdown--item').contains('Create Database').click()
+    })
+    cy.get('.CodeMirror-code')
+      .invoke('text')
+      .then(queryText => {
+        const match = queryText.match(/CREATE DATABASE\s+"([^"]+)"/i)
+        if (match && match[1]) {
+          targetDatabase = match[1]
+        }
+      })
+    cy.get('.query-editor--status-actions').within(() => {
       cy.get('button').contains('Submit Query').click()
       cy.wait('@postQuery')
       cy.reload()
     })
 
     cy.contains('.query-builder--column', 'DB.RetentionPolicy').within(() => {
-      cy.contains('.query-builder--list-item', 'db_name.autogen').should(
-        'exist'
-      )
+      cy.contains('.query-builder--list-item', `${targetDatabase}.autogen`, {
+        timeout: 10000,
+      }).should('exist')
     })
     cy.get('.query-editor--status-actions').within(() => {
       cy.get('.dropdown').contains('Metaquery Templates').click()
@@ -142,9 +154,9 @@ describe('InfluxQL', () => {
       cy.wait('@postQuery')
     })
     cy.contains('.query-builder--column', 'DB.RetentionPolicy').within(() => {
-      cy.contains('.query-builder--list-item', 'db_name.autogen').should(
-        'not.exist'
-      )
+      cy.contains('.query-builder--list-item', `${targetDatabase}.autogen`, {
+        timeout: 10000,
+      }).should('not.exist')
     })
   })
 })

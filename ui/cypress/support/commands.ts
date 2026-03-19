@@ -1,4 +1,37 @@
 const apiUrl = '/chronograf/v1'
+const unsafeMethods = new Set(['POST', 'PUT', 'PATCH', 'DELETE'])
+
+const shouldInjectSameOriginHeaders = (method: string, url: string): boolean => {
+  if (!unsafeMethods.has(method.toUpperCase())) {
+    return false
+  }
+
+  return (
+    url.startsWith('/chronograf/') ||
+    url.startsWith('http://localhost:8888/chronograf/')
+  )
+}
+
+const withSameOriginHeaders = (options: any): any => {
+  const method = String(options?.method || 'GET').toUpperCase()
+  const url = String(options?.url || '')
+
+  if (!shouldInjectSameOriginHeaders(method, url)) {
+    return options
+  }
+
+  const baseUrl = String(Cypress.config('baseUrl') || 'http://localhost:8888')
+    .replace(/\/$/, '')
+
+  return {
+    ...options,
+    headers: {
+      Origin: baseUrl,
+      Referer: `${baseUrl}/`,
+      ...(options.headers || {}),
+    },
+  }
+}
 
 export const getByTestID = (
   dataTest: string,
@@ -588,6 +621,36 @@ export const clickAttached = (subject?: JQuery<HTMLElement>): void => {
     $el.trigger('click')
   })
 }
+
+Cypress.Commands.overwrite('request', (originalFn: any, ...args: any[]) => {
+  if (args.length === 1 && typeof args[0] === 'object') {
+    return originalFn(withSameOriginHeaders(args[0]))
+  }
+
+  if (args.length === 1 && typeof args[0] === 'string') {
+    return originalFn(withSameOriginHeaders({url: args[0]}))
+  }
+
+  if (
+    args.length === 2 &&
+    typeof args[0] === 'string' &&
+    typeof args[1] === 'string'
+  ) {
+    return originalFn(withSameOriginHeaders({method: args[0], url: args[1]}))
+  }
+
+  if (
+    args.length === 3 &&
+    typeof args[0] === 'string' &&
+    typeof args[1] === 'string'
+  ) {
+    return originalFn(
+      withSameOriginHeaders({method: args[0], url: args[1], body: args[2]})
+    )
+  }
+
+  return originalFn(...args)
+})
 
 Cypress.Commands.add('getByTestID', getByTestID)
 Cypress.Commands.add('createInfluxDBConnection', createInfluxDBConnection)

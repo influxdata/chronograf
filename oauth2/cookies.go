@@ -18,12 +18,13 @@ type cookie struct {
 	Name       string        // Name is the name of the cookie stored on the browser
 	Lifespan   time.Duration // Lifespan is the expiration date of the cookie. 0 means session cookie
 	Inactivity time.Duration // Inactivity is the length of time a token is valid if there is no activity
+	Secure     bool          // Secure controls whether the cookie is sent only over HTTPS
 	Now        func() time.Time
 	Tokens     Tokenizer
 }
 
 // NewCookieJWT creates an Authenticator that uses cookies for auth
-func NewCookieJWT(secret string, lifespan, inactivity time.Duration) Authenticator {
+func NewCookieJWT(secret string, lifespan, inactivity time.Duration, secure bool) Authenticator {
 	// Server interprets a token duration longer than the cookie lifespan as
 	// a token that was issued by a server with a longer auth-duration and is
 	// thus invalid, as a security precaution. So, inactivity must be set to
@@ -35,6 +36,7 @@ func NewCookieJWT(secret string, lifespan, inactivity time.Duration) Authenticat
 		Name:       DefaultCookieName,
 		Lifespan:   lifespan,
 		Inactivity: inactivity,
+		Secure:     secure,
 		Now:        DefaultNowTime,
 		Tokens: &JWT{
 			Secret: secret,
@@ -107,6 +109,8 @@ func (c *cookie) setCookie(w http.ResponseWriter, value string, exp time.Time) {
 		Value:    value,
 		HttpOnly: true,
 		Path:     "/",
+		SameSite: http.SameSiteStrictMode,
+		Secure:   c.Secure,
 	}
 
 	// Only set a cookie to be persistent (endure beyond the browser session)
@@ -126,6 +130,8 @@ func (c *cookie) Expire(w http.ResponseWriter) {
 		HttpOnly: true,
 		Path:     "/",
 		Expires:  c.Now().Add(-1 * time.Hour),
+		SameSite: http.SameSiteStrictMode,
+		Secure:   c.Secure,
 	}
 
 	http.SetCookie(w, &cookie)

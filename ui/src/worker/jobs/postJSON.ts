@@ -7,7 +7,10 @@ export default async (msg: Message): Promise<Response> => {
   const response = await fetch(url, {
     method: 'POST',
     body,
-    headers: {'Content-Type': 'application/json'},
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
   })
 
   return response
