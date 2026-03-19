@@ -20,6 +20,7 @@ type cookie struct {
 	Inactivity time.Duration // Inactivity is the length of time a token is valid if there is no activity
 	Now        func() time.Time
 	Tokens     Tokenizer
+	Secure     bool
 }
 
 // NewCookieJWT creates an Authenticator that uses cookies for auth
