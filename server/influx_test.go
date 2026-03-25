@@ -14,6 +14,7 @@ import (
 
 	"github.com/influxdata/chronograf/log"
 	"github.com/influxdata/chronograf/mocks"
+	"github.com/influxdata/chronograf/roles"
 
 	"github.com/influxdata/chronograf"
 )
@@ -117,6 +118,37 @@ func TestService_Influx(t *testing.T) {
 			t.Errorf("%q. Influx() =\ngot  ***%v***\nwant ***%v***\n", tt.name, string(body), tt.want.Body)
 		}
 
+	}
+}
+
+func TestService_Influx_ReaderRejectsUnsafeQuery(t *testing.T) {
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest(
+		"POST",
+		"http://any.url",
+		ioutil.NopCloser(bytes.NewReader([]byte(`{"query":"DROP DATABASE mydb"}`))),
+	)
+
+	ctx := httprouter.WithParams(
+		context.Background(),
+		httprouter.Params{{Key: "id", Value: "1"}},
+	)
+	ctx = context.WithValue(ctx, roles.ContextKey, roles.ReaderRoleName)
+	r = r.WithContext(ctx)
+
+	h := &Service{
+		Logger: log.New(log.ErrorLevel),
+	}
+	h.Influx(w, r)
+
+	resp := w.Result()
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	if resp.StatusCode != http.StatusForbidden {
+		t.Fatalf("expected status %d, got %d", http.StatusForbidden, resp.StatusCode)
+	}
+	if !strings.Contains(string(body), readerInfluxQLForbiddenMsg) {
+		t.Fatalf("expected forbidden message, got %s", string(body))
 	}
 }
 

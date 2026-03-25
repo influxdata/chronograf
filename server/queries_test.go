@@ -5,11 +5,13 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/bouk/httprouter"
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/mocks"
+	"github.com/influxdata/chronograf/roles"
 )
 
 func TestService_Queries(t *testing.T) {
@@ -107,5 +109,38 @@ func TestService_Queries(t *testing.T) {
 				t.Errorf("got:\n%s\nwant:\n%s\n", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestService_Queries_ReaderRejectsUnsafeQuery(t *testing.T) {
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest("POST", "/queries", bytes.NewReader([]byte(`{
+		"queries": [{"id":"1","query":"DROP DATABASE mydb"}]
+	}`)))
+
+	ctx := httprouter.WithParams(
+		context.Background(),
+		httprouter.Params{{Key: "id", Value: "1"}},
+	)
+	ctx = context.WithValue(ctx, roles.ContextKey, roles.ReaderRoleName)
+	r = r.WithContext(ctx)
+
+	s := &Service{
+		Store: &mocks.Store{
+			SourcesStore: &mocks.SourcesStore{
+				GetF: func(ctx context.Context, id int) (chronograf.Source, error) {
+					return chronograf.Source{ID: id}, nil
+				},
+			},
+		},
+		Logger: &mocks.TestLogger{},
+	}
+
+	s.Queries(w, r)
+	if w.Code != http.StatusForbidden {
+		t.Fatalf("expected status %d, got %d", http.StatusForbidden, w.Code)
+	}
+	if !strings.Contains(w.Body.String(), readerInfluxQLForbiddenMsg) {
+		t.Fatalf("expected forbidden message, got %s", w.Body.String())
 	}
 }

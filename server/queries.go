@@ -67,6 +67,11 @@ func (s *Service) Queries(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for i, q := range req.Queries {
+		if err := enforceReaderInfluxQLReadOnly(ctx, q.Query); err != nil {
+			Error(w, http.StatusForbidden, err.Error(), s.Logger)
+			return
+		}
+
 		qr := QueryResponse{
 			ID:    q.ID,
 			Query: q.Query,
