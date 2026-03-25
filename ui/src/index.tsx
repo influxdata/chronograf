@@ -133,7 +133,7 @@ interface State {
 const LogsPageRoute = () => (
   <Authorized
     requiredRole={VIEWER_ROLE}
-    replaceWithIfNotAuthorized={<Redirect to="/" />}
+    replaceWithIfNotAuthorized={<Redirect from="*" to="/" />}
   >
     <LogsPage />
   </Authorized>
@@ -142,7 +142,7 @@ const LogsPageRoute = () => (
 const OnboardingWizardRoute = () => (
   <Authorized
     requiredRole={EDITOR_ROLE}
-    replaceWithIfNotAuthorized={<Redirect to="/" />}
+    replaceWithIfNotAuthorized={<Redirect from="*" to="/" />}
   >
     <OnboardingWizard />
   </Authorized>
