@@ -166,7 +166,12 @@ export class CheckSources extends Component<Props, State> {
       return router.push('/purgatory')
     }
 
-    if (!isFetching && isUsingAuth && me.role === READER_ROLE && params.sourceID) {
+    if (
+      !isFetching &&
+      isUsingAuth &&
+      me.role === READER_ROLE &&
+      params.sourceID
+    ) {
       const dashboardsPath = `/sources/${params.sourceID}/dashboards`
 
       if (!location.pathname.startsWith(dashboardsPath)) {
