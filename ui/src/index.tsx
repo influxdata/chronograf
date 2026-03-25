@@ -3,7 +3,7 @@ import 'babel-polyfill'
 import React, {PureComponent} from 'react'
 import {render} from 'react-dom'
 import {Provider as ReduxProvider} from 'react-redux'
-import {Router, Route, useRouterHistory} from 'react-router'
+import {Router, Route, Redirect, useRouterHistory} from 'react-router'
 import {createHistory, Pathname} from 'history'
 import {syncHistoryWithStore} from 'react-router-redux'
 import {bindActionCreators} from 'redux'
@@ -21,6 +21,7 @@ import {
   UserIsNotAuthenticated,
   Purgatory,
 } from 'src/auth'
+import Authorized, {EDITOR_ROLE, VIEWER_ROLE} from 'src/auth/Authorized'
 import CheckSources from 'src/CheckSources'
 import {StatusPage} from 'src/status'
 import {HostsPage, HostPage} from 'src/hosts'
@@ -129,6 +130,24 @@ interface State {
   ready: boolean
 }
 
+const LogsPageRoute = () => (
+  <Authorized
+    requiredRole={VIEWER_ROLE}
+    replaceWithIfNotAuthorized={<Redirect to="/" />}
+  >
+    <LogsPage />
+  </Authorized>
+)
+
+const OnboardingWizardRoute = () => (
+  <Authorized
+    requiredRole={EDITOR_ROLE}
+    replaceWithIfNotAuthorized={<Redirect to="/" />}
+  >
+    <OnboardingWizard />
+  </Authorized>
+)
+
 class Root extends PureComponent<Record<string, never>, State> {
   private getLinks = bindActionCreators(getLinksAsync, dispatch)
   private getMe = bindActionCreators(getMeAsync, dispatch)
@@ -177,11 +196,11 @@ class Root extends PureComponent<Record<string, never>, State> {
               component={UserIsAuthenticated(Purgatory)}
             />
             <Route component={UserIsAuthenticated(App)}>
-              <Route path="/logs" component={LogsPage} />
+              <Route path="/logs" component={LogsPageRoute} />
             </Route>
             <Route
               path="/sources/new"
-              component={UserIsAuthenticated(OnboardingWizard)}
+              component={UserIsAuthenticated(OnboardingWizardRoute)}
             />
             <Route
               path="/sources/:sourceID"

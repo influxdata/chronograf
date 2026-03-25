@@ -42,6 +42,10 @@ const setup = (override?) => {
 }
 
 describe('CheckSources', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   describe('rendering', () => {
     it('renders', async () => {
       const {wrapper} = setup()
@@ -65,6 +69,58 @@ describe('CheckSources', () => {
         expect(child.exists()).toBe(true)
         done()
       })
+    })
+  })
+
+  describe('reader route restrictions', () => {
+    const readerAuth = {
+      isUsingAuth: true,
+      me: {
+        role: 'reader',
+        organizations: [{id: 'org1'}],
+        currentOrganization: {id: 'org1'},
+        superAdmin: false,
+      },
+    }
+
+    it('redirects reader to dashboards when visiting non-dashboard source route', async () => {
+      const push = jest.fn()
+      const {wrapper, props} = setup({
+        router: {push},
+      })
+
+      await (wrapper.instance() as any).UNSAFE_componentWillUpdate(
+        {
+          ...props,
+          router: {push},
+          params: {sourceID: source.id},
+          location: {pathname: `/sources/${source.id}/manage-sources`},
+          auth: readerAuth,
+        },
+        {isFetching: false}
+      )
+
+      expect(push).toHaveBeenCalledWith(`/sources/${source.id}/dashboards`)
+    })
+
+    it('does not redirect reader when already on dashboards route', async () => {
+      const push = jest.fn()
+      const {wrapper, props} = setup({
+        router: {push},
+      })
+
+      await (wrapper.instance() as any).UNSAFE_componentWillUpdate(
+        {
+          ...props,
+          router: {push},
+          params: {sourceID: source.id},
+          location: {pathname: `/sources/${source.id}/dashboards`},
+          auth: readerAuth,
+        },
+        {isFetching: false}
+      )
+
+      expect(push).not.toHaveBeenCalled()
     })
   })
 })
