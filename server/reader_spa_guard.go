@@ -94,7 +94,7 @@ func isSPARouteSubjectToReaderGuard(routePath string) bool {
 		return false
 	}
 	switch routePath {
-	case "/ping", "/nonce", "/swagger.json", "/docs":
+	case "/ping", "/nonce", "/swagger.json", "/docs", "/landing":
 		return false
 	}
 	return !strings.HasPrefix(routePath, "/debug/pprof")

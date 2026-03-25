@@ -85,6 +85,12 @@ func TestReaderSPARouteGuard(t *testing.T) {
 			wantStatus: http.StatusOK,
 		},
 		{
+			name:       "landing ignored for oauth bootstrap",
+			path:       "/landing",
+			accept:     "text/html",
+			wantStatus: http.StatusOK,
+		},
+		{
 			name:       "non-html request ignored",
 			path:       "/sources/1/manage-sources",
 			accept:     "application/json",
