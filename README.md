@@ -115,6 +115,13 @@ Manage users, roles, permissions for
 actively running queries and stop expensive queries on the Query Management
 page.
 
+Reader role behavior:
+
+* Reader access is dashboard-focused.
+* Reader InfluxQL execution is read-only (`SELECT`/`SHOW` only).
+* Reader Flux execution is read-only; write-capable calls such as `to()` are denied.
+* Reader attempts to execute write/admin query operations are rejected by the server.
+
 ### TLS/HTTPS Support
 
 See
