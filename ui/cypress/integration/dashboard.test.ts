@@ -108,6 +108,9 @@ describe('Use Dashboards', () => {
 
     it('denies reader flux proxy requests to non-query paths', () => {
       cy.visit(`/sources/${source.id}/dashboards`)
+      cy.request('/chronograf/v1/me').then(meResponse => {
+        expect(meResponse.status).to.eq(200)
+      })
 
       cy.request({
         method: 'POST',
@@ -121,7 +124,8 @@ describe('Use Dashboards', () => {
         },
       }).then(response => {
         expect(response.status).to.eq(403)
-        expect(JSON.stringify(response.body)).to.contain(
+        expect(response.body).to.have.property('message')
+        expect(response.body.message).to.eq(
           'reader role cannot execute write-capable Flux functions'
         )
       })
