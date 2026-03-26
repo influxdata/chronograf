@@ -3,7 +3,7 @@ import 'babel-polyfill'
 import React, {PureComponent} from 'react'
 import {render} from 'react-dom'
 import {Provider as ReduxProvider} from 'react-redux'
-import {Router, Route, Redirect, useRouterHistory} from 'react-router'
+import {Router, Route, useRouterHistory} from 'react-router'
 import {createHistory, Pathname} from 'history'
 import {syncHistoryWithStore} from 'react-router-redux'
 import {bindActionCreators} from 'redux'
@@ -130,10 +130,20 @@ interface State {
   ready: boolean
 }
 
+class RedirectToRoot extends PureComponent<Record<string, never>> {
+  public componentDidMount() {
+    browserHistory.replace('/')
+  }
+
+  public render() {
+    return null
+  }
+}
+
 const LogsPageRoute = () => (
   <Authorized
     requiredRole={VIEWER_ROLE}
-    replaceWithIfNotAuthorized={<Redirect from="*" to="/" />}
+    replaceWithIfNotAuthorized={<RedirectToRoot />}
   >
     <LogsPage />
   </Authorized>
@@ -142,7 +152,7 @@ const LogsPageRoute = () => (
 const OnboardingWizardRoute = () => (
   <Authorized
     requiredRole={EDITOR_ROLE}
-    replaceWithIfNotAuthorized={<Redirect from="*" to="/" />}
+    replaceWithIfNotAuthorized={<RedirectToRoot />}
   >
     <OnboardingWizard />
   </Authorized>
