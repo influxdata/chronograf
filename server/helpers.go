@@ -1,9 +1,14 @@
 package server
 
 import (
+	"bytes"
+	"errors"
+	"io"
 	"net/http"
 	"path"
 )
+
+var errReaderBodyTooLarge = errors.New("reader request body too large")
 
 func location(w http.ResponseWriter, self string) {
 	w.Header().Add("Location", self)
@@ -43,4 +48,22 @@ func logout(nextURL, basepath string, routes AuthRoutes) http.HandlerFunc {
 		}
 		http.Redirect(w, r, route.Logout, http.StatusTemporaryRedirect)
 	}
+}
+
+// readAndRestoreBodyWithLimit reads up to maxBytes+1, restores r.Body for downstream
+// consumers, and returns errReaderBodyTooLarge if the limit is exceeded.
+func readAndRestoreBodyWithLimit(r *http.Request, maxBytes int64) ([]byte, error) {
+	body, err := io.ReadAll(io.LimitReader(r.Body, maxBytes+1))
+	if err != nil {
+		return nil, err
+	}
+
+	// Preserve the full stream for downstream handlers/proxying.
+	r.Body = io.NopCloser(io.MultiReader(bytes.NewReader(body), r.Body))
+
+	if int64(len(body)) > maxBytes {
+		return nil, errReaderBodyTooLarge
+	}
+
+	return body, nil
 }

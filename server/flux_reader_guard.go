@@ -1,10 +1,8 @@
 package server
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 
@@ -14,6 +12,7 @@ import (
 )
 
 const readerFluxForbiddenMsg = "reader role cannot execute write-capable Flux functions"
+const readerFluxMaxBodyBytes int64 = 1 << 20 // 1 MiB
 
 type fluxQueryRequest struct {
 	Query string `json:"query"`
@@ -27,12 +26,10 @@ func enforceReaderFluxReadOnly(r *http.Request) error {
 		return nil
 	}
 
-	body, err := io.ReadAll(r.Body)
+	body, err := readAndRestoreBodyWithLimit(r, readerFluxMaxBodyBytes)
 	if err != nil {
 		return fmt.Errorf(readerFluxForbiddenMsg)
 	}
-	// Restore body for reverse proxy.
-	r.Body = io.NopCloser(bytes.NewReader(body))
 
 	var req fluxQueryRequest
 	if err := json.Unmarshal(body, &req); err != nil {

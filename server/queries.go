@@ -12,6 +12,7 @@ import (
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/influx"
 	"github.com/influxdata/chronograf/influx/queries"
+	"github.com/influxdata/chronograf/roles"
 )
 
 // QueryRequest is query that will be converted to a queryConfig
@@ -56,6 +57,12 @@ func (s *Service) Queries(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		notFound(w, srcID, s.Logger)
 		return
+	}
+	if role, ok := hasRoleContext(ctx); ok && role == roles.ReaderRoleName {
+		if _, err := readAndRestoreBodyWithLimit(r, readerInfluxQLMaxBodyBytes); err != nil {
+			Error(w, http.StatusForbidden, readerInfluxQLForbiddenMsg, s.Logger)
+			return
+		}
 	}
 
 	var req QueriesRequest

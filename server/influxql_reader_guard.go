@@ -15,6 +15,7 @@ var errReaderInfluxQLParse = errors.New("invalid InfluxQL query")
 var errReaderInfluxQLForbidden = errors.New("reader role can only execute SELECT and SHOW queries")
 
 const readerInfluxQLForbiddenMsg = "reader role can only execute SELECT and SHOW queries"
+const readerInfluxQLMaxBodyBytes int64 = 1 << 20 // 1 MiB
 
 func enforceReaderInfluxQLReadOnly(ctx context.Context, command string) error {
 	role, ok := hasRoleContext(ctx)

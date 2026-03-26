@@ -121,64 +121,63 @@ func TestService_Influx(t *testing.T) {
 	}
 }
 
-func TestService_Influx_ReaderRejectsUnsafeQuery(t *testing.T) {
-	w := httptest.NewRecorder()
-	r := httptest.NewRequest(
-		"POST",
-		"http://any.url",
-		ioutil.NopCloser(bytes.NewReader([]byte(`{"query":"DROP DATABASE mydb"}`))),
-	)
-
-	ctx := httprouter.WithParams(
-		context.Background(),
-		httprouter.Params{{Key: "id", Value: "1"}},
-	)
-	ctx = context.WithValue(ctx, roles.ContextKey, roles.ReaderRoleName)
-	r = r.WithContext(ctx)
-
-	h := &Service{
-		Logger: log.New(log.ErrorLevel),
+func TestService_Influx_ReaderGuardResponses(t *testing.T) {
+	tests := []struct {
+		name       string
+		body       string
+		wantStatus int
+		wantBody   string
+	}{
+		{
+			name:       "rejects unsafe query",
+			body:       `{"query":"DROP DATABASE mydb"}`,
+			wantStatus: http.StatusForbidden,
+			wantBody:   readerInfluxQLForbiddenMsg,
+		},
+		{
+			name:       "returns bad request for invalid query",
+			body:       `{"query":"SELECT"}`,
+			wantStatus: http.StatusBadRequest,
+			wantBody:   "invalid InfluxQL query",
+		},
+		{
+			name:       "rejects oversized body",
+			body:       `{"query":"` + strings.Repeat("a", int(readerInfluxQLMaxBodyBytes)) + `"}`,
+			wantStatus: http.StatusForbidden,
+			wantBody:   readerInfluxQLForbiddenMsg,
+		},
 	}
-	h.Influx(w, r)
 
-	resp := w.Result()
-	body, _ := ioutil.ReadAll(resp.Body)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest(
+				"POST",
+				"http://any.url",
+				ioutil.NopCloser(bytes.NewReader([]byte(tt.body))),
+			)
 
-	if resp.StatusCode != http.StatusForbidden {
-		t.Fatalf("expected status %d, got %d", http.StatusForbidden, resp.StatusCode)
-	}
-	if !strings.Contains(string(body), readerInfluxQLForbiddenMsg) {
-		t.Fatalf("expected forbidden message, got %s", string(body))
-	}
-}
+			ctx := httprouter.WithParams(
+				context.Background(),
+				httprouter.Params{{Key: "id", Value: "1"}},
+			)
+			ctx = context.WithValue(ctx, roles.ContextKey, roles.ReaderRoleName)
+			r = r.WithContext(ctx)
 
-func TestService_Influx_ReaderInvalidQueryReturnsBadRequest(t *testing.T) {
-	w := httptest.NewRecorder()
-	r := httptest.NewRequest(
-		"POST",
-		"http://any.url",
-		ioutil.NopCloser(bytes.NewReader([]byte(`{"query":"SELECT"}`))),
-	)
+			h := &Service{
+				Logger: log.New(log.ErrorLevel),
+			}
+			h.Influx(w, r)
 
-	ctx := httprouter.WithParams(
-		context.Background(),
-		httprouter.Params{{Key: "id", Value: "1"}},
-	)
-	ctx = context.WithValue(ctx, roles.ContextKey, roles.ReaderRoleName)
-	r = r.WithContext(ctx)
-
-	h := &Service{
-		Logger: log.New(log.ErrorLevel),
-	}
-	h.Influx(w, r)
-
-	resp := w.Result()
-	body, _ := ioutil.ReadAll(resp.Body)
-	if resp.StatusCode != http.StatusBadRequest {
-		t.Fatalf("expected status %d, got %d", http.StatusBadRequest, resp.StatusCode)
-	}
-	if !strings.Contains(string(body), "invalid InfluxQL query") {
-		t.Fatalf("expected parse error message, got %s", string(body))
+			resp := w.Result()
+			body, _ := ioutil.ReadAll(resp.Body)
+			if resp.StatusCode != tt.wantStatus {
+				t.Fatalf("expected status %d, got %d", tt.wantStatus, resp.StatusCode)
+			}
+			if tt.wantBody != "" && !strings.Contains(string(body), tt.wantBody) {
+				t.Fatalf("expected response to contain %q, got %s", tt.wantBody, string(body))
+			}
+		})
 	}
 }
 

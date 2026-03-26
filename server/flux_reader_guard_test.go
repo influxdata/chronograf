@@ -68,6 +68,13 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			body:    `not-json`,
 			wantErr: true,
 		},
+		{
+			name:    "reader oversized body is denied",
+			role:    roles.ReaderRoleName,
+			method:  http.MethodPost,
+			body:    strings.Repeat("a", int(readerFluxMaxBodyBytes)+1),
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {

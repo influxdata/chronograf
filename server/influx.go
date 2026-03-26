@@ -17,6 +17,7 @@ import (
 	"github.com/influxdata/chronograf"
 	uuid "github.com/influxdata/chronograf/id"
 	"github.com/influxdata/chronograf/influx"
+	"github.com/influxdata/chronograf/roles"
 	"github.com/influxdata/chronograf/util"
 )
 
@@ -39,6 +40,12 @@ func (s *Service) Influx(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, err.Error(), s.Logger)
 		return
+	}
+	if role, ok := hasRoleContext(r.Context()); ok && role == roles.ReaderRoleName {
+		if _, err := readAndRestoreBodyWithLimit(r, readerInfluxQLMaxBodyBytes); err != nil {
+			Error(w, http.StatusForbidden, readerInfluxQLForbiddenMsg, s.Logger)
+			return
+		}
 	}
 
 	var req chronograf.Query
