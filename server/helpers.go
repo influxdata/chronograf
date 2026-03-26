@@ -50,16 +50,25 @@ func logout(nextURL, basepath string, routes AuthRoutes) http.HandlerFunc {
 	}
 }
 
+type readCloser struct {
+	io.Reader
+	io.Closer
+}
+
 // readAndRestoreBodyWithLimit reads up to maxBytes+1, restores r.Body for downstream
 // consumers, and returns errReaderBodyTooLarge if the limit is exceeded.
 func readAndRestoreBodyWithLimit(r *http.Request, maxBytes int64) ([]byte, error) {
-	body, err := io.ReadAll(io.LimitReader(r.Body, maxBytes+1))
+	originalBody := r.Body
+	body, err := io.ReadAll(io.LimitReader(originalBody, maxBytes+1))
 	if err != nil {
 		return nil, err
 	}
 
-	// Preserve the full stream for downstream handlers/proxying.
-	r.Body = io.NopCloser(io.MultiReader(bytes.NewReader(body), r.Body))
+	// Preserve full stream and preserve close semantics of original body.
+	r.Body = &readCloser{
+		Reader: io.MultiReader(bytes.NewReader(body), originalBody),
+		Closer: originalBody,
+	}
 
 	if int64(len(body)) > maxBytes {
 		return nil, errReaderBodyTooLarge
