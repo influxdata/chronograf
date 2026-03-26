@@ -62,11 +62,11 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:    "reader non-json body is left unchanged",
+			name:    "reader non-json body is denied",
 			role:    roles.ReaderRoleName,
 			method:  http.MethodPost,
 			body:    `not-json`,
-			wantErr: false,
+			wantErr: true,
 		},
 	}
 

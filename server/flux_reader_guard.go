@@ -36,8 +36,8 @@ func enforceReaderFluxReadOnly(r *http.Request) error {
 
 	var req fluxQueryRequest
 	if err := json.Unmarshal(body, &req); err != nil {
-		// Non-query payload: leave unchanged.
-		return nil
+		// Fail closed for Reader when payload cannot be inspected.
+		return fmt.Errorf(readerFluxForbiddenMsg)
 	}
 
 	query := strings.TrimSpace(req.Query)
