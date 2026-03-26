@@ -67,7 +67,7 @@ func ReaderSPARouteGuard(
 }
 
 func isSPAHTMLNavigation(r *http.Request) bool {
-	return r.Method == http.MethodGet && strings.Contains(r.Header.Get("Accept"), "text/html")
+	return r.Method == http.MethodGet && strings.Contains(strings.ToLower(r.Header.Get("Accept")), "text/html")
 }
 
 func normalizeSPARoutePath(rawPath, basepath string) string {
