@@ -108,27 +108,41 @@ describe('Use Dashboards', () => {
 
     it('denies reader flux proxy requests to non-query paths', () => {
       cy.visit(`/sources/${source.id}/dashboards`)
-      cy.request('/chronograf/v1/me').then(meResponse => {
-        expect(meResponse.status).to.eq(200)
-      })
+      cy.getCookie('session')
+        .should('exist')
+        .then(cookie => {
+          const sessionCookie = cookie as Cypress.Cookie
+          const authHeaders = {
+            Cookie: `${sessionCookie.name}=${sessionCookie.value}`,
+          }
 
-      cy.request({
-        method: 'POST',
-        failOnStatusCode: false,
-        url:
-          `/chronograf/v1/sources/${source.id}/proxy/flux` +
-          `?path=${encodeURIComponent('/api/v2/delete')}`,
-        body: {
-          start: '2020-01-01T00:00:00Z',
-          stop: '2020-01-02T00:00:00Z',
-        },
-      }).then(response => {
-        expect(response.status).to.eq(403)
-        expect(response.body).to.have.property('message')
-        expect(response.body.message).to.eq(
-          'reader role cannot execute write-capable Flux functions'
-        )
-      })
+          cy.request({
+            method: 'GET',
+            url: '/chronograf/v1/me',
+            headers: authHeaders,
+          }).then(meResponse => {
+            expect(meResponse.status).to.eq(200)
+          })
+
+          cy.request({
+            method: 'POST',
+            failOnStatusCode: false,
+            url:
+              `/chronograf/v1/sources/${source.id}/proxy/flux` +
+              `?path=${encodeURIComponent('/api/v2/delete')}`,
+            headers: authHeaders,
+            body: {
+              start: '2020-01-01T00:00:00Z',
+              stop: '2020-01-02T00:00:00Z',
+            },
+          }).then(response => {
+            expect(response.status).to.eq(403)
+            expect(response.body).to.have.property('message')
+            expect(response.body.message).to.eq(
+              'reader role cannot execute write-capable Flux functions'
+            )
+          })
+        })
     })
   })
 })
