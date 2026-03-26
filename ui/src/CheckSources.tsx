@@ -174,7 +174,10 @@ export class CheckSources extends Component<Props, State> {
     ) {
       const dashboardsPath = `/sources/${params.sourceID}/dashboards`
 
-      if (!location.pathname.startsWith(dashboardsPath)) {
+      if (
+        location.pathname !== dashboardsPath &&
+        !location.pathname.startsWith(dashboardsPath + '/')
+      ) {
         return router.push(dashboardsPath)
       }
     }
