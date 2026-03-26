@@ -58,15 +58,20 @@ func (s *Service) Queries(w http.ResponseWriter, r *http.Request) {
 		notFound(w, srcID, s.Logger)
 		return
 	}
-	if role, ok := hasRoleContext(ctx); ok && role == roles.ReaderRoleName {
-		if _, err := readAndRestoreBodyWithLimit(r, readerInfluxQLMaxBodyBytes); err != nil {
-			Error(w, http.StatusForbidden, readerInfluxQLForbiddenMsg, s.Logger)
-			return
-		}
+	role, ok := hasRoleContext(ctx)
+	isReader := ok && role == roles.ReaderRoleName
+	if isReader {
+		// In this handler we decode once and do not need to preserve the original body stream.
+		r.Body = http.MaxBytesReader(w, r.Body, readerInfluxQLMaxBodyBytes)
 	}
 
 	var req QueriesRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		var maxErr *http.MaxBytesError
+		if isReader && errors.As(err, &maxErr) {
+			Error(w, http.StatusForbidden, readerInfluxQLForbiddenMsg, s.Logger)
+			return
+		}
 		invalidJSON(w, s.Logger)
 		return
 	}
