@@ -1,8 +1,11 @@
 package server
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -14,6 +17,7 @@ import (
 
 const readerFluxForbiddenMsg = "reader role cannot execute write-capable Flux functions"
 const readerFluxMaxBodyBytes int64 = 1 << 20 // 1 MiB
+var errReaderBodyTooLarge = errors.New("reader request body too large")
 
 type fluxQueryRequest struct {
 	Query string `json:"query"`
@@ -56,6 +60,33 @@ func enforceReaderFluxReadOnly(r *http.Request) error {
 		return fmt.Errorf(readerFluxForbiddenMsg)
 	}
 	return nil
+}
+
+type readCloser struct {
+	io.Reader
+	io.Closer
+}
+
+// readAndRestoreBodyWithLimit reads up to maxBytes+1, restores r.Body for downstream
+// consumers, and returns errReaderBodyTooLarge if the limit is exceeded.
+func readAndRestoreBodyWithLimit(r *http.Request, maxBytes int64) ([]byte, error) {
+	originalBody := r.Body
+	body, err := io.ReadAll(io.LimitReader(originalBody, maxBytes+1))
+	if err != nil {
+		return nil, err
+	}
+
+	// Preserve full stream and preserve close semantics of original body.
+	r.Body = &readCloser{
+		Reader: io.MultiReader(bytes.NewReader(body), originalBody),
+		Closer: originalBody,
+	}
+
+	if int64(len(body)) > maxBytes {
+		return nil, errReaderBodyTooLarge
+	}
+
+	return body, nil
 }
 
 func isReaderAllowedFluxPath(rawPath string) bool {

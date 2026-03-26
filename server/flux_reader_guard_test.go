@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -11,6 +12,16 @@ import (
 
 	"github.com/influxdata/chronograf/roles"
 )
+
+type trackingReadCloser struct {
+	io.Reader
+	closed bool
+}
+
+func (t *trackingReadCloser) Close() error {
+	t.closed = true
+	return nil
+}
 
 func TestEnforceReaderFluxReadOnly(t *testing.T) {
 	tests := []struct {
@@ -130,5 +141,53 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 				t.Fatalf("body changed by guard; got %q want %q", string(gotBody), tt.body)
 			}
 		})
+	}
+}
+
+func TestReadAndRestoreBodyWithLimit_CloseDelegatesToOriginalBody(t *testing.T) {
+	req := httptest.NewRequest("POST", "/", strings.NewReader("abc"))
+	original := &trackingReadCloser{Reader: strings.NewReader("abc")}
+	req.Body = original
+
+	body, err := readAndRestoreBodyWithLimit(req, 1024)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if string(body) != "abc" {
+		t.Fatalf("body=%q want=%q", string(body), "abc")
+	}
+
+	if err := req.Body.Close(); err != nil {
+		t.Fatalf("close error: %v", err)
+	}
+	if !original.closed {
+		t.Fatal("expected original body to be closed")
+	}
+}
+
+func TestReadAndRestoreBodyWithLimit_TooLargePreservesReadableBody(t *testing.T) {
+	payload := "abcdef"
+	req := httptest.NewRequest("POST", "/", strings.NewReader(payload))
+	original := &trackingReadCloser{Reader: strings.NewReader(payload)}
+	req.Body = original
+
+	_, err := readAndRestoreBodyWithLimit(req, 3)
+	if !errors.Is(err, errReaderBodyTooLarge) {
+		t.Fatalf("expected errReaderBodyTooLarge, got %v", err)
+	}
+
+	got, readErr := io.ReadAll(req.Body)
+	if readErr != nil {
+		t.Fatalf("read error: %v", readErr)
+	}
+	if string(got) != payload {
+		t.Fatalf("body=%q want=%q", string(got), payload)
+	}
+
+	if err := req.Body.Close(); err != nil {
+		t.Fatalf("close error: %v", err)
+	}
+	if !original.closed {
+		t.Fatal("expected original body to be closed")
 	}
 }
