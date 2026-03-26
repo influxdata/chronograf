@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/csv"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -49,7 +50,11 @@ func (s *Service) Influx(w http.ResponseWriter, r *http.Request) {
 		invalidData(w, err, s.Logger)
 		return
 	}
-	if err = enforceReaderInfluxQLReadOnly(r.Context(), req.Command); err != nil {
+	if err := enforceReaderInfluxQLReadOnly(r.Context(), req.Command); err != nil {
+		if errors.Is(err, errReaderInfluxQLParse) {
+			Error(w, http.StatusBadRequest, err.Error(), s.Logger)
+			return
+		}
 		Error(w, http.StatusForbidden, err.Error(), s.Logger)
 		return
 	}

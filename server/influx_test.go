@@ -152,6 +152,36 @@ func TestService_Influx_ReaderRejectsUnsafeQuery(t *testing.T) {
 	}
 }
 
+func TestService_Influx_ReaderInvalidQueryReturnsBadRequest(t *testing.T) {
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest(
+		"POST",
+		"http://any.url",
+		ioutil.NopCloser(bytes.NewReader([]byte(`{"query":"SELECT"}`))),
+	)
+
+	ctx := httprouter.WithParams(
+		context.Background(),
+		httprouter.Params{{Key: "id", Value: "1"}},
+	)
+	ctx = context.WithValue(ctx, roles.ContextKey, roles.ReaderRoleName)
+	r = r.WithContext(ctx)
+
+	h := &Service{
+		Logger: log.New(log.ErrorLevel),
+	}
+	h.Influx(w, r)
+
+	resp := w.Result()
+	body, _ := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusBadRequest {
+		t.Fatalf("expected status %d, got %d", http.StatusBadRequest, resp.StatusCode)
+	}
+	if !strings.Contains(string(body), "invalid InfluxQL query") {
+		t.Fatalf("expected parse error message, got %s", string(body))
+	}
+}
+
 // TestService_Influx_UseCommand test preprocessing of use command
 func TestService_Influx_UseCommand(t *testing.T) {
 	tests := []struct {
