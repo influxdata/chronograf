@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/influxdata/chronograf/roles"
@@ -26,6 +27,11 @@ func enforceReaderFluxReadOnly(r *http.Request) error {
 		return nil
 	}
 
+	// Reader may only proxy Flux query endpoint.
+	if !isReaderAllowedFluxPath(r.URL.Query().Get("path")) {
+		return fmt.Errorf(readerFluxForbiddenMsg)
+	}
+
 	body, err := readAndRestoreBodyWithLimit(r, readerFluxMaxBodyBytes)
 	if err != nil {
 		return fmt.Errorf(readerFluxForbiddenMsg)
@@ -39,7 +45,7 @@ func enforceReaderFluxReadOnly(r *http.Request) error {
 
 	query := strings.TrimSpace(req.Query)
 	if query == "" {
-		return nil
+		return fmt.Errorf(readerFluxForbiddenMsg)
 	}
 
 	pkg := parser.ParseSource(query)
@@ -50,6 +56,18 @@ func enforceReaderFluxReadOnly(r *http.Request) error {
 		return fmt.Errorf(readerFluxForbiddenMsg)
 	}
 	return nil
+}
+
+func isReaderAllowedFluxPath(rawPath string) bool {
+	rawPath = strings.TrimSpace(rawPath)
+	if rawPath == "" {
+		return false
+	}
+	u, err := url.Parse(rawPath)
+	if err != nil {
+		return false
+	}
+	return u.Path == "/api/v2/query"
 }
 
 func hasReaderDeniedFluxCall(pkg *ast.Package) bool {

@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -16,6 +17,7 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 		name    string
 		role    string
 		method  string
+		path    string
 		body    string
 		wantErr bool
 	}{
@@ -23,6 +25,7 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			name:    "reader blocks to()",
 			role:    roles.ReaderRoleName,
 			method:  http.MethodPost,
+			path:    "/api/v2/query",
 			body:    `{"query":"from(bucket: \"telegraf\") |> range(start: -1h) |> to(bucket: \"out\")"}`,
 			wantErr: true,
 		},
@@ -30,6 +33,7 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			name:    "reader blocks member to()",
 			role:    roles.ReaderRoleName,
 			method:  http.MethodPost,
+			path:    "/api/v2/query",
 			body:    "{\"query\":\"import \\\"influxdata/influxdb/v1\\\"\\nfrom(bucket: \\\"telegraf\\\") |> range(start: -1h) |> v1.to(bucket: \\\"out\\\", org: \\\"defaultorgname\\\")\"}",
 			wantErr: true,
 		},
@@ -37,6 +41,7 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			name:    "reader allows read query",
 			role:    roles.ReaderRoleName,
 			method:  http.MethodPost,
+			path:    "/api/v2/query",
 			body:    `{"query":"from(bucket: \"telegraf\") |> range(start: -1h) |> limit(n: 1)"}`,
 			wantErr: false,
 		},
@@ -44,6 +49,7 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			name:    "viewer not restricted by this guard",
 			role:    roles.ViewerRoleName,
 			method:  http.MethodPost,
+			path:    "/api/v2/query",
 			body:    `{"query":"from(bucket: \"telegraf\") |> range(start: -1h) |> to(bucket: \"out\")"}`,
 			wantErr: false,
 		},
@@ -51,6 +57,7 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			name:    "reader parse error is denied",
 			role:    roles.ReaderRoleName,
 			method:  http.MethodPost,
+			path:    "/api/v2/query",
 			body:    `{"query":"from("}`,
 			wantErr: true,
 		},
@@ -58,6 +65,7 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			name:    "reader GET is ignored by this guard",
 			role:    roles.ReaderRoleName,
 			method:  http.MethodGet,
+			path:    "/api/v2/query",
 			body:    `{"query":"from(bucket: \"telegraf\") |> range(start: -1h) |> to(bucket: \"out\")"}`,
 			wantErr: false,
 		},
@@ -65,6 +73,7 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			name:    "reader non-json body is denied",
 			role:    roles.ReaderRoleName,
 			method:  http.MethodPost,
+			path:    "/api/v2/query",
 			body:    `not-json`,
 			wantErr: true,
 		},
@@ -72,16 +81,37 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			name:    "reader oversized body is denied",
 			role:    roles.ReaderRoleName,
 			method:  http.MethodPost,
+			path:    "/api/v2/query",
 			body:    strings.Repeat("a", int(readerFluxMaxBodyBytes)+1),
+			wantErr: true,
+		},
+		{
+			name:    "reader empty query is denied",
+			role:    roles.ReaderRoleName,
+			method:  http.MethodPost,
+			path:    "/api/v2/query",
+			body:    `{"query":""}`,
+			wantErr: true,
+		},
+		{
+			name:    "reader non-query flux endpoint is denied",
+			role:    roles.ReaderRoleName,
+			method:  http.MethodPost,
+			path:    "/api/v2/delete",
+			body:    `{"start":"2020-01-01T00:00:00Z","stop":"2020-01-02T00:00:00Z"}`,
 			wantErr: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			path := tt.path
+			if path == "" {
+				path = "/api/v2/query"
+			}
 			req := httptest.NewRequest(
 				tt.method,
-				"http://server.local/chronograf/v1/sources/1/proxy/flux?path=/api/v2/query",
+				"http://server.local/chronograf/v1/sources/1/proxy/flux?path="+url.QueryEscape(path),
 				strings.NewReader(tt.body),
 			)
 			if tt.role != "" {
