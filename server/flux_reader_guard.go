@@ -17,7 +17,13 @@ import (
 
 const readerFluxForbiddenMsg = "reader role cannot execute write-capable Flux functions"
 const readerFluxMaxBodyBytes int64 = 1 << 20 // 1 MiB
+
 var errReaderBodyTooLarge = errors.New("reader request body too large")
+var errReaderFluxPathForbidden = errors.New("reader role may only query /api/v2/query")
+var errReaderFluxInvalidJSON = errors.New("invalid JSON request body")
+var errReaderFluxQueryRequired = errors.New("query field required")
+var errReaderFluxParse = errors.New("invalid Flux query")
+var errReaderFluxWriteForbidden = errors.New(readerFluxForbiddenMsg)
 
 type fluxQueryRequest struct {
 	Query string `json:"query"`
@@ -33,33 +39,64 @@ func enforceReaderFluxReadOnly(r *http.Request) error {
 
 	// Reader may only proxy Flux query endpoint.
 	if !isReaderAllowedFluxPath(r.URL.Query().Get("path")) {
-		return fmt.Errorf(readerFluxForbiddenMsg)
+		return errReaderFluxPathForbidden
 	}
 
 	body, err := readAndRestoreBodyWithLimit(r, readerFluxMaxBodyBytes)
 	if err != nil {
-		return fmt.Errorf(readerFluxForbiddenMsg)
+		if errors.Is(err, errReaderBodyTooLarge) {
+			return err
+		}
+		return fmt.Errorf("%w: %v", errReaderFluxInvalidJSON, err)
 	}
 
 	var req fluxQueryRequest
 	if err := json.Unmarshal(body, &req); err != nil {
-		// Fail closed for Reader when payload cannot be inspected.
-		return fmt.Errorf(readerFluxForbiddenMsg)
+		return fmt.Errorf("%w: %v", errReaderFluxInvalidJSON, err)
 	}
 
 	query := strings.TrimSpace(req.Query)
 	if query == "" {
-		return fmt.Errorf(readerFluxForbiddenMsg)
+		return errReaderFluxQueryRequired
 	}
 
 	pkg := parser.ParseSource(query)
 	if ast.Check(pkg) > 0 {
-		return fmt.Errorf(readerFluxForbiddenMsg)
+		return fmt.Errorf("%w: %v", errReaderFluxParse, ast.GetError(pkg))
 	}
 	if hasReaderDeniedFluxCall(pkg) {
-		return fmt.Errorf(readerFluxForbiddenMsg)
+		return errReaderFluxWriteForbidden
 	}
 	return nil
+}
+
+func readerFluxErrorStatus(err error) int {
+	switch {
+	case errors.Is(err, errReaderBodyTooLarge):
+		return http.StatusRequestEntityTooLarge
+	case errors.Is(err, errReaderFluxInvalidJSON),
+		errors.Is(err, errReaderFluxQueryRequired),
+		errors.Is(err, errReaderFluxParse):
+		return http.StatusBadRequest
+	default:
+		// path restriction + write-capable usage remain authorization denials
+		return http.StatusForbidden
+	}
+}
+
+func readerFluxErrorMessage(err error) string {
+	switch {
+	case errors.Is(err, errReaderBodyTooLarge):
+		return errReaderBodyTooLarge.Error()
+	case errors.Is(err, errReaderFluxPathForbidden):
+		return errReaderFluxPathForbidden.Error()
+	case errors.Is(err, errReaderFluxQueryRequired):
+		return errReaderFluxQueryRequired.Error()
+	case errors.Is(err, errReaderFluxWriteForbidden):
+		return readerFluxForbiddenMsg
+	default:
+		return err.Error()
+	}
 }
 
 type readCloser struct {

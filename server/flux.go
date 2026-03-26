@@ -152,7 +152,7 @@ func (s *Service) ProxyFlux(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := enforceReaderFluxReadOnly(r); err != nil {
-		Error(w, http.StatusForbidden, err.Error(), s.Logger)
+		Error(w, readerFluxErrorStatus(err), readerFluxErrorMessage(err), s.Logger)
 		return
 	}
 

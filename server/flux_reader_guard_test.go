@@ -31,6 +31,7 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 		path    string
 		body    string
 		wantErr bool
+		wantMsg string
 	}{
 		{
 			name:    "reader blocks to()",
@@ -38,6 +39,7 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			method:  http.MethodPost,
 			body:    `{"query":"from(bucket: \"telegraf\") |> range(start: -1h) |> to(bucket: \"out\")"}`,
 			wantErr: true,
+			wantMsg: readerFluxForbiddenMsg,
 		},
 		{
 			name:    "reader blocks member to()",
@@ -45,6 +47,7 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			method:  http.MethodPost,
 			body:    "{\"query\":\"import \\\"influxdata/influxdb/v1\\\"\\nfrom(bucket: \\\"telegraf\\\") |> range(start: -1h) |> v1.to(bucket: \\\"out\\\", org: \\\"defaultorgname\\\")\"}",
 			wantErr: true,
+			wantMsg: readerFluxForbiddenMsg,
 		},
 		{
 			name:    "reader allows read query",
@@ -66,6 +69,7 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			method:  http.MethodPost,
 			body:    `{"query":"from("}`,
 			wantErr: true,
+			wantMsg: "invalid Flux query",
 		},
 		{
 			name:    "reader GET is ignored by this guard",
@@ -80,6 +84,7 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			method:  http.MethodPost,
 			body:    `not-json`,
 			wantErr: true,
+			wantMsg: "invalid JSON request body",
 		},
 		{
 			name:    "reader oversized body is denied",
@@ -87,6 +92,7 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			method:  http.MethodPost,
 			body:    strings.Repeat("a", int(readerFluxMaxBodyBytes)+1),
 			wantErr: true,
+			wantMsg: errReaderBodyTooLarge.Error(),
 		},
 		{
 			name:    "reader empty query is denied",
@@ -94,6 +100,7 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			method:  http.MethodPost,
 			body:    `{"query":""}`,
 			wantErr: true,
+			wantMsg: errReaderFluxQueryRequired.Error(),
 		},
 		{
 			name:    "reader non-query flux endpoint is denied",
@@ -102,6 +109,7 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			path:    "/api/v2/delete",
 			body:    `{"start":"2020-01-01T00:00:00Z","stop":"2020-01-02T00:00:00Z"}`,
 			wantErr: true,
+			wantMsg: errReaderFluxPathForbidden.Error(),
 		},
 	}
 
@@ -128,8 +136,8 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			if !tt.wantErr && err != nil {
 				t.Fatalf("expected nil, got %v", err)
 			}
-			if err != nil && !strings.Contains(err.Error(), readerFluxForbiddenMsg) {
-				t.Fatalf("expected %q, got %q", readerFluxForbiddenMsg, err.Error())
+			if tt.wantMsg != "" && (err == nil || !strings.Contains(err.Error(), tt.wantMsg)) {
+				t.Fatalf("expected error containing %q, got %v", tt.wantMsg, err)
 			}
 
 			// Body must remain readable by proxy path.
