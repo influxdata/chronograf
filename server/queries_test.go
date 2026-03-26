@@ -140,8 +140,8 @@ func TestService_Queries_ReaderGuardResponses(t *testing.T) {
 			body: `{
 		"queries": [{"id":"1","query":"` + strings.Repeat("a", int(readerInfluxQLMaxBodyBytes)) + `"}]
 	}`,
-			wantStatus: http.StatusForbidden,
-			wantBody:   readerInfluxQLForbiddenMsg,
+			wantStatus: http.StatusRequestEntityTooLarge,
+			wantBody:   readerInfluxQLBodyTooLargeMsg,
 		},
 	}
 

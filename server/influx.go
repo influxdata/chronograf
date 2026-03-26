@@ -52,7 +52,7 @@ func (s *Service) Influx(w http.ResponseWriter, r *http.Request) {
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
 		var maxErr *http.MaxBytesError
 		if isReader && errors.As(err, &maxErr) {
-			Error(w, http.StatusForbidden, readerInfluxQLForbiddenMsg, s.Logger)
+			Error(w, http.StatusRequestEntityTooLarge, readerInfluxQLBodyTooLargeMsg, s.Logger)
 			return
 		}
 		invalidJSON(w, s.Logger)

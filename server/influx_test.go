@@ -143,8 +143,8 @@ func TestService_Influx_ReaderGuardResponses(t *testing.T) {
 		{
 			name:       "rejects oversized body",
 			body:       `{"query":"` + strings.Repeat("a", int(readerInfluxQLMaxBodyBytes)) + `"}`,
-			wantStatus: http.StatusForbidden,
-			wantBody:   readerInfluxQLForbiddenMsg,
+			wantStatus: http.StatusRequestEntityTooLarge,
+			wantBody:   readerInfluxQLBodyTooLargeMsg,
 		},
 	}
 
