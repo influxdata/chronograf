@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/roles"
 	"github.com/influxdata/influxql"
 )
@@ -17,7 +18,17 @@ func enforceReaderInfluxQLReadOnly(ctx context.Context, command string) error {
 		return nil
 	}
 
-	q, err := influxql.ParseQuery(command)
+	// Reuse existing query preprocessing so Reader can run:
+	// USE <db>; SELECT ...
+	req := chronograf.Query{Command: command}
+	setupQueryFromCommand(&req)
+
+	guardCommand := strings.TrimSpace(req.Command)
+	if guardCommand == "" {
+		return nil
+	}
+
+	q, err := influxql.ParseQuery(guardCommand)
 	if err != nil {
 		return fmt.Errorf(readerInfluxQLForbiddenMsg)
 	}
