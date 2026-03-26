@@ -182,6 +182,15 @@ func TestNewCookieJWT(t *testing.T) {
 	} else if cookie.Inactivity != defaultInactivityDuration {
 		t.Errorf("NewCookieJWT() inactivity was not five minutes: %s", cookie.Inactivity)
 	}
+
+	auth = NewCookieJWT("secret", 30*time.Minute, defaultInactivityDuration, true)
+	if cookie, ok := auth.(*cookie); !ok {
+		t.Errorf("NewCookieJWT() did not create cookie Authenticator")
+	} else if cookie.Inactivity != defaultInactivityDuration {
+		t.Errorf("NewCookieJWT() inactivity was not five minutes: %s", cookie.Inactivity)
+	} else if !cookie.Secure {
+		t.Errorf("NewCookieJWT() secure was false, expected true")
+	}
 }
 
 func TestCookieExtend(t *testing.T) {
