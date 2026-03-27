@@ -64,6 +64,9 @@ func enforceReaderFluxReadOnly(r *http.Request) error {
 	if ast.Check(pkg) > 0 {
 		return fmt.Errorf("%w: %v", errReaderFluxParse, ast.GetError(pkg))
 	}
+	if hasReaderDeniedFluxAlias(pkg) {
+		return errReaderFluxWriteForbidden
+	}
 	if hasReaderDeniedFluxCall(pkg) {
 		return errReaderFluxWriteForbidden
 	}
@@ -138,6 +141,27 @@ func isReaderAllowedFluxPath(rawPath string) bool {
 	return u.Path == "/api/v2/query"
 }
 
+// hasReaderDeniedFluxAlias blocks direct aliases of to(), e.g.:
+//
+//	t = to
+//	t = v1.to
+func hasReaderDeniedFluxAlias(pkg *ast.Package) bool {
+	blocked := false
+	ast.Walk(ast.CreateVisitor(func(node ast.Node) {
+		if blocked {
+			return
+		}
+		assign, ok := node.(*ast.VariableAssignment)
+		if !ok || assign == nil || assign.Init == nil {
+			return
+		}
+		if fluxCallName(assign.Init) == "to" {
+			blocked = true
+		}
+	}), pkg)
+	return blocked
+}
+
 func hasReaderDeniedFluxCall(pkg *ast.Package) bool {
 	blocked := false
 	ast.Walk(ast.CreateVisitor(func(node ast.Node) {
@@ -161,6 +185,11 @@ func fluxCallName(expr ast.Expression) string {
 		return callee.Name
 	case *ast.MemberExpression:
 		return callee.Property.Key()
+	case *ast.ParenExpression:
+		if callee == nil || callee.Expression == nil {
+			return ""
+		}
+		return fluxCallName(callee.Expression)
 	default:
 		return ""
 	}

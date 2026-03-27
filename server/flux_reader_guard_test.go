@@ -50,6 +50,22 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			wantMsg: readerFluxForbiddenMsg,
 		},
 		{
+			name:    "reader blocks aliased to()",
+			role:    roles.ReaderRoleName,
+			method:  http.MethodPost,
+			body:    `{"query":"t = to\nfrom(bucket: \"telegraf\") |> range(start: -1h) |> t(bucket: \"out\")"}`,
+			wantErr: true,
+			wantMsg: readerFluxForbiddenMsg,
+		},
+		{
+			name:    "reader blocks member aliased to()",
+			role:    roles.ReaderRoleName,
+			method:  http.MethodPost,
+			body:    "{\"query\":\"import \\\"influxdata/influxdb/v1\\\"\\nt = v1.to\\nfrom(bucket: \\\"telegraf\\\") |> range(start: -1h) |> t(bucket: \\\"out\\\", org: \\\"defaultorgname\\\")\"}",
+			wantErr: true,
+			wantMsg: readerFluxForbiddenMsg,
+		},
+		{
 			name:    "reader allows read query",
 			role:    roles.ReaderRoleName,
 			method:  http.MethodPost,
