@@ -211,3 +211,48 @@ func TestReaderSPARouteGuard_MultiRoleReturnsInternalServerError(t *testing.T) {
 		t.Fatalf("status=%d want=%d", w.Code, http.StatusInternalServerError)
 	}
 }
+
+func TestReaderSPARouteGuard_ZeroRoleReturnsForbidden(t *testing.T) {
+	store := &mocks.Store{
+		OrganizationsStore: &mocks.OrganizationsStore{
+			DefaultOrganizationF: func(ctx context.Context) (*chronograf.Organization, error) {
+				return &chronograf.Organization{ID: "org-1"}, nil
+			},
+			GetF: func(ctx context.Context, q chronograf.OrganizationQuery) (*chronograf.Organization, error) {
+				return &chronograf.Organization{ID: "org-1"}, nil
+			},
+		},
+		UsersStore: &mocks.UsersStore{
+			GetF: func(ctx context.Context, q chronograf.UserQuery) (*chronograf.User, error) {
+				return &chronograf.User{
+					ID:       1,
+					Name:     "user",
+					Provider: "issuer",
+					Scheme:   "oauth2",
+					Roles:    []chronograf.Role{},
+				}, nil
+			},
+		},
+	}
+	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+	auth := &mocks.Authenticator{
+		Principal: oauth2.Principal{
+			Subject:      "user",
+			Issuer:       "issuer",
+			Organization: "org-1",
+		},
+	}
+
+	h := ReaderSPARouteGuard(store, true, "", auth, log.New(log.DebugLevel), next)
+
+	req := httptest.NewRequest(http.MethodGet, "/sources/1/manage-sources", nil)
+	req.Header.Set("Accept", "text/html")
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, req)
+
+	if w.Code != http.StatusForbidden {
+		t.Fatalf("status=%d want=%d", w.Code, http.StatusForbidden)
+	}
+}
