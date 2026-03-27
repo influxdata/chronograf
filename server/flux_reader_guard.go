@@ -33,13 +33,18 @@ type fluxQueryRequest struct {
 // For OP fix #3, this enforces the known minimum: block to().
 func enforceReaderFluxReadOnly(r *http.Request) error {
 	role, ok := hasRoleContext(r.Context())
-	if !ok || role != roles.ReaderRoleName || r.Method != http.MethodPost {
+	if !ok || role != roles.ReaderRoleName {
 		return nil
 	}
 
-	// Reader may only proxy Flux query endpoint.
+	// Reader may only proxy the Flux query endpoint (all methods).
 	if !isReaderAllowedFluxPath(r.URL.Query().Get("path")) {
 		return errReaderFluxPathForbidden
+	}
+
+	// Only POST carries Flux query JSON body that needs AST checks.
+	if r.Method != http.MethodPost {
+		return nil
 	}
 
 	body, err := readAndRestoreBodyWithLimit(r, readerFluxMaxBodyBytes)

@@ -88,11 +88,20 @@ func TestEnforceReaderFluxReadOnly(t *testing.T) {
 			wantMsg: "invalid Flux query",
 		},
 		{
-			name:    "reader GET is ignored by this guard",
+			name:    "reader GET query path allowed",
 			role:    roles.ReaderRoleName,
 			method:  http.MethodGet,
 			body:    `{"query":"from(bucket: \"telegraf\") |> range(start: -1h) |> to(bucket: \"out\")"}`,
 			wantErr: false,
+		},
+		{
+			name:    "reader GET non-query flux endpoint is denied",
+			role:    roles.ReaderRoleName,
+			method:  http.MethodGet,
+			path:    "/api/v2/delete",
+			body:    ``,
+			wantErr: true,
+			wantMsg: errReaderFluxPathForbidden.Error(),
 		},
 		{
 			name:    "reader non-json body is denied",
