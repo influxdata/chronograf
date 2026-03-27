@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"path"
 	"regexp"
@@ -60,7 +61,9 @@ func ReaderSPARouteGuard(
 			return
 		}
 		if len(resolved.ScopedUser.Roles) > 1 {
-			Error(w, http.StatusInternalServerError, "Internal server error", logger)
+			msg := `User %d has too many role in organization. User: %#v.Please report this log at https://github.com/influxdata/chronograf/issues/new"`
+			logger.Error(fmt.Sprintf(msg, resolved.ScopedUser.ID, resolved.ScopedUser))
+			unknownErrorWithMessage(w, fmt.Errorf("please have administrator check logs and report error"), logger)
 			return
 		}
 
