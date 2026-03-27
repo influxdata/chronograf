@@ -247,7 +247,7 @@ func AuthorizedUser(
 
 		if hasAuthorizedRole(u, role) {
 			if len(u.Roles) != 1 {
-				msg := `User %d has too many role in organization. User: %#v.Please report this log at https://github.com/influxdata/chronograf/issues/new"`
+				msg := `User %d has too many roles in organization. User: %#v. Please report this log at https://github.com/influxdata/chronograf/issues/new`
 				log.Error(fmt.Sprint(msg, u.ID, u))
 				unknownErrorWithMessage(w, fmt.Errorf("please have administrator check logs and report error"), logger)
 				return
