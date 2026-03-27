@@ -51,8 +51,12 @@ func ReaderSPARouteGuard(
 			next.ServeHTTP(w, r)
 			return
 		}
-		if resolved.ScopedUser == nil || len(resolved.ScopedUser.Roles) != 1 {
+		if resolved.ScopedUser == nil {
 			Error(w, http.StatusForbidden, "User is not authorized", logger)
+			return
+		}
+		if len(resolved.ScopedUser.Roles) != 1 {
+			Error(w, http.StatusInternalServerError, "Internal server error", logger)
 			return
 		}
 
