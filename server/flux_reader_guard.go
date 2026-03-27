@@ -29,8 +29,8 @@ type fluxQueryRequest struct {
 	Query string `json:"query"`
 }
 
-// enforceReaderFluxReadOnly blocks Reader requests that contain write-capable Flux calls.
-// For OP fix #3, this enforces the known minimum: block to().
+// enforceReaderFluxReadOnly blocks Reader requests that contain write-capable Flux calls;
+// as a minimum policy this guard denies to() usage for Reader role.
 func enforceReaderFluxReadOnly(r *http.Request) error {
 	role, ok := hasRoleContext(r.Context())
 	if !ok || role != roles.ReaderRoleName {
