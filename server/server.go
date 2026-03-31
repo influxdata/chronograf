@@ -503,6 +503,26 @@ func (s *Server) useTLS() bool {
 	return s.Cert != ""
 }
 
+// useSecureCookies determines whether auth cookies should be marked Secure.
+// It is true when Chronograf serves TLS directly, or when the configured
+// public URL is HTTPS (e.g. TLS termination at a reverse proxy).
+func (s *Server) useSecureCookies() bool {
+	if s.useTLS() {
+		return true
+	}
+
+	if s.PublicURL == "" {
+		return false
+	}
+
+	publicURL, err := url.Parse(s.PublicURL)
+	if err != nil {
+		return false
+	}
+
+	return strings.EqualFold(publicURL.Scheme, "https")
+}
+
 // NewListener will return an http or https listener depending useTLS().
 func (s *Server) NewListener() (net.Listener, error) {
 	addr := net.JoinHostPort(s.Host, strconv.Itoa(s.Port))
@@ -772,7 +792,7 @@ func (s *Server) Serve(ctx context.Context) {
 	transport.TLSClientConfig.RootCAs = certs
 	s.oauthClient = http.Client{Transport: transport}
 
-	auth := oauth2.NewCookieJWT(s.TokenSecret, s.AuthDuration, s.InactivityDuration)
+	auth := oauth2.NewCookieJWT(s.TokenSecret, s.AuthDuration, s.InactivityDuration, s.useSecureCookies())
 	providerFuncs := []func(func(oauth2.Provider, oauth2.Mux)){
 		provide(s.githubOAuth(logger, auth)),
 		provide(s.googleOAuth(logger, auth)),

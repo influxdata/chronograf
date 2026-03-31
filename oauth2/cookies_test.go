@@ -162,25 +162,34 @@ func TestCookieValidate(t *testing.T) {
 }
 
 func TestNewCookieJWT(t *testing.T) {
-	auth := NewCookieJWT("secret", 2*time.Second, defaultInactivityDuration)
+	auth := NewCookieJWT("secret", 2*time.Second, defaultInactivityDuration, false)
 	if cookie, ok := auth.(*cookie); !ok {
 		t.Errorf("NewCookieJWT() did not create cookie Authenticator")
 	} else if cookie.Inactivity != time.Second {
 		t.Errorf("NewCookieJWT() inactivity was not two seconds: %s", cookie.Inactivity)
 	}
 
-	auth = NewCookieJWT("secret", time.Hour, defaultInactivityDuration)
+	auth = NewCookieJWT("secret", time.Hour, defaultInactivityDuration, false)
 	if cookie, ok := auth.(*cookie); !ok {
 		t.Errorf("NewCookieJWT() did not create cookie Authenticator")
 	} else if cookie.Inactivity != defaultInactivityDuration {
 		t.Errorf("NewCookieJWT() inactivity was not five minutes: %s", cookie.Inactivity)
 	}
 
-	auth = NewCookieJWT("secret", 0, defaultInactivityDuration)
+	auth = NewCookieJWT("secret", 0, defaultInactivityDuration, false)
 	if cookie, ok := auth.(*cookie); !ok {
 		t.Errorf("NewCookieJWT() did not create cookie Authenticator")
 	} else if cookie.Inactivity != defaultInactivityDuration {
 		t.Errorf("NewCookieJWT() inactivity was not five minutes: %s", cookie.Inactivity)
+	}
+
+	auth = NewCookieJWT("secret", 30*time.Minute, defaultInactivityDuration, true)
+	if cookie, ok := auth.(*cookie); !ok {
+		t.Errorf("NewCookieJWT() did not create cookie Authenticator")
+	} else if cookie.Inactivity != defaultInactivityDuration {
+		t.Errorf("NewCookieJWT() inactivity was not five minutes: %s", cookie.Inactivity)
+	} else if !cookie.Secure {
+		t.Errorf("NewCookieJWT() secure was false, expected true")
 	}
 }
 
