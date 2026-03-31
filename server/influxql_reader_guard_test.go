@@ -42,8 +42,8 @@ func TestEnforceReaderInfluxQLReadOnly_NonReaderUnchanged(t *testing.T) {
 func TestEnforceReaderInfluxQLReadOnly_DashboardPlaceholdersAllowed(t *testing.T) {
 	ctx := context.WithValue(context.Background(), roles.ContextKey, roles.ReaderRoleName)
 	queries := []string{
-		`SELECT mean("v") AS "mean_v" FROM "smoke"."autogen"."m" WHERE time > :dashboardTime: AND time < :upperDashboardTime: GROUP BY time(:interval:) FILL(null)`,
-		`SELECT mean("cpu_temp") AS "mean_cpu_temp" FROM "gateway"."autogen"."device_metrics" WHERE time > :dashboardTime: AND time < :upperDashboardTime: GROUP BY time(:interval:) FILL(linear)`,
+		`SELECT mean("usage_user") AS "mean_usage_user" FROM "telegraf"."autogen"."cpu" WHERE time > :dashboardTime: AND time < :upperDashboardTime: GROUP BY time(:interval:) FILL(null)`,
+		`SELECT mean("usage_system") AS "mean_usage_system" FROM "telegraf"."autogen"."cpu" WHERE time > :dashboardTime: AND time < :upperDashboardTime: GROUP BY time(:interval:) FILL(linear)`,
 	}
 
 	for _, q := range queries {
