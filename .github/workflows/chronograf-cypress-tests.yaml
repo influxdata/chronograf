@@ -58,6 +58,7 @@ jobs:
           helm repo add jetstack https://charts.jetstack.io
           helm repo add influxdata https://helm.influxdata.com/
           helm repo update
+          helm show chart influxdata/influxdb-enterprise
           helm upgrade --wait --install \
               cert-manager jetstack/cert-manager \
               --namespace cert-manager \
@@ -69,13 +70,26 @@ jobs:
           kubectl apply -f .github/workflows/resources/test-resources.yaml
           kubectl create secret generic influxdb-license --from-literal=INFLUXDB_ENTERPRISE_LICENSE_KEY=${INFLUXDB_ENTERPRISE_LICENSE_KEY}
           helm upgrade --install influxdb influxdata/influxdb-enterprise --namespace default \
+              --wait \
+              --timeout 10m \
+              --debug \
               --set-string envFromSecret=influxdb-license \
               --set-string data.service.type=NodePort \
               --set-string meta.service.type=NodePort \
               --set data.service.nodePort=30086 \
               --set meta.service.nodePort=30091
+          helm status influxdb -n default
         env:
           INFLUXDB_ENTERPRISE_LICENSE_KEY: "${{ secrets.INFLUXDB_ENTERPRISE_LICENSE_KEY }}"
+
+      - name: Enterprise diagnostics (on failure)
+        if: failure()
+        run: |
+          helm status influxdb -n default || true
+          kubectl get pods -n default -o wide || true
+          kubectl get events -n default --sort-by=.lastTimestamp | tail -n 300 || true
+          kubectl describe pods -n default || true
+          kubectl logs -n default --all-containers=true -l app.kubernetes.io/instance=influxdb --tail=400 || true
 
       - name: OAuth2 Mock Server
         run: |
