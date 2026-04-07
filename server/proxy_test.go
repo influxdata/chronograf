@@ -28,7 +28,7 @@ func TestService_Proxy_AuthHeaderForwarding(t *testing.T) {
 			name:                       "strips incoming cookie and auth headers",
 			incomingCookie:             "session=victim-session",
 			incomingAuthorization:      "Bearer victim-token",
-			incomingProxyAuthorization: "Basic dmljdGltOnRva2Vu",
+			incomingProxyAuthorization: "Basic test_only_not_real_credentials",
 		},
 		{
 			name:           "does not set authorization when upstream credentials are empty",
