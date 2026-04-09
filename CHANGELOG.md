@@ -4,6 +4,7 @@
 
 1. [#6186](https://github.com/influxdata/chronograf/pull/6186): Hardened CSRF protections on Data Explorer and unsafe query endpoints.
 1. [#6191](https://github.com/influxdata/chronograf/pull/6191): Hardened Reader-only access and read-only query enforcement.
+2. [#6198](https://github.com/influxdata/chronograf/pull/6198): Prevent proxy credential leakage by default.
 
 ## v1.11.0 [2026-02-19]
 
