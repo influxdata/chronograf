@@ -166,6 +166,22 @@ export class CheckSources extends Component<Props, State> {
       return router.push('/purgatory')
     }
 
+    if (
+      !isFetching &&
+      isUsingAuth &&
+      me.role === READER_ROLE &&
+      params.sourceID
+    ) {
+      const dashboardsPath = `/sources/${params.sourceID}/dashboards`
+
+      if (
+        location.pathname !== dashboardsPath &&
+        !location.pathname.startsWith(dashboardsPath + '/')
+      ) {
+        return router.push(dashboardsPath)
+      }
+    }
+
     // TODO: At this point, the sources we have in Redux may be out of sync with what's on the server
     // Do we need to refresh this data more frequently? Does it need to come as frequently as the `me` response?
     if (!isFetching && !source) {

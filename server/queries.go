@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -11,6 +12,7 @@ import (
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/influx"
 	"github.com/influxdata/chronograf/influx/queries"
+	"github.com/influxdata/chronograf/roles"
 )
 
 // QueryRequest is query that will be converted to a queryConfig
@@ -56,9 +58,20 @@ func (s *Service) Queries(w http.ResponseWriter, r *http.Request) {
 		notFound(w, srcID, s.Logger)
 		return
 	}
+	role, ok := hasRoleContext(ctx)
+	isReader := ok && role == roles.ReaderRoleName
+	if isReader {
+		// In this handler we decode once and do not need to preserve the original body stream.
+		r.Body = http.MaxBytesReader(w, r.Body, readerInfluxQLMaxBodyBytes)
+	}
 
 	var req QueriesRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		var maxErr *http.MaxBytesError
+		if isReader && errors.As(err, &maxErr) {
+			Error(w, http.StatusRequestEntityTooLarge, readerInfluxQLBodyTooLargeMsg, s.Logger)
+			return
+		}
 		invalidJSON(w, s.Logger)
 		return
 	}
@@ -67,6 +80,15 @@ func (s *Service) Queries(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for i, q := range req.Queries {
+		if err := enforceReaderInfluxQLReadOnly(ctx, q.Query); err != nil {
+			if errors.Is(err, errReaderInfluxQLParse) {
+				Error(w, http.StatusBadRequest, err.Error(), s.Logger)
+				return
+			}
+			Error(w, http.StatusForbidden, err.Error(), s.Logger)
+			return
+		}
+
 		qr := QueryResponse{
 			ID:    q.ID,
 			Query: q.Query,

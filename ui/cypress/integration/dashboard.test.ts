@@ -91,5 +91,36 @@ describe('Use Dashboards', () => {
         .find('.dropdown-selected')
         .should('contain.text', 'Past 5m')
     })
+
+    it('redirects reader away from non-dashboard source routes', () => {
+      const dashboardsPath = `/sources/${source.id}/dashboards`
+      const blockedPaths = [
+        `/sources/${source.id}/chronograf/data-explorer`,
+        `/sources/${source.id}/alert-rules`,
+        `/sources/${source.id}/admin-influxdb/databases`,
+      ]
+
+      cy.wrap(blockedPaths).each(path => {
+        cy.visit(path as string)
+        cy.location('pathname').should('eq', dashboardsPath)
+      })
+    })
+
+    it('denies reader flux proxy requests to non-query paths', () => {
+      cy.visit(`/sources/${source.id}/dashboards`)
+      cy.request({
+        method: 'POST',
+        failOnStatusCode: false,
+        url:
+          `/chronograf/v1/sources/${source.id}/proxy/flux` +
+          `?path=${encodeURIComponent('/api/v2/delete')}`,
+        body: {
+          start: '2020-01-01T00:00:00Z',
+          stop: '2020-01-02T00:00:00Z',
+        },
+      }).then(response => {
+        expect(response.status).to.eq(403)
+      })
+    })
   })
 })

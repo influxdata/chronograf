@@ -21,6 +21,7 @@ import {
   UserIsNotAuthenticated,
   Purgatory,
 } from 'src/auth'
+import Authorized, {EDITOR_ROLE, VIEWER_ROLE} from 'src/auth/Authorized'
 import CheckSources from 'src/CheckSources'
 import {StatusPage} from 'src/status'
 import {HostsPage, HostPage} from 'src/hosts'
@@ -129,6 +130,34 @@ interface State {
   ready: boolean
 }
 
+class RedirectToRoot extends PureComponent<Record<string, never>> {
+  public componentDidMount() {
+    browserHistory.replace('/')
+  }
+
+  public render() {
+    return null
+  }
+}
+
+const LogsPageRoute = () => (
+  <Authorized
+    requiredRole={VIEWER_ROLE}
+    replaceWithIfNotAuthorized={<RedirectToRoot />}
+  >
+    <LogsPage />
+  </Authorized>
+)
+
+const OnboardingWizardRoute = () => (
+  <Authorized
+    requiredRole={EDITOR_ROLE}
+    replaceWithIfNotAuthorized={<RedirectToRoot />}
+  >
+    <OnboardingWizard />
+  </Authorized>
+)
+
 class Root extends PureComponent<Record<string, never>, State> {
   private getLinks = bindActionCreators(getLinksAsync, dispatch)
   private getMe = bindActionCreators(getMeAsync, dispatch)
@@ -177,11 +206,11 @@ class Root extends PureComponent<Record<string, never>, State> {
               component={UserIsAuthenticated(Purgatory)}
             />
             <Route component={UserIsAuthenticated(App)}>
-              <Route path="/logs" component={LogsPage} />
+              <Route path="/logs" component={LogsPageRoute} />
             </Route>
             <Route
               path="/sources/new"
-              component={UserIsAuthenticated(OnboardingWizard)}
+              component={UserIsAuthenticated(OnboardingWizardRoute)}
             />
             <Route
               path="/sources/:sourceID"

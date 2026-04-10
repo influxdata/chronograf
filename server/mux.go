@@ -417,6 +417,7 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	} else {
 		out = router
 	}
+	out = ReaderSPARouteGuard(service.Store, opts.UseAuth, opts.Basepath, opts.Auth, opts.Logger, out)
 	out = RequireSameOriginForSessionAuth(opts.Logger, out)
 	out = SecurityHeaders(out)
 	out = Logger(opts.Logger, FlushingHandler(out))
