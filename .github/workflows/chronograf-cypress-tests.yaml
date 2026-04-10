@@ -72,8 +72,6 @@ jobs:
           helm upgrade --install influxdb influxdata/influxdb-enterprise --namespace default \
               --wait \
               --timeout 5m \
-              --set-string image.tag=1.11 \
-              --set image.addsuffix=true \
               --set-string envFromSecret=influxdb-license \
               --set-string data.service.type=NodePort \
               --set-string meta.service.type=NodePort \
