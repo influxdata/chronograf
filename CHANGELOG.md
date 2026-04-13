@@ -15,7 +15,7 @@
 1. [#6170](https://github.com/influxdata/chronograf/pull/6170): Update Flux help in the UI to align with stdlib `0.199`.
 1. [#6171](https://github.com/influxdata/chronograf/pull/6171): Upgrade dependencies. Upgrade typescript to 4.9.5. Upgrade jest to 30.2.0. Upgrade eslint to 9.34.0.  Reconfigure eslint.
 1. [#6174](https://github.com/influxdata/chronograf/pull/6174): Upgrade dependencies. Upgrade nodejs to v24.13.0. Upgrade sass to 1.97.3. Remove dependency on node-sass.
-1. [#6181](https://github.com/influxdata/chronograf/pull/6181): Upgrade dependencies. Upgrade golang to 1.25.7
+1. [#6181](https://github.com/influxdata/chronograf/pull/6181): Upgrade dependencies. Upgrade golang to 1.25.8. Upgrade flux to `0.200`.
     * All darwin builds will now be dynamic only.
     * All windows builds will now be dynamic only.
     * All linux builds will now be static only.
