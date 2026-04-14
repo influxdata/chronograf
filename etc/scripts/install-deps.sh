@@ -14,11 +14,10 @@ apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     rpm \
     zip \
     python3-pip \
+    python3-boto3 \
+    python3-botocore \
     autoconf \
     libtool
-
-python3 -m pip install --upgrade pip
-python3 -m pip install --upgrade boto3 botocore requests python-jose
 gem install dotenv -v 2.8.1
 gem install fpm
 
