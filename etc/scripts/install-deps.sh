@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     apt-transport-https \
@@ -16,7 +17,8 @@ apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     autoconf \
     libtool
 
-pip3 install boto3 requests python-jose --upgrade
+python3 -m pip install --upgrade pip
+python3 -m pip install --upgrade boto3 botocore requests python-jose
 gem install dotenv -v 2.8.1
 gem install fpm
 
