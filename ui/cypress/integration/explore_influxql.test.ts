@@ -138,7 +138,7 @@ describe('InfluxQL', () => {
       })
     cy.get('.query-editor--status-actions').within(() => {
       cy.get('button').contains('Submit Query').click()
-      cy.wait('@postQuery')
+      cy.wait('@postQuery').its('response.statusCode').should('eq', 200)
       cy.reload()
     })
 
@@ -151,7 +151,8 @@ describe('InfluxQL', () => {
       cy.get('.dropdown').contains('Metaquery Templates').click()
       cy.getByTestID('dropdown--item').contains('Drop Database').click()
       cy.get('button').contains('Submit Query').click()
-      cy.wait('@postQuery')
+      cy.wait('@postQuery').its('response.statusCode').should('eq', 200)
+      cy.reload()
     })
     cy.contains('.query-builder--column', 'DB.RetentionPolicy').within(() => {
       cy.contains('.query-builder--list-item', `${targetDatabase}.autogen`, {
