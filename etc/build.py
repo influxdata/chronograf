@@ -107,7 +107,7 @@ supported_packages = {
 ################
 
 def print_banner():
-    logging.info("""
+    logging.info(r"""
    ___ _                                     __
   / __| |_  _ _ ___ _ _  ___  __ _ _ _ __ _ / _|
  | (__| ' \| '_/ _ \ ' \/ _ \/ _` | '_/ _` |  _|
@@ -175,9 +175,9 @@ def run_generate():
 def make_clean():
     """Generate static assets.
     """
-    start_time = datetime.utcnow()
+    start_time = datetime.now(timezone.utc)
     run("make clean", shell=True, print_output=True)
-    end_time = datetime.utcnow()
+    end_time = datetime.now(timezone.utc)
     logging.info("Time taken: {}s".format((end_time - start_time).total_seconds()))
     return True
 
@@ -229,14 +229,14 @@ def run(command, allow_failure=False, shell=False, print_output=False):
             out = out.decode('utf-8').strip()
         if p.returncode != 0:
             if allow_failure:
-                logging.warn(u"Command '{}' failed with error: {}".format(command, out))
+                logging.warning(u"Command '{}' failed with error: {}".format(command, out))
                 return None
             else:
                 logging.error(u"Command '{}' failed with error: {}".format(command, out))
                 sys.exit(1)
     except OSError as e:
         if allow_failure:
-            logging.warn("Command '{}' failed with error: {}".format(command, e))
+            logging.warning("Command '{}' failed with error: {}".format(command, e))
             return out
         else:
             logging.error("Command '{}' failed with error: {}".format(command, e))
@@ -258,7 +258,7 @@ def increment_minor_version(version):
     """
     ver_list = version.split('.')
     if len(ver_list) != 3:
-        logging.warn("Could not determine how to increment version '{}', will just use provided version.".format(version))
+        logging.warning("Could not determine how to increment version '{}', will just use provided version.".format(version))
         return version
     ver_list[1] = str(int(ver_list[1]) + 1)
     ver_list[2] = str(0)
@@ -341,7 +341,7 @@ def get_go_version():
     """Retrieve version information for Go.
     """
     out = run("go version")
-    matches = re.search('go version go(\S+)', out)
+    matches = re.search(r'go version go(\S+)', out)
     if matches is not None:
         return matches.groups()[0].strip()
     return None
@@ -367,7 +367,7 @@ def check_environ(build_dir = None):
 
     cwd = os.getcwd()
     if build_dir is None and os.environ.get("GOPATH") and os.environ.get("GOPATH") not in cwd:
-        logging.warn("Your current directory is not under your GOPATH. This may lead to build failures.")
+        logging.warning("Your current directory is not under your GOPATH. This may lead to build failures.")
     return True
 
 def check_prereqs():
@@ -390,7 +390,7 @@ def upload_packages(packages, bucket_name=None, overwrite=False):
         from botocore.exceptions import ClientError
         logging.getLogger("boto3").setLevel(logging.WARNING)
     except ImportError:
-        logging.warn("Cannot upload packages without 'boto3' Python library!")
+        logging.warning("Cannot upload packages without 'boto3' Python library!")
         return False
     logging.info("Connecting to AWS S3...")
 
@@ -616,7 +616,7 @@ def generate_sig_from_file(path):
     logging.debug("Generating GPG signature for file: {}".format(path))
     gpg_path = check_path_for('gpg')
     if gpg_path is None:
-        logging.warn("gpg binary not found on path! Skipping signature creation.")
+        logging.warning("gpg binary not found on path! Skipping signature creation.")
         return False
     if os.environ.get("GNUPG_HOME") is not None:
         run('gpg --homedir {} --armor --yes --detach-sign {}'.format(os.environ.get("GNUPG_HOME"), path))
@@ -761,7 +761,7 @@ def package(build_output, pkg_name, version, nightly=False, iteration=1, static=
                         if matches is not None:
                             outfile = matches.groups()[0]
                         if outfile is None:
-                            logging.warn("Could not determine output from packaging output!")
+                            logging.warning("Could not determine output from packaging output!")
                         else:
                             if nightly:
                                 # TODO: check if this is correct
@@ -816,7 +816,7 @@ def main(args):
 
     if args.nightly:
         args.version = increment_minor_version(args.version)
-        args.version = "{}~{}".format(datetime.utcnow().strftime("%Y%m%d%H%M"),
+        args.version = "{}~{}".format(datetime.now(timezone.utc).strftime("%Y%m%d%H%M"),
                                       args.version)
         args.iteration = 0
 

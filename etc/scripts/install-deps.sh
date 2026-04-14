@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     apt-transport-https \
@@ -12,11 +13,9 @@ apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     ruby-dev \
     rpm \
     zip \
-    python3-pip \
+    python3-boto3 \
     autoconf \
     libtool
-
-pip3 install boto3 requests python-jose --upgrade
 gem install dotenv -v 2.8.1
 gem install fpm
 
