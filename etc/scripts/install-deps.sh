@@ -13,9 +13,7 @@ apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     ruby-dev \
     rpm \
     zip \
-    python3-pip \
     python3-boto3 \
-    python3-botocore \
     autoconf \
     libtool
 gem install dotenv -v 2.8.1
