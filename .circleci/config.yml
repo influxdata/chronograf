@@ -2,7 +2,7 @@ version: 2.1
 executors:
   cross-builder:
     docker:
-      - image: quay.io/influxdb/cross-builder:go1.25.7-latest
+      - image: quay.io/influxdb/cross-builder:go1.25.8-latest
     resource_class: large
     environment:
       GOPATH: /root/go
@@ -17,7 +17,7 @@ commands:
           name: Install additional dependencies
           command: |
             ./etc/scripts/install-deps.sh
-            echo 'export PATH=/usr/local/node/bin:$PATH' >> $BASH_ENV   
+            echo 'export PATH=$HOME/chronograf/.venv/bin:/usr/local/node/bin:$PATH' >> $BASH_ENV
 
 orbs:
   browser-tools: circleci/browser-tools@1.1.3

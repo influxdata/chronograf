@@ -13,9 +13,12 @@ apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     rpm \
     zip \
     python3-pip \
+    python3-venv \
     autoconf \
     libtool
 
+python3 -m venv ./.venv
+source ./.venv/bin/activate
 pip3 install boto3 requests python-jose --upgrade
 gem install dotenv -v 2.8.1
 gem install fpm
