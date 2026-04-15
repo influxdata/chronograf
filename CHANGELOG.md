@@ -1,4 +1,4 @@
-## Unreleased
+## v1.11.1 [2026-04-15]
 
 ### Security Fixes
 
