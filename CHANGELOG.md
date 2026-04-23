@@ -12,6 +12,8 @@
    * All darwin builds will now be dynamic only.
    * All windows builds will now be dynamic only.
    * All linux builds will now be static only.
+1. [#6206](https://github.com/influxdata/chronograf/pull/6206): Upgrade golang to 1.25.9.
+
 
 ## v1.11.0 [2026-02-19]
 
