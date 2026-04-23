@@ -14,7 +14,6 @@
    * All linux builds will now be static only.
 1. [#6206](https://github.com/influxdata/chronograf/pull/6206): Upgrade golang to 1.25.9.
 
-
 ## v1.11.0 [2026-02-19]
 
 ⚠️ Removed support for Linux i386, armhf, armel and static build. Removed support for Darwin arm64.
