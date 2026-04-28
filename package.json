@@ -10,6 +10,9 @@
   "scripts": {
     "postinstall": "echo \"\" > node_modules/go.mod"
   },
+  "@parcel/resolver-default": {
+    "packageExports": true
+  },
   "homepage": "https://github.com/influxdata/chronograf",
   "repository": {
     "type": "git",
@@ -24,13 +27,14 @@
   },
   "license": "AGPL-3.0",
   "devDependencies": {
-    "@parcel/core": "^2.6.2",
-    "@parcel/transformer-sass": "^2.6.2",
+    "@parcel/core": "^2.16.4",
+    "@parcel/transformer-sass": "^2.16.4",
     "assert": "^2.0.0",
     "events": "^3.3.0",
     "http-proxy-middleware": "^2.0.9",
     "process": "^0.11.10",
     "querystring-es3": "^0.2.1",
+    "url": "^0.11.4",
     "util": "^0.12.4"
   }
 }

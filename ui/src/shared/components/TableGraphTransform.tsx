@@ -1,7 +1,7 @@
 // Libraries
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 import memoizeOne from 'memoize-one'
 
 // Components
@@ -66,7 +66,7 @@ class TableGraphTransform extends PureComponent<Props, State> {
       return null
     }
 
-    return this.props.children(this.state.transformedData, uuid.v4())
+    return this.props.children(this.state.transformedData, uuidv4())
   }
 
   public componentDidMount() {

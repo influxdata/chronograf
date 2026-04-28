@@ -1,7 +1,7 @@
 import AJAX from 'src/utils/ajax'
 import _ from 'lodash'
 import {proxy} from 'utils/queryUrlGenerator'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 
 export const showDatabases = async source => {
   const query = 'SHOW DATABASES'
@@ -82,7 +82,7 @@ export const showTagValues = async ({
             ],
           },
         ],
-        uuid: uuid.v4(),
+        uuid: uuidv4,
       },
     }
   }

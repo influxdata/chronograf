@@ -1,7 +1,7 @@
 import React, {Component, ChangeEvent, KeyboardEvent, MouseEvent} from 'react'
 import classnames from 'classnames'
 
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 
 import ClickOutsideInput from 'src/shared/components/ClickOutsideInput'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -51,7 +51,7 @@ class OptIn extends Component<Props, State> {
       customValue,
     }
 
-    this.id = uuid.v4()
+    this.id = uuidv4()
     this.isCustomValueInputFocused = false
   }
 

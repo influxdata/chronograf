@@ -1,7 +1,7 @@
 // Libraries
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 
 // Components
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
@@ -128,7 +128,7 @@ class GaugeOptions extends PureComponent<Props> {
 
       const newThreshold = {
         type: COLOR_TYPE_THRESHOLD,
-        id: uuid.v4(),
+        id: uuidv4(),
         value: randomValue,
         hex: THRESHOLD_COLORS[randomColor].hex,
         name: THRESHOLD_COLORS[randomColor].name,

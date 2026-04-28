@@ -1,5 +1,5 @@
 // Libraries
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 import {get} from 'lodash'
 
 // Utils
@@ -75,7 +75,7 @@ function initialQueryDrafts(cell: Cell | NewDefaultCell): CellQuery[] {
   }
 
   return queries.map(q => {
-    const id = uuid.v4()
+    const id = uuidv4()
     const queryConfig = {
       ...q.queryConfig,
       range: getTimeRange(q.queryConfig),
@@ -90,7 +90,7 @@ export function defaultQueryDraft(
   type: QueryType,
   source: string = ''
 ): CellQuery {
-  const id = uuid.v4()
+  const id = uuidv4()
   const defaultDraft: CellQuery = {
     id,
     type,

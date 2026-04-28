@@ -2,7 +2,7 @@ import React, {Component, MouseEvent} from 'react'
 import {withRouter, WithRouterProps} from 'react-router'
 import classnames from 'classnames'
 import {connect} from 'react-redux'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 
 import AnnotationWindow from 'src/shared/components/AnnotationWindow'
 import {
@@ -197,7 +197,7 @@ class NewAnnotation extends Component<Props & WithRouterProps, State> {
     }
 
     onSetAddingAnnotation(newAnnotation)
-    onAddAnnotationAsync(createUrl, {...newAnnotation, id: uuid.v4()})
+    onAddAnnotationAsync(createUrl, {...newAnnotation, id: uuidv4()})
 
     onAddingAnnotationSuccess()
     onMouseLeaveTempAnnotation()

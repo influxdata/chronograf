@@ -1,4 +1,4 @@
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 import {PureComponent} from 'react'
 
 import {AutoRefresher} from 'src/utils/AutoRefresher'
@@ -18,7 +18,7 @@ export default class AutoRefresh extends PureComponent<Props, State> {
   public static getDerivedStateFromProps(nextProps: Props, state: State) {
     if (state.manualRefresh !== nextProps.manualRefresh) {
       return {
-        id: uuid.v4(),
+        id: uuidv4(),
         manualRefresh: nextProps.manualRefresh,
       }
     }
@@ -30,7 +30,7 @@ export default class AutoRefresh extends PureComponent<Props, State> {
     super(props)
     this.state = {
       manualRefresh: props.manualRefresh,
-      id: uuid.v4(),
+      id: uuidv4(),
     }
   }
 
@@ -55,6 +55,6 @@ export default class AutoRefresh extends PureComponent<Props, State> {
   }
 
   private update = () => {
-    this.setState({id: uuid.v4()})
+    this.setState({id: uuidv4()})
   }
 }

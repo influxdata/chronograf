@@ -1,6 +1,6 @@
 // Libraries
 import React, {PureComponent} from 'react'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 import memoizeOne from 'memoize-one'
 
 // Components
@@ -105,7 +105,7 @@ class TimeMachineTables extends PureComponent<Props, State> {
           <TableGraphTransform
             data={this.selectedResult}
             dataType={dataType}
-            uuid={uuid.v4()}
+            uuid={uuidv4()}
           >
             {(transformedData, nextUUID) => (
               <TableGraphFormat
