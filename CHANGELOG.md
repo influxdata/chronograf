@@ -13,6 +13,10 @@
    * All windows builds will now be dynamic only.
    * All linux builds will now be static only.
 1. [#6206](https://github.com/influxdata/chronograf/pull/6206): Upgrade golang to 1.25.9.
+1. [#6208](https://github.com/influxdata/chronograf/pull/6208): Upgrade dependencies.
+   * Upgrade "uuid" package version to "^14.0.0".
+   * Upgrade "@parcel/core" version to "^2.16.4".
+   * Remove "@types/uuid" because newer "uuid" versions are included types in the package.
 
 ## v1.11.0 [2026-02-19]
 
