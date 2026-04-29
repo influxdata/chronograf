@@ -1,6 +1,6 @@
 // Libraries
 import React, {Component} from 'react'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 import _ from 'lodash'
 import {connect, ResolveThunks} from 'react-redux'
 import {AutoSizer} from 'react-virtualized'
@@ -708,7 +708,7 @@ class LogsPage extends Component<Props, State> {
 
   private handleTagSelection = (selection: {tag: string; key: string}) => {
     this.props.addFilter({
-      id: uuid.v4(),
+      id: uuidv4(),
       key: selection.key,
       value: selection.tag,
       operator: '==',

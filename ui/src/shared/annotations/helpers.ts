@@ -1,4 +1,4 @@
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 
 import {Annotation, TagFilter, TagFilterType} from 'src/types/annotations'
 
@@ -16,7 +16,7 @@ export const DEFAULT_ANNOTATION = (): Annotation => ({
 })
 
 export const NEW_TAG_FILTER = (): TagFilter => ({
-  id: uuid.v4(),
+  id: uuidv4(),
   tagKey: '',
   tagValue: '',
   filterType: TagFilterType.Equals,

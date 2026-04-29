@@ -1,4 +1,4 @@
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 import {Action} from 'src/types/actions/notifications'
 import {Notification} from 'src/types'
 
@@ -10,7 +10,7 @@ export const notifications = (state = initialState, action: Action) => {
       const {notification} = action.payload
       const publishedNotification = {
         ...notification,
-        id: uuid.v4(),
+        id: uuidv4(),
       }
 
       return [publishedNotification, ...state]

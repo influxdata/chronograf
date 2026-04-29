@@ -1,7 +1,7 @@
 // Libraries
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 
 // Comonents
 import Threshold from 'src/dashboards/components/Threshold'
@@ -112,7 +112,7 @@ class ThresholdsList extends PureComponent<Props> {
 
     const newThreshold = {
       type: thresholdsListType,
-      id: uuid.v4(),
+      id: uuidv4(),
       value: randomValue,
       hex: THRESHOLD_COLORS[randomColor].hex,
       name: THRESHOLD_COLORS[randomColor].name,

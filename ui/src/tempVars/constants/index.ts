@@ -1,4 +1,4 @@
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 
 import {TimeRange} from 'src/types/queries'
 import {
@@ -84,7 +84,7 @@ interface DefaultTemplates {
 export const DEFAULT_TEMPLATES: DefaultTemplates = {
   [TemplateType.Databases]: () => {
     return {
-      id: uuid.v4(),
+      id: uuidv4(),
       tempVar: '',
       values: [
         {
@@ -103,7 +103,7 @@ export const DEFAULT_TEMPLATES: DefaultTemplates = {
   },
   [TemplateType.Measurements]: () => {
     return {
-      id: uuid.v4(),
+      id: uuidv4(),
       tempVar: '',
       values: [],
       type: TemplateType.Measurements,
@@ -116,7 +116,7 @@ export const DEFAULT_TEMPLATES: DefaultTemplates = {
   },
   [TemplateType.CSV]: () => {
     return {
-      id: uuid.v4(),
+      id: uuidv4(),
       tempVar: '',
       values: [],
       type: TemplateType.CSV,
@@ -126,7 +126,7 @@ export const DEFAULT_TEMPLATES: DefaultTemplates = {
   },
   [TemplateType.Map]: () => {
     return {
-      id: uuid.v4(),
+      id: uuidv4(),
       tempVar: '',
       values: [],
       type: TemplateType.Map,
@@ -136,7 +136,7 @@ export const DEFAULT_TEMPLATES: DefaultTemplates = {
   },
   [TemplateType.TagKeys]: () => {
     return {
-      id: uuid.v4(),
+      id: uuidv4(),
       tempVar: '',
       values: [],
       type: TemplateType.TagKeys,
@@ -148,7 +148,7 @@ export const DEFAULT_TEMPLATES: DefaultTemplates = {
   },
   [TemplateType.FieldKeys]: () => {
     return {
-      id: uuid.v4(),
+      id: uuidv4(),
       tempVar: '',
       values: [],
       type: TemplateType.FieldKeys,
@@ -160,7 +160,7 @@ export const DEFAULT_TEMPLATES: DefaultTemplates = {
   },
   [TemplateType.TagValues]: () => {
     return {
-      id: uuid.v4(),
+      id: uuidv4(),
       tempVar: '',
       values: [],
       type: TemplateType.TagValues,
@@ -172,7 +172,7 @@ export const DEFAULT_TEMPLATES: DefaultTemplates = {
   },
   [TemplateType.MetaQuery]: () => {
     return {
-      id: uuid.v4(),
+      id: uuidv4(),
       tempVar: ':my-meta-query:',
       values: [],
       type: TemplateType.MetaQuery,
@@ -184,7 +184,7 @@ export const DEFAULT_TEMPLATES: DefaultTemplates = {
   },
   [TemplateType.FluxQuery]: () => {
     return {
-      id: uuid.v4(),
+      id: uuidv4(),
       tempVar: ':my-flux-query:',
       values: [],
       type: TemplateType.FluxQuery,
@@ -196,7 +196,7 @@ export const DEFAULT_TEMPLATES: DefaultTemplates = {
   },
   [TemplateType.Text]: () => {
     return {
-      id: uuid.v4(),
+      id: uuidv4(),
       tempVar: ':my-text:',
       values: [
         {

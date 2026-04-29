@@ -1,4 +1,4 @@
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 
 import {getQueryConfigAndStatus} from 'src/shared/apis'
 
@@ -43,7 +43,7 @@ export interface ActionAddQuery {
   }
 }
 
-export const addQuery = (queryID: string = uuid.v4()): ActionAddQuery => ({
+export const addQuery = (queryID: string = uuidv4()): ActionAddQuery => ({
   type: 'DE_ADD_QUERY',
   payload: {
     queryID,

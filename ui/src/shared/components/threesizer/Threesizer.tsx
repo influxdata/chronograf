@@ -5,7 +5,7 @@ import React, {
   CSSProperties,
 } from 'react'
 import classnames from 'classnames'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 import _ from 'lodash'
 
 import Division from 'src/shared/components/threesizer/Division'
@@ -224,7 +224,7 @@ class Threesizer extends PureComponent<Props, State> {
 
       return {
         ...d,
-        id: uuid.v4(),
+        id: uuidv4(),
         size,
         handlePixels: d.handlePixels || HANDLE_PIXELS,
       }

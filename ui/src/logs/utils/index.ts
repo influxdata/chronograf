@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import moment from 'moment'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 import {Filter} from 'src/types/logs'
 import {TimeRange, Namespace, QueryConfig} from 'src/types'
 import {NULL_STRING} from 'src/shared/constants/queryFillOptions'
@@ -289,7 +289,7 @@ export const buildHistogramQueryConfig = (
   namespace: Namespace,
   range: TimeRange
 ): QueryConfig => {
-  const id = uuid.v4()
+  const id = uuidv4()
   const {database, retentionPolicy} = namespace
 
   return {
@@ -307,7 +307,7 @@ export const buildTableQueryConfig = (
   namespace: Namespace,
   range: TimeRange
 ): QueryConfig => {
-  const id = uuid.v4()
+  const id = uuidv4()
   const {database, retentionPolicy} = namespace
 
   return {
