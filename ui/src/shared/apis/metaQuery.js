@@ -82,7 +82,7 @@ export const showTagValues = async ({
             ],
           },
         ],
-        uuid: uuidv4,
+        uuid: uuidv4(),
       },
     }
   }
