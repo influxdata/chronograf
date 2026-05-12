@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/pem"
 	"errors"
 	"fmt"
@@ -150,6 +151,8 @@ type Server struct {
 	ReportingDisabled bool   `short:"r" long:"reporting-disabled" description:"Disable reporting of usage stats (os,arch,version,cluster_id,uptime) once every 24hr" env:"REPORTING_DISABLED"`
 	CustomAutoRefresh string `long:"custom-auto-refresh" description:"Adds custom auto refresh options using semicolon separated list of label=milliseconds pairs" env:"CUSTOM_AUTO_REFRESH"`
 	LogLevel          string `short:"l" long:"log-level" value-name:"choice" choice:"debug" choice:"info" choice:"error" default:"info" description:"Set the logging level" env:"LOG_LEVEL"`
+	SecretsMasterKey  string `long:"secrets-master-key" description:"Base64-encoded 32-byte master key used to wrap/unwrap the data encryption key for secret-field encryption" env:"SECRETS_MASTER_KEY"`
+	SecretsMasterKeyFile flags.Filename `long:"secrets-master-key-file" description:"Path to file containing a base64-encoded 32-byte master key used to wrap/unwrap the data encryption key for secret-field encryption" env:"SECRETS_MASTER_KEY_FILE"`
 	Basepath          string `short:"p" long:"basepath" description:"A URL path prefix under which all chronograf routes will be mounted. (Note: PREFIX_ROUTES has been deprecated. Now, if basepath is set, all routes will be prefixed with it.)" env:"BASE_PATH"`
 	ShowVersion       bool   `short:"v" long:"version" description:"Show Chronograf version info"`
 	BuildInfo         chronograf.BuildInfo
@@ -162,6 +165,8 @@ type Server struct {
 	TLSMaxVersion string `long:"tls-max-version" description:"Maximum version of the TLS protocol that will be negotiated." env:"TLS_MAX_VERSION"`
 
 	oauthClient http.Client
+
+	secretsMasterKey []byte
 }
 
 func provide(p oauth2.Provider, m oauth2.Mux, ok func() error) func(func(oauth2.Provider, oauth2.Mux)) {
@@ -641,6 +646,38 @@ func (s *Server) setPubkey() error {
 	return err
 }
 
+func (s *Server) loadSecretsMasterKey() ([]byte, error) {
+	if s.SecretsMasterKey != "" && s.SecretsMasterKeyFile != "" {
+		return nil, errors.New("secrets master key must be provided by either --secrets-master-key or --secrets-master-key-file, not both")
+	}
+
+	if s.SecretsMasterKey == "" && s.SecretsMasterKeyFile == "" {
+		return nil, nil
+	}
+
+	raw := strings.TrimSpace(s.SecretsMasterKey)
+	if s.SecretsMasterKeyFile != "" {
+		b, err := os.ReadFile(string(s.SecretsMasterKeyFile))
+		if err != nil {
+			return nil, fmt.Errorf("reading secrets master key file: %w", err)
+		}
+		raw = strings.TrimSpace(string(b))
+	}
+
+	if raw == "" {
+		return nil, errors.New("secrets master key is empty")
+	}
+
+	key, err := base64.StdEncoding.DecodeString(raw)
+	if err != nil {
+		return nil, fmt.Errorf("decoding secrets master key: %w", err)
+	}
+	if len(key) != 32 {
+		return nil, fmt.Errorf("invalid secrets master key length: got %d bytes, expected 32", len(key))
+	}
+	return key, nil
+}
+
 // Serve starts and runs the chronograf server
 func (s *Server) Serve(ctx context.Context) {
 	go rotateSuperAdminNonce(ctx, s.NonceExpiration)
@@ -688,6 +725,13 @@ func (s *Server) Serve(ctx context.Context) {
 		logger.Error("Unable to set public key ", err)
 		os.Exit(1)
 	}
+
+	secretsMasterKey, err := s.loadSecretsMasterKey()
+	if err != nil {
+		logger.Error("Invalid secrets master key configuration: ", err)
+		os.Exit(1)
+	}
+	s.secretsMasterKey = secretsMasterKey
 
 	var db kv.Store
 	if len(s.EtcdEndpoints) == 0 {
