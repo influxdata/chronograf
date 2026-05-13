@@ -34,6 +34,13 @@ func (s *Service) InitializeSecretDEK(ctx context.Context, masterKey []byte) err
 
 	if len(wrappedDEK) == 0 {
 		if len(masterKey) == 0 {
+			encryptedExists, err := s.hasEncryptedSecrets(ctx)
+			if err != nil {
+				return err
+			}
+			if encryptedExists {
+				return errors.New("encrypted secrets exist but no wrapped DEK or secrets master key is configured")
+			}
 			return nil
 		}
 
@@ -73,6 +80,69 @@ func (s *Service) InitializeSecretDEK(ctx context.Context, masterKey []byte) err
 		return err
 	}
 	return nil
+}
+
+func (s *Service) hasEncryptedSecrets(ctx context.Context) (bool, error) {
+	encrypted := false
+	if err := s.kv.View(ctx, func(tx Tx) error {
+		sourcesEncrypted, err := hasEncryptedSources(tx)
+		if err != nil {
+			return err
+		}
+		if sourcesEncrypted {
+			encrypted = true
+			return nil
+		}
+
+		serversEncrypted, err := hasEncryptedServers(tx)
+		if err != nil {
+			return err
+		}
+		if serversEncrypted {
+			encrypted = true
+		}
+		return nil
+	}); err != nil {
+		return false, err
+	}
+	return encrypted, nil
+}
+
+func hasEncryptedSources(tx Tx) (bool, error) {
+	encrypted := false
+	if err := tx.Bucket(sourcesBucket).ForEach(func(k, v []byte) error {
+		var pb internal.Source
+		if err := proto.Unmarshal(v, &pb); err != nil {
+			return err
+		}
+		if pb.GetPasswordEncoding() == internal.SecretEncoding_ENCRYPTED_V1 ||
+			pb.GetSharedSecretEncoding() == internal.SecretEncoding_ENCRYPTED_V1 ||
+			pb.GetManagementTokenEncoding() == internal.SecretEncoding_ENCRYPTED_V1 ||
+			pb.GetDatabaseTokenEncoding() == internal.SecretEncoding_ENCRYPTED_V1 {
+			encrypted = true
+		}
+		return nil
+	}); err != nil {
+		return false, err
+	}
+	return encrypted, nil
+}
+
+func hasEncryptedServers(tx Tx) (bool, error) {
+	encrypted := false
+	if err := tx.Bucket(serversBucket).ForEach(func(k, v []byte) error {
+		var pb internal.Server
+		if err := proto.Unmarshal(v, &pb); err != nil {
+			return err
+		}
+		if pb.GetPasswordEncoding() == internal.SecretEncoding_ENCRYPTED_V1 {
+			encrypted = true
+		}
+		return nil
+	}); err != nil {
+		return false, err
+	}
+	return encrypted, nil
 }
 
 func (s *Service) migrateLegacyPlaintextSecrets(ctx context.Context) error {
