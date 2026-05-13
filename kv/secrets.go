@@ -113,6 +113,123 @@ func (s *Service) RewrapSecretDEK(ctx context.Context, oldMasterKey, newMasterKe
 	})
 }
 
+// DisableSecretEncryption decrypts persisted secrets back to plaintext and
+// removes the wrapped DEK. Requires the current master key.
+func (s *Service) DisableSecretEncryption(ctx context.Context, masterKey []byte) error {
+	if len(masterKey) == 0 {
+		return errors.New("secrets master key is required")
+	}
+
+	var wrappedDEK []byte
+	if err := s.kv.View(ctx, func(tx Tx) error {
+		v, err := tx.Bucket(configBucket).Get(wrappedDEKID)
+		if err != nil {
+			return err
+		}
+		if len(v) == 0 {
+			return errors.New("wrapped DEK not found")
+		}
+		wrappedDEK = append([]byte(nil), v...)
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	dek, err := internal.UnwrapDEK(masterKey, wrappedDEK)
+	if err != nil {
+		return fmt.Errorf("unable to unwrap stored DEK: %w", err)
+	}
+
+	if err := s.kv.Update(ctx, func(tx Tx) error {
+		if err := rewriteEncryptedSecretsToPlaintext(tx, dek); err != nil {
+			return err
+		}
+		return tx.Bucket(configBucket).Delete(wrappedDEKID)
+	}); err != nil {
+		return err
+	}
+
+	internal.SetSecretDEK(nil)
+	return nil
+}
+
+func rewriteEncryptedSecretsToPlaintext(tx Tx, dek []byte) error {
+	type sourceRewrite struct {
+		key []byte
+		src chronograf.Source
+	}
+	type serverRewrite struct {
+		key []byte
+		srv chronograf.Server
+	}
+
+	var sourceRewrites []sourceRewrite
+	var serverRewrites []serverRewrite
+
+	internal.SetSecretDEK(dek)
+	defer internal.SetSecretDEK(nil)
+
+	if err := tx.Bucket(sourcesBucket).ForEach(func(k, v []byte) error {
+		var pb internal.Source
+		if err := proto.Unmarshal(v, &pb); err != nil {
+			return err
+		}
+		if !sourceHasEncryptedEncoding(pb) {
+			return nil
+		}
+		var src chronograf.Source
+		if err := internal.UnmarshalSource(v, &src); err != nil {
+			return err
+		}
+		sourceRewrites = append(sourceRewrites, sourceRewrite{key: append([]byte(nil), k...), src: src})
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	if err := tx.Bucket(serversBucket).ForEach(func(k, v []byte) error {
+		var pb internal.Server
+		if err := proto.Unmarshal(v, &pb); err != nil {
+			return err
+		}
+		if pb.GetPasswordEncoding() != internal.SecretEncoding_ENCRYPTED_V1 {
+			return nil
+		}
+		var srv chronograf.Server
+		if err := internal.UnmarshalServer(v, &srv); err != nil {
+			return err
+		}
+		serverRewrites = append(serverRewrites, serverRewrite{key: append([]byte(nil), k...), srv: srv})
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	internal.SetSecretDEK(nil)
+
+	for _, rw := range sourceRewrites {
+		plaintext, err := internal.MarshalSource(rw.src)
+		if err != nil {
+			return err
+		}
+		if err := tx.Bucket(sourcesBucket).Put(rw.key, plaintext); err != nil {
+			return err
+		}
+	}
+
+	for _, rw := range serverRewrites {
+		plaintext, err := internal.MarshalServer(rw.srv)
+		if err != nil {
+			return err
+		}
+		if err := tx.Bucket(serversBucket).Put(rw.key, plaintext); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (s *Service) hasEncryptedSecrets(ctx context.Context) (bool, error) {
 	encrypted := false
 	if err := s.kv.View(ctx, func(tx Tx) error {
@@ -146,10 +263,7 @@ func hasEncryptedSources(tx Tx) (bool, error) {
 		if err := proto.Unmarshal(v, &pb); err != nil {
 			return err
 		}
-		if pb.GetPasswordEncoding() == internal.SecretEncoding_ENCRYPTED_V1 ||
-			pb.GetSharedSecretEncoding() == internal.SecretEncoding_ENCRYPTED_V1 ||
-			pb.GetManagementTokenEncoding() == internal.SecretEncoding_ENCRYPTED_V1 ||
-			pb.GetDatabaseTokenEncoding() == internal.SecretEncoding_ENCRYPTED_V1 {
+		if sourceHasEncryptedEncoding(pb) {
 			encrypted = true
 		}
 		return nil
@@ -285,4 +399,11 @@ func sourceNeedsSecretMigration(pb internal.Source) bool {
 		(pb.SharedSecret != "" && pb.GetSharedSecretEncoding() != internal.SecretEncoding_ENCRYPTED_V1) ||
 		(pb.ManagementToken != "" && pb.GetManagementTokenEncoding() != internal.SecretEncoding_ENCRYPTED_V1) ||
 		(pb.DatabaseToken != "" && pb.GetDatabaseTokenEncoding() != internal.SecretEncoding_ENCRYPTED_V1)
+}
+
+func sourceHasEncryptedEncoding(pb internal.Source) bool {
+	return pb.GetPasswordEncoding() == internal.SecretEncoding_ENCRYPTED_V1 ||
+		pb.GetSharedSecretEncoding() == internal.SecretEncoding_ENCRYPTED_V1 ||
+		pb.GetManagementTokenEncoding() == internal.SecretEncoding_ENCRYPTED_V1 ||
+		pb.GetDatabaseTokenEncoding() == internal.SecretEncoding_ENCRYPTED_V1
 }
