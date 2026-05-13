@@ -14,6 +14,21 @@ const (
 	gcmNonceSize               = 12
 )
 
+// GenerateDEK returns a random 32-byte data encryption key.
+func GenerateDEK() ([]byte, error) {
+	return generateDEK()
+}
+
+// WrapDEK encrypts a DEK with the master key.
+func WrapDEK(masterKey, dek []byte) ([]byte, error) {
+	return wrapDEK(masterKey, dek)
+}
+
+// UnwrapDEK decrypts a wrapped DEK with the master key.
+func UnwrapDEK(masterKey, wrappedDEK []byte) ([]byte, error) {
+	return unwrapDEK(masterKey, wrappedDEK)
+}
+
 func generateDEK() ([]byte, error) {
 	dek := make([]byte, aes256KeySize)
 	if _, err := io.ReadFull(rand.Reader, dek); err != nil {

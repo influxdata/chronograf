@@ -147,15 +147,15 @@ type Server struct {
 	CustomLinks            map[string]string `long:"custom-link" description:"Custom link to be added to the client User menu. Multiple links can be added by using multiple of the same flag with different 'name:url' values, or as an environment variable with comma-separated 'name:url' values. E.g. via flags: '--custom-link=InfluxData:https://www.influxdata.com --custom-link=Chronograf:https://github.com/influxdata/chronograf'. E.g. via environment variable: 'export CUSTOM_LINKS=InfluxData:https://www.influxdata.com,Chronograf:https://github.com/influxdata/chronograf'" env:"CUSTOM_LINKS" env-delim:","`
 	TelegrafSystemInterval time.Duration     `long:"telegraf-system-interval" default:"1m" description:"Duration used in the GROUP BY time interval for the hosts list" env:"TELEGRAF_SYSTEM_INTERVAL"`
 
-	HostPageDisabled  bool   `short:"H" long:"host-page-disabled" description:"Disable the host list page" env:"HOST_PAGE_DISABLED"`
-	ReportingDisabled bool   `short:"r" long:"reporting-disabled" description:"Disable reporting of usage stats (os,arch,version,cluster_id,uptime) once every 24hr" env:"REPORTING_DISABLED"`
-	CustomAutoRefresh string `long:"custom-auto-refresh" description:"Adds custom auto refresh options using semicolon separated list of label=milliseconds pairs" env:"CUSTOM_AUTO_REFRESH"`
-	LogLevel          string `short:"l" long:"log-level" value-name:"choice" choice:"debug" choice:"info" choice:"error" default:"info" description:"Set the logging level" env:"LOG_LEVEL"`
-	SecretsMasterKey  string `long:"secrets-master-key" description:"Base64-encoded 32-byte master key used to wrap/unwrap the data encryption key for secret-field encryption" env:"SECRETS_MASTER_KEY"`
+	HostPageDisabled     bool           `short:"H" long:"host-page-disabled" description:"Disable the host list page" env:"HOST_PAGE_DISABLED"`
+	ReportingDisabled    bool           `short:"r" long:"reporting-disabled" description:"Disable reporting of usage stats (os,arch,version,cluster_id,uptime) once every 24hr" env:"REPORTING_DISABLED"`
+	CustomAutoRefresh    string         `long:"custom-auto-refresh" description:"Adds custom auto refresh options using semicolon separated list of label=milliseconds pairs" env:"CUSTOM_AUTO_REFRESH"`
+	LogLevel             string         `short:"l" long:"log-level" value-name:"choice" choice:"debug" choice:"info" choice:"error" default:"info" description:"Set the logging level" env:"LOG_LEVEL"`
+	SecretsMasterKey     string         `long:"secrets-master-key" description:"Base64-encoded 32-byte master key used to wrap/unwrap the data encryption key for secret-field encryption" env:"SECRETS_MASTER_KEY"`
 	SecretsMasterKeyFile flags.Filename `long:"secrets-master-key-file" description:"Path to file containing a base64-encoded 32-byte master key used to wrap/unwrap the data encryption key for secret-field encryption" env:"SECRETS_MASTER_KEY_FILE"`
-	Basepath          string `short:"p" long:"basepath" description:"A URL path prefix under which all chronograf routes will be mounted. (Note: PREFIX_ROUTES has been deprecated. Now, if basepath is set, all routes will be prefixed with it.)" env:"BASE_PATH"`
-	ShowVersion       bool   `short:"v" long:"version" description:"Show Chronograf version info"`
-	BuildInfo         chronograf.BuildInfo
+	Basepath             string         `short:"p" long:"basepath" description:"A URL path prefix under which all chronograf routes will be mounted. (Note: PREFIX_ROUTES has been deprecated. Now, if basepath is set, all routes will be prefixed with it.)" env:"BASE_PATH"`
+	ShowVersion          bool           `short:"v" long:"version" description:"Show Chronograf version info"`
+	BuildInfo            chronograf.BuildInfo
 
 	BasicAuthRealm    string         `long:"basic-auth-realm" default:"Chronograf" description:"User visible basic authentication realm" env:"BASICAUTH_REALM"`
 	BasicAuthHtpasswd flags.Filename `long:"htpasswd" description:"File location of .htpasswd file, turns on HTTP basic authentication when specified." env:"HTPASSWD"`
@@ -791,7 +791,7 @@ func (s *Server) Serve(ctx context.Context) {
 			Info("InfluxDB v3 time condition validated and configured")
 	}
 
-	service := openService(ctx, db, s.newBuilders(logger), logger, s.useAuth(),
+	service := openService(ctx, db, s.newBuilders(logger), logger, s.useAuth(), s.secretsMasterKey,
 		chronograf.V3Config{
 			CloudDedicatedManagementURL: s.InfluxDBCloudDedicatedMgmtURL,
 			ClusteredAccountID:          s.InfluxDBClusteredAccountID,
@@ -928,10 +928,17 @@ func (s *Server) Serve(ctx context.Context) {
 		Info("Stopped serving chronograf at ", scheme, "://", listener.Addr())
 }
 
-func openService(ctx context.Context, db kv.Store, builder builders, logger chronograf.Logger, useAuth bool, v3Config chronograf.V3Config) Service {
+func openService(ctx context.Context, db kv.Store, builder builders, logger chronograf.Logger, useAuth bool, secretsMasterKey []byte, v3Config chronograf.V3Config) Service {
 	svc, err := kv.NewService(ctx, db, kv.WithLogger(logger))
 	if err != nil {
 		logger.Error("Unable to create kv service", err)
+		os.Exit(1)
+	}
+
+	if err := svc.InitializeSecretDEK(ctx, secretsMasterKey); err != nil {
+		logger.
+			WithField("component", "Secrets").
+			Error("Unable to initialize secret encryption", err)
 		os.Exit(1)
 	}
 
