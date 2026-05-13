@@ -184,6 +184,57 @@ func TestInitializeSecretDEK(t *testing.T) {
 		}
 	})
 
+	t.Run("Rewrap Secret DEK", func(t *testing.T) {
+		internal.SetSecretDEK(nil)
+
+		f, err := ioutil.TempFile("", "chronograf-bolt-")
+		if err != nil {
+			t.Fatal(err)
+		}
+		path := f.Name()
+		if err := f.Close(); err != nil {
+			t.Fatal(err)
+		}
+		defer os.Remove(path)
+
+		svc, err := NewTestClientAtPath(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := svc.InitializeSecretDEK(ctx, keyA); err != nil {
+			t.Fatal(err)
+		}
+
+		src, err := svc.SourcesStore().Add(ctx, chronograf.Source{
+			Name:     "src",
+			Type:     "influx",
+			Password: "pw",
+			URL:      "http://localhost:8086",
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if err := svc.RewrapSecretDEK(ctx, keyA, keyB); err != nil {
+			t.Fatal(err)
+		}
+		if err := svc.Close(); err != nil {
+			t.Fatal(err)
+		}
+
+		svc, err = NewTestClientAtPath(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer svc.Close()
+		if err := svc.InitializeSecretDEK(ctx, keyB); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := svc.SourcesStore().Get(ctx, src.ID); err != nil {
+			t.Fatal(err)
+		}
+	})
+
 	t.Run("Encrypted Records Without Wrapped DEK Are Rejected", func(t *testing.T) {
 		internal.SetSecretDEK(nil)
 

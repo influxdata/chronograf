@@ -82,6 +82,37 @@ func (s *Service) InitializeSecretDEK(ctx context.Context, masterKey []byte) err
 	return nil
 }
 
+// RewrapSecretDEK rotates the master key by rewrapping the stored DEK.
+// It does not re-encrypt persisted source/server secrets.
+func (s *Service) RewrapSecretDEK(ctx context.Context, oldMasterKey, newMasterKey []byte) error {
+	var wrappedDEK []byte
+	if err := s.kv.View(ctx, func(tx Tx) error {
+		v, err := tx.Bucket(configBucket).Get(wrappedDEKID)
+		if err != nil {
+			return err
+		}
+		if len(v) == 0 {
+			return errors.New("wrapped DEK not found")
+		}
+		wrappedDEK = append([]byte(nil), v...)
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	dek, err := internal.UnwrapDEK(oldMasterKey, wrappedDEK)
+	if err != nil {
+		return fmt.Errorf("unable to unwrap stored DEK with old master key: %w", err)
+	}
+	rewrapped, err := internal.WrapDEK(newMasterKey, dek)
+	if err != nil {
+		return fmt.Errorf("unable to wrap DEK with new master key: %w", err)
+	}
+	return s.kv.Update(ctx, func(tx Tx) error {
+		return tx.Bucket(configBucket).Put(wrappedDEKID, rewrapped)
+	})
+}
+
 func (s *Service) hasEncryptedSecrets(ctx context.Context) (bool, error) {
 	encrypted := false
 	if err := s.kv.View(ctx, func(tx Tx) error {

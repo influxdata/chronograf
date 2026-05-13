@@ -7,6 +7,7 @@ Available commands:
   add-superadmin  Creates a new superadmin user  (bolt specific)
   gen-secrets-master-key Generates a secrets master key
   list-users      Lists users                    (bolt specific)
+  rewrap-secrets-master-key Rewraps stored DEK with new master key
   migrate         Migrate db (beta)
 ```
 
