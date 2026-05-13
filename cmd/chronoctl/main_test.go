@@ -24,6 +24,10 @@ func TestChronoctlCommands(t *testing.T) {
 			err:  false,
 		},
 		{
+			args: []string{"gen-secrets-master-key", "-h"},
+			err:  false,
+		},
+		{
 			args: []string{"list-users", "-h"},
 			err:  false,
 		},
