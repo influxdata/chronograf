@@ -12,6 +12,53 @@ Available commands:
   migrate         Migrate db (beta)
 ```
 
+### Secrets Encryption Commands
+
+Use these commands when Chronograf secret-at-rest encryption is enabled.
+
+##### Generate Secrets Master Key
+Generate a base64-encoded 32-byte key:
+
+```sh
+$ chronoctl gen-secrets-master-key
+```
+
+Write the generated key to a file (0600):
+
+```sh
+$ chronoctl gen-secrets-master-key --out ./chronograf-secrets.key
+```
+
+##### Rewrap Secrets Master Key
+Rotate the secrets master key by rewrapping the stored DEK:
+
+```sh
+$ chronoctl rewrap-secrets-master-key \
+    --bolt-path ./chronograf-v1.db \
+    --old-secrets-master-key-file ./old.key \
+    --new-secrets-master-key-file ./new.key
+```
+
+After successful rewrap, start Chronograf with the new key.
+
+##### Disable Secrets Encryption
+Disable secret encryption by decrypting persisted secrets to plaintext and
+removing the wrapped DEK:
+
+```sh
+$ chronoctl disable-secrets-encryption \
+    --bolt-path ./chronograf-v1.db \
+    --secrets-master-key-file ./current.key
+```
+
+After successful disable:
+- Chronograf no longer requires `--secrets-master-key` / `--secrets-master-key-file`
+- persisted secrets are plaintext again
+
+Important:
+- `rewrap-secrets-master-key` changes only master-key wrapping and does not re-encrypt secret records.
+- `disable-secrets-encryption` is a destructive security downgrade.
+
 
 ### Migrate
 
