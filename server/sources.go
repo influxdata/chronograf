@@ -113,6 +113,8 @@ func newSourceResponse(ctx context.Context, src chronograf.Source) sourceRespons
 	// Omit the password and shared secret on response
 	src.Password = ""
 	src.SharedSecret = ""
+	src.DatabaseToken = ""
+	src.ManagementToken = ""
 
 	httpAPISrcs := "/chronograf/v1/sources"
 	res := sourceResponse{
