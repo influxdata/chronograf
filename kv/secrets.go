@@ -154,6 +154,8 @@ func (s *Service) DisableSecretEncryption(ctx context.Context, masterKey []byte)
 }
 
 func rewriteEncryptedSecretsToPlaintext(tx Tx, dek []byte) error {
+	defer clear(dek)
+
 	type sourceRewrite struct {
 		key []byte
 		src chronograf.Source

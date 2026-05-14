@@ -210,6 +210,9 @@ func TestMarshalServerWithSecretDEK(t *testing.T) {
 	if pb.Password == in.Password {
 		t.Fatal("expected encrypted stored password to differ from plaintext")
 	}
+	if pb.Username != in.Username {
+		t.Fatalf("expected username to remain plaintext in proto: got %q want %q", pb.Username, in.Username)
+	}
 
 	var out chronograf.Server
 	if err := internal.UnmarshalServer(data, &out); err != nil {

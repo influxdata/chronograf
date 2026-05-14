@@ -165,8 +165,6 @@ type Server struct {
 	TLSMaxVersion string `long:"tls-max-version" description:"Maximum version of the TLS protocol that will be negotiated." env:"TLS_MAX_VERSION"`
 
 	oauthClient http.Client
-
-	secretsMasterKey []byte
 }
 
 func provide(p oauth2.Provider, m oauth2.Mux, ok func() error) func(func(oauth2.Provider, oauth2.Mux)) {
@@ -731,7 +729,6 @@ func (s *Server) Serve(ctx context.Context) {
 		logger.Error("Invalid secrets master key configuration: ", err)
 		os.Exit(1)
 	}
-	s.secretsMasterKey = secretsMasterKey
 
 	var db kv.Store
 	if len(s.EtcdEndpoints) == 0 {
@@ -791,7 +788,7 @@ func (s *Server) Serve(ctx context.Context) {
 			Info("InfluxDB v3 time condition validated and configured")
 	}
 
-	service := openService(ctx, db, s.newBuilders(logger), logger, s.useAuth(), s.secretsMasterKey,
+	service := openService(ctx, db, s.newBuilders(logger), logger, s.useAuth(), secretsMasterKey,
 		chronograf.V3Config{
 			CloudDedicatedManagementURL: s.InfluxDBCloudDedicatedMgmtURL,
 			ClusteredAccountID:          s.InfluxDBClusteredAccountID,
@@ -929,6 +926,8 @@ func (s *Server) Serve(ctx context.Context) {
 }
 
 func openService(ctx context.Context, db kv.Store, builder builders, logger chronograf.Logger, useAuth bool, secretsMasterKey []byte, v3Config chronograf.V3Config) Service {
+	defer clear(secretsMasterKey)
+
 	svc, err := kv.NewService(ctx, db, kv.WithLogger(logger))
 	if err != nil {
 		logger.Error("Unable to create kv service", err)

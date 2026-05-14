@@ -23,6 +23,8 @@ func SetSecretDEK(dek []byte) {
 	secretDEKMu.Lock()
 	defer secretDEKMu.Unlock()
 
+	clear(secretDEK)
+
 	if len(dek) == 0 {
 		secretDEK = nil
 		return
