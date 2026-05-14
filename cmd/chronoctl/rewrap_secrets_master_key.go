@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 )
 
 func init() {
@@ -70,7 +71,7 @@ func loadCLISecretsMasterKey(value, filePath, label string) ([]byte, error) {
 		}
 		raw = string(b)
 	}
-	raw = trimSpace(raw)
+	raw = strings.TrimSpace(raw)
 	if raw == "" {
 		return nil, fmt.Errorf("%s secrets master key is empty", label)
 	}
