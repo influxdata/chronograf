@@ -42,6 +42,8 @@ func (c *genSecretsMasterKeyCommand) Execute(args []string) error {
 
 	if _, err := os.Stat(string(c.Out)); err == nil {
 		errExit(errors.New("Specify non-existant file to write to."))
+	} else if !errors.Is(err, os.ErrNotExist) {
+		errExit(err)
 	}
 
 	if err := os.WriteFile(string(c.Out), []byte(key+"\n"), 0600); err != nil {
