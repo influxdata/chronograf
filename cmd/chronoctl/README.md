@@ -57,7 +57,7 @@ After successful disable:
 
 Important:
 - `rewrap-secrets-master-key` changes only master-key wrapping and does not re-encrypt secret records.
-- `disable-secrets-encryption` is a destructive security downgrade.
+- `disable-secrets-encryption` decrypts encrypted secrets and stores them as plaintext.
 
 
 ### Migrate
