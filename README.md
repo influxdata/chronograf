@@ -12,7 +12,7 @@ and automation rules.
 
 ### Host List
 
-* List and sort hosts
+* List and sort hosts Test
 * View general CPU and load stats
 * View and access dashboard templates for configured apps
 
