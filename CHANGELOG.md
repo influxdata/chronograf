@@ -9,6 +9,8 @@
    * Remove "@types/uuid" because newer "uuid" versions are included types in the package.
 1. [#6214](https://github.com/influxdata/chronograf/pull/6214): Fix `chronograf-cypress-tests-report.yaml` workflow
 caused by lack of write permissions.
+   * Add write permission to the `chronograf-cypress-tests-report.yaml` workflow.
+   * Upgrade `dorny/test-reporter` action to v3
 
 ## v1.11.1 [2026-04-15]
 
