@@ -6,6 +6,9 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+
 jobs:
   e2e:
     if: github.actor != 'dependabot[bot]'
