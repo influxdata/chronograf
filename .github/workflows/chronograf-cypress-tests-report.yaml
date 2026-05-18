@@ -4,6 +4,10 @@ on:
     workflows: ['chronograf/cypress']
     types:
       - completed
+
+permissions:
+  contents: read
+
 jobs:
   report:
     runs-on: ubuntu-latest
