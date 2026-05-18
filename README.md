@@ -12,9 +12,9 @@ and automation rules.
 
 ### Host List
 
-* List and sort hosts
-* View general CPU and load stats
-* View and access dashboard templates for configured apps
+* List and sort hosts.
+* View general CPU and load stats.
+* View and access dashboard templates for configured apps.
 
 ### Dashboard Templates
 
