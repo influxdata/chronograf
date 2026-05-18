@@ -3935,7 +3935,7 @@
         },
         "password": {
           "type": "string",
-          "description": "Password is in cleartext."
+          "description": "Write-only password for kapacitor authentication. Redacted in API responses."
         },
         "url": {
           "type": "string",
@@ -5212,11 +5212,11 @@
         },
         "password": {
           "type": "string",
-          "description": "Password is in cleartext."
+          "description": "Write-only password for source authentication. Redacted in API responses."
         },
         "sharedSecret": {
           "type": "string",
-          "description": "JWT signing secret for optional Authorization: Bearer to InfluxDB"
+          "description": "Write-only JWT signing secret for optional Authorization: Bearer to InfluxDB. Redacted in API responses."
         },
         "clusterId": {
           "type": "string",
@@ -5228,11 +5228,11 @@
         },
         "managementToken": {
           "type": "string",
-          "description": "Management token for InfluxDB Cloud Dedicated sources"
+          "description": "Write-only management token for InfluxDB Cloud Dedicated sources. Redacted in API responses."
         },
         "databaseToken": {
           "type": "string",
-          "description": "Database token for InfluxDB Cloud Dedicated or other InfluxDB 3 sources"
+          "description": "Write-only database token for InfluxDB Cloud Dedicated or other InfluxDB 3 sources. Redacted in API responses."
         },
         "tagsCSVPath": {
           "type": "string",
