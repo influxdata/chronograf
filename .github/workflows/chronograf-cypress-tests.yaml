@@ -46,7 +46,7 @@ jobs:
       - run: yarn node --version
 
       - name: Setup Helm
-        uses: azure/setup-helm@v1
+        uses: azure/setup-helm@v5
         with:
           version: v3.21.0
 
