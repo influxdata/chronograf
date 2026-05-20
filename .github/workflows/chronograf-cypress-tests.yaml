@@ -6,6 +6,9 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+
 jobs:
   e2e:
     if: github.actor != 'dependabot[bot]'
@@ -20,12 +23,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
       - name: Setup Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v5
         with:
           go-version: '1.26.3'
 
@@ -36,19 +39,19 @@ jobs:
         uses: dtolnay/rust-toolchain@1.72
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: '24'
       - run: if [ ! -x "$(command -v yarn)" ]; then npm install -g yarn; fi
       - run: yarn node --version
 
       - name: Setup Helm
-        uses: azure/setup-helm@v1
+        uses: azure/setup-helm@v5
         with:
-          version: v3.6.3
+          version: v3.21.0
 
       - name: Create kind cluster
-        uses: helm/kind-action@v1.2.0
+        uses: helm/kind-action@v1.13.0
         with:
           cluster_name: "chronograf-testing"
           config: .github/workflows/resources/kind-config.yaml
@@ -63,7 +66,7 @@ jobs:
               cert-manager jetstack/cert-manager \
               --namespace cert-manager \
               --create-namespace \
-              --version v1.5.4 \
+              --version v1.19.5 \
               --set prometheus.enabled=false \
               --set webhook.timeoutSeconds=30 \
               --set installCRDs=true

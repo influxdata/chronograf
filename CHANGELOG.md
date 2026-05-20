@@ -2,7 +2,11 @@
 
 ### Other
 
-1. [#6219](https://github.com/influxdata/chronograf/pull/6219): Upgrade golang to 1.26.3
+1. [#6214](https://github.com/influxdata/chronograf/pull/6214): Fix `chronograf-cypress-tests-report.yaml` workflow
+   caused by lack of write permissions.
+   * Add write permission to the `chronograf-cypress-tests-report.yaml` workflow.
+   * Upgrade `dorny/test-reporter` action to v3
+2. [#6219](https://github.com/influxdata/chronograf/pull/6219): Upgrade golang to 1.26.3
 
 ## v1.11.2 [2026-05-06]
 
