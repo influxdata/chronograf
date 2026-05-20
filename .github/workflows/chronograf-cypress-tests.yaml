@@ -75,6 +75,7 @@ jobs:
           helm upgrade --install influxdb influxdata/influxdb-enterprise --namespace default \
               --wait \
               --timeout 15m \
+              --debug \
               --set-string envFromSecret=influxdb-license \
               --set-string data.service.type=NodePort \
               --set-string meta.service.type=NodePort \
@@ -83,6 +84,36 @@ jobs:
           helm status influxdb -n default
         env:
           INFLUXDB_ENTERPRISE_LICENSE_KEY: "${{ secrets.INFLUXDB_ENTERPRISE_LICENSE_KEY }}"
+
+      - name: Enterprise Helm Diagnostics
+        if: failure()
+        run: |
+          echo "=== Helm releases ==="
+          helm list -A || true
+          echo
+
+          echo "=== Helm status/default values/manifests for influxdb ==="
+          helm status influxdb -n default || true
+          helm get values influxdb -n default || true
+          helm get manifest influxdb -n default || true
+          echo
+
+          echo "=== Kubernetes resources ==="
+          kubectl get ns || true
+          kubectl get all -A -o wide || true
+          echo
+
+          echo "=== Recent cluster events ==="
+          kubectl get events -A --sort-by=.lastTimestamp | tail -n 400 || true
+          echo
+
+          echo "=== InfluxDB Enterprise pod diagnostics ==="
+          for p in $(kubectl get pods -n default -l app.kubernetes.io/instance=influxdb -o name 2>/dev/null); do
+            echo "--- describe $p ---"
+            kubectl describe -n default "$p" || true
+            echo "--- logs $p ---"
+            kubectl logs -n default "$p" --all-containers --tail=300 || true
+          done
 
       - name: OAuth2 Mock Server
         run: |
