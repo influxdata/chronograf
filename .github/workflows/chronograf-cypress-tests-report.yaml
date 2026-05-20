@@ -7,12 +7,14 @@ on:
 
 permissions:
   contents: read
+  actions: read
+  checks: write
 
 jobs:
   report:
     runs-on: ubuntu-latest
     steps:
-      - uses: dorny/test-reporter@v1
+      - uses: dorny/test-reporter@v3
         if: success() || failure()
         with:
           artifact: results
