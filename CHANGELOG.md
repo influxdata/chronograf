@@ -1,3 +1,37 @@
+## v1.11.3 [unreleased]
+
+### Other
+
+1. [#6214](https://github.com/influxdata/chronograf/pull/6214): Fix `chronograf-cypress-tests-report.yaml` workflow
+   caused by lack of write permissions.
+   * Add write permission to the `chronograf-cypress-tests-report.yaml` workflow.
+   * Upgrade `dorny/test-reporter` action to v3
+
+## v1.11.2 [2026-05-06]
+
+### Other
+
+1. [#6206](https://github.com/influxdata/chronograf/pull/6206): Upgrade golang to 1.25.9.
+1. [#6208](https://github.com/influxdata/chronograf/pull/6208): Upgrade dependencies.
+   * Upgrade "uuid" package version to "^14.0.0".
+   * Upgrade "@parcel/core" version to "^2.16.4".
+   * Remove "@types/uuid" because newer "uuid" versions are included types in the package.
+
+## v1.11.1 [2026-04-15]
+
+### Security Fixes
+
+1. [#6186](https://github.com/influxdata/chronograf/pull/6186): Hardened CSRF protections on Data Explorer and unsafe query endpoints.
+1. [#6191](https://github.com/influxdata/chronograf/pull/6191): Hardened Reader-only access and read-only query enforcement.
+2. [#6198](https://github.com/influxdata/chronograf/pull/6198): Prevent proxy credential leakage by default.
+
+### Other
+
+1. [#6181](https://github.com/influxdata/chronograf/pull/6181): Upgrade dependencies. Upgrade golang to 1.25.8. Upgrade flux to `0.200`.
+   * All darwin builds will now be dynamic only.
+   * All windows builds will now be dynamic only.
+   * All linux builds will now be static only.
+
 ## v1.11.0 [2026-02-19]
 
 ⚠️ Removed support for Linux i386, armhf, armel and static build. Removed support for Darwin arm64.

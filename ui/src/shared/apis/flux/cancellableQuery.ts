@@ -49,6 +49,7 @@ export const runQuery = (
   const headers = {
     'Content-Type': 'application/json',
     'Accept-Encoding': 'gzip',
+    'X-Requested-With': 'XMLHttpRequest',
   }
 
   const request = fetch(url, {

@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 import {withRouter, WithRouterProps} from 'react-router'
 import {connect, HandleThunkActionCreator} from 'react-redux'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 
 import {updateTagFilterAsync} from 'src/shared/actions/annotations'
 
@@ -58,7 +58,7 @@ class AnnotationTagsDropdown extends PureComponent<Props> {
     const {dashboardID} = this.props.params
 
     const newTagFilter = {
-      id: uuid.v4(),
+      id: uuidv4(),
       tagKey,
       tagValue,
       filterType: TagFilterType.Equals,

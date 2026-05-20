@@ -1,6 +1,6 @@
 import Papa from 'papaparse'
 import _ from 'lodash'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 
 import {FluxTable} from 'src/types'
 
@@ -120,7 +120,7 @@ export const parseTables = (responseChunk: string): FluxTable[] => {
     const data: Array<Array<string | number>> = [headerRow, ...tableData]
 
     return {
-      id: uuid.v4(),
+      id: uuidv4(),
       data,
       name,
       groupKey,

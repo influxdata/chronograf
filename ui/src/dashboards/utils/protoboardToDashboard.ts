@@ -1,4 +1,4 @@
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 
 import {getNextAvailablePosition} from 'src/dashboards/utils/cellGetters'
 
@@ -38,7 +38,7 @@ const addNewCellToCells = (
 const createTemplatesForProtoboard = (pbTemplates, source): Template[] => {
   const telegraf = source.telegraf || 'telegraf'
   return pbTemplates.map(pbt => {
-    return {...pbt, id: uuid.v4(), query: {...pbt.query, db: telegraf}}
+    return {...pbt, id: uuidv4(), query: {...pbt.query, db: telegraf}}
   })
 }
 

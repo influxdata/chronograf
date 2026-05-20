@@ -1,5 +1,5 @@
 import React, {PureComponent, ChangeEvent} from 'react'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 import moment from 'moment'
 
 import {Radio, ButtonShape} from 'src/reusable_ui'
@@ -68,7 +68,7 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
     const type = startTime === endTime ? 'point' : 'window'
 
     const tags = Object.entries(props.annotation.tags || {}).map(([k, v]) => ({
-      id: uuid.v4(),
+      id: uuidv4(),
       tagKey: k,
       tagValue: v,
       shouldAutoFocus: false,
@@ -368,7 +368,7 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
 
   private handleAddTag = (): void => {
     const newTag = {
-      id: uuid.v4(),
+      id: uuidv4(),
       tagKey: '',
       tagValue: '',
       shouldAutoFocus: true,

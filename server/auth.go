@@ -211,43 +211,18 @@ func AuthorizedUser(
 			Error(w, http.StatusForbidden, "User is not authorized", logger)
 			return
 		}
-		scheme, err := getScheme(ctx)
-		if err != nil {
-			log.Error("Failed to retrieve scheme from context")
-			Error(w, http.StatusForbidden, "User is not authorized", logger)
-			return
-		}
-
-		// This is as if the user was logged into the default organization
-		if p.Organization == "" {
-			p.Organization = defaultOrg.ID
-		}
-
-		// validate that the organization exists
-		_, err = store.Organizations(serverCtx).Get(serverCtx, chronograf.OrganizationQuery{ID: &p.Organization})
-		if err != nil {
-			log.Error(fmt.Sprintf("Failed to retrieve organization %s from organizations store", p.Organization))
-			Error(w, http.StatusForbidden, "User is not authorized", logger)
-			return
-		}
-		ctx = context.WithValue(ctx, organizations.ContextKey, p.Organization)
-		// TODO: seems silly to look up a user twice
-		u, err := store.Users(serverCtx).Get(serverCtx, chronograf.UserQuery{
-			Name:     &p.Subject,
-			Provider: &p.Issuer,
-			Scheme:   &scheme,
-		})
-
+		resolved, err := resolvePrincipalUsers(ctx, store, p, defaultOrg.ID)
 		if err != nil {
 			log.Error("Failed to retrieve user")
 			Error(w, http.StatusForbidden, "User is not authorized", logger)
 			return
 		}
+		ctx = context.WithValue(ctx, organizations.ContextKey, resolved.OrganizationID)
 		// In particular this is used by sever/users.go so that we know when and when not to
 		// allow users to make someone a super admin
-		ctx = context.WithValue(ctx, UserContextKey, u)
+		ctx = context.WithValue(ctx, UserContextKey, resolved.RawUser)
 
-		if u.SuperAdmin {
+		if resolved.RawUser.SuperAdmin {
 			// To access resources (servers, sources, databases, layouts) within a DataStore,
 			// an organization and a role are required even if you are a super admin or are
 			// not using auth. Every user's current organization is set on context to filter
@@ -264,20 +239,15 @@ func AuthorizedUser(
 			return
 		}
 
-		u, err = store.Users(ctx).Get(ctx, chronograf.UserQuery{
-			Name:     &p.Subject,
-			Provider: &p.Issuer,
-			Scheme:   &scheme,
-		})
-		if err != nil {
-			log.Error("Failed to retrieve user")
+		u := resolved.ScopedUser
+		if u == nil {
 			Error(w, http.StatusForbidden, "User is not authorized", logger)
 			return
 		}
 
 		if hasAuthorizedRole(u, role) {
 			if len(u.Roles) != 1 {
-				msg := `User %d has too many role in organization. User: %#v.Please report this log at https://github.com/influxdata/chronograf/issues/new"`
+				msg := `User %d has too many roles in organization. User: %#v. Please report this log at https://github.com/influxdata/chronograf/issues/new`
 				log.Error(fmt.Sprint(msg, u.ID, u))
 				unknownErrorWithMessage(w, fmt.Errorf("please have administrator check logs and report error"), logger)
 				return

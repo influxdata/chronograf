@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import idGenerator from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 import Deferred from 'src/worker/Deferred'
 import {readPayload, writePayload} from './Database'
 import {
@@ -137,7 +137,7 @@ class JobManager {
   }
 
   private publishJob = async (type, payload) => {
-    const id = idGenerator.v1()
+    const id = uuidv4()
     const deferred = new Deferred()
 
     this.jobs[id] = deferred
@@ -148,7 +148,7 @@ class JobManager {
   }
 
   private publishDBJob = async (type, payload) => {
-    const id = idGenerator.v1()
+    const id = uuidv4()
     const deferred = new Deferred()
 
     this.jobs[id] = deferred

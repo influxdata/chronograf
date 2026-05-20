@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/csv"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -16,6 +17,7 @@ import (
 	"github.com/influxdata/chronograf"
 	uuid "github.com/influxdata/chronograf/id"
 	"github.com/influxdata/chronograf/influx"
+	"github.com/influxdata/chronograf/roles"
 	"github.com/influxdata/chronograf/util"
 )
 
@@ -39,14 +41,33 @@ func (s *Service) Influx(w http.ResponseWriter, r *http.Request) {
 		Error(w, http.StatusUnprocessableEntity, err.Error(), s.Logger)
 		return
 	}
+	role, ok := hasRoleContext(r.Context())
+	isReader := ok && role == roles.ReaderRoleName
+	if isReader {
+		// In this handler we decode once and do not need to preserve the original body stream.
+		r.Body = http.MaxBytesReader(w, r.Body, readerInfluxQLMaxBodyBytes)
+	}
 
 	var req chronograf.Query
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
+		var maxErr *http.MaxBytesError
+		if isReader && errors.As(err, &maxErr) {
+			Error(w, http.StatusRequestEntityTooLarge, readerInfluxQLBodyTooLargeMsg, s.Logger)
+			return
+		}
 		invalidJSON(w, s.Logger)
 		return
 	}
 	if err = ValidInfluxRequest(req); err != nil {
 		invalidData(w, err, s.Logger)
+		return
+	}
+	if err := enforceReaderInfluxQLReadOnly(r.Context(), req.Command); err != nil {
+		if errors.Is(err, errReaderInfluxQLParse) {
+			Error(w, http.StatusBadRequest, err.Error(), s.Logger)
+			return
+		}
+		Error(w, http.StatusForbidden, err.Error(), s.Logger)
 		return
 	}
 

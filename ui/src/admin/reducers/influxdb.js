@@ -1,6 +1,6 @@
 import reject from 'lodash/reject'
 import {NEW_DEFAULT_DATABASE, NEW_EMPTY_RP} from 'src/admin/constants'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 import {parseDuration, compareDurations} from 'src/utils/influxDuration'
 import {
   changeNamedCollection,
@@ -76,7 +76,7 @@ const adminInfluxDB = (state = initialState, action) => {
     case 'INFLUXDB_ADD_DATABASE': {
       const newDatabase = {
         ...NEW_DEFAULT_DATABASE,
-        links: {self: `temp-ID${uuid.v4()}`},
+        links: {self: `temp-ID${uuidv4()}`},
         isEditing: true,
       }
 

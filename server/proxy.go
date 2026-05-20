@@ -49,6 +49,12 @@ func (s *Service) Proxy(w http.ResponseWriter, r *http.Request) {
 	}
 
 	director := func(req *http.Request) {
+		// Do not forward Chronograf user credentials to external upstreams.
+		// This prevents session token disclosure via configured proxy targets.
+		req.Header.Del("Cookie")
+		req.Header.Del("Authorization")
+		req.Header.Del("Proxy-Authorization")
+
 		// Set the Host header of the original Kapacitor URL
 		req.Host = u.Host
 		req.URL = u

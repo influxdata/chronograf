@@ -1,4 +1,4 @@
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 import {getActiveKapacitor} from 'shared/apis'
 import {notify} from 'shared/actions/notifications'
 import {
@@ -91,7 +91,7 @@ export const getRule = (kapacitor, ruleID) => async dispatch => {
 
 export const loadDefaultRule = () => {
   return dispatch => {
-    const queryID = uuid.v4()
+    const queryID = uuidv4()
     dispatch({
       type: 'LOAD_DEFAULT_RULE',
       payload: {

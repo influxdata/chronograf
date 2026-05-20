@@ -1,7 +1,7 @@
 // Libraries
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 
 // APIs
 import {executeQueries as executeInfluxQLQueries} from 'src/shared/apis/query'
@@ -238,7 +238,7 @@ class TimeSeries extends PureComponent<Props, State> {
     let responseUUID: string
     let loading: RemoteDataState = null
 
-    const latestUUID = uuid.v4()
+    const latestUUID = uuidv4()
 
     this.setState({
       loading: RemoteDataState.Loading,

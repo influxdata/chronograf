@@ -122,10 +122,17 @@ async function AJAX<T = any>(
         : JSON.stringify(requestData)
   }
 
+  const isFluxProxyGet =
+    method === 'GET' && typeof url === 'string' && url.includes('/proxy/flux')
+  const requestHeadersWithRequestedWith =
+    method === 'GET' && !isFluxProxyGet
+      ? requestHeaders
+      : {...requestHeaders, 'X-Requested-With': 'XMLHttpRequest'}
+
   const fetchResponse = await fetch(url, {
     method: method as string,
     body,
-    headers: requestHeaders,
+    headers: requestHeadersWithRequestedWith,
     signal,
   }).catch(e =>
     e.name === 'AbortError'

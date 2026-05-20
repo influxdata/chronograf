@@ -1,5 +1,5 @@
 import React, {Component, CSSProperties} from 'react'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 import classnames from 'classnames'
 
 import {ClickOutside} from 'src/shared/components/ClickOutside'
@@ -73,7 +73,7 @@ class ColorScaleDropdown extends Component<Props, State> {
                   ? 'color-dropdown--item active'
                   : 'color-dropdown--item'
               }
-              key={uuid.v4()}
+              key={uuidv4()}
               onClick={this.handleDropdownClick(colorScale)}
             >
               <div

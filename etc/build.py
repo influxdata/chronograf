@@ -3,7 +3,7 @@
 import sys
 import os
 import subprocess
-from datetime import datetime
+from datetime import datetime, timezone
 import shutil
 import tempfile
 import hashlib
@@ -90,7 +90,7 @@ targets = {
 }
 
 supported_builds = {
-    'darwin': [ "amd64" ],
+    'darwin': [ "amd64", "arm64" ],
     'windows': [ "amd64" ],
     'linux': [ "amd64", "arm64" ]
 }
@@ -107,7 +107,7 @@ supported_packages = {
 ################
 
 def print_banner():
-    logging.info("""
+    logging.info(r"""
    ___ _                                     __
   / __| |_  _ _ ___ _ _  ___  __ _ _ _ __ _ / _|
  | (__| ' \| '_/ _ \ ' \/ _ \/ _` | '_/ _` |  _|
@@ -165,19 +165,19 @@ def package_scripts(build_root, config_only=False, windows=False):
 def run_generate():
     """Generate static assets.
     """
-    start_time = datetime.utcnow()
+    start_time = datetime.now(timezone.utc)
     logging.info("Generating static assets...")
     run("make assets", shell=True, print_output=True)
-    end_time = datetime.utcnow()
+    end_time = datetime.now(timezone.utc)
     logging.info("Time taken: {}s".format((end_time - start_time).total_seconds()))
     return True
 
 def make_clean():
     """Generate static assets.
     """
-    start_time = datetime.utcnow()
+    start_time = datetime.now(timezone.utc)
     run("make clean", shell=True, print_output=True)
-    end_time = datetime.utcnow()
+    end_time = datetime.now(timezone.utc)
     logging.info("Time taken: {}s".format((end_time - start_time).total_seconds()))
     return True
 
@@ -185,22 +185,22 @@ def make_clean():
 def go_get(branch, update=False, no_uncommitted=False):
     """Retrieve build dependencies or restore pinned dependencies.
     """
-    start_time = datetime.utcnow()
+    start_time = datetime.now(timezone.utc)
     if local_changes() and no_uncommitted:
         logging.error("There are uncommitted changes in the current directory.")
         return False
     run("make dep -B", shell=True, print_output=True)
-    end_time = datetime.utcnow()
+    end_time = datetime.now(timezone.utc)
     logging.info("Time taken: {}s".format((end_time - start_time).total_seconds()))
     return True
 
 def run_tests(race, parallel, timeout, no_vet):
     """Run the Go and NPM test suite on binary output.
     """
-    start_time = datetime.utcnow()
+    start_time = datetime.now(timezone.utc)
     logging.info("Running tests...")
     run("make test", shell=True, print_output=True)
-    end_time = datetime.utcnow()
+    end_time = datetime.now(timezone.utc)
     logging.info("Time taken: {}s".format((end_time - start_time).total_seconds()))
     return True
 
@@ -229,14 +229,14 @@ def run(command, allow_failure=False, shell=False, print_output=False):
             out = out.decode('utf-8').strip()
         if p.returncode != 0:
             if allow_failure:
-                logging.warn(u"Command '{}' failed with error: {}".format(command, out))
+                logging.warning(u"Command '{}' failed with error: {}".format(command, out))
                 return None
             else:
                 logging.error(u"Command '{}' failed with error: {}".format(command, out))
                 sys.exit(1)
     except OSError as e:
         if allow_failure:
-            logging.warn("Command '{}' failed with error: {}".format(command, e))
+            logging.warning("Command '{}' failed with error: {}".format(command, e))
             return out
         else:
             logging.error("Command '{}' failed with error: {}".format(command, e))
@@ -258,7 +258,7 @@ def increment_minor_version(version):
     """
     ver_list = version.split('.')
     if len(ver_list) != 3:
-        logging.warn("Could not determine how to increment version '{}', will just use provided version.".format(version))
+        logging.warning("Could not determine how to increment version '{}', will just use provided version.".format(version))
         return version
     ver_list[1] = str(int(ver_list[1]) + 1)
     ver_list[2] = str(0)
@@ -341,7 +341,7 @@ def get_go_version():
     """Retrieve version information for Go.
     """
     out = run("go version")
-    matches = re.search('go version go(\S+)', out)
+    matches = re.search(r'go version go(\S+)', out)
     if matches is not None:
         return matches.groups()[0].strip()
     return None
@@ -367,7 +367,7 @@ def check_environ(build_dir = None):
 
     cwd = os.getcwd()
     if build_dir is None and os.environ.get("GOPATH") and os.environ.get("GOPATH") not in cwd:
-        logging.warn("Your current directory is not under your GOPATH. This may lead to build failures.")
+        logging.warning("Your current directory is not under your GOPATH. This may lead to build failures.")
     return True
 
 def check_prereqs():
@@ -385,42 +385,58 @@ def upload_packages(packages, bucket_name=None, overwrite=False):
     """
     logging.debug("Uploading files to bucket '{}': {}".format(bucket_name, packages))
     try:
-        import boto
-        from boto.s3.key import Key
-        from boto.s3.connection import OrdinaryCallingFormat
-        logging.getLogger("boto").setLevel(logging.WARNING)
+        import boto3
+        from botocore.config import Config
+        from botocore.exceptions import ClientError
+        logging.getLogger("boto3").setLevel(logging.WARNING)
     except ImportError:
-        logging.warn("Cannot upload packages without 'boto' Python library!")
+        logging.warning("Cannot upload packages without 'boto3' Python library!")
         return False
     logging.info("Connecting to AWS S3...")
-    # Up the number of attempts to 10 from default of 1
-    boto.config.add_section("Boto")
-    boto.config.set("Boto", "metadata_service_num_attempts", "10")
-    c = boto.connect_s3(calling_format=OrdinaryCallingFormat())
+
     if bucket_name is None:
         bucket_name = DEFAULT_BUCKET
-    bucket = c.get_bucket(bucket_name.split('/')[0])
+
+    bucket = bucket_name.split('/')[0]
+    prefix = '/'
+    if '/' in bucket_name:
+        # Allow for nested paths within the bucket name (ex:
+        # bucket/folder). Assuming forward-slashes as path
+        # delimiter.
+        prefix = '/'.join(bucket_name.split('/')[1:])
+
+    # Keep retries at 10 attempts and use path-style addressing for dotted bucket names.
+    # Also ensure robust EC2 instance metadata (IMDS) credential retrieval by setting
+    # botocore's IMDS retry/timeout defaults if they are not already configured.
+    os.environ.setdefault("AWS_EC2_METADATA_SERVICE_NUM_ATTEMPTS", "10")
+    os.environ.setdefault("AWS_EC2_METADATA_SERVICE_TIMEOUT", "1")
+    config = Config(retries={'max_attempts': 10}, s3={'addressing_style': 'path'})
+    s3 = boto3.client('s3', config=config)
+
     for p in packages:
-        if '/' in bucket_name:
-            # Allow for nested paths within the bucket name (ex:
-            # bucket/folder). Assuming forward-slashes as path
-            # delimiter.
-            name = os.path.join('/'.join(bucket_name.split('/')[1:]),
-                                os.path.basename(p))
+        if prefix:
+            name = os.path.join(prefix, os.path.basename(p))
         else:
             name = os.path.basename(p)
         logging.debug("Using key: {}".format(name))
-        if bucket.get_key(name) is None or overwrite:
-            logging.info("Uploading file {}".format(name))
-            k = Key(bucket)
-            k.key = name
-            if overwrite:
-                n = k.set_contents_from_filename(p, replace=True)
-            else:
-                n = k.set_contents_from_filename(p, replace=False)
-            k.make_public()
-        else:
-            logging.warn("Not uploading file {}, as it already exists in the target bucket.".format(name))
+
+        if not overwrite:
+            try:
+                s3.head_object(Bucket=bucket, Key=name)
+                logging.warning("Not uploading file {}, as it already exists in the target bucket.".format(name))
+                continue
+            except ClientError as exc:
+                code = exc.response.get("Error", {}).get("Code", "")
+                if code not in ("404", "NoSuchKey", "NotFound"):
+                    logging.error("Failed checking for existing key '{}': {}".format(name, exc))
+                    return False
+
+        logging.info("Uploading file {}".format(name))
+        try:
+            s3.upload_file(p, bucket, name, ExtraArgs={'ACL': 'public-read'})
+        except ClientError as exc:
+            logging.error("Uploading file '{}' failed: {}".format(name, exc))
+            return False
     return True
 
 def go_list(vendor=False, relative=False):
@@ -493,21 +509,35 @@ def build(version=None,
         if  arch == "aarch64" or arch == "arm64":
             arch = "arm64"
 
+        # NOTE(bnpfeife,karel-rehor): Previously, linux/arm64 was statically built
+        # regardless whether "--static" was passed to this script. Now
+        # darwin builds fail when "--static" is passed (we are missing
+        # some static libraries). So, the following *always* generates
+        # static builds for linux, and *always* generates dynamic
+        # builds for darwin and windows.
+
         if platform == "linux":
             if arch == "amd64":
+                cc = "/musl/x86_64/bin/musl-gcc"
                 tags += ["netgo", "osusergo", "static_build"]
             if arch == "arm64":
                 cc = "/musl/aarch64/bin/musl-gcc"
                 tags += ["netgo", "osusergo", "static_build", "noasm"]
-        elif platform == "darwin" and arch == "amd64":
-            cc = "x86_64-apple-darwin18-clang"
-            tags += [ "netgo", "osusergo"]
+        elif platform == "darwin":
+            if arch == "amd64":
+                cc = "x86_64-apple-darwin23.5-clang"
+                tags += [ "netgo", "osusergo"]
+            if arch == "arm64":
+                cc = "aarch64-apple-darwin23.5-clang"
+                # TODO - see if the following can't be added to cross-builder in `/root/.cargo/config` as
+                # [target.aarch64-apple-darwin]
+                # linker = "aarch64-apple-darwin23.5-clang"
+                build_command += "CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER=aarch64-apple-darwin23.5-clang "
+                tags += [ "netgo", "osusergo", "noasm"]
         elif  platform == "windows" and arch == "amd64":
             cc = "x86_64-w64-mingw32-gcc"
-        if cc == "":
-            build_command += "GOOS={} GOARCH={} ".format(platform, arch)
-        else:
-            build_command += "CC={} GOOS={} GOARCH={} ".format(cc, platform, arch)
+
+        build_command += "CC={} GOOS={} GOARCH={} ".format(cc, platform, arch)
 
         if "arm" in fullarch:
             if  fullarch != "arm64":
@@ -523,21 +553,42 @@ def build(version=None,
         if len(tags) > 0:
             build_command += "-tags \"{}\" ".format(' '.join(tags))
 
-            # Starting with Go 1.5, the linker flag arguments changed to 'name=value' from 'name value'
+        # "ldflags" start
         build_command += "-ldflags=\""
-        if static:
-            build_command +="-s "
+
+        # version strings
+        build_command += "-X main.version={} -X main.branch={} -X main.commit={} -X main.platform=OSS ".format(
+            version,
+            get_current_branch(),
+            get_current_commit(),
+        )
+
+        # if platform == "linux":
+        #    build_command += r'-extldflags \"-fno-PIC -Wl,-z,stack-size=8388608,--allow-multiple-definition\"  '
+        # build_command += '-X main.version={} -X main.branch={} -X main.commit={} -X main.platform=OSS" '.format(version,
+        #                                                                                                        get_current_branch(),
+        #                                                                                                        get_current_commit())
+
+        # if static:
+        #    build_command += "-a -installsuffix cgo "
         if platform == "linux":
-            build_command += r'-extldflags \"-fno-PIC -Wl,-z,stack-size=8388608,--allow-multiple-definition\"  '
-        build_command += '-X main.version={} -X main.branch={} -X main.commit={} -X main.platform=OSS" '.format(version,
-                                                                                                                get_current_branch(),
-                                                                                                                get_current_commit())
-        if static:
-            build_command += "-a -installsuffix cgo "
+            # "extldflags" start
+            build_command += "-linkmode=external -extldflags \\\"-fno-PIC -Wl,-z,stack-size=8388608,--allow-multiple-definition "
+            if arch == "amd64":
+                build_command += "-L{} -Wl,-lunwind ".format(find_rustlib_path("x86_64-unknown-linux-musl"))
+            if arch == "arm64":
+                build_command += "-L{} -Wl,-lunwind ".format(find_rustlib_path("aarch64-unknown-linux-musl"))
+            # "exdldflags" end
+            build_command += "\\\" "
+
+        # "ldflags" end
+        build_command += "\" "
         build_command += path
-        start_time = datetime.utcnow()
+        # start_time = datetime.utcnow()
+        start_time = datetime.now(timezone.utc)
         run(build_command, shell=True, print_output=True)
-        end_time = datetime.utcnow()
+        # end_time = datetime.utcnow()
+        end_time = datetime.now(timezone.utc)
         logging.info("Time taken: {}s".format((end_time - start_time).total_seconds()))
     return True
 
@@ -565,7 +616,7 @@ def generate_sig_from_file(path):
     logging.debug("Generating GPG signature for file: {}".format(path))
     gpg_path = check_path_for('gpg')
     if gpg_path is None:
-        logging.warn("gpg binary not found on path! Skipping signature creation.")
+        logging.warning("gpg binary not found on path! Skipping signature creation.")
         return False
     if os.environ.get("GNUPG_HOME") is not None:
         run('gpg --homedir {} --armor --yes --detach-sign {}'.format(os.environ.get("GNUPG_HOME"), path))
@@ -710,7 +761,7 @@ def package(build_output, pkg_name, version, nightly=False, iteration=1, static=
                         if matches is not None:
                             outfile = matches.groups()[0]
                         if outfile is None:
-                            logging.warn("Could not determine output from packaging output!")
+                            logging.warning("Could not determine output from packaging output!")
                         else:
                             if nightly:
                                 # TODO: check if this is correct
@@ -738,6 +789,24 @@ def package(build_output, pkg_name, version, nightly=False, iteration=1, static=
         # Cleanup
         # shutil.rmtree(tmp_build_dir)
 
+def find_rustlib_path(triple):
+    """
+    Retrieves the "rustlib" directory.
+    """
+
+    # "find_rustlib_path" is included within the crossbuilder docker
+    # image. This script retrieves the "rustlib" directory. "rustlib"
+    # contains static libraries which serve as replacements for
+    # various glibc components. This is required for object-files
+    # built by the Rust toolchain to properly link with Go.
+    return subprocess.run(
+        ['find_rustlib_path', triple],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+
+
 def main(args):
     global PACKAGE_NAME
 
@@ -747,7 +816,7 @@ def main(args):
 
     if args.nightly:
         args.version = increment_minor_version(args.version)
-        args.version = "{}~{}".format(datetime.utcnow().strftime("%Y%m%d%H%M"),
+        args.version = "{}~{}".format(datetime.now(timezone.utc).strftime("%Y%m%d%H%M"),
                                       args.version)
         args.iteration = 0
 

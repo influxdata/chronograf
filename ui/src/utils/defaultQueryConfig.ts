@@ -1,4 +1,4 @@
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 
 import {NULL_STRING} from 'src/shared/constants/queryFillOptions'
 import {QueryConfig} from 'src/types'
@@ -10,7 +10,7 @@ interface DefaultQueryArgs {
 }
 
 const defaultQueryConfig = (
-  {id, isKapacitorRule = false}: DefaultQueryArgs = {id: uuid.v4()}
+  {id, isKapacitorRule = false}: DefaultQueryArgs = {id: uuidv4()}
 ): QueryConfig => {
   const queryConfig = {
     id,

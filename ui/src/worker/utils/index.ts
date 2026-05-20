@@ -1,5 +1,5 @@
 import {readPayload, writePayload} from 'src/worker/Database'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 
 import {Message} from 'src/worker/types'
 
@@ -8,7 +8,7 @@ export const fetchData = async (msg: Message): Promise<any> => {
 }
 
 export const error = (msg: Message, err: Error) => {
-  const id = uuid.v4()
+  const id = uuidv4()
 
   postMessage({
     id,
@@ -20,7 +20,7 @@ export const error = (msg: Message, err: Error) => {
 
 export const success = async (originMsg: Message, payload: any) => {
   const msg = {
-    id: uuid.v4(),
+    id: uuidv4(),
     origin: originMsg.id,
     result: 'success',
   }

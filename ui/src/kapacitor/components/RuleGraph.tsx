@@ -2,7 +2,7 @@
 import React, {PureComponent, CSSProperties} from 'react'
 import {connect} from 'react-redux'
 import TimeSeries from 'src/shared/components/time_series/TimeSeries'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 
 // Components
 import TimeRangeDropdown from 'src/shared/components/TimeRangeDropdown'
@@ -68,7 +68,7 @@ class RuleGraph extends PureComponent<Props> {
             source={source}
             queries={this.queries}
             templates={this.templates}
-            uuid={uuid.v4()}
+            uuid={uuidv4()}
           >
             {data => {
               return (

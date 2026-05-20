@@ -133,6 +133,7 @@ export const executeQuery = async (
 
   xhr.open('POST', url)
   xhr.setRequestHeader('Content-Type', 'application/json')
+  xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
   xhr.send(body)
 
   return deferred.promise

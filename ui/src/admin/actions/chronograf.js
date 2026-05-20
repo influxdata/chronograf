@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 
 import {
   getUsers as getUsersAJAX,
@@ -162,7 +162,7 @@ export const loadMappingsAsync = () => async dispatch => {
 }
 
 export const createMappingAsync = (url, mapping) => async dispatch => {
-  const mappingWithTempId = {...mapping, _tempID: uuid.v4()}
+  const mappingWithTempId = {...mapping, _tempID: uuidv4()}
   dispatch(addMapping(mappingWithTempId))
   try {
     const {data} = await createMappingAJAX(url, mapping)
@@ -206,7 +206,7 @@ export const updateMappingAsync = (
 export const createUserAsync = (url, user) => async dispatch => {
   // temp uuid is added to be able to disambiguate a created user that has the
   // same scheme, provider, and name as an existing user
-  const userWithTempID = {...user, _tempID: uuid.v4()}
+  const userWithTempID = {...user, _tempID: uuidv4()}
   dispatch(addUser(userWithTempID))
   try {
     const {data} = await createUserAJAX(url, user)
@@ -269,7 +269,7 @@ export const createOrganizationAsync = (
 ) => async dispatch => {
   // temp uuid is added to be able to disambiguate a created organization with
   // the same name as an existing organization
-  const organizationWithTempID = {...organization, _tempID: uuid.v4()}
+  const organizationWithTempID = {...organization, _tempID: uuidv4()}
   dispatch(addOrganization(organizationWithTempID))
   try {
     const {data} = await createOrganizationAJAX(url, organization)

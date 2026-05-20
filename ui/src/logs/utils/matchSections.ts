@@ -1,5 +1,5 @@
 import {MatchType, Filter, MatchSection, Operator} from 'src/types/logs'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 
 export const getMatchSections = (
   pattern: string,
@@ -35,7 +35,7 @@ const matchSections = (re: RegExp, text) => {
 }
 
 const createSection = (type: MatchType, text: string): MatchSection => ({
-  id: uuid.v4(),
+  id: uuidv4(),
   type,
   text,
 })

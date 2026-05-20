@@ -2,7 +2,7 @@ import React, {PureComponent, ChangeEvent} from 'react'
 import {connect} from 'react-redux'
 import {withSource} from 'src/CheckSources'
 import {bindActionCreators} from 'redux'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 
 import Tickscript from 'src/kapacitor/components/Tickscript'
 import * as kapactiorActionCreators from 'src/kapacitor/actions/view'
@@ -359,8 +359,8 @@ export class TickscriptPage extends PureComponent<Props, State> {
           areLogsEnabled: true,
           logs: [
             {
-              id: uuid.v4(),
-              key: uuid.v4(),
+              id: uuidv4(),
+              key: uuidv4(),
               lvl: 'info',
               msg: 'created log session',
               service: 'sessions',
@@ -410,7 +410,7 @@ export class TickscriptPage extends PureComponent<Props, State> {
               ...logs,
               ...JSON.parse(jsonStr).map(log => ({
                 ...log,
-                key: uuid.v4(),
+                key: uuidv4(),
               })),
             ]
             failStr = ''

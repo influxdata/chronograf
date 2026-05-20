@@ -1,4 +1,4 @@
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 import _ from 'lodash'
 
 import {Filter} from 'src/types/logs'
@@ -106,7 +106,7 @@ const createAttributeFilter = (
   value: string,
   operator: Operator
 ) => ({
-  id: uuid.v4(),
+  id: uuidv4(),
   key,
   value,
   operator,
