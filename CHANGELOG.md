@@ -6,6 +6,7 @@
    caused by lack of write permissions.
    * Add write permission to the `chronograf-cypress-tests-report.yaml` workflow.
    * Upgrade `dorny/test-reporter` action to v3
+   1. [#6220](https://github.com/influxdata/chronograf/pull/6220): Upgrade golang to 1.25.10.
 
 ## v1.11.2 [2026-05-06]
 
