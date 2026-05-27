@@ -1,10 +1,20 @@
-## v1.11.3 [unreleased]
+## v1.11.4 [unreleased]
 
 ### Security Fixes
 
 1. [#6211](https://github.com/influxdata/chronograf/pull/6211): Harden secrets-at-rest protections for persisted source and server credentials using envelope encryption.
    * Add startup migration for legacy plaintext secrets when a secrets master key is configured.
    * Add `chronoctl` commands for master-key generation, rewrap, and disable workflows.
+
+## v1.11.3 [2026-05-27]
+
+### Other
+
+1. [#6214](https://github.com/influxdata/chronograf/pull/6214): Fix `chronograf-cypress-tests-report.yaml` workflow
+   caused by lack of write permissions.
+   * Add write permission to the `chronograf-cypress-tests-report.yaml` workflow.
+   * Upgrade `dorny/test-reporter` action to v3
+1. [#6220](https://github.com/influxdata/chronograf/pull/6220): Upgrade golang to 1.25.10.
 
 ## v1.11.2 [2026-05-06]
 
