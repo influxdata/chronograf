@@ -157,3 +157,23 @@ func TestGenerateSecretsMasterKey(t *testing.T) {
 		t.Fatalf("unexpected decoded key length: got %d, want 32", len(raw))
 	}
 }
+
+func TestValidateExistingBoltPath(t *testing.T) {
+	t.Run("missing path", func(t *testing.T) {
+		err := validateExistingBoltPath(filepath.Join(t.TempDir(), "missing.db"))
+		if err == nil {
+			t.Fatalf("expected error for missing path")
+		}
+	})
+
+	t.Run("existing path", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "chronograf-v1.db")
+		if err := os.WriteFile(path, []byte{}, 0600); err != nil {
+			t.Fatal(err)
+		}
+		if err := validateExistingBoltPath(path); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+}

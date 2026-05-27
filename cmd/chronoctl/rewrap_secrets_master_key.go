@@ -36,6 +36,10 @@ func (c *rewrapSecretsMasterKeyCommand) Execute(args []string) error {
 		errExit(err)
 	}
 
+	if err := validateExistingBoltPath(c.BoltPath); err != nil {
+		errExit(err)
+	}
+
 	store, err := NewBoltClient(c.BoltPath)
 	if err != nil {
 		return err
