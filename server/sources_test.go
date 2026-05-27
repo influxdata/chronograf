@@ -892,7 +892,7 @@ func TestService_UpdateSource(t *testing.T) {
 			wantStatusCode:  200,
 			wantContentType: "application/json",
 			wantBody: func(url string) string {
-				return fmt.Sprintf(`{"id":"2","name":"v3-core","type":"influx-v3-core","databaseToken":"test-token-123","url":"%s","default":false,"telegraf":"telegraf","organization":"1337","defaultRP":"","defaultDB":"mydb","version":"Unknown","authentication":"unknown","links":{"self":"/chronograf/v1/sources/2","kapacitors":"/chronograf/v1/sources/2/kapacitors","services":"/chronograf/v1/sources/2/services","proxy":"/chronograf/v1/sources/2/proxy","queries":"/chronograf/v1/sources/2/queries","write":"/chronograf/v1/sources/2/write","permissions":"/chronograf/v1/sources/2/permissions","users":"/chronograf/v1/sources/2/users","databases":"/chronograf/v1/sources/2/dbs","annotations":"/chronograf/v1/sources/2/annotations","health":"/chronograf/v1/sources/2/health"}}
+				return fmt.Sprintf(`{"id":"2","name":"v3-core","type":"influx-v3-core","url":"%s","default":false,"telegraf":"telegraf","organization":"1337","defaultRP":"","defaultDB":"mydb","version":"Unknown","authentication":"unknown","links":{"self":"/chronograf/v1/sources/2","kapacitors":"/chronograf/v1/sources/2/kapacitors","services":"/chronograf/v1/sources/2/services","proxy":"/chronograf/v1/sources/2/proxy","queries":"/chronograf/v1/sources/2/queries","write":"/chronograf/v1/sources/2/write","permissions":"/chronograf/v1/sources/2/permissions","users":"/chronograf/v1/sources/2/users","databases":"/chronograf/v1/sources/2/dbs","annotations":"/chronograf/v1/sources/2/annotations","health":"/chronograf/v1/sources/2/health"}}
 `, url)
 			},
 		},
@@ -945,7 +945,7 @@ func TestService_UpdateSource(t *testing.T) {
 			wantStatusCode:  200,
 			wantContentType: "application/json",
 			wantBody: func(url string) string {
-				return fmt.Sprintf(`{"id":"3","name":"v3-enterprise","type":"influx-v3-enterprise","databaseToken":"enterprise-token-456","url":"%s","default":false,"telegraf":"telegraf","organization":"1337","defaultRP":"","defaultDB":"enterprise_db","version":"Unknown","authentication":"unknown","links":{"self":"/chronograf/v1/sources/3","kapacitors":"/chronograf/v1/sources/3/kapacitors","services":"/chronograf/v1/sources/3/services","proxy":"/chronograf/v1/sources/3/proxy","queries":"/chronograf/v1/sources/3/queries","write":"/chronograf/v1/sources/3/write","permissions":"/chronograf/v1/sources/3/permissions","users":"/chronograf/v1/sources/3/users","databases":"/chronograf/v1/sources/3/dbs","annotations":"/chronograf/v1/sources/3/annotations","health":"/chronograf/v1/sources/3/health"}}
+				return fmt.Sprintf(`{"id":"3","name":"v3-enterprise","type":"influx-v3-enterprise","url":"%s","default":false,"telegraf":"telegraf","organization":"1337","defaultRP":"","defaultDB":"enterprise_db","version":"Unknown","authentication":"unknown","links":{"self":"/chronograf/v1/sources/3","kapacitors":"/chronograf/v1/sources/3/kapacitors","services":"/chronograf/v1/sources/3/services","proxy":"/chronograf/v1/sources/3/proxy","queries":"/chronograf/v1/sources/3/queries","write":"/chronograf/v1/sources/3/write","permissions":"/chronograf/v1/sources/3/permissions","users":"/chronograf/v1/sources/3/users","databases":"/chronograf/v1/sources/3/dbs","annotations":"/chronograf/v1/sources/3/annotations","health":"/chronograf/v1/sources/3/health"}}
 `, url)
 			},
 		},
@@ -999,7 +999,7 @@ func TestService_UpdateSource(t *testing.T) {
 			wantStatusCode:  200,
 			wantContentType: "application/json",
 			wantBody: func(url string) string {
-				return fmt.Sprintf(`{"id":"4","name":"v3-clustered","type":"influx-v3-clustered","clusterId":"a1b2c3d4-e5f6-7890-abcd-ef1234567890","accountId":"f1e2d3c4-b5a6-9870-dcba-fe9876543210","managementToken":"mgmt-token-789","databaseToken":"db-token-789","url":"%s","default":false,"telegraf":"telegraf","organization":"1337","defaultRP":"","defaultDB":"clustered_db","authentication":"unknown","links":{"self":"/chronograf/v1/sources/4","kapacitors":"/chronograf/v1/sources/4/kapacitors","services":"/chronograf/v1/sources/4/services","proxy":"/chronograf/v1/sources/4/proxy","queries":"/chronograf/v1/sources/4/queries","write":"/chronograf/v1/sources/4/write","permissions":"/chronograf/v1/sources/4/permissions","users":"/chronograf/v1/sources/4/users","databases":"/chronograf/v1/sources/4/dbs","annotations":"/chronograf/v1/sources/4/annotations","health":"/chronograf/v1/sources/4/health"}}
+				return fmt.Sprintf(`{"id":"4","name":"v3-clustered","type":"influx-v3-clustered","clusterId":"a1b2c3d4-e5f6-7890-abcd-ef1234567890","accountId":"f1e2d3c4-b5a6-9870-dcba-fe9876543210","url":"%s","default":false,"telegraf":"telegraf","organization":"1337","defaultRP":"","defaultDB":"clustered_db","authentication":"unknown","links":{"self":"/chronograf/v1/sources/4","kapacitors":"/chronograf/v1/sources/4/kapacitors","services":"/chronograf/v1/sources/4/services","proxy":"/chronograf/v1/sources/4/proxy","queries":"/chronograf/v1/sources/4/queries","write":"/chronograf/v1/sources/4/write","permissions":"/chronograf/v1/sources/4/permissions","users":"/chronograf/v1/sources/4/users","databases":"/chronograf/v1/sources/4/dbs","annotations":"/chronograf/v1/sources/4/annotations","health":"/chronograf/v1/sources/4/health"}}
 `, url)
 			},
 		},
@@ -1055,7 +1055,7 @@ func TestService_UpdateSource(t *testing.T) {
 			wantStatusCode:  200,
 			wantContentType: "application/json",
 			wantBody: func(url string) string {
-				return fmt.Sprintf(`{"id":"5","name":"v3-cloud-dedicated","type":"influx-v3-cloud-dedicated","clusterId":"12345678-1234-5678-1234-567812345678","accountId":"87654321-4321-8765-4321-876543218765","managementToken":"cloud-mgmt-abc","databaseToken":"cloud-token-abc","url":"%s","default":false,"telegraf":"telegraf","organization":"1337","defaultRP":"","defaultDB":"cloud_db","authentication":"unknown","links":{"self":"/chronograf/v1/sources/5","kapacitors":"/chronograf/v1/sources/5/kapacitors","services":"/chronograf/v1/sources/5/services","proxy":"/chronograf/v1/sources/5/proxy","queries":"/chronograf/v1/sources/5/queries","write":"/chronograf/v1/sources/5/write","permissions":"/chronograf/v1/sources/5/permissions","users":"/chronograf/v1/sources/5/users","databases":"/chronograf/v1/sources/5/dbs","annotations":"/chronograf/v1/sources/5/annotations","health":"/chronograf/v1/sources/5/health"}}
+				return fmt.Sprintf(`{"id":"5","name":"v3-cloud-dedicated","type":"influx-v3-cloud-dedicated","clusterId":"12345678-1234-5678-1234-567812345678","accountId":"87654321-4321-8765-4321-876543218765","url":"%s","default":false,"telegraf":"telegraf","organization":"1337","defaultRP":"","defaultDB":"cloud_db","authentication":"unknown","links":{"self":"/chronograf/v1/sources/5","kapacitors":"/chronograf/v1/sources/5/kapacitors","services":"/chronograf/v1/sources/5/services","proxy":"/chronograf/v1/sources/5/proxy","queries":"/chronograf/v1/sources/5/queries","write":"/chronograf/v1/sources/5/write","permissions":"/chronograf/v1/sources/5/permissions","users":"/chronograf/v1/sources/5/users","databases":"/chronograf/v1/sources/5/dbs","annotations":"/chronograf/v1/sources/5/annotations","health":"/chronograf/v1/sources/5/health"}}
 `, url)
 			},
 		},
@@ -1111,7 +1111,7 @@ func TestService_UpdateSource(t *testing.T) {
 			wantStatusCode:  200,
 			wantContentType: "application/json",
 			wantBody: func(url string) string {
-				return fmt.Sprintf(`{"id":"6","name":"v3-cloud-dedicated","type":"influx-v3-cloud-dedicated","databaseToken":"old-cloud-token","url":"%s","default":false,"telegraf":"my-db","organization":"1337","defaultRP":"","defaultDB":"my-db","authentication":"unknown","links":{"self":"/chronograf/v1/sources/6","kapacitors":"/chronograf/v1/sources/6/kapacitors","services":"/chronograf/v1/sources/6/services","proxy":"/chronograf/v1/sources/6/proxy","queries":"/chronograf/v1/sources/6/queries","write":"/chronograf/v1/sources/6/write","permissions":"/chronograf/v1/sources/6/permissions","users":"/chronograf/v1/sources/6/users","databases":"/chronograf/v1/sources/6/dbs","annotations":"/chronograf/v1/sources/6/annotations","health":"/chronograf/v1/sources/6/health"}}
+				return fmt.Sprintf(`{"id":"6","name":"v3-cloud-dedicated","type":"influx-v3-cloud-dedicated","url":"%s","default":false,"telegraf":"my-db","organization":"1337","defaultRP":"","defaultDB":"my-db","authentication":"unknown","links":{"self":"/chronograf/v1/sources/6","kapacitors":"/chronograf/v1/sources/6/kapacitors","services":"/chronograf/v1/sources/6/services","proxy":"/chronograf/v1/sources/6/proxy","queries":"/chronograf/v1/sources/6/queries","write":"/chronograf/v1/sources/6/write","permissions":"/chronograf/v1/sources/6/permissions","users":"/chronograf/v1/sources/6/users","databases":"/chronograf/v1/sources/6/dbs","annotations":"/chronograf/v1/sources/6/annotations","health":"/chronograf/v1/sources/6/health"}}
 `, url)
 			},
 		},
@@ -1164,7 +1164,7 @@ func TestService_UpdateSource(t *testing.T) {
 			wantStatusCode:  200,
 			wantContentType: "application/json",
 			wantBody: func(url string) string {
-				return fmt.Sprintf(`{"id":"7","name":"v3-serverless","type":"influx-v3-serverless","databaseToken":"serverless-token-xyz","url":"%s","default":false,"telegraf":"telegraf","organization":"1337","defaultRP":"","defaultDB":"serverless_db","authentication":"token","links":{"self":"/chronograf/v1/sources/7","kapacitors":"/chronograf/v1/sources/7/kapacitors","services":"/chronograf/v1/sources/7/services","proxy":"/chronograf/v1/sources/7/proxy","queries":"/chronograf/v1/sources/7/queries","write":"/chronograf/v1/sources/7/write","permissions":"/chronograf/v1/sources/7/permissions","users":"/chronograf/v1/sources/7/users","databases":"/chronograf/v1/sources/7/dbs","annotations":"/chronograf/v1/sources/7/annotations","health":"/chronograf/v1/sources/7/health"}}
+				return fmt.Sprintf(`{"id":"7","name":"v3-serverless","type":"influx-v3-serverless","url":"%s","default":false,"telegraf":"telegraf","organization":"1337","defaultRP":"","defaultDB":"serverless_db","authentication":"token","links":{"self":"/chronograf/v1/sources/7","kapacitors":"/chronograf/v1/sources/7/kapacitors","services":"/chronograf/v1/sources/7/services","proxy":"/chronograf/v1/sources/7/proxy","queries":"/chronograf/v1/sources/7/queries","write":"/chronograf/v1/sources/7/write","permissions":"/chronograf/v1/sources/7/permissions","users":"/chronograf/v1/sources/7/users","databases":"/chronograf/v1/sources/7/dbs","annotations":"/chronograf/v1/sources/7/annotations","health":"/chronograf/v1/sources/7/health"}}
 `, url)
 			},
 		},

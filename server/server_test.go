@@ -4,13 +4,16 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
+	"encoding/base64"
 	"encoding/pem"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/bouk/httprouter"
+	flags "github.com/jessevdk/go-flags"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -129,6 +132,59 @@ func Test_useSecureCookies(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Test_loadSecretsMasterKey(t *testing.T) {
+	validKey := []byte("0123456789abcdef0123456789abcdef")
+	validB64 := base64.StdEncoding.EncodeToString(validKey)
+
+	t.Run("empty config returns nil", func(t *testing.T) {
+		s := Server{}
+		got, err := s.loadSecretsMasterKey()
+		require.NoError(t, err)
+		require.Nil(t, got)
+	})
+
+	t.Run("fails when both direct and file are set", func(t *testing.T) {
+		s := Server{
+			SecretsMasterKey:     validB64,
+			SecretsMasterKeyFile: "master-key.txt",
+		}
+		_, err := s.loadSecretsMasterKey()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "either --secrets-master-key or --secrets-master-key-file")
+	})
+
+	t.Run("fails on invalid base64", func(t *testing.T) {
+		s := Server{SecretsMasterKey: "not-base64"}
+		_, err := s.loadSecretsMasterKey()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "decoding secrets master key")
+	})
+
+	t.Run("fails on wrong decoded length", func(t *testing.T) {
+		tooShort := base64.StdEncoding.EncodeToString([]byte("short"))
+		s := Server{SecretsMasterKey: tooShort}
+		_, err := s.loadSecretsMasterKey()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "invalid secrets master key length")
+	})
+
+	t.Run("loads direct key", func(t *testing.T) {
+		s := Server{SecretsMasterKey: validB64}
+		got, err := s.loadSecretsMasterKey()
+		require.NoError(t, err)
+		require.Equal(t, validKey, got)
+	})
+
+	t.Run("loads key from file", func(t *testing.T) {
+		f := t.TempDir() + "/master-key.txt"
+		require.NoError(t, os.WriteFile(f, []byte(validB64+"\n"), 0600))
+		s := Server{SecretsMasterKeyFile: flags.Filename(f)}
+		got, err := s.loadSecretsMasterKey()
+		require.NoError(t, err)
+		require.Equal(t, validKey, got)
+	})
 }
 
 func TestValidAuth(t *testing.T) {
