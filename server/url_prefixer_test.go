@@ -210,3 +210,53 @@ func Test_Server_Prefixer_IgnoreJsAndSvg(t *testing.T) {
 		}
 	}
 }
+
+func Test_Server_Prefixer_RewritesMinifiedHTML(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		subject  string
+		expected string
+	}{
+		{"Unquoted href", `<link rel=stylesheet href=/ui.css>`, `<link rel=stylesheet href=/chronograf/ui.css>`},
+		{"Unquoted src", `<script src=/ui.js></script>`, `<script src=/chronograf/ui.js></script>`},
+		{"Empty data-basepath", `<div id=react-root data-basepath></div>`, `<div id=react-root data-basepath="/chronograf/"></div>`},
+		{
+			"Minified index HTML",
+			`<link rel=stylesheet href=/ui.f8bbc9c4.css><link rel="icon shortcut" href=/favicon.70d63073.ico><div id=react-root data-basepath></div><script type=module src=/ui.eb3e79e6.js></script>`,
+			`<link rel=stylesheet href=/chronograf/ui.f8bbc9c4.css><link rel="icon shortcut" href=/chronograf/favicon.70d63073.ico><div id=react-root data-basepath="/chronograf/"></div><script type=module src=/chronograf/ui.eb3e79e6.js></script>`,
+		},
+	}
+
+	for _, test := range tests {
+		backend := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			fmt.Fprint(w, test.subject)
+		})
+
+		pfx := server.NewDefaultURLPrefixer("/chronograf/", backend, nil)
+
+		ts := httptest.NewServer(pfx)
+		defer ts.Close()
+
+		res, err := http.Get(ts.URL)
+		if err != nil {
+			t.Fatal("Unexpected error fetching from prefixer: err:", err)
+		}
+
+		actual, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			t.Fatal("Unable to read prefixed body: err:", err)
+		}
+
+		if string(actual) != test.expected {
+			t.Error(
+				test.name,
+				":\n Unsuccessful prefixing.\n\tWant:",
+				fmt.Sprintf("%+q", test.expected),
+				"\n\tGot: ",
+				fmt.Sprintf("%+q", string(actual)),
+			)
+		}
+	}
+}
