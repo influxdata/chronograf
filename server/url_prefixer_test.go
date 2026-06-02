@@ -222,6 +222,7 @@ func Test_Server_Prefixer_RewritesMinifiedHTML(t *testing.T) {
 		{"Unquoted href", `<link rel=stylesheet href=/ui.css>`, `<link rel=stylesheet href=/chronograf/ui.css>`},
 		{"Unquoted src", `<script src=/ui.js></script>`, `<script src=/chronograf/ui.js></script>`},
 		{"Empty data-basepath", `<div id=react-root data-basepath></div>`, `<div id=react-root data-basepath="/chronograf/"></div>`},
+		{"Quoted data-basepath", `<div id=react-root data-basepath=""></div>`, `<div id=react-root data-basepath="/chronograf/"></div>`},
 		{
 			"Minified index HTML",
 			`<link rel=stylesheet href=/ui.f8bbc9c4.css><link rel="icon shortcut" href=/favicon.70d63073.ico><div id=react-root data-basepath></div><script type=module src=/ui.eb3e79e6.js></script>`,
