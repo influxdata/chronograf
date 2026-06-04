@@ -1,3 +1,9 @@
+## v1.11.4 [unreleased]
+
+### Bug Fixes
+
+1. [#6227](https://github.com/influxdata/chronograf/pull/6227): Respect base path in minified UI HTML.
+
 ## v1.11.3 [2026-05-27]
 
 ### Other
