@@ -1,4 +1,4 @@
-## v1.11.4 [unreleased]
+## v1.11.5 [unreleased]
 
 ### Security Fixes
 
@@ -6,6 +6,7 @@
    * Add startup migration for legacy plaintext secrets when a secrets master key is configured.
    * Add `chronoctl` commands for master-key generation, rewrap, and disable workflows.
    * Secrets encryption is supported only for BoltDB-backed deployments.
+
 ## v1.11.4 [2026-06-16]
 
 ### Bug Fixes
