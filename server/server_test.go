@@ -145,6 +145,13 @@ func Test_loadSecretsMasterKey(t *testing.T) {
 		require.Nil(t, got)
 	})
 
+	t.Run("etcd config without key returns nil", func(t *testing.T) {
+		s := Server{EtcdEndpoints: []string{"localhost:2379"}}
+		got, err := s.loadSecretsMasterKey()
+		require.NoError(t, err)
+		require.Nil(t, got)
+	})
+
 	t.Run("fails when both direct and file are set", func(t *testing.T) {
 		s := Server{
 			SecretsMasterKey:     validB64,
@@ -153,6 +160,25 @@ func Test_loadSecretsMasterKey(t *testing.T) {
 		_, err := s.loadSecretsMasterKey()
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "either --secrets-master-key or --secrets-master-key-file")
+	})
+
+	t.Run("fails when direct key is set with etcd", func(t *testing.T) {
+		s := Server{
+			EtcdEndpoints:    []string{"localhost:2379"},
+			SecretsMasterKey: validB64,
+		}
+		_, err := s.loadSecretsMasterKey()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "supported only with BoltDB storage")
+	})
+
+	t.Run("fails when key file is set with etcd", func(t *testing.T) {
+		f := t.TempDir() + "/master-key.txt"
+		require.NoError(t, os.WriteFile(f, []byte(validB64+"\n"), 0600))
+		s := Server{EtcdEndpoints: []string{"localhost:2379"}, SecretsMasterKeyFile: flags.Filename(f)}
+		_, err := s.loadSecretsMasterKey()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "supported only with BoltDB storage")
 	})
 
 	t.Run("fails on invalid base64", func(t *testing.T) {

@@ -151,8 +151,8 @@ type Server struct {
 	ReportingDisabled    bool           `short:"r" long:"reporting-disabled" description:"Disable reporting of usage stats (os,arch,version,cluster_id,uptime) once every 24hr" env:"REPORTING_DISABLED"`
 	CustomAutoRefresh    string         `long:"custom-auto-refresh" description:"Adds custom auto refresh options using semicolon separated list of label=milliseconds pairs" env:"CUSTOM_AUTO_REFRESH"`
 	LogLevel             string         `short:"l" long:"log-level" value-name:"choice" choice:"debug" choice:"info" choice:"error" default:"info" description:"Set the logging level" env:"LOG_LEVEL"`
-	SecretsMasterKey     string         `long:"secrets-master-key" description:"Base64-encoded 32-byte master key used to wrap/unwrap the data encryption key for secret-field encryption" env:"SECRETS_MASTER_KEY"`
-	SecretsMasterKeyFile flags.Filename `long:"secrets-master-key-file" description:"Path to file containing a base64-encoded 32-byte master key used to wrap/unwrap the data encryption key for secret-field encryption" env:"SECRETS_MASTER_KEY_FILE"`
+	SecretsMasterKey     string         `long:"secrets-master-key" description:"Base64-encoded 32-byte master key used to wrap/unwrap the data encryption key for secret-field encryption (BoltDB storage only)" env:"SECRETS_MASTER_KEY"`
+	SecretsMasterKeyFile flags.Filename `long:"secrets-master-key-file" description:"Path to file containing a base64-encoded 32-byte master key used to wrap/unwrap the data encryption key for secret-field encryption (BoltDB storage only)" env:"SECRETS_MASTER_KEY_FILE"`
 	Basepath             string         `short:"p" long:"basepath" description:"A URL path prefix under which all chronograf routes will be mounted. (Note: PREFIX_ROUTES has been deprecated. Now, if basepath is set, all routes will be prefixed with it.)" env:"BASE_PATH"`
 	ShowVersion          bool           `short:"v" long:"version" description:"Show Chronograf version info"`
 	BuildInfo            chronograf.BuildInfo
@@ -647,6 +647,12 @@ func (s *Server) setPubkey() error {
 func (s *Server) loadSecretsMasterKey() ([]byte, error) {
 	if s.SecretsMasterKey != "" && s.SecretsMasterKeyFile != "" {
 		return nil, errors.New("secrets master key must be provided by either --secrets-master-key or --secrets-master-key-file, not both")
+	}
+
+	// Storage topology is validated here because this is the last common point
+	// before Serve opens either BoltDB or etcd; secrets encryption is BoltDB-only.
+	if len(s.EtcdEndpoints) > 0 && (s.SecretsMasterKey != "" || s.SecretsMasterKeyFile != "") {
+		return nil, errors.New("--secrets-master-key/--secrets-master-key-file are supported only with BoltDB storage; remove them, or rely on etcd encryption-at-rest or platform-level disk encryption")
 	}
 
 	if s.SecretsMasterKey == "" && s.SecretsMasterKeyFile == "" {
