@@ -1,6 +1,6 @@
 {
   "name": "chronograf-ui",
-  "version": "1.11.3",
+  "version": "1.11.4",
   "private": true,
   "license": "AGPL-3.0",
   "description": "",
@@ -44,7 +44,7 @@
   },
   "author": "",
   "devDependencies": {
-    "@babel/core": "^7.28.5",
+    "@babel/core": "^7.29.6",
     "@babel/eslint-parser": "^7.28.5",
     "@babel/eslint-plugin": "^7.27.1",
     "@babel/plugin-proposal-class-properties": "^7.1.0",

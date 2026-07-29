@@ -31,7 +31,7 @@
     "@parcel/transformer-sass": "^2.16.4",
     "assert": "^2.0.0",
     "events": "^3.3.0",
-    "http-proxy-middleware": "^2.0.9",
+    "http-proxy-middleware": "^2.0.10",
     "process": "^0.11.10",
     "querystring-es3": "^0.2.1",
     "url": "^0.11.4",

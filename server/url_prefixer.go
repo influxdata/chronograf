@@ -104,8 +104,8 @@ func (up *URLPrefixer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 	// setup a buffer which is the max length of our target attrs
 	b := make([]byte, up.maxlen(up.Attrs...))
-	io.ReadFull(nextRead, b) // prime the buffer with the start of the input
-	buf := bytes.NewBuffer(b)
+	n, _ := io.ReadFull(nextRead, b) // prime the buffer with the start of the input
+	buf := bytes.NewBuffer(b[:n])
 
 	// Read next handler's response byte by byte
 	src := bufio.NewScanner(nextRead)
@@ -113,38 +113,68 @@ func (up *URLPrefixer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	for {
 		window := buf.Bytes()
 
-		// advance a byte if window is not a src attr
-		if matchlen, match := up.match(window, up.Attrs...); matchlen == 0 {
-			if src.Scan() {
-				// shift the next byte into buf
-				rw.Write(buf.Next(1))
-				writtenCount++
-				buf.Write(src.Bytes())
-
-				if writtenCount >= ChunkSize {
-					flusher.Flush()
-					writtenCount = 0
-				}
-			} else {
-				if err := src.Err(); err != nil {
-					up.Logger.
-						WithField("component", "prefixer").
-						Error("Error encountered while scanning: err:", err)
-				}
-				rw.Write(window)
-				flusher.Flush()
-				break
-			}
-			continue
-		} else {
-			buf.Next(matchlen) // advance to the relative URL
-			for i := 0; i < matchlen; i++ {
-				src.Scan()
-				buf.Write(src.Bytes())
-			}
-			rw.Write(match)               // add the src attr to the output
-			io.WriteString(rw, up.Prefix) // write the prefix
+		if len(window) == 0 {
+			flusher.Flush()
+			break
 		}
+
+		// advance a byte if window is not a src attr
+		matchlen, match := up.match(window, up.Attrs...)
+		if matchlen == 0 {
+			rw.Write(buf.Next(1))
+			writtenCount++
+
+			if src.Scan() {
+				buf.Write(src.Bytes())
+			} else if err := src.Err(); err != nil {
+				up.Logger.
+					WithField("component", "prefixer").
+					Error("Error encountered while scanning: err:", err)
+			}
+
+			if writtenCount >= ChunkSize {
+				flusher.Flush()
+				writtenCount = 0
+			}
+
+			continue
+		}
+
+		buf.Next(matchlen) // advance to the relative URL
+		for i := 0; i < matchlen; i++ {
+			src.Scan()
+			buf.Write(src.Bytes())
+		}
+		if bytes.Equal(match, []byte(`src=/`)) {
+			if bytes.HasPrefix(buf.Bytes(), []byte(`/`)) {
+				rw.Write(match)
+				continue
+			}
+			rw.Write([]byte(`src=`))
+			io.WriteString(rw, up.Prefix)
+			continue
+		}
+		if bytes.Equal(match, []byte(`href=/`)) {
+			if bytes.HasPrefix(buf.Bytes(), []byte(`/`)) {
+				rw.Write(match)
+				continue
+			}
+			rw.Write([]byte(`href=`))
+			io.WriteString(rw, up.Prefix)
+			continue
+		}
+		if bytes.Equal(match, []byte(`data-basepath`)) {
+			if len(buf.Bytes()) > 0 && bytes.ContainsAny(buf.Bytes()[:1], "> \t\r\n") {
+				rw.Write([]byte(`data-basepath="`))
+				io.WriteString(rw, up.Prefix)
+				rw.Write([]byte(`"`))
+				continue
+			}
+			rw.Write(match)
+			continue
+		}
+		rw.Write(match)               // add the src attr to the output
+		io.WriteString(rw, up.Prefix) // write the prefix
 	}
 }
 
@@ -154,7 +184,7 @@ func (up *URLPrefixer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 // targets. The matching []byte is also returned as the second return parameter
 func (up *URLPrefixer) match(subject []byte, targets ...[]byte) (int, []byte) {
 	for _, target := range targets {
-		if bytes.Equal(subject[:len(target)], target) {
+		if len(subject) >= len(target) && bytes.Equal(subject[:len(target)], target) {
 			return len(target), target
 		}
 	}
@@ -186,7 +216,10 @@ func NewDefaultURLPrefixer(prefix string, next http.Handler, lg chronograf.Logge
 			[]byte(`src="`),
 			[]byte(`href="`),
 			[]byte(`url(`),
+			[]byte(`src=/`),
+			[]byte(`href=/`),
 			[]byte(`data-basepath="`), // for forwarding basepath to frontend
+			[]byte(`data-basepath`),
 		},
 	}
 }
