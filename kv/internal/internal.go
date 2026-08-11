@@ -1,14 +1,93 @@
 package internal
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"sync"
 
 	"github.com/influxdata/chronograf"
 	"google.golang.org/protobuf/proto"
 )
 
 //go:generate protoc --go_out=. internal.proto
+
+var (
+	secretDEKMu sync.RWMutex
+	secretDEK   []byte
+)
+
+// SetSecretDEK configures the DEK used for secret field persistence.
+// Pass nil or empty to disable encryption and persist plaintext.
+func SetSecretDEK(dek []byte) {
+	secretDEKMu.Lock()
+	defer secretDEKMu.Unlock()
+
+	clear(secretDEK)
+
+	if len(dek) == 0 {
+		secretDEK = nil
+		return
+	}
+
+	secretDEK = append([]byte(nil), dek...)
+}
+
+func currentSecretDEK() []byte {
+	secretDEKMu.RLock()
+	defer secretDEKMu.RUnlock()
+
+	if len(secretDEK) == 0 {
+		return nil
+	}
+
+	return append([]byte(nil), secretDEK...)
+}
+
+func marshalSecretValue(fieldName, plaintext string, dek []byte) (string, SecretEncoding, error) {
+	if plaintext == "" {
+		return "", SecretEncoding_PLAINTEXT, nil
+	}
+	if len(dek) == 0 {
+		return plaintext, SecretEncoding_PLAINTEXT, nil
+	}
+
+	encryptedPayload, err := encryptSecret(dek, []byte(plaintext))
+	if err != nil {
+		return "", SecretEncoding_PLAINTEXT, fmt.Errorf("%s: %w", fieldName, err)
+	}
+
+	return base64.StdEncoding.EncodeToString(encryptedPayload), SecretEncoding_ENCRYPTED_V1, nil
+}
+
+func unmarshalSecretValue(fieldName, stored string, encoding SecretEncoding, dek []byte) (string, error) {
+	if stored == "" {
+		return "", nil
+	}
+
+	switch encoding {
+	case SecretEncoding_PLAINTEXT:
+		return stored, nil
+	case SecretEncoding_ENCRYPTED_V1:
+		if len(dek) == 0 {
+			return "", fmt.Errorf("%s: encrypted value requires configured DEK", fieldName)
+		}
+
+		encryptedPayload, err := base64.StdEncoding.DecodeString(stored)
+		if err != nil {
+			return "", fmt.Errorf("%s: decode encrypted value: %w", fieldName, err)
+		}
+
+		plaintext, err := decryptSecret(dek, encryptedPayload)
+		if err != nil {
+			return "", fmt.Errorf("%s: %w", fieldName, err)
+		}
+
+		return string(plaintext), nil
+	default:
+		return "", fmt.Errorf("%s: unsupported secret encoding %d", fieldName, encoding)
+	}
+}
 
 // MarshalBuild encodes a build to binary protobuf format.
 func MarshalBuild(b chronograf.BuildInfo) ([]byte, error) {
@@ -32,28 +111,51 @@ func UnmarshalBuild(data []byte, b *chronograf.BuildInfo) error {
 
 // MarshalSource encodes a source to binary protobuf format.
 func MarshalSource(s chronograf.Source) ([]byte, error) {
+	dek := currentSecretDEK()
+
+	password, passwordEncoding, err := marshalSecretValue("Source.Password", s.Password, dek)
+	if err != nil {
+		return nil, err
+	}
+	sharedSecret, sharedSecretEncoding, err := marshalSecretValue("Source.SharedSecret", s.SharedSecret, dek)
+	if err != nil {
+		return nil, err
+	}
+	managementToken, managementTokenEncoding, err := marshalSecretValue("Source.ManagementToken", s.ManagementToken, dek)
+	if err != nil {
+		return nil, err
+	}
+	databaseToken, databaseTokenEncoding, err := marshalSecretValue("Source.DatabaseToken", s.DatabaseToken, dek)
+	if err != nil {
+		return nil, err
+	}
+
 	return proto.Marshal(&Source{
-		ID:                 int64(s.ID),
-		Name:               s.Name,
-		Type:               s.Type,
-		Username:           s.Username,
-		Password:           s.Password,
-		SharedSecret:       s.SharedSecret,
-		URL:                s.URL,
-		MetaURL:            s.MetaURL,
-		InsecureSkipVerify: s.InsecureSkipVerify,
-		Default:            s.Default,
-		Telegraf:           s.Telegraf,
-		Organization:       s.Organization,
-		Role:               s.Role,
-		DefaultRP:          s.DefaultRP,
-		Version:            s.Version,
-		ClusterID:          s.ClusterID,
-		AccountID:          s.AccountID,
-		ManagementToken:    s.ManagementToken,
-		DatabaseToken:      s.DatabaseToken,
-		TagsCSVPath:        s.TagsCSVPath,
-		DefaultDatabase:    s.DefaultDB,
+		ID:                      int64(s.ID),
+		Name:                    s.Name,
+		Type:                    s.Type,
+		Username:                s.Username,
+		Password:                password,
+		PasswordEncoding:        passwordEncoding,
+		SharedSecret:            sharedSecret,
+		SharedSecretEncoding:    sharedSecretEncoding,
+		URL:                     s.URL,
+		MetaURL:                 s.MetaURL,
+		InsecureSkipVerify:      s.InsecureSkipVerify,
+		Default:                 s.Default,
+		Telegraf:                s.Telegraf,
+		Organization:            s.Organization,
+		Role:                    s.Role,
+		DefaultRP:               s.DefaultRP,
+		Version:                 s.Version,
+		ClusterID:               s.ClusterID,
+		AccountID:               s.AccountID,
+		ManagementToken:         managementToken,
+		ManagementTokenEncoding: managementTokenEncoding,
+		DatabaseToken:           databaseToken,
+		DatabaseTokenEncoding:   databaseTokenEncoding,
+		TagsCSVPath:             s.TagsCSVPath,
+		DefaultDatabase:         s.DefaultDB,
 	})
 }
 
@@ -63,13 +165,31 @@ func UnmarshalSource(data []byte, s *chronograf.Source) error {
 	if err := proto.Unmarshal(data, &pb); err != nil {
 		return err
 	}
+	dek := currentSecretDEK()
+
+	password, err := unmarshalSecretValue("Source.Password", pb.Password, pb.GetPasswordEncoding(), dek)
+	if err != nil {
+		return err
+	}
+	sharedSecret, err := unmarshalSecretValue("Source.SharedSecret", pb.SharedSecret, pb.GetSharedSecretEncoding(), dek)
+	if err != nil {
+		return err
+	}
+	managementToken, err := unmarshalSecretValue("Source.ManagementToken", pb.ManagementToken, pb.GetManagementTokenEncoding(), dek)
+	if err != nil {
+		return err
+	}
+	databaseToken, err := unmarshalSecretValue("Source.DatabaseToken", pb.DatabaseToken, pb.GetDatabaseTokenEncoding(), dek)
+	if err != nil {
+		return err
+	}
 
 	s.ID = int(pb.ID)
 	s.Name = pb.Name
 	s.Type = pb.Type
 	s.Username = pb.Username
-	s.Password = pb.Password
-	s.SharedSecret = pb.SharedSecret
+	s.Password = password
+	s.SharedSecret = sharedSecret
 	s.URL = pb.URL
 	s.MetaURL = pb.MetaURL
 	s.InsecureSkipVerify = pb.InsecureSkipVerify
@@ -81,8 +201,8 @@ func UnmarshalSource(data []byte, s *chronograf.Source) error {
 	s.Version = pb.Version
 	s.ClusterID = pb.ClusterID
 	s.AccountID = pb.AccountID
-	s.ManagementToken = pb.ManagementToken
-	s.DatabaseToken = pb.DatabaseToken
+	s.ManagementToken = managementToken
+	s.DatabaseToken = databaseToken
 	s.TagsCSVPath = pb.TagsCSVPath
 	s.DefaultDB = pb.DefaultDatabase
 	return nil
@@ -94,6 +214,11 @@ func MarshalServer(s chronograf.Server) ([]byte, error) {
 		metadata []byte
 		err      error
 	)
+	dek := currentSecretDEK()
+	password, passwordEncoding, err := marshalSecretValue("Server.Password", s.Password, dek)
+	if err != nil {
+		return nil, err
+	}
 	metadata, err = json.Marshal(s.Metadata)
 	if err != nil {
 		return nil, err
@@ -103,7 +228,8 @@ func MarshalServer(s chronograf.Server) ([]byte, error) {
 		SrcID:              int64(s.SrcID),
 		Name:               s.Name,
 		Username:           s.Username,
-		Password:           s.Password,
+		Password:           password,
+		PasswordEncoding:   passwordEncoding,
 		URL:                s.URL,
 		Active:             s.Active,
 		Organization:       s.Organization,
@@ -119,6 +245,11 @@ func UnmarshalServer(data []byte, s *chronograf.Server) error {
 	if err := proto.Unmarshal(data, &pb); err != nil {
 		return err
 	}
+	dek := currentSecretDEK()
+	password, err := unmarshalSecretValue("Server.Password", pb.Password, pb.GetPasswordEncoding(), dek)
+	if err != nil {
+		return err
+	}
 
 	s.Metadata = make(map[string]interface{})
 	if len(pb.MetadataJSON) > 0 {
@@ -131,7 +262,7 @@ func UnmarshalServer(data []byte, s *chronograf.Server) error {
 	s.SrcID = int(pb.SrcID)
 	s.Name = pb.Name
 	s.Username = pb.Username
-	s.Password = pb.Password
+	s.Password = password
 	s.URL = pb.URL
 	s.Active = pb.Active
 	s.Organization = pb.Organization

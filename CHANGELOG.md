@@ -1,3 +1,12 @@
+## v1.11.5 [unreleased]
+
+### Security Fixes
+
+1. [#6211](https://github.com/influxdata/chronograf/pull/6211): Harden secrets-at-rest protections for persisted source and server credentials using envelope encryption.
+   * Add startup migration for legacy plaintext secrets when a secrets master key is configured.
+   * Add `chronoctl` commands for master-key generation, rewrap, and disable workflows.
+   * Secrets encryption is supported only for BoltDB-backed deployments.
+
 ## v1.11.4 [2026-06-16]
 
 ### Bug Fixes

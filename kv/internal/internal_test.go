@@ -1,15 +1,20 @@
 package internal_test
 
 import (
+	"bytes"
 	"reflect"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/kv/internal"
+	"google.golang.org/protobuf/proto"
 )
 
 func TestMarshalSource(t *testing.T) {
+	internal.SetSecretDEK(nil)
+	t.Cleanup(func() { internal.SetSecretDEK(nil) })
+
 	tests := []struct {
 		name string
 		src  chronograf.Source
@@ -88,7 +93,75 @@ func TestMarshalSource(t *testing.T) {
 	}
 }
 
+func TestMarshalSourceWithSecretDEK(t *testing.T) {
+	internal.SetSecretDEK(bytes.Repeat([]byte{0x41}, 32))
+	t.Cleanup(func() { internal.SetSecretDEK(nil) })
+
+	in := chronograf.Source{
+		ID:              12,
+		Name:            "Fountain of Truth",
+		Type:            "influx-v3-cloud-dedicated",
+		Password:        "pw",
+		SharedSecret:    "shared",
+		ManagementToken: "mgmt-token",
+		DatabaseToken:   "database-token",
+	}
+
+	data, err := internal.MarshalSource(in)
+	if err != nil {
+		t.Fatalf("marshal source: %v", err)
+	}
+
+	var pb internal.Source
+	if err := proto.Unmarshal(data, &pb); err != nil {
+		t.Fatalf("unmarshal source proto: %v", err)
+	}
+
+	if pb.GetPasswordEncoding() != internal.SecretEncoding_ENCRYPTED_V1 ||
+		pb.GetSharedSecretEncoding() != internal.SecretEncoding_ENCRYPTED_V1 ||
+		pb.GetManagementTokenEncoding() != internal.SecretEncoding_ENCRYPTED_V1 ||
+		pb.GetDatabaseTokenEncoding() != internal.SecretEncoding_ENCRYPTED_V1 {
+		t.Fatalf("expected encrypted encodings, got %#v", pb)
+	}
+
+	if pb.Password == in.Password || pb.SharedSecret == in.SharedSecret || pb.ManagementToken == in.ManagementToken || pb.DatabaseToken == in.DatabaseToken {
+		t.Fatal("expected encrypted stored values to differ from plaintext")
+	}
+
+	var out chronograf.Source
+	if err := internal.UnmarshalSource(data, &out); err != nil {
+		t.Fatalf("unmarshal source: %v", err)
+	}
+	if !reflect.DeepEqual(in, out) {
+		t.Fatalf("source roundtrip mismatch: got %#v, expected %#v", out, in)
+	}
+}
+
+func TestUnmarshalSourceEncryptedWithoutDEK(t *testing.T) {
+	internal.SetSecretDEK(bytes.Repeat([]byte{0x42}, 32))
+
+	data, err := internal.MarshalSource(chronograf.Source{
+		ID:       1,
+		Name:     "source",
+		Type:     "influx",
+		Password: "secret",
+	})
+	if err != nil {
+		t.Fatalf("marshal source: %v", err)
+	}
+
+	internal.SetSecretDEK(nil)
+
+	var out chronograf.Source
+	if err := internal.UnmarshalSource(data, &out); err == nil {
+		t.Fatal("expected error when encrypted source is unmarshaled without DEK")
+	}
+}
+
 func TestMarshalServer(t *testing.T) {
+	internal.SetSecretDEK(nil)
+	t.Cleanup(func() { internal.SetSecretDEK(nil) })
+
 	v := chronograf.Server{
 		ID:                 12,
 		SrcID:              2,
@@ -106,6 +179,52 @@ func TestMarshalServer(t *testing.T) {
 		t.Fatal(err)
 	} else if !reflect.DeepEqual(v, vv) {
 		t.Fatalf("source protobuf copy error: got %#v, expected %#v", vv, v)
+	}
+}
+
+func TestMarshalServerWithSecretDEK(t *testing.T) {
+	internal.SetSecretDEK(bytes.Repeat([]byte{0x43}, 32))
+	t.Cleanup(func() { internal.SetSecretDEK(nil) })
+
+	in := chronograf.Server{
+		ID:       7,
+		SrcID:    2,
+		Name:     "kap",
+		Username: "docbrown",
+		Password: "super-secret",
+		URL:      "http://oldmanpeabody.mall.io:9092",
+	}
+
+	data, err := internal.MarshalServer(in)
+	if err != nil {
+		t.Fatalf("marshal server: %v", err)
+	}
+
+	var pb internal.Server
+	if err := proto.Unmarshal(data, &pb); err != nil {
+		t.Fatalf("unmarshal server proto: %v", err)
+	}
+	if pb.GetPasswordEncoding() != internal.SecretEncoding_ENCRYPTED_V1 {
+		t.Fatalf("expected encrypted password encoding, got %v", pb.GetPasswordEncoding())
+	}
+	if pb.Password == in.Password {
+		t.Fatal("expected encrypted stored password to differ from plaintext")
+	}
+	if pb.Username != in.Username {
+		t.Fatalf("expected username to remain plaintext in proto: got %q want %q", pb.Username, in.Username)
+	}
+
+	var out chronograf.Server
+	if err := internal.UnmarshalServer(data, &out); err != nil {
+		t.Fatalf("unmarshal server: %v", err)
+	}
+	if !reflect.DeepEqual(in, out) {
+		t.Fatalf("server roundtrip mismatch: got %#v, expected %#v", out, in)
+	}
+
+	internal.SetSecretDEK(nil)
+	if err := internal.UnmarshalServer(data, &out); err == nil {
+		t.Fatal("expected error when encrypted server is unmarshaled without DEK")
 	}
 }
 

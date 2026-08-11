@@ -2,6 +2,11 @@ syntax = "proto3";
 package internal;
 option go_package = ".;internal";
 
+enum SecretEncoding {
+	PLAINTEXT    = 0;
+	ENCRYPTED_V1 = 1;
+}
+
 message Source {
 	int64 ID                  = 1;  // ID is the unique ID of the source
 	string Name               = 2;  // Name is the user-defined name for the source
@@ -23,7 +28,11 @@ message Source {
 	string ManagementToken    = 18; // Management token of an InfluxDB Cloud Dedicated source
 	string DatabaseToken      = 19; // Database token of an InfluxDB Cloud Dedicated or other InfluxDB 3 source
 	string TagsCSVPath        = 20; // TagsCSVPath is the path to a directory containing CSV files (per db) with tags for the source
-  string DefaultDatabase    = 21; // DefaultDatabase is the default database used in queries for InfluxDB Cloud Dedicated when database list is not available
+	string DefaultDatabase    = 21; // DefaultDatabase is the default database used in queries for InfluxDB Cloud Dedicated when database list is not available
+	SecretEncoding PasswordEncoding        = 22; // Encoding state for Password
+	SecretEncoding SharedSecretEncoding    = 23; // Encoding state for SharedSecret
+	SecretEncoding ManagementTokenEncoding = 24; // Encoding state for ManagementToken
+	SecretEncoding DatabaseTokenEncoding   = 25; // Encoding state for DatabaseToken
 }
 
 message Dashboard {
@@ -136,6 +145,7 @@ message Server {
 	bool InsecureSkipVerify = 9;  // InsecureSkipVerify accepts any certificate from the client
 	string Type             = 10; // Type is the kind of the server (e.g. flux)
 	string MetadataJSON     = 11; // JSON byte representation of the metadata
+	SecretEncoding PasswordEncoding = 12; // Encoding state for Password
 }
 
 message Layout {

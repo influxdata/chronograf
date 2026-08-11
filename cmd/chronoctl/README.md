@@ -5,15 +5,68 @@ Chronoctl is a tool to interact with an instance of a chronograf's bolt database
 ```
 Available commands:
   add-superadmin  Creates a new superadmin user  (bolt specific)
+  gen-secrets-master-key Generates a secrets master key
   list-users      Lists users                    (bolt specific)
+  disable-secrets-encryption Disables secrets encryption and removes wrapped DEK  (bolt specific)
+  rewrap-secrets-master-key Rewraps stored DEK with new master key              (bolt specific)
   migrate         Migrate db (beta)
 ```
+
+### Secrets Encryption Commands
+
+Use these commands when Chronograf secret-at-rest encryption is enabled with BoltDB storage.
+
+##### Generate Secrets Master Key
+Generate a base64-encoded 32-byte key:
+
+```sh
+$ chronoctl gen-secrets-master-key
+```
+
+Write the generated key to a file (0600):
+
+```sh
+$ chronoctl gen-secrets-master-key --out ./chronograf-secrets.key
+```
+
+##### Rewrap Secrets Master Key
+Rotate the secrets master key by rewrapping the stored DEK:
+
+```sh
+$ chronoctl rewrap-secrets-master-key \
+    --bolt-path ./chronograf-v1.db \
+    --old-secrets-master-key-file ./old.key \
+    --new-secrets-master-key-file ./new.key
+```
+
+After successful rewrap, start Chronograf with the new key.
+
+##### Disable Secrets Encryption
+Disable secret encryption by decrypting persisted secrets to plaintext and
+removing the wrapped DEK:
+
+```sh
+$ chronoctl disable-secrets-encryption \
+    --bolt-path ./chronograf-v1.db \
+    --secrets-master-key-file ./current.key
+```
+
+After successful disable:
+- Chronograf no longer requires `--secrets-master-key` / `--secrets-master-key-file`
+- persisted secrets are plaintext again
+
+Important:
+- `rewrap-secrets-master-key` changes only master-key wrapping and does not re-encrypt secret records.
+- `disable-secrets-encryption` decrypts encrypted secrets and stores them as plaintext.
+- Secrets encryption management supports BoltDB only; etcd-backed deployments should rely on etcd encryption-at-rest or platform-level disk encryption.
 
 
 ### Migrate
 
 The `migrate` command allows you to migrate your chronograf configuration store. It is highly recommended that you make a backup of all databases involved before running a migration as there is no guarantee that there will be no data loss. When specifying an etcd endpoint, the URI must begin with `etcd://`. It is preferred that you prefix `bolt://` to an absolute path when specifying a local bolt db file, but a lone relative path is also accepted without the prefix. If there is authentication on etcd, use the standard URI format to define a username/password: `[scheme:][//[userinfo@]host][/]path`.
 There is currently no cleanup for a failed migration, so keep that in mind before migrating to a db that contains other important data.
+If migrating from an encrypted BoltDB, first run `disable-secrets-encryption`.
+The `migrate` command does not initialize a secrets DEK and cannot read encrypted source or server secrets.
 
 
 ##### Usage

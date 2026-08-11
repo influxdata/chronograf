@@ -23,6 +23,20 @@ func NewService(s kv.Store) (*kv.Service, error) {
 	return kv.NewService(context.TODO(), s)
 }
 
+func validateExistingBoltPath(path string) error {
+	if _, err := os.Stat(path); err != nil {
+		if os.IsNotExist(err) {
+			return fmt.Errorf(
+				"bolt db %q not found; use --bolt-path to target an existing chronograf database",
+				path,
+			)
+		}
+		return fmt.Errorf("checking bolt db %q: %w", path, err)
+	}
+
+	return nil
+}
+
 func NewTabWriter() *tabwriter.Writer {
 	return tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
 }
