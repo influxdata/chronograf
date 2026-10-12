@@ -1,6 +1,6 @@
 module github.com/influxdata/chronograf
 
-go 1.26.5
+go 1.26.9
 
 require (
 	github.com/NYTimes/gziphandler v1.1.1
