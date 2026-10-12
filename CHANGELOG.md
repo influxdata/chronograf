@@ -2,7 +2,7 @@
 
 ### Other
 
-1. Upgrade golang to 1.26.9.
+1. [#6258](https://github.com/influxdata/chronograf/pull/6258): Upgrade golang to 1.26.9.
 
 ## v1.11.5 [2026-09-16]
 
