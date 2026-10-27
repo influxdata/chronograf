@@ -3,6 +3,7 @@
 ### Other
 
 1. [6262](https://github.com/influxdata/chronograf/pull/6262): Upgrade golang to 1.26.10
+1. [6263](https://github.com/influxdata/chronograf/pull/6263): Upgrade flux and use flux_nosqlite flag
 
 ## v1.11.6 [2026-10-15]
 
