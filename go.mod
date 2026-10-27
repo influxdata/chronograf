@@ -10,7 +10,7 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/uuid v1.6.0
-	github.com/influxdata/flux v0.200.0
+	github.com/influxdata/flux v0.201.0
 	github.com/influxdata/kapacitor v1.8.2
 	github.com/influxdata/usage-client v0.0.0-20160829180054-6d3895376368
 	github.com/jessevdk/go-flags v1.4.0
@@ -49,7 +49,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/form3tech-oss/jwt-go v3.2.5+incompatible // indirect
-	github.com/go-logr/logr v1.4.3 // indirect
+	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/gofrs/uuid v3.3.0+incompatible // indirect
@@ -100,9 +100,9 @@ require (
 	go.etcd.io/etcd/raft/v3 v3.5.0-alpha.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.67.0 // indirect
-	go.opentelemetry.io/otel v1.44.0 // indirect
-	go.opentelemetry.io/otel/metric v1.44.0 // indirect
-	go.opentelemetry.io/otel/trace v1.44.0 // indirect
+	go.opentelemetry.io/otel v1.45.0 // indirect
+	go.opentelemetry.io/otel/metric v1.45.0 // indirect
+	go.opentelemetry.io/otel/trace v1.45.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
