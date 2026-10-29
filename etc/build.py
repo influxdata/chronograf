@@ -511,6 +511,11 @@ def build(version=None,
         if  arch == "aarch64" or arch == "arm64":
             arch = "arm64"
 
+        # Common
+        # NOTE(jdstrand): chronograf doesn't run flux queries, so this isn't
+        # technically needed, but add it in case that changes some day.
+        tags += ["flux_nosqlite"]
+
         # NOTE(bnpfeife,karel-rehor): Previously, linux/arm64 was statically built
         # regardless whether "--static" was passed to this script. Now
         # darwin builds fail when "--static" is passed (we are missing
