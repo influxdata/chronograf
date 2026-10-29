@@ -1,3 +1,9 @@
+## Unreleased
+
+### Other
+
+1. [6262](https://github.com/influxdata/chronograf/pull/6262): Upgrade golang to 1.26.10
+
 ## v1.11.6 [2026-10-15]
 
 ### Other
