@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 	"net/url"
@@ -12,9 +13,15 @@ import (
 
 // RequireSameOriginForSessionAuth validates Origin/Referer for unsafe methods
 // when the request carries the session cookie used for browser auth.
-func RequireSameOriginForSessionAuth(logger chronograf.Logger, next http.Handler) http.Handler {
+func RequireSameOriginForSessionAuth(logger chronograf.Logger, next http.Handler, publicUrl string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !isUnsafeMethod(r.Method) || !hasSessionCookie(r) {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		// Bypass if origin matches publicUrl
+		if matchesPublicUrl(publicUrl, r) {
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -76,6 +83,59 @@ func requestScheme(r *http.Request) string {
 		return "https"
 	}
 	return "http"
+}
+
+func normalizeSchemePort(u *url.URL, err error) (*url.URL, error) {
+	if err != nil {
+		return nil, err
+	}
+	if u.Port() == "" {
+		switch u.Scheme {
+		case "http":
+			result, err := url.Parse(fmt.Sprintf("%s://%s:%s", u.Scheme, u.Host, "80"))
+			if err != nil {
+				return nil, err
+			}
+			return result, nil
+		case "https":
+			result, err := url.Parse(fmt.Sprintf("%s://%s:%s", u.Scheme, u.Host, "443"))
+			if err != nil {
+				return nil, err
+			}
+			return result, nil
+		case "":
+			return u, nil
+		default:
+			return nil, fmt.Errorf("scheme %s not supported", u.Scheme)
+		}
+	}
+	return u, nil
+}
+
+func matchesPublicUrl(publicUrl string, r *http.Request) bool {
+
+	pu, err := normalizeSchemePort(url.Parse(publicUrl))
+	if err != nil {
+		return false
+	}
+
+	origin := r.Header.Get("Origin")
+	if origin == "" {
+		return false
+	}
+
+	ou, err := normalizeSchemePort(url.Parse(origin))
+	if err != nil {
+		return false
+	}
+
+	if pu.Scheme == ou.Scheme && pu.Host == ou.Host && pu.Port() == ou.Port() {
+		return true
+	}
+
+	// N.B. if origin check fails, do not fall back to referrer.
+
+	return false
 }
 
 func sameHost(rawURL, expectedScheme, expectedHost string) bool {

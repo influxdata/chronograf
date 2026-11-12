@@ -256,12 +256,6 @@ func TestSecurityHeaders(t *testing.T) {
 
 func TestRequireSameOriginForSessionAuth(t *testing.T) {
 	logger := log.New(log.DebugLevel)
-	protected := RequireSameOriginForSessionAuth(
-		logger,
-		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusNoContent)
-		}),
-	)
 
 	tests := []struct {
 		name       string
@@ -270,6 +264,7 @@ func TestRequireSameOriginForSessionAuth(t *testing.T) {
 		origin     string
 		referer    string
 		forwarded  string
+		publicUrl  string
 		hasSession bool
 		expected   int
 	}{
@@ -337,9 +332,95 @@ func TestRequireSameOriginForSessionAuth(t *testing.T) {
 			hasSession: true,
 			expected:   http.StatusNoContent,
 		},
+		{
+			name:       "unsafe method with matching normalized publicUrl bypasses origin guard",
+			method:     http.MethodPost,
+			host:       "network-load-balancer.test",
+			origin:     "https://chronograf.test:8443",
+			publicUrl:  "https://chronograf.test:8443",
+			hasSession: true,
+			expected:   http.StatusNoContent,
+		},
+		{
+			name:       "unsafe method without matching normalized publicUrl blocked",
+			method:     http.MethodPost,
+			host:       "network-load-balancer.test",
+			origin:     "https://chronograf.test:8443",
+			hasSession: true,
+			expected:   http.StatusForbidden,
+		},
+		{
+			name:       "unsafe method with matching implied publicUrl 443 bypasses origin guard",
+			method:     http.MethodPost,
+			host:       "network-load-balancer.test",
+			origin:     "https://chronograf.test:443",
+			publicUrl:  "https://chronograf.test",
+			hasSession: true,
+			expected:   http.StatusNoContent,
+		},
+		{
+			name:       "unsafe method with matching implied publicUrl 80 bypasses origin guard",
+			method:     http.MethodPost,
+			host:       "network-load-balancer.test",
+			origin:     "http://chronograf.test:80",
+			publicUrl:  "http://chronograf.test",
+			hasSession: true,
+			expected:   http.StatusNoContent,
+		},
+		{
+			name:       "mismatched scheme with matching publicUrl bypasses origin guard",
+			method:     http.MethodPost,
+			host:       "http://chronograf.test",
+			origin:     "https://chronograf.test",
+			publicUrl:  "https://chronograf.test",
+			hasSession: true,
+			expected:   http.StatusNoContent,
+		},
+		{
+			name:       "mismatched scheme without publicUrl blocked",
+			method:     http.MethodPost,
+			host:       "http://chronograf.test",
+			origin:     "https://chronograf.test",
+			hasSession: true,
+			expected:   http.StatusForbidden,
+		},
+		{
+			name:       "unsafe method with publicUrl and schemeless origin blocked",
+			method:     http.MethodPost,
+			host:       "http://chronograf.test",
+			origin:     "chronograf.test",
+			publicUrl:  "http://chronograf.test",
+			hasSession: true,
+			expected:   http.StatusForbidden,
+		},
+		{
+			name:       "unsafe method with schemeless publicUrl blocked",
+			method:     http.MethodPost,
+			host:       "http://chronograf.test",
+			origin:     "http://chronograf.test",
+			publicUrl:  "chronograf.test",
+			hasSession: true,
+			expected:   http.StatusForbidden,
+		},
+		{
+			name:       "unsafe method with schemeless publicUrl and origin bypasses origin guard",
+			method:     http.MethodPost,
+			host:       "network-load-balancer.test",
+			origin:     "chronograf.test",
+			publicUrl:  "chronograf.test",
+			hasSession: true,
+			expected:   http.StatusNoContent,
+		},
 	}
 
 	for _, tt := range tests {
+		protected := RequireSameOriginForSessionAuth(
+			logger,
+			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusNoContent)
+			}),
+			tt.publicUrl,
+		)
 		t.Run(tt.name, func(t *testing.T) {
 			req := httptest.NewRequest(tt.method, "http://chronograf.test/test", nil)
 			req.Host = tt.host

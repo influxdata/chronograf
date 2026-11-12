@@ -828,6 +828,7 @@ func (s *Server) Serve(ctx context.Context) {
 		DisableGZip:   s.DisableGZip,
 		nonceExpire:   s.NonceExpiration,
 		BasicAuth:     basicAuthenticator,
+		PublicUrl:     s.PublicURL,
 	}, service)
 
 	// Add chronograf's version header to all requests
