@@ -13,7 +13,8 @@ import (
 
 // RequireSameOriginForSessionAuth validates Origin/Referer for unsafe methods
 // when the request carries the session cookie used for browser auth.
-func RequireSameOriginForSessionAuth(logger chronograf.Logger, next http.Handler, publicUrl string) http.Handler {
+// when Origin matches publicUrl the validation will be bypassed
+func RequireSameOriginForSessionAuth(logger chronograf.Logger, next http.Handler, publicUrl *url.URL) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !isUnsafeMethod(r.Method) || !hasSessionCookie(r) {
 			next.ServeHTTP(w, r)
@@ -112,12 +113,7 @@ func normalizeSchemePort(u *url.URL, err error) (*url.URL, error) {
 	return u, nil
 }
 
-func matchesPublicUrl(publicUrl string, r *http.Request) bool {
-
-	pu, err := normalizeSchemePort(url.Parse(publicUrl))
-	if err != nil {
-		return false
-	}
+func matchesPublicUrl(pu *url.URL, r *http.Request) bool {
 
 	origin := r.Header.Get("Origin")
 	if origin == "" {

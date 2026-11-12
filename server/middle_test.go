@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	"github.com/bouk/httprouter"
@@ -484,12 +485,13 @@ func TestRequireSameOriginForSessionAuth(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		publicUrl, _ := normalizeSchemePort(url.Parse(tt.publicUrl))
 		protected := RequireSameOriginForSessionAuth(
 			logger,
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusNoContent)
 			}),
-			tt.publicUrl,
+			publicUrl,
 		)
 		t.Run(tt.name, func(t *testing.T) {
 			req := httptest.NewRequest(tt.method, "http://chronograf.test/test", nil)
