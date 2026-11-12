@@ -121,7 +121,16 @@ func matchesPublicUrl(publicUrl string, r *http.Request) bool {
 
 	origin := r.Header.Get("Origin")
 	if origin == "" {
-		return false
+		// if origin does not exist fall back to referer
+		referer := r.Header.Get("Referer")
+		if referer == "" {
+			return false
+		}
+		ru, err := normalizeSchemePort(url.Parse(referer))
+		if err != nil {
+			return false
+		}
+		return pu.Scheme == ru.Scheme && pu.Host == ru.Host && pu.Port() == ru.Port()
 	}
 
 	ou, err := normalizeSchemePort(url.Parse(origin))
@@ -129,13 +138,10 @@ func matchesPublicUrl(publicUrl string, r *http.Request) bool {
 		return false
 	}
 
-	if pu.Scheme == ou.Scheme && pu.Host == ou.Host && pu.Port() == ou.Port() {
-		return true
-	}
+	return pu.Scheme == ou.Scheme && pu.Host == ou.Host && pu.Port() == ou.Port()
 
-	// N.B. if origin check fails, do not fall back to referrer.
+	// N.B. if origin exists and check fails, do not fall back to referrer.
 
-	return false
 }
 
 func sameHost(rawURL, expectedScheme, expectedHost string) bool {
