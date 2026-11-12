@@ -40,7 +40,7 @@ type MuxOpts struct {
 	DisableGZip   bool         // Optionally disable gzip.
 	nonceExpire   time.Duration
 	BasicAuth     *basicAuth.BasicAuth // HTTP basic authentication provider
-	PublicUrl     string               // Public URL leveraged in CSRF checks
+	PublicUrl     *url.URL             // Public URL leveraged in CSRF checks
 }
 
 // NewMux attaches all the route handlers; handler returned servers chronograf.
@@ -419,8 +419,7 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 		out = router
 	}
 	out = ReaderSPARouteGuard(service.Store, opts.UseAuth, opts.Basepath, opts.Auth, opts.Logger, out)
-	publicUrl, _ := normalizeSchemePort(url.Parse(opts.PublicUrl))
-	out = RequireSameOriginForSessionAuth(opts.Logger, out, publicUrl)
+	out = RequireSameOriginForSessionAuth(opts.Logger, out, opts.PublicUrl)
 	out = SecurityHeaders(out)
 	out = Logger(opts.Logger, FlushingHandler(out))
 

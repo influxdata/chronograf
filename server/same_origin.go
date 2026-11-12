@@ -90,6 +90,7 @@ func normalizeSchemePort(u *url.URL, err error) (*url.URL, error) {
 	if err != nil {
 		return nil, err
 	}
+	u.Host = strings.ToLower(u.Host)
 	if u.Port() == "" {
 		switch u.Scheme {
 		case "http":
@@ -126,7 +127,10 @@ func matchesPublicUrl(pu *url.URL, r *http.Request) bool {
 		if err != nil {
 			return false
 		}
-		return pu.Scheme == ru.Scheme && pu.Host == ru.Host && pu.Port() == ru.Port()
+
+		return pu.Scheme == ru.Scheme &&
+			pu.Host == ru.Host &&
+			pu.Port() == ru.Port()
 	}
 
 	ou, err := normalizeSchemePort(url.Parse(origin))
@@ -134,7 +138,9 @@ func matchesPublicUrl(pu *url.URL, r *http.Request) bool {
 		return false
 	}
 
-	return pu.Scheme == ou.Scheme && pu.Host == ou.Host && pu.Port() == ou.Port()
+	return pu.Scheme == ou.Scheme &&
+		pu.Host == ou.Host &&
+		pu.Port() == ou.Port()
 
 	// N.B. if origin exists and check fails, do not fall back to referrer.
 
