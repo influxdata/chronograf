@@ -1,3 +1,9 @@
+## v1.11.8 [unreleased]
+
+### Bug Fixes
+
+1. [6274](https://github.com/influxdata/chronograf/pull/6274): Allow `PUBLIC_URL` to be used as a preliminary check when checking same origin authentication.
+
 ## v1.11.7 [2026-11-04]
 
 ### Other
