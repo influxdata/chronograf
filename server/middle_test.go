@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"testing"
 
 	"github.com/bouk/httprouter"
@@ -368,6 +367,22 @@ func TestRequireSameOriginForSessionAuth(t *testing.T) {
 			expected:   http.StatusForbidden,
 		},
 		{
+			name:       "unsafe method with malformed origin blocked",
+			method:     http.MethodPost,
+			host:       "network-load-balancer.test",
+			origin:     "mallory",
+			hasSession: true,
+			expected:   http.StatusForbidden,
+		},
+		{
+			name:       "unsafe method without origin and malformed referrer blocked",
+			method:     http.MethodPost,
+			host:       "network-load-balancer.test",
+			referer:    "mallory",
+			hasSession: true,
+			expected:   http.StatusForbidden,
+		},
+		{
 			name:       "unsafe method with matching implied publicUrl 443 bypasses origin guard",
 			method:     http.MethodPost,
 			host:       "network-load-balancer.test",
@@ -456,36 +471,26 @@ func TestRequireSameOriginForSessionAuth(t *testing.T) {
 			expected:   http.StatusForbidden,
 		},
 		{
-			name:       "unsafe method with schemeless publicUrl blocked",
+			name:       "unsafe method with publicUrl and origin cases mismatch allowed",
 			method:     http.MethodPost,
-			host:       "http://chronograf.test",
-			origin:     "http://chronograf.test",
-			publicUrl:  "chronograf.test",
-			hasSession: true,
-			expected:   http.StatusForbidden,
-		},
-		{
-			name:       "unsafe method with schemeless publicUrl and origin bypasses origin guard",
-			method:     http.MethodPost,
-			host:       "network-load-balancer.test",
-			origin:     "chronograf.test",
-			publicUrl:  "chronograf.test",
+			host:       "chronograf.test",
+			origin:     "HTTP://Chronograf.Test",
+			publicUrl:  "http://chronograf.test",
 			hasSession: true,
 			expected:   http.StatusNoContent,
 		},
 		{
-			name:       "unsafe method with schemeless publicUrl and referer bypasses origin guard",
+			name:       "unsafe method without publicUrl and implied ports",
 			method:     http.MethodPost,
-			host:       "network-load-balancer.test",
-			referer:    "chronograf.test",
-			publicUrl:  "chronograf.test",
+			host:       "chronograf.test",
+			origin:     "http://chronograf.test",
 			hasSession: true,
 			expected:   http.StatusNoContent,
 		},
 	}
 
 	for _, tt := range tests {
-		publicUrl, _ := normalizeSchemePort(url.Parse(tt.publicUrl))
+		publicUrl, _ := parseURL(tt.publicUrl)
 		protected := RequireSameOriginForSessionAuth(
 			logger,
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -514,6 +519,86 @@ func TestRequireSameOriginForSessionAuth(t *testing.T) {
 
 			if rec.Code != tt.expected {
 				t.Fatalf("status=%d, want=%d", rec.Code, tt.expected)
+			}
+		})
+	}
+}
+
+func TestSanePublicUrl(t *testing.T) {
+
+	tests := []struct {
+		name string
+		url  string
+		sane bool
+	}{
+		{
+			"standard http url",
+			"http://chronograf.test",
+			true,
+		},
+		{
+			"normalized https url",
+			"https://chronograf.test:8443",
+			true,
+		},
+		{
+			"uppercase scheme and host",
+			"HTTPS://Chronograf.Test",
+			true,
+		},
+		{
+			"plain string as url without scheme or port",
+			"lazyhost",
+			false,
+		},
+		{
+			"plain string with domain as url without scheme or port",
+			"lazyhost.net",
+			false,
+		},
+		{
+			"plain string with port as url without scheme",
+			"lazyhost.net:8443",
+			false,
+		},
+		{
+			"url without hostname",
+			"https://:443",
+			false,
+		},
+		{
+			"scheme only tls",
+			"https://",
+			false,
+		},
+		{
+			"scheme only",
+			"http://",
+			false,
+		},
+		{
+			"ipv6 localhost literal",
+			"http://[::1]",
+			true,
+		},
+		{
+			"ipv4 literal",
+			"http://127.0.0.1",
+			true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			url, err := parseURL(tt.url)
+			if err != nil {
+				if tt.sane {
+					t.Fatalf("failed to parse url(%s): %s", tt.url, err)
+				}
+			}
+			b := sanePublicUrl(url)
+			if tt.sane != b {
+				t.Fatalf("url %s expected sane %t, got %t ", tt.url, tt.sane, b)
 			}
 		})
 	}

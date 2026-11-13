@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/influxdata/chronograf"
@@ -86,13 +87,38 @@ func requestScheme(r *http.Request) string {
 	return "http"
 }
 
-func normalizeSchemePort(u *url.URL, err error) (*url.URL, error) {
+func sanePublicUrl(url *url.URL) bool {
+	publicUrlSchemes := map[string]bool{"http": true, "https": true}
+
+	if url == nil {
+		return false
+	}
+
+	host, port, err := net.SplitHostPort(url.Host)
+
+	if err != nil {
+		return false
+	}
+
+	iPort, err := strconv.Atoi(port)
+
+	return host != "" && publicUrlSchemes[strings.ToLower(url.Scheme)] && iPort > 0 && iPort < 65536
+}
+
+func parseURL(us string) (*url.URL, error) {
+	if us == "" {
+		return nil, nil
+	}
+
+	u, err := url.Parse(us)
+
 	if err != nil {
 		return nil, err
 	}
+
 	u.Host = strings.ToLower(u.Host)
 	if u.Port() == "" {
-		switch u.Scheme {
+		switch strings.ToLower(u.Scheme) {
 		case "http":
 			result, err := url.Parse(fmt.Sprintf("%s://%s:%s", u.Scheme, u.Host, "80"))
 			if err != nil {
@@ -116,6 +142,9 @@ func normalizeSchemePort(u *url.URL, err error) (*url.URL, error) {
 
 func matchesPublicUrl(pu *url.URL, r *http.Request) bool {
 
+	if pu == nil {
+		return false
+	}
 	origin := r.Header.Get("Origin")
 	if origin == "" {
 		// if origin does not exist fall back to referer
@@ -123,7 +152,7 @@ func matchesPublicUrl(pu *url.URL, r *http.Request) bool {
 		if referer == "" {
 			return false
 		}
-		ru, err := normalizeSchemePort(url.Parse(referer))
+		ru, err := parseURL(referer)
 		if err != nil {
 			return false
 		}
@@ -133,7 +162,7 @@ func matchesPublicUrl(pu *url.URL, r *http.Request) bool {
 			pu.Port() == ru.Port()
 	}
 
-	ou, err := normalizeSchemePort(url.Parse(origin))
+	ou, err := parseURL(origin)
 	if err != nil {
 		return false
 	}
