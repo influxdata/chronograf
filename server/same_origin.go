@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -87,22 +88,59 @@ func requestScheme(r *http.Request) string {
 	return "http"
 }
 
-func sanePublicUrl(url *url.URL) bool {
+func saneHeaderUrl(url *url.URL) bool {
 	publicUrlSchemes := map[string]bool{"http": true, "https": true}
-
 	if url == nil {
-		return false
+		return true
 	}
 
-	host, port, err := net.SplitHostPort(url.Host)
+	// Pass ipV6 but reject ipV4 host:port when host is empty
+	if m, _ := regexp.MatchString(":\\d*$", url.Host); m {
+		host, port, err := net.SplitHostPort(url.Host)
+		if err != nil || host == "" {
+			return false
+		}
 
-	if err != nil {
-		return false
+		iport, err := strconv.Atoi(port)
+		if err != nil || iport <= 0 || iport > 65535 {
+			return false
+		}
 	}
 
-	iPort, err := strconv.Atoi(port)
+	return url.Path == "" &&
+		url.RawQuery == "" &&
+		url.Fragment == "" &&
+		url.User == nil &&
+		publicUrlSchemes[strings.ToLower(url.Scheme)] &&
+		url.Host != ""
+}
 
-	return host != "" && publicUrlSchemes[strings.ToLower(url.Scheme)] && iPort > 0 && iPort < 65536
+func normalizeUrl(url *url.URL) (*url.URL, error) {
+
+	url.Host = strings.ToLower(url.Host)
+	url.Scheme = strings.ToLower(url.Scheme)
+
+	if url.Port() == "" {
+		switch strings.ToLower(url.Scheme) {
+		case "http":
+			result, err := url.Parse(fmt.Sprintf("%s://%s:%s", url.Scheme, url.Host, "80"))
+			if err != nil {
+				return nil, err
+			}
+			return result, nil
+		case "https":
+			result, err := url.Parse(fmt.Sprintf("%s://%s:%s", url.Scheme, url.Host, "443"))
+			if err != nil {
+				return nil, err
+			}
+			return result, nil
+		case "":
+			return url, nil
+		default:
+			return nil, fmt.Errorf("scheme %s not supported", url.Scheme)
+		}
+	}
+	return url, nil
 }
 
 func parseURL(us string) (*url.URL, error) {
@@ -116,28 +154,23 @@ func parseURL(us string) (*url.URL, error) {
 		return nil, err
 	}
 
-	u.Host = strings.ToLower(u.Host)
-	if u.Port() == "" {
-		switch strings.ToLower(u.Scheme) {
-		case "http":
-			result, err := url.Parse(fmt.Sprintf("%s://%s:%s", u.Scheme, u.Host, "80"))
-			if err != nil {
-				return nil, err
-			}
-			return result, nil
-		case "https":
-			result, err := url.Parse(fmt.Sprintf("%s://%s:%s", u.Scheme, u.Host, "443"))
-			if err != nil {
-				return nil, err
-			}
-			return result, nil
-		case "":
-			return u, nil
-		default:
-			return nil, fmt.Errorf("scheme %s not supported", u.Scheme)
-		}
+	if !saneHeaderUrl(u) {
+		return nil, fmt.Errorf("invalid URL for Header URL or PublicUrl: %s", us)
 	}
-	return u, nil
+
+	return normalizeUrl(u)
+}
+
+func urlPortToInt(url *url.URL) (int, error) {
+	var p int
+	if url.Port() != "" {
+		parsed, err := strconv.Atoi(url.Port())
+		if err != nil {
+			return -1, err
+		}
+		p = parsed
+	}
+	return p, nil
 }
 
 func matchesPublicUrl(pu *url.URL, r *http.Request) bool {
@@ -145,6 +178,13 @@ func matchesPublicUrl(pu *url.URL, r *http.Request) bool {
 	if pu == nil {
 		return false
 	}
+
+	pport, err := urlPortToInt(pu)
+
+	if err != nil {
+		return false
+	}
+
 	origin := r.Header.Get("Origin")
 	if origin == "" {
 		// if origin does not exist fall back to referer
@@ -152,14 +192,27 @@ func matchesPublicUrl(pu *url.URL, r *http.Request) bool {
 		if referer == "" {
 			return false
 		}
-		ru, err := parseURL(referer)
+		ru, err := url.Parse(referer)
 		if err != nil {
 			return false
 		}
 
-		return pu.Scheme == ru.Scheme &&
+		ru, err = normalizeUrl(ru)
+
+		if err != nil {
+			return false
+		}
+
+		rport, err := urlPortToInt(ru)
+
+		if err != nil {
+			return false
+		}
+
+		return ru.User == nil &&
+			pu.Scheme == ru.Scheme &&
 			pu.Host == ru.Host &&
-			pu.Port() == ru.Port()
+			pport == rport
 	}
 
 	ou, err := parseURL(origin)
@@ -167,9 +220,19 @@ func matchesPublicUrl(pu *url.URL, r *http.Request) bool {
 		return false
 	}
 
+	if !saneHeaderUrl(ou) {
+		return false
+	}
+
+	oport, err := urlPortToInt(ou)
+
+	if err != nil {
+		return false
+	}
+
 	return pu.Scheme == ou.Scheme &&
 		pu.Host == ou.Host &&
-		pu.Port() == ou.Port()
+		pport == oport
 
 	// N.B. if origin exists and check fails, do not fall back to referrer.
 
