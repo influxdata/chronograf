@@ -814,12 +814,12 @@ func (s *Server) Serve(ctx context.Context) {
 		)
 	}
 
-	normalizedPublicUrl, err := parseURL(s.PublicURL)
+	normalizedPublicUrl, err := parseURL(s.PublicURL, true)
 	if err != nil {
 		logger.WithField("component", "server").Error("Unable to parse or normalize PublicUrl: ", s.PublicURL, err)
 		return
 	}
-	if s.PublicURL != "" && !saneHeaderUrl(normalizedPublicUrl) {
+	if s.PublicURL != "" && !saneHeaderUrl(normalizedPublicUrl, true) {
 		logger.WithField("component", "server").Error("PublicUrl does not match [scheme]://[host:port] - ", s.PublicURL)
 		return
 	}

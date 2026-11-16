@@ -88,7 +88,7 @@ func requestScheme(r *http.Request) string {
 	return "http"
 }
 
-func saneHeaderUrl(url *url.URL) bool {
+func saneHeaderUrl(url *url.URL, forPublicUrl bool) bool {
 	publicUrlSchemes := map[string]bool{"http": true, "https": true}
 	if url == nil {
 		return true
@@ -105,6 +105,14 @@ func saneHeaderUrl(url *url.URL) bool {
 		if err != nil || iport <= 0 || iport > 65535 {
 			return false
 		}
+	}
+
+	if forPublicUrl {
+		return url.RawQuery == "" &&
+			url.Fragment == "" &&
+			url.User == nil &&
+			publicUrlSchemes[strings.ToLower(url.Scheme)] &&
+			url.Host != ""
 	}
 
 	return url.Path == "" &&
@@ -143,7 +151,7 @@ func normalizeUrl(url *url.URL) (*url.URL, error) {
 	return url, nil
 }
 
-func parseURL(us string) (*url.URL, error) {
+func parseURL(us string, forPublicUrl bool) (*url.URL, error) {
 	if us == "" {
 		return nil, nil
 	}
@@ -154,7 +162,7 @@ func parseURL(us string) (*url.URL, error) {
 		return nil, err
 	}
 
-	if !saneHeaderUrl(u) {
+	if !saneHeaderUrl(u, forPublicUrl) {
 		return nil, fmt.Errorf("invalid URL for Header URL or PublicUrl: %s", us)
 	}
 
@@ -215,12 +223,12 @@ func matchesPublicUrl(pu *url.URL, r *http.Request) bool {
 			pport == rport
 	}
 
-	ou, err := parseURL(origin)
+	ou, err := parseURL(origin, false)
 	if err != nil {
 		return false
 	}
 
-	if !saneHeaderUrl(ou) {
+	if !saneHeaderUrl(ou, false) {
 		return false
 	}
 

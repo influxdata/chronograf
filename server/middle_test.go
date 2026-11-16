@@ -498,7 +498,7 @@ func TestRequireSameOriginForSessionAuth(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		publicUrl, _ := parseURL(tt.publicUrl)
+		publicUrl, _ := parseURL(tt.publicUrl, true)
 		protected := RequireSameOriginForSessionAuth(
 			logger,
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -643,14 +643,14 @@ func TestSaneUrl(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			url, err := parseURL(tt.url)
+			url, err := parseURL(tt.url, false)
 			if err != nil {
 				if tt.sane {
 					t.Fatalf("failed to parse url(%s): %s", tt.url, err)
 				}
 				return
 			}
-			b := saneHeaderUrl(url)
+			b := saneHeaderUrl(url, false)
 			if tt.sane != b {
 				t.Fatalf("url %s expected sane %t, got %t ", tt.url, tt.sane, b)
 			}
