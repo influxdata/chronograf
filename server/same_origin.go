@@ -135,12 +135,14 @@ func normalizeUrl(url *url.URL) (*url.URL, error) {
 			if err != nil {
 				return nil, err
 			}
+			result.Path = url.Path
 			return result, nil
 		case "https":
 			result, err := url.Parse(fmt.Sprintf("%s://%s:%s", url.Scheme, url.Host, "443"))
 			if err != nil {
 				return nil, err
 			}
+			result.Path = url.Path
 			return result, nil
 		case "":
 			return url, nil
@@ -220,6 +222,7 @@ func matchesPublicUrl(pu *url.URL, r *http.Request) bool {
 		return ru.User == nil &&
 			pu.Scheme == ru.Scheme &&
 			pu.Host == ru.Host &&
+			pu.Path == ru.Path &&
 			pport == rport
 	}
 

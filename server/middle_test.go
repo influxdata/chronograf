@@ -495,6 +495,33 @@ func TestRequireSameOriginForSessionAuth(t *testing.T) {
 			hasSession: true,
 			expected:   http.StatusForbidden,
 		},
+		{
+			name:       "unsafe method with PublicUrl with path with referer path same",
+			method:     http.MethodPost,
+			host:       "http://chronograf.test",
+			publicUrl:  "http://chronograf.proxy/chronograf",
+			referer:    "http://chronograf.proxy/chronograf",
+			hasSession: true,
+			expected:   http.StatusNoContent,
+		},
+		{
+			name:       "unsafe method with PublicUrl with path with referer path different",
+			method:     http.MethodPost,
+			host:       "http://chronograf.test",
+			publicUrl:  "http://chronograf.proxy/chronograf",
+			referer:    "http://chronograf.proxy/mallory",
+			hasSession: true,
+			expected:   http.StatusForbidden,
+		},
+		{
+			name:       "unsafe method with PublicUrl with path still works with matching Origin",
+			method:     http.MethodPost,
+			host:       "http://chronograf.test",
+			publicUrl:  "http://chronograf.proxy/chronograf",
+			origin:     "http://chronograf.proxy",
+			hasSession: true,
+			expected:   http.StatusNoContent,
+		},
 	}
 
 	for _, tt := range tests {
@@ -535,122 +562,167 @@ func TestRequireSameOriginForSessionAuth(t *testing.T) {
 func TestSaneUrl(t *testing.T) {
 
 	tests := []struct {
-		name string
-		url  string
-		sane bool
+		name     string
+		url      string
+		isPublic bool
+		sane     bool
 	}{
 		{
 			"url is nil",
 			"",
+			false,
 			true,
 		},
 		{
 			"standard http url",
 			"http://chronograf.test",
+			false,
 			true,
 		},
 		{
 			"normalized https url",
 			"https://chronograf.test:8443",
+			false,
 			true,
 		},
 		{
 			"uppercase scheme and host",
 			"HTTPS://Chronograf.Test",
+			false,
 			true,
 		},
 		{
 			"url has unsupported scheme ODBC",
 			"odbc://chronograf.test:9999",
 			false,
+			false,
 		},
 		{
 			"url has trailing slash",
 			"https://chronograf.test:8443/",
+			false,
 			false,
 		},
 		{
 			"plain string as url without scheme or port",
 			"lazyhost",
 			false,
+			false,
 		},
 		{
 			"plain string with domain as url without scheme or port",
 			"lazyhost.net",
+			false,
 			false,
 		},
 		{
 			"plain string with port as url without scheme",
 			"lazyhost.net:8443",
 			false,
+			false,
 		},
 		{
 			"url without hostname",
 			"https://:443",
+			false,
 			false,
 		},
 		{
 			"scheme only tls",
 			"https://",
 			false,
+			false,
 		},
 		{
 			"scheme only",
 			"http://",
 			false,
+			false,
 		},
 		{
 			"ipv6 localhost literal",
 			"http://[::1]",
+			false,
 			true,
 		},
 		{
 			"ipv4 literal",
 			"http://127.0.0.1",
+			false,
 			true,
 		},
 		{
 			"url has illegal path",
 			"https://chronograf.test:8443/lurking/mallory",
 			false,
+			false,
 		},
 		{
 			"url has illegal query",
 			"https://chronograf.test:8443?dashboard=mallory",
+			false,
 			false,
 		},
 		{
 			"url has illegal fragment",
 			"https://chronograf.test:8443#mallors_id",
 			false,
+			false,
 		},
 		{
 			"url has low invalid port",
 			"http://chronograf.test:0",
+			false,
 			false,
 		},
 		{
 			"url has high invalid port",
 			"http://chronograf.test:65537",
 			false,
+			false,
 		},
 		{
 			"url has userinfo",
 			"http://mallory:hehe@chronograf.test",
+			false,
+			false,
+		},
+		{
+			"is public with path",
+			"http://chronoraf.proxy/chronograf",
+			true,
+			true,
+		},
+		{
+			"is public with port and path",
+			"http://chronograf.proxy:8443/chronograf",
+			true,
+			true,
+		},
+		{
+			"is public with path and fragment",
+			"http://chronograf.proxy/chronograf#section8",
+			true,
+			false,
+		},
+		{
+			"is public with path and query",
+			"http://chronograf.proxy/chronograf?mallory=attempt",
+			true,
 			false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			url, err := parseURL(tt.url, false)
+			url, err := parseURL(tt.url, tt.isPublic)
 			if err != nil {
 				if tt.sane {
 					t.Fatalf("failed to parse url(%s): %s", tt.url, err)
 				}
 				return
 			}
-			b := saneHeaderUrl(url, false)
+			b := saneHeaderUrl(url, tt.isPublic)
 			if tt.sane != b {
 				t.Fatalf("url %s expected sane %t, got %t ", tt.url, tt.sane, b)
 			}

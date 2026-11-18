@@ -814,6 +814,10 @@ func (s *Server) Serve(ctx context.Context) {
 		)
 	}
 
+	if s.PublicURL != "" {
+		logger.WithField("component", "server").Info("Starting server with Public URL: ", s.PublicURL)
+	}
+
 	normalizedPublicUrl, err := parseURL(s.PublicURL, true)
 	if err != nil {
 		logger.WithField("component", "server").Error("Unable to parse or normalize PublicUrl: ", s.PublicURL, err)
