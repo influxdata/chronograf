@@ -23,9 +23,21 @@ func RequireSameOriginForSessionAuth(logger chronograf.Logger, next http.Handler
 			return
 		}
 
-		// Bypass if origin matches publicUrl
-		if matchesPublicUrl(publicUrl, r) {
-			next.ServeHTTP(w, r)
+		// If PUBLIC_URL is defined use as gatekeeper
+		if publicUrl != nil {
+			if matchesPublicUrl(publicUrl, r) {
+				next.ServeHTTP(w, r)
+				return
+			}
+			logger.
+				WithField("component", "same_origin_guard").
+				WithField("remote_addr", r.RemoteAddr).
+				WithField("method", r.Method).
+				WithField("url", r.URL).
+				WithField("origin", r.Header.Get("Origin")).
+				WithField("referer", r.Header.Get("Referer")).
+				Error("With PUBLIC_URL defined request failed to match PUBLIC_URL")
+			Error(w, http.StatusForbidden, "request must match public url", logger)
 			return
 		}
 
@@ -127,30 +139,32 @@ func normalizeUrl(url *url.URL) (*url.URL, error) {
 
 	url.Host = strings.ToLower(url.Host)
 	url.Scheme = strings.ToLower(url.Scheme)
+	result := url
+	var err error
 
 	if url.Port() == "" {
 		switch strings.ToLower(url.Scheme) {
 		case "http":
-			result, err := url.Parse(fmt.Sprintf("%s://%s:%s", url.Scheme, url.Host, "80"))
+			result, err = url.Parse(fmt.Sprintf("%s://%s:%s", url.Scheme, url.Host, "80"))
 			if err != nil {
 				return nil, err
 			}
-			result.Path = url.Path
-			return result, nil
+			break
 		case "https":
-			result, err := url.Parse(fmt.Sprintf("%s://%s:%s", url.Scheme, url.Host, "443"))
+			result, err = url.Parse(fmt.Sprintf("%s://%s:%s", url.Scheme, url.Host, "443"))
 			if err != nil {
 				return nil, err
 			}
-			result.Path = url.Path
-			return result, nil
+			break
 		case "":
-			return url, nil
+			break
 		default:
 			return nil, fmt.Errorf("scheme %s not supported", url.Scheme)
 		}
 	}
-	return url, nil
+	result.User = url.User
+	result.Path = url.Path
+	return result, err
 }
 
 func parseURL(us string, forPublicUrl bool) (*url.URL, error) {
@@ -251,7 +265,7 @@ func matchesPublicUrl(pu *url.URL, r *http.Request) bool {
 
 func sameHost(rawURL, expectedScheme, expectedHost string) bool {
 	u, err := url.Parse(rawURL)
-	if err != nil || u.Scheme == "" || u.Host == "" {
+	if err != nil || u.Scheme == "" || u.Host == "" || u.User != nil {
 		return false
 	}
 	if !strings.EqualFold(u.Scheme, expectedScheme) {
