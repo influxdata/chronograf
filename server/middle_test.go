@@ -531,6 +531,15 @@ func TestRequireSameOriginForSessionAuth(t *testing.T) {
 			expected:   http.StatusForbidden,
 		},
 		{
+			name:       "unsafe method with PublicUrl without path with referrer with trailing slash passes",
+			method:     http.MethodPost,
+			host:       "chronograf.test",
+			publicUrl:  "http://chronograf.proxy",
+			referer:    "http://chronograf.proxy/",
+			hasSession: true,
+			expected:   http.StatusNoContent,
+		},
+		{
 			name:       "unsafe method with PublicUrl with path still works with matching Origin",
 			method:     http.MethodPost,
 			host:       "chronograf.test",
