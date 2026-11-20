@@ -149,15 +149,12 @@ func normalizeUrl(url *url.URL) (*url.URL, error) {
 			if err != nil {
 				return nil, err
 			}
-			break
 		case "https":
 			result, err = url.Parse(fmt.Sprintf("%s://%s:%s", url.Scheme, url.Host, "443"))
 			if err != nil {
 				return nil, err
 			}
-			break
 		case "":
-			break
 		default:
 			return nil, fmt.Errorf("scheme %s not supported", url.Scheme)
 		}
