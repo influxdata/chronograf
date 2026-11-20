@@ -228,7 +228,6 @@ func matchesPublicUrl(pu *url.URL, r *http.Request) bool {
 		}
 
 		rport, err := urlPortToInt(ru)
-		prefixLocation := strings.Index(ru.Path, pu.Path)
 
 		if err != nil {
 			return false
@@ -237,7 +236,6 @@ func matchesPublicUrl(pu *url.URL, r *http.Request) bool {
 		return ru.User == nil &&
 			pu.Scheme == ru.Scheme &&
 			pu.Host == ru.Host &&
-			prefixLocation == 0 &&
 			pport == rport
 	}
 

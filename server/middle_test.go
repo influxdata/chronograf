@@ -522,13 +522,13 @@ func TestRequireSameOriginForSessionAuth(t *testing.T) {
 			expected:   http.StatusNoContent,
 		},
 		{
-			name:       "unsafe method with PublicUrl with path with referer path different",
+			name:       "unsafe method with PublicUrl with path with referer path different passes",
 			method:     http.MethodPost,
 			host:       "chronograf.test",
 			publicUrl:  "http://chronograf.proxy/chronograf",
-			referer:    "http://chronograf.proxy/mallory",
+			referer:    "http://chronograf.proxy/lostdog",
 			hasSession: true,
-			expected:   http.StatusForbidden,
+			expected:   http.StatusNoContent,
 		},
 		{
 			name:       "unsafe method with PublicUrl without path with referrer with trailing slash passes",
