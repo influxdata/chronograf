@@ -110,7 +110,7 @@ type Server struct {
 	GoogleClientID     string   `long:"google-client-id" description:"Google Client ID for OAuth 2 support" env:"GOOGLE_CLIENT_ID"`
 	GoogleClientSecret string   `long:"google-client-secret" description:"Google Client Secret for OAuth 2 support" env:"GOOGLE_CLIENT_SECRET"`
 	GoogleDomains      []string `long:"google-domains" description:"Google email domain user is required to have active membership" env:"GOOGLE_DOMAINS" env-delim:","`
-	PublicURL          string   `long:"public-url" description:"Full public URL used to access Chronograf from a web browser. Used for OAuth2 authentication. (http://localhost:8888)" env:"PUBLIC_URL"`
+	PublicURL          string   `long:"public-url" description:"Full public URL used to access Chronograf from a web browser. Used for OAuth2 authentication and as the expected origin for CSRF validation.. (http://localhost:8888)" env:"PUBLIC_URL"`
 
 	HerokuClientID      string   `long:"heroku-client-id" description:"Heroku Client ID for OAuth 2 support" env:"HEROKU_CLIENT_ID"`
 	HerokuSecret        string   `long:"heroku-secret" description:"Heroku Secret for OAuth 2 support" env:"HEROKU_SECRET"`
@@ -814,6 +814,20 @@ func (s *Server) Serve(ctx context.Context) {
 		)
 	}
 
+	if s.PublicURL != "" {
+		logger.WithField("component", "server").Info("Starting server with Public URL: ", s.PublicURL)
+	}
+
+	normalizedPublicUrl, err := parseURL(s.PublicURL, true)
+	if err != nil {
+		logger.WithField("component", "server").Error("Unable to parse or normalize PublicUrl: ", s.PublicURL, " ", err)
+		os.Exit(1)
+	}
+	if s.PublicURL != "" && !saneHeaderUrl(normalizedPublicUrl, true) {
+		logger.WithField("component", "server").Error("PublicUrl does not match [scheme]://[host:port]<path> - ", s.PublicURL)
+		os.Exit(1)
+	}
+
 	handler := NewMux(MuxOpts{
 		Develop:       s.Develop,
 		Auth:          auth,
@@ -828,6 +842,7 @@ func (s *Server) Serve(ctx context.Context) {
 		DisableGZip:   s.DisableGZip,
 		nonceExpire:   s.NonceExpiration,
 		BasicAuth:     basicAuthenticator,
+		PublicUrl:     normalizedPublicUrl,
 	}, service)
 
 	// Add chronograf's version header to all requests
